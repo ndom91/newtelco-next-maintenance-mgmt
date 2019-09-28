@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 
 export default () => {
   const router = useRouter();
-  console.log(router.query)
+  // console.log(router.query)
   return (
     <Layout>
       <h1>{router.query.id}</h1>

@@ -13,5 +13,6 @@ deploy:
   script:
     - npm i
     - npm run build
+    - npm run export
     - npm i -g netlify-cli
     - netlify deploy --site $NETLIFY_SITE_ID --auth $NETLIFY_AUTH_TOKEN --prod -m "$CI_COMMIT_REF_NAME@$CI_COMMIT_SHORT_SHA - $CI_COMMIT_MESSAGE"
