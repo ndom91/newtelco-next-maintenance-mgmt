@@ -1,18 +1,88 @@
+import React from 'react'
 import Link from 'next/link'
+import Fonts from './fonts'
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faCog,
+  faHome,
+  faHistory,
+  faInbox
+} from "@fortawesome/free-solid-svg-icons";
 
-const linkStyle = {
-  marginRight: 15
+class Header extends React.Component {
+
+  componentDidMount() {
+    Fonts()
+  }
+
+  render () {
+    return (
+      <div className='wrapper'>
+        <img src="/static/images/icons/nt-64.png"></img>
+        <div className='menu'>
+          <Link href='/'>
+            <a>
+              <FontAwesomeIcon className='menu-icon' icon={faHome} />
+              <span className='menu-label'>Home</span>
+            </a>
+          </Link>
+          <Link href='/inbox'>
+            <a>
+              <FontAwesomeIcon className='menu-icon' icon={faInbox} />
+              <span className='menu-label'>Inbox</span>
+            </a>
+          </Link>
+          <Link href='/history'>
+            <a>
+              <FontAwesomeIcon className='menu-icon' icon={faHistory} />
+              <span className='menu-label'>History</span>
+            </a>
+          </Link>
+          <Link href='/settings'>
+            <a>
+              <FontAwesomeIcon className='menu-icon' icon={faCog} />
+              <span className='menu-label'>Settings</span>
+            </a>
+          </Link>
+        </div>
+        <style jsx>{`
+          .wrapper {
+            position: absolute;
+            display: flex;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            
+            background-color: #67B246;
+            justify-content: space-between;
+          }
+          img {
+            margin-left: 2rem;
+            height: 50px;
+          }
+          .menu {
+            line-height: 50px;
+            margin: auto 30px auto 0px;
+          }
+          .menu-icon {
+            font-size: 20px;
+          }
+          .menu-label {
+            margin-left: 10px;
+          }
+          a {
+            font-family: Lato, Helvetica;
+            font-weight: 800;
+            text-decoration: none;
+            color: #fff; 
+            margin: 0 20px;
+          }
+        `}
+        </style>
+      </div>
+    )
+  }
 }
-
-const Header = () => (
-  <div>
-    <Link href='/'>
-      <a style={linkStyle}>Home</a>
-    </Link>
-    <Link href='/about'>
-      <a style={linkStyle}>About</a>
-    </Link>
-  </div>
-)
 
 export default Header
