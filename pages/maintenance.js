@@ -15,9 +15,9 @@ function Maintenance ({ profile }) {
   return (
     <Layout>
       <div>
-        <h1>{profile.bearbeitetvon}</h1>
-        <p>{profile.notes}</p>
-        <p>{profile.maileingang}</p>
+        <h1>{profile.bearbeitetvon || 'John'}</h1>
+        <p>{profile.notes || 'Note'}</p>
+        <p>{profile.maileingang || 'Today'}</p>
         <Link href='/history'>
           <a>← Back to history</a>
         </Link>
