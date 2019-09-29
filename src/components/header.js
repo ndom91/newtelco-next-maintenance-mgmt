@@ -1,46 +1,45 @@
 import React from 'react'
 import Link from 'next/link'
 import Fonts from './fonts'
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
   faCog,
   faHome,
   faHistory,
   faInbox
-} from "@fortawesome/free-solid-svg-icons";
+} from '@fortawesome/free-solid-svg-icons'
 
 class Header extends React.Component {
-
-  componentDidMount() {
+  componentDidMount () {
     Fonts()
   }
 
   render () {
     return (
       <div className='wrapper'>
-        <img src="/static/images/icons/nt-64.png"></img>
+        <img src='/static/images/icons/nt-64.png' />
         <div className='menu'>
           <Link href='/'>
             <a>
-              <FontAwesomeIcon className='menu-icon' icon={faHome} />
+              <FontAwesomeIcon width='1.125em' className='menu-icon' icon={faHome} />
               <span className='menu-label'>Home</span>
             </a>
           </Link>
           <Link href='/inbox'>
             <a>
-              <FontAwesomeIcon className='menu-icon' icon={faInbox} />
+              <FontAwesomeIcon width='1.125em' className='menu-icon' icon={faInbox} />
               <span className='menu-label'>Inbox</span>
             </a>
           </Link>
           <Link href='/history'>
             <a>
-              <FontAwesomeIcon className='menu-icon' icon={faHistory} />
+              <FontAwesomeIcon width='1.125em' className='menu-icon' icon={faHistory} />
               <span className='menu-label'>History</span>
             </a>
           </Link>
           <Link href='/settings'>
             <a>
-              <FontAwesomeIcon className='menu-icon' icon={faCog} />
+              <FontAwesomeIcon width='1.125em' className='menu-icon' icon={faCog} />
               <span className='menu-label'>Settings</span>
             </a>
           </Link>

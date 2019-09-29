@@ -16,15 +16,19 @@
     "@fortawesome/fontawesome-svg-core": "^1.2.25",
     "@fortawesome/free-solid-svg-icons": "^5.11.2",
     "@fortawesome/react-fontawesome": "^0.1.4",
+    "@zeit/next-css": "^1.0.1",
     "fontfaceobserver": "^2.1.0",
     "isomorphic-unfetch": "^3.0.0",
     "next": "^9.0.7",
     "next-offline": "^4.0.5",
     "react": "^16.10.0",
-    "react-dom": "^16.10.0"
+    "react-dom": "^16.10.0",
+    "serverless-mysql": "^1.5.1",
+    "sql-template-strings": "^2.2.2"
   },
   "devDependencies": {
     "babel-eslint": "^10.0.3",
+    "dotenv": "^8.1.0",
     "standard": "^14.3.1"
   },
   "standard": {
