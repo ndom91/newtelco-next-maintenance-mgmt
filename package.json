@@ -4,10 +4,10 @@
   "description": "NextJS Rewrite of MaintenanceDB",
   "main": "index.js",
   "scripts": {
-    "dev": "next",
+    "dev": "next -p 4000",
     "build": "next build",
     "export": "next export",
-    "start": "next start"
+    "start": "next start -p 4000"
   },
   "keywords": [],
   "author": "Nico Domino <ndomino@newtelco.de>",
@@ -27,6 +27,9 @@
     "sql-template-strings": "^2.2.2"
   },
   "devDependencies": {
+    "@zeit/next-sass": "^1.0.1",
+    "ag-grid-community": "^21.2.2",
+    "ag-grid-react": "^21.2.2",
     "babel-eslint": "^10.0.3",
     "dotenv": "^8.1.0",
     "standard": "^14.3.1"

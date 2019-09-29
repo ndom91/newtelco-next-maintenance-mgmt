@@ -1,5 +1,6 @@
 import React from 'react'
 import App from 'next/app'
+import Head from 'next/head'
 
 class MyApp extends App {
   // Only uncomment this method if you have blocking data requirements for
@@ -18,6 +19,10 @@ class MyApp extends App {
     const { Component, pageProps } = this.props
     return (
       <>
+        <Head>
+          <title>Newtelco Maintenance - NextJS</title>
+          <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' />
+        </Head>
         <Component {...pageProps} />
         <style jsx global>{`
           html {
