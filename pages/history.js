@@ -4,8 +4,7 @@ import Link from 'next/link'
 import fetch from 'isomorphic-unfetch'
 import { AgGridReact } from 'ag-grid-react'
 import 'ag-grid-community/dist/styles/ag-grid.css'
-import 'ag-grid-community/dist/styles/ag-theme-material.css'
-// import 'ag-grid-community/dist/styles/ag-theme-balham.css'
+import 'ag-grid-community/dist/styles/ag-theme-balham.css'
 
 // { maintenances, page, pageCount }
 export default class About extends React.Component {
