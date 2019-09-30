@@ -13,6 +13,8 @@
   "author": "Nico Domino <ndomino@newtelco.de>",
   "license": "MIT",
   "dependencies": {
+    "@bugsnag/js": "^6.4.1",
+    "@bugsnag/plugin-react": "^6.4.0",
     "@fortawesome/fontawesome-svg-core": "^1.2.25",
     "@fortawesome/free-solid-svg-icons": "^5.11.2",
     "@fortawesome/react-fontawesome": "^0.1.4",

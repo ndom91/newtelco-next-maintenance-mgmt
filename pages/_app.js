@@ -1,6 +1,12 @@
 import React from 'react'
 import App from 'next/app'
 import Head from 'next/head'
+import bugsnag from '@bugsnag/js'
+import bugsnagReact from '@bugsnag/plugin-react'
+
+const bugsnagClient = bugsnag('cccea6dd356e289efb3eb14ddc48bc43')
+bugsnagClient.use(bugsnagReact, React)
+const ErrorBoundary = bugsnagClient.getPlugin('react')
 
 class MyApp extends App {
   // Only uncomment this method if you have blocking data requirements for
@@ -17,8 +23,9 @@ class MyApp extends App {
 
   render () {
     const { Component, pageProps } = this.props
+
     return (
-      <>
+      <ErrorBoundary>
         <Head>
           <title>Newtelco Maintenance - NextJS</title>
           <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' />
@@ -37,7 +44,7 @@ class MyApp extends App {
           }
         `}
         </style>
-      </>
+      </ErrorBoundary>
     )
   }
 }

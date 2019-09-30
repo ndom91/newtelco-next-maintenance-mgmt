@@ -108,7 +108,7 @@ export default class About extends React.Component {
   }
 
   componentDidMount () {
-    console.log(this.props.jsonData.maintenances)
+    // console.log(this.props.jsonData.maintenances)
     this.setState({ rowData: this.props.jsonData.maintenances })
   }
 

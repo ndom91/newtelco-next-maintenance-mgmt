@@ -18,6 +18,6 @@ module.exports = async (req, res) => {
     `)
   const { maintenancesCount } = count[0]
   const maintenanceCount = Math.ceil(maintenancesCount / limit)
-  console.log(db)
+  // console.log(db)
   res.status(200).json({ maintenances, maintenanceCount, page })
 }
