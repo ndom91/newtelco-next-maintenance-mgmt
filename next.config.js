@@ -1,6 +1,9 @@
-const { parsed: localEnv } = require('dotenv').config()
+const { parsed: localEnv } = require('dotenv').config({ path: './.env' })
 const webpack = require('webpack')
 const withCSS = require('@zeit/next-css')
+require('dotenv').config()
+const path = require('path')
+const Dotenv = require('dotenv-webpack')
 
 function HACK_removeMinimizeOptionFromCssLoaders (config) {
   console.warn(
@@ -20,7 +23,7 @@ function HACK_removeMinimizeOptionFromCssLoaders (config) {
 const nextConfig = {
   target: 'server',
   compress: false,
-  env: {
+  publicRuntimeConfig: {
     MYSQL_HOST: process.env.MYSQL_HOST,
     MYSQL_DATABASE: process.env.MYSQL_DATABASE,
     MYSQL_USER: process.env.MYSQL_USER,
@@ -34,7 +37,11 @@ const nextConfig = {
   webpack (config) {
     config.plugins.push(new webpack.EnvironmentPlugin(localEnv))
     HACK_removeMinimizeOptionFromCssLoaders(config)
-
+    // Read the .env file
+    new Dotenv({
+      path: path.join(__dirname, '.env'),
+      systemvars: true
+    })
     return config
   }
 }
