@@ -2,8 +2,9 @@ import React from 'react'
 import Layout from '../src/components/layout'
 // import Link from 'next/link'
 import fetch from 'isomorphic-unfetch'
-import { AgGridReact } from 'ag-grid-react'
 import { NextAuth } from 'next-auth/client'
+import RequireLogin from '../src/components/require-login'
+import { AgGridReact } from 'ag-grid-react'
 import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-balham.css'
 import EditBtn from '../src/components/ag-grid/edit-btn'
@@ -127,34 +128,40 @@ export default class About extends React.Component {
   }
 
   render () {
-    return (
-      <Layout session={this.props.session}>
-        <div className='table-wrapper'>
-          <div
-            className='ag-theme-balham'
-            style={{
-              height: '700px',
-              width: '100%',
-              border: '1px solid #ececec'
-            }}
-          >
-            <AgGridReact
-              gridOptions={this.state.gridOptions}
-              rowData={this.state.rowData}
-              onGridReady={this.onGridReady}
-              animateRows
-              pagination
-              onFirstDataRendered={this.onFirstDataRendered.bind(this)}
-            />
+    if (this.props.session.user) {
+      return (
+        <Layout session={this.props.session}>
+          <div className='table-wrapper'>
+            <div
+              className='ag-theme-balham'
+              style={{
+                height: '700px',
+                width: '100%',
+                border: '1px solid #ececec'
+              }}
+            >
+              <AgGridReact
+                gridOptions={this.state.gridOptions}
+                rowData={this.state.rowData}
+                onGridReady={this.onGridReady}
+                animateRows
+                pagination
+                onFirstDataRendered={this.onFirstDataRendered.bind(this)}
+              />
+            </div>
           </div>
-        </div>
-        <style jsx>{`
+          <style jsx>{`
           .table-wrapper { 
             width: 100%;
           }
         `}
-        </style>
-      </Layout>
-    )
+          </style>
+        </Layout>
+      )
+    } else {
+      return (
+        <RequireLogin />
+      )
+    }
   }
 }
