@@ -3,6 +3,7 @@ import Header from './header'
 import Router from 'next/router'
 import Link from 'next/link'
 import { NextAuth } from 'next-auth/client'
+import { Container, Row, Col } from 'shards-react'
 
 export default class Layout extends React.Component {
   constructor (props) {
@@ -26,9 +27,16 @@ export default class Layout extends React.Component {
     return (
       <div>
         <Header session={this.props.session} />
-        <div className='content'>
-          {this.props.children}
-        </div>
+        <Container fluid>
+          <Row style={{ height: '20px' }} />
+          <Row>
+            <Col sm='0' lg='1' />
+            <Col sm='12' lg='10'>
+              {this.props.children}
+            </Col>
+            <Col sm='0' lg='1' />
+          </Row>
+        </Container>
         {/* <Footer/> */}
       </div>
     )

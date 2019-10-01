@@ -47,7 +47,7 @@ export default class App extends React.Component {
       return (
         <div className='container'>
           <div className='text-center'>
-            <h1 className='display-4 mt-3'>NextAuth Example</h1>
+            <h1 className='display-4 mt-3'>Newtelco Maintenance</h1>
             <p className='lead mt-3 mb-1'>You are signed in as <span className='font-weight-bold'>{this.props.session.user.email}</span>.</p>
           </div>
           <div className='row'>
@@ -67,7 +67,7 @@ export default class App extends React.Component {
       return (
         <div className='container'>
           <div className='text-center'>
-            <h1 className='display-4 mt-3 mb-3'>NextAuth Example</h1>
+            <h1 className='display-4 mt-3 mb-3'>Newtelco Maintenance</h1>
           </div>
           <div className='row'>
             <div className='col-sm-6 mr-auto ml-auto'>

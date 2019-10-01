@@ -19,6 +19,7 @@
     "@fortawesome/free-solid-svg-icons": "^5.11.2",
     "@fortawesome/react-fontawesome": "^0.1.4",
     "@zeit/next-css": "^1.0.1",
+    "bootstrap": "^4.3.1",
     "connect-mongo": "^3.0.0",
     "dotenv-webpack": "^1.7.0",
     "express-session": "^1.16.2",
@@ -36,6 +37,8 @@
     "react": "^16.10.0",
     "react-dom": "^16.10.0",
     "serverless-mysql": "^1.5.1",
+    "shards-react": "^1.0.3",
+    "shards-ui": "^3.0.0",
     "sql-template-strings": "^2.2.2"
   },
   "devDependencies": {
