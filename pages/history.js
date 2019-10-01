@@ -53,15 +53,18 @@ export default class About extends React.Component {
           }, {
             headerName: 'Start',
             field: 'startDateTime',
-            width: 100
+            width: 100,
+            tooltipField: 'startDateTime'
           }, {
             headerName: 'End',
             field: 'endDateTime',
-            width: 100
+            width: 100,
+            tooltipField: 'endDateTime'
           }, {
             headerName: 'Newtelco CIDs',
             field: 'betroffeneCIDs',
-            width: 120
+            width: 120,
+            tooltipField: 'betroffeneCIDs'
           }, {
             headerName: 'Supplier',
             field: 'name',
@@ -69,7 +72,8 @@ export default class About extends React.Component {
           }, {
             headerName: 'Mail Arrived',
             field: 'maileingang',
-            width: 100
+            width: 100,
+            tooltipField: 'maileingang'
           }, {
             headerName: 'Postponed',
             field: 'postponed',
