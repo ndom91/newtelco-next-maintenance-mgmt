@@ -39,7 +39,8 @@ export default class About extends React.Component {
           {
             headerName: 'ID',
             field: 'id',
-            width: 60
+            width: 60,
+            sort: { direction: 'asc', priority: 0 }
           }, {
             headerName: 'Edited By',
             field: 'bearbeitetvon',
@@ -109,12 +110,12 @@ export default class About extends React.Component {
   onGridReady = params => {
     this.gridApi = params.gridApi
     this.gridColumnApi = params.gridColumnApi
-    params.columnApi.sizeColumnsToFit()
+    // params.columnApi.sizeColumnsToFit()
   }
 
   onFirstDataRendered (params) {
     // params.columnApi.autoSizeColumns()
-    params.columnApi.sizeColumnsToFit()
+    // params.columnApi.sizeColumnsToFit()
   }
 
   render () {
