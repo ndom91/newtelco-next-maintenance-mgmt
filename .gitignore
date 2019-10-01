@@ -4,4 +4,4 @@ node_modules
 out
 .env
 oauth*.json
-maintenance*.json
+serviceacct.json
