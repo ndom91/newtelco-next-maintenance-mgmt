@@ -3,3 +3,5 @@ node_modules
 .vscode
 out
 .env
+oauth*.json
+maintenance*.json
