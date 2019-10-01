@@ -12,7 +12,7 @@ const ErrorBoundary = bugsnagClient.getPlugin('react')
 class MyApp extends App {
   // Only uncomment this method if you have blocking data requirements for
   // every single page in your application. This disables the ability to
-      // perform automatic static optimization, causing every page in your app to
+  // perform automatic static optimization, causing every page in your app to
   // be server-side rendered.
   //
   // static async getInitialProps(appContext) {
@@ -29,7 +29,9 @@ class MyApp extends App {
       <ErrorBoundary>
         <Head>
           <title>Newtelco Maintenance - NextJS</title>
+          <meta name='viewport' content='width=device-width, initial-scale=1' />
           <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' />
+          <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css' integrity='sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm' crossOrigin='anonymous' />
         </Head>
         <Component {...pageProps} />
         <style jsx global>{`

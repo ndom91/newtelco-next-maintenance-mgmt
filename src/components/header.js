@@ -43,6 +43,10 @@ class Header extends React.Component {
               <span className='menu-label'>Settings</span>
             </a>
           </Link>
+          <form id='signout' method='post' action='/auth/signout' onSubmit={this.handleSignOutSubmit}>
+            <input name='_csrf' type='hidden' value={this.props.session.csrfToken} />
+            <button type='submit' className='btn btn-outline-secondary'>Sign out</button>
+          </form>
         </div>
         <style jsx>{`
           .wrapper {
