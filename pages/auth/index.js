@@ -89,9 +89,9 @@ export default class App extends React.Component {
               </div>
             </div>
           </div>
-          <p className='text-center small'>
+          {/* <p className='text-center small'>
             <Link href='/auth/credentials'><a>Sign in with credentials</a></Link>
-          </p>
+          </p> */}
           <p className='text-center'>
             <Link href='/'><a>Home</a></Link>
           </p>
