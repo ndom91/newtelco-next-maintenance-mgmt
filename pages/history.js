@@ -6,13 +6,13 @@ import { AgGridReact } from 'ag-grid-react'
 import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-balham.css'
 import EditBtn from '../src/components/ag-grid/edit-btn'
+import './style/history.css'
 
 // { maintenances, page, pageCount }
 export default class About extends React.Component {
   static async getInitialProps ({ req, query }) {
     const host = req ? req.headers['x-forwarded-host'] : location.host
-    const pageRequest = `https://${host}/api/maintenances?page=${query.page ||
-      1}&limit=${query.limit || 21}`
+    const pageRequest = `https://${host}/api/maintenances` // ?page=${query.page || 1}&limit=${query.limit || 41}`
     const res = await fetch(pageRequest)
     const json = await res.json()
     return { jsonData: json }
@@ -30,7 +30,7 @@ export default class About extends React.Component {
         columnDefs: [
           {
             headerName: '',
-            width: 70,
+            width: 40,
             sortable: false,
             filter: false,
             resizable: false,
@@ -39,15 +39,16 @@ export default class About extends React.Component {
           {
             headerName: 'ID',
             field: 'id',
-            width: 50
+            width: 60
           }, {
             headerName: 'Edited By',
             field: 'bearbeitetvon',
-            width: 150
+            width: 100
           }, {
             headerName: 'Their CID',
-            field: 'derenCIDid',
-            width: 100
+            field: 'derenCID',
+            tooltipField: 'derenCID'
+            // width: 100
           }, {
             headerName: 'Start',
             field: 'startDateTime',
@@ -57,24 +58,16 @@ export default class About extends React.Component {
             field: 'endDateTime',
             width: 100
           }, {
-            headerName: 'CIDs',
+            headerName: 'Newtelco CIDs',
             field: 'betroffeneCIDs',
-            width: 75
+            width: 120
           }, {
             headerName: 'Supplier',
-            field: 'lieferant',
-            width: 100
-          }, {
-            headerName: 'Mail Sent',
-            field: 'mailSentAt',
+            field: 'name',
             width: 100
           }, {
             headerName: 'Mail Arrived',
             field: 'maileingang',
-            width: 100
-          }, {
-            headerName: 'Notes',
-            field: 'notes',
             width: 100
           }, {
             headerName: 'Postponed',
@@ -82,22 +75,23 @@ export default class About extends React.Component {
             width: 50
           }, {
             headerName: 'Updated',
-            field: 'updatedAt',
-            width: 100
-          }, {
-            headerName: 'Last Updated By',
-            field: 'updatedBy',
-            width: 75
-          }, {
-            headerName: 'Complete',
-            field: 'done',
-            width: 50
+            field: 'updatedAt'
+            // width: 100
           }
         ],
         context: { componentParent: this },
         frameworkComponents: {
           editBtn: EditBtn
+        },
+        paginationPageSize: 20,
+        rowHeight: 30,
+        rowClass: 'row-class',
+        rowClassRules: {
+          'row-completed': function (params) { return params.data.done === 1 },
+          'row-cancelled': function (params) { return params.data.cancelled === 1 },
+          'row-emergency': function (params) { return params.data.emergency === 1 }
         }
+
         // rowModelType: 'infinite',
         // cacheOverflowSize: 2,
         // maxConcurrentDatasourceRequests: 2,
@@ -115,10 +109,12 @@ export default class About extends React.Component {
   onGridReady = params => {
     this.gridApi = params.gridApi
     this.gridColumnApi = params.gridColumnApi
+    params.columnApi.sizeColumnsToFit()
   }
 
   onFirstDataRendered (params) {
-    params.columnApi.autoSizeColumns()
+    // params.columnApi.autoSizeColumns()
+    params.columnApi.sizeColumnsToFit()
   }
 
   render () {
@@ -128,7 +124,7 @@ export default class About extends React.Component {
           <div
             className='ag-theme-balham'
             style={{
-              height: '600px',
+              height: '700px',
               width: '100%',
               border: '1px solid #ececec'
             }}
@@ -137,8 +133,9 @@ export default class About extends React.Component {
               gridOptions={this.state.gridOptions}
               rowData={this.state.rowData}
               onGridReady={this.onGridReady}
+              animateRows
+              pagination
               onFirstDataRendered={this.onFirstDataRendered.bind(this)}
-
             />
           </div>
         </div>

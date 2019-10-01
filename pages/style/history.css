@@ -1,0 +1,15 @@
+.row-class {
+  vertical-align: center;
+}
+
+.row-completed {
+  background-color: rgba(184, 246, 155, 0.2) !important;
+}
+
+.row-cancelled {
+  color: rgba(0, 0, 0, 0.5) !important;
+}
+
+.row-emergency {
+  background: rgba(246, 155, 155, 0.4) !important;
+}
