@@ -3,6 +3,7 @@ import Layout from '../src/components/layout'
 // import Link from 'next/link'
 import fetch from 'isomorphic-unfetch'
 import { AgGridReact } from 'ag-grid-react'
+import { NextAuth } from 'next-auth/client'
 import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-balham.css'
 import EditBtn from '../src/components/ag-grid/edit-btn'
@@ -15,7 +16,10 @@ export default class About extends React.Component {
     const pageRequest = `https://${host}/api/maintenances` // ?page=${query.page || 1}&limit=${query.limit || 41}`
     const res = await fetch(pageRequest)
     const json = await res.json()
-    return { jsonData: json }
+    return {
+      jsonData: json,
+      session: await NextAuth.init({ req })
+    }
   }
 
   constructor (props) {
@@ -124,7 +128,7 @@ export default class About extends React.Component {
 
   render () {
     return (
-      <Layout>
+      <Layout session={this.props.session}>
         <div className='table-wrapper'>
           <div
             className='ag-theme-balham'

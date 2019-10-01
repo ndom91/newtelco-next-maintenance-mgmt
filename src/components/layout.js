@@ -5,12 +5,6 @@ import Link from 'next/link'
 import { NextAuth } from 'next-auth/client'
 
 export default class Layout extends React.Component {
-  static async getInitialProps ({ req }) {
-    return {
-      session: await NextAuth.init({ req })
-    }
-  }
-
   constructor (props) {
     super(props)
     this.handleSignOutSubmit = this.handleSignOutSubmit.bind(this)
@@ -29,22 +23,14 @@ export default class Layout extends React.Component {
   }
 
   render () {
-    if (this.props.session.user) {
-      return (
-        <div>
-          <Header />
-          <div className='content'>
-            {this.props.children}
-          </div>
-          {/* <Footer/> */}
+    return (
+      <div>
+        <Header session={this.props.session} />
+        <div className='content'>
+          {this.props.children}
         </div>
-      )
-    } else {
-      return (
-        <>
-          <p><Link href='/auth'><a className='btn btn-primary'>Sign in</a></Link></p>
-        </>
-      )
-    }
+        {/* <Footer/> */}
+      </div>
+    )
   }
 }

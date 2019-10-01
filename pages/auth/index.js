@@ -3,7 +3,7 @@ import Router from 'next/router'
 import Link from 'next/link'
 import { NextAuth } from 'next-auth/client'
 
-export default class extends React.Component {
+export default class App extends React.Component {
   static async getInitialProps ({ req }) {
     return {
       session: await NextAuth.init({ req }),

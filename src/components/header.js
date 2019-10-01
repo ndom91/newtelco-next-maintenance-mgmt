@@ -1,15 +1,23 @@
 import React from 'react'
 import Link from 'next/link'
 import Fonts from './fonts'
+import { NextAuth } from 'next-auth/client'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
   faCog,
   faHome,
   faHistory,
+  faPowerOff,
   faInbox
 } from '@fortawesome/free-solid-svg-icons'
 
 class Header extends React.Component {
+  // static async getInitialProps ({ req }) {
+  //   return {
+  //     session: await NextAuth.init({ req })
+  //   }
+  // }
+
   componentDidMount () {
     Fonts()
   }
@@ -45,7 +53,9 @@ class Header extends React.Component {
           </Link>
           <form id='signout' method='post' action='/auth/signout' onSubmit={this.handleSignOutSubmit}>
             <input name='_csrf' type='hidden' value={this.props.session.csrfToken} />
-            <button type='submit' className='btn btn-outline-secondary'>Sign out</button>
+            <div className='logout-btn-wrapper'>
+              <FontAwesomeIcon width='1.125em' className='menu-icon logout' icon={faPowerOff} />
+            </div>
           </form>
         </div>
         <style jsx>{`
@@ -80,6 +90,18 @@ class Header extends React.Component {
             text-decoration: none;
             color: #fff; 
             margin: 0 20px;
+          }
+          #signout {
+            display: inline-block;
+          }
+          .lagout-btn-wrapper {
+            padding: 5px;
+            border: 1px solid #B22222;
+            border-radius: 5px;
+          }
+          .logout {
+            color: #B22222;
+            fill: #B22222;
           }
         `}
         </style>
