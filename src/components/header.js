@@ -104,14 +104,14 @@ class Header extends React.Component {
               </Link>
             </NavItem>
           </Nav>
-          <Nav navbar className='ml-auto'>
-            <InputGroup className='search-group' style={{ alignItems: 'center' }} size='sm' seamless>
+          <Nav style={{ justifyContent: 'flex-end' }} navbar className='ml-auto'>
+            <InputGroup id='search-group' style={{ width: '100%', alignItems: 'center' }} size='sm' seamless>
               <InputGroupAddon type='prepend'>
-                <InputGroupText>
+                <InputGroupText className='input-group-text'>
                   <FontAwesomeIcon icon={faSearch} width='1em' style={{ color: 'secondary' }} />
                 </InputGroupText>
               </InputGroupAddon>
-              <FormInput className='border-0' placeholder='Search...' />
+              <FormInput className='border-0 nav-search' placeholder='Search...' />
             </InputGroup>
             <NavItem>
               <NavLink>
@@ -133,8 +133,17 @@ class Header extends React.Component {
             font-weight: 300;
             cursor: pointer;
           }
+          .input-group-text {
+            width: 50%;
+          }
+          .input-group-text:active,
+          .input-group-text:focus {
+            width: 100%;
+          }
           .search-group {
+            width: 50%;
             align-items: center;
+            justify-content: flex-end;
           }
           #signout {
             display: inline-block;
@@ -149,6 +158,14 @@ class Header extends React.Component {
             background: none;
             border: none;
             color: #fff;
+            outline: none;
+            opacity: 0.5;
+            transition: all 350ms ease-in-out;
+          }
+          .logout-btn:hover,
+          .logout-btn:focus {
+            opacity: 0.8;
+            transition: all 350ms ease-in-out;
           }
           .logout {
           }

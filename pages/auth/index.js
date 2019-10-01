@@ -71,7 +71,7 @@ export default class App extends React.Component {
       return (
         <div className='container'>
           <div className='text-center'>
-            <img width='384px' src='/static/images/login-network1.png' alt='Newtelco Maintenance' />
+            <img width='384px' src='/static/images/nt-black.png' alt='Newtelco Maintenance' />
           </div>
           <div className='row'>
             <div className='col-sm-6 mr-auto ml-auto'>

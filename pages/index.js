@@ -29,6 +29,7 @@ export default class Blog extends React.Component {
   }
 
   render () {
+    console.log(this.props.session)
     if (this.props.session.user) {
       return (
         <Layout session={this.props.session}>

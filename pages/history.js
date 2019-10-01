@@ -146,8 +146,7 @@ export default class About extends React.Component {
                   className='ag-theme-balham'
                   style={{
                     height: '700px',
-                    width: '100%',
-                    border: '1px solid #ececec'
+                    width: '100%'
                   }}
                 >
                   <AgGridReact
