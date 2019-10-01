@@ -8,21 +8,26 @@ export default class RequireLogin extends React.Component {
         <div className='container'>
           <div className='row'>
             <div className='col-sm-6 mr-auto ml-auto'>
-              <div className='card mt-3 mb-3'>
+              <div className='card card-outline mt-3 mb-3'>
                 <h4 className='card-header text-error'>Error!</h4>
                 <div className='card-body pb-0'>
-                    <p>
+                  <p>
                       You must be signed-in to view this content.
-                    </p>
-                    <p className='text-right'>
-                      <Link href="/auth">Sign-In</Link>
-                    </p>
+                  </p>
+                  <p className='text-right'>
+                    <Link href='/auth'>
+                      <button id='signin-btn' type='submit' className='btn btn-outline-success'>Sign in</button>
+                    </Link>
+                  </p>
                 </div>
               </div>
             </div>
           </div>
-          </div>
+        </div>
         <style jsx>{`
+          .card-outline {
+            border: 1px solid rgba(244,10,10,0.5);
+          }
           .require-login-wrapper {
             display: flex;
             align-content: center;
@@ -30,6 +35,9 @@ export default class RequireLogin extends React.Component {
           .require-login-wrapper > div {
             margin-top: 20px;
             font-family: Lato, Helvetica;
+          }
+          #signin-btn {
+            margin-bottom: 20px;
           }
         `}
         </style>

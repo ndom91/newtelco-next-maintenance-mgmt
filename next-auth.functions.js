@@ -201,19 +201,21 @@ module.exports = () => {
         //
         // To disable this option, do not set sendSignInEmail (or set it to null).
         sendSignInEmail: ({ email, url, req }) => {
-          nodemailer
-            .createTransport(nodemailerTransport)
-            .sendMail({
-              to: email,
-              from: process.env.EMAIL_FROM,
-              subject: 'Sign in link',
-              text: `Use the link below to sign in:\n\n${url}\n\n`,
-              html: `<p>Use the link below to sign in:</p><p>${url}</p>`
-            }, (err) => {
-              if (err) {
-                console.error('Error sending email to ' + email, err)
-              }
-            })
+          if (email.includes(process.env.EMAIL_DOMAIN)) {
+            nodemailer
+              .createTransport(nodemailerTransport)
+              .sendMail({
+                to: email,
+                from: process.env.EMAIL_FROM,
+                subject: 'Sign in link',
+                text: `Use the link below to sign in:\n\n${url}\n\n`,
+                html: `<p>Use the link below to sign in:</p><p>${url}</p>`
+              }, (err) => {
+                if (err) {
+                  console.error('Error sending email to ' + email, err)
+                }
+              })
+          }
           if (process.env.NODE_ENV === 'development') {
             console.log('Generated sign in link ' + url + ' for ' + email)
           }

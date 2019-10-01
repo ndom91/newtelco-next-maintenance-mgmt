@@ -121,14 +121,6 @@ class Header extends React.Component {
                     <button className='logout-btn' type='submit'>
                       <FontAwesomeIcon width='1.125em' className='menu-icon logout' icon={faPowerOff} />
                     </button>
-                    <Tooltip
-                      open={this.state.open}
-                      target='#signout'
-                      noArrow
-                      toggle={this.toggle}
-                    >
-                      Logout
-                    </Tooltip>
                   </div>
                 </form>
               </NavLink>

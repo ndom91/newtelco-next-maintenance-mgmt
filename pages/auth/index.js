@@ -2,6 +2,10 @@ import React from 'react'
 import Router from 'next/router'
 import Link from 'next/link'
 import { NextAuth } from 'next-auth/client'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import {
+  faGoogle
+} from '@fortawesome/free-brands-svg-icons'
 
 export default class App extends React.Component {
   static async getInitialProps ({ req }) {
@@ -67,7 +71,7 @@ export default class App extends React.Component {
       return (
         <div className='container'>
           <div className='text-center'>
-            <h1 className='display-4 mt-3 mb-3'>Newtelco Maintenance</h1>
+            <img width='384px' src='/static/images/login-network1.png' alt='Newtelco Maintenance' />
           </div>
           <div className='row'>
             <div className='col-sm-6 mr-auto ml-auto'>
@@ -79,22 +83,24 @@ export default class App extends React.Component {
                     <input name='_csrf' type='hidden' value={this.state.session.csrfToken} />
                     <p>
                       <label htmlFor='email'>Email address</label><br />
-                      <input name='email' type='text' placeholder='j.smith@example.com' id='email' className='form-control' value={this.state.email} onChange={this.handleEmailChange} />
+                      <input name='email' type='text' placeholder='jcleese@newtelco.de' id='email' className='form-control' value={this.state.email} onChange={this.handleEmailChange} />
                     </p>
                     <p className='text-right'>
-                      <button id='submitButton' type='submit' className='btn btn-outline-primary'>Sign in with email</button>
+                      <button id='submitButton' type='submit' style={{ width: '10rem' }} className='btn btn-outline-success'>
+                        Sign in
+                      </button>
                     </p>
                   </form>
                 </div>
               </div>
             </div>
           </div>
-          {/* <p className='text-center small'>
-            <Link href='/auth/credentials'><a>Sign in with credentials</a></Link>
-          </p> */}
-          <p className='text-center'>
-            <Link href='/'><a>Home</a></Link>
-          </p>
+          <style jsx>{`
+            .text-center {
+              margin: 100px 0 50px 0;
+            } 
+          `}
+          </style>
         </div>
       )
     }
@@ -152,6 +158,7 @@ export class SignInButtons extends React.Component {
             return (
               <p key={i}>
                 <a className='btn btn-block btn-outline-secondary' href={this.props.providers[provider].signin}>
+                  <FontAwesomeIcon icon={faGoogle} width='1em' style={{ float: 'left', color: 'secondary' }} />
                   Sign in with {provider}
                 </a>
               </p>

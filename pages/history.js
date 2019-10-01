@@ -9,6 +9,13 @@ import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-balham.css'
 import EditBtn from '../src/components/ag-grid/edit-btn'
 import './style/history.css'
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardBody,
+  CardFooter
+} from 'shards-react'
 
 // { maintenances, page, pageCount }
 export default class About extends React.Component {
@@ -131,25 +138,31 @@ export default class About extends React.Component {
     if (this.props.session.user) {
       return (
         <Layout session={this.props.session}>
-          <div className='table-wrapper'>
-            <div
-              className='ag-theme-balham'
-              style={{
-                height: '700px',
-                width: '100%',
-                border: '1px solid #ececec'
-              }}
-            >
-              <AgGridReact
-                gridOptions={this.state.gridOptions}
-                rowData={this.state.rowData}
-                onGridReady={this.onGridReady}
-                animateRows
-                pagination
-                onFirstDataRendered={this.onFirstDataRendered.bind(this)}
-              />
-            </div>
-          </div>
+          <Card style={{ maxWidth: '100%' }}>
+            <CardHeader><h2>History</h2></CardHeader>
+            <CardBody>
+              <div className='table-wrapper'>
+                <div
+                  className='ag-theme-balham'
+                  style={{
+                    height: '700px',
+                    width: '100%',
+                    border: '1px solid #ececec'
+                  }}
+                >
+                  <AgGridReact
+                    gridOptions={this.state.gridOptions}
+                    rowData={this.state.rowData}
+                    onGridReady={this.onGridReady}
+                    animateRows
+                    pagination
+                    onFirstDataRendered={this.onFirstDataRendered.bind(this)}
+                  />
+                </div>
+              </div>
+            </CardBody>
+            <CardFooter>Card footer</CardFooter>
+          </Card>
           <style jsx>{`
           .table-wrapper { 
             width: 100%;

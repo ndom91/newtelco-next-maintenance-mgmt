@@ -30,14 +30,12 @@ export default class Layout extends React.Component {
         <Container fluid>
           <Row style={{ height: '20px' }} />
           <Row>
-            <Col sm='0' lg='1' />
-            <Col sm='12' lg='10'>
+            <Col style={{ flex: '1', margin: '0 30px' }} className='toplevel-col' sm='12' lg='12'>
               {this.props.children}
             </Col>
-            <Col sm='0' lg='1' />
           </Row>
         </Container>
-        {/* <Footer/> */}
+        {/* <Footer /> */}
       </div>
     )
   }
