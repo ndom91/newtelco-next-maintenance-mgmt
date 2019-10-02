@@ -6,13 +6,12 @@ import { NextAuth } from 'next-auth/client'
 import RequireLogin from '../src/components/require-login'
 import { AgGridReact } from 'ag-grid-react'
 import 'ag-grid-community/dist/styles/ag-grid.css'
-import 'ag-grid-community/dist/styles/ag-theme-balham.css'
+import 'ag-grid-community/dist/styles/ag-theme-material.css'
 import EditBtn from '../src/components/ag-grid/edit-btn'
 import './style/history.css'
 import {
   Card,
   CardHeader,
-  CardTitle,
   CardBody,
   CardFooter
 } from 'shards-react'
@@ -42,7 +41,7 @@ export default class About extends React.Component {
         columnDefs: [
           {
             headerName: '',
-            width: 40,
+            width: 80,
             sortable: false,
             filter: false,
             resizable: false,
@@ -51,7 +50,7 @@ export default class About extends React.Component {
           {
             headerName: 'ID',
             field: 'id',
-            width: 60,
+            width: 80,
             sort: { direction: 'asc', priority: 0 }
           }, {
             headerName: 'Edited By',
@@ -101,7 +100,6 @@ export default class About extends React.Component {
           editBtn: EditBtn
         },
         paginationPageSize: 20,
-        rowHeight: 30,
         rowClass: 'row-class',
         rowClassRules: {
           'row-completed': function (params) { return params.data.done === 1 },
@@ -143,7 +141,7 @@ export default class About extends React.Component {
             <CardBody>
               <div className='table-wrapper'>
                 <div
-                  className='ag-theme-balham'
+                  className='ag-theme-material'
                   style={{
                     height: '700px',
                     width: '100%'

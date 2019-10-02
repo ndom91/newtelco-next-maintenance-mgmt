@@ -11,7 +11,7 @@ export default class extends React.Component {
   }
 
   render () {
-    if (this.props.action == 'signin' && this.props.type == 'oauth') {
+    if (this.props.action === 'signin' && this.props.type === 'oauth') {
       return (
         <div className='container'>
           <div className='text-center mb-5'>
@@ -44,7 +44,7 @@ export default class extends React.Component {
           </div>
         </div>
       )
-    } else if (this.props.action == 'signin' && this.props.type == 'token-invalid') {
+    } else if (this.props.action === 'signin' && this.props.type === 'token-invalid') {
       return (
         <div className='container'>
           <div className='text-center'>

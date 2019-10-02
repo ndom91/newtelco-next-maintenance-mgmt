@@ -61,7 +61,7 @@ class Header extends React.Component {
   render () {
     return (
       <Navbar type='dark' theme='secondary' expand='md'>
-        <NavbarBrand href='#'>
+        <NavbarBrand href='/'>
 
           <svg version='1.0' xmlns='http://www.w3.org/2000/svg' width='48px' height='48px' viewBox='0 0 1280 1280' preserveAspectRatio='xMidYMid meet'>
             <g id='layer101' fill='#ffffff' stroke='none'>

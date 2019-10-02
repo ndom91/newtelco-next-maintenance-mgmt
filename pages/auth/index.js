@@ -99,6 +99,9 @@ export default class App extends React.Component {
             .text-center {
               margin: 100px 0 50px 0;
             } 
+            #email::placeholder {
+              opacity: 0.4;
+            }
           `}
           </style>
         </div>

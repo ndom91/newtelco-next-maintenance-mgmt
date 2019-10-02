@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
 import Link from 'next/link'
+import { Button } from 'shards-react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
-  faEdit
+  faPencilAlt
 } from '@fortawesome/free-solid-svg-icons'
 
 export default class EditBtn extends Component {
@@ -10,7 +11,9 @@ export default class EditBtn extends Component {
     // console.log(this.props.node)
     return (
       <Link href={`/maintenance?id=${this.props.node.data.id}`}>
-        <FontAwesomeIcon width='1.125em' className='edit-icon' icon={faEdit} />
+        <Button size='sm' outline pill>
+          <FontAwesomeIcon width='1.325em' className='edit-icon' icon={faPencilAlt} />
+        </Button>
       </Link>
     )
   }
