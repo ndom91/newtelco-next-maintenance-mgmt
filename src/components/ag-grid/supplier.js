@@ -9,7 +9,6 @@ export default class UpdatedAt extends Component {
   }
 
   render () {
-    console.log(this.state.imgSrc)
     return (
       <span>
         <img src={this.state.imgSrc} style={{ padding: '5px' }} alt='Domain Favicon' />

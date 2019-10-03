@@ -5,6 +5,7 @@ import RequireLogin from '../src/components/require-login'
 import { NextAuth } from 'next-auth/client'
 import Link from 'next/link'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { format, isValid } from 'date-fns'
 import {
   faSave,
   faCalendarAlt,
@@ -24,7 +25,8 @@ import {
   Badge,
   Form,
   FormGroup,
-  FormInput
+  FormInput,
+  FormTextarea
 } from 'shards-react'
 
 export default class Maintenance extends React.Component {
@@ -54,6 +56,16 @@ export default class Maintenance extends React.Component {
     })
   }
 
+  convertDateTime = (datetime) => {
+    let newDateTime
+    if (isValid(new Date(datetime))) {
+      newDateTime = format(new Date(datetime), 'dd.MM.yyyy HH:mm')
+    } else {
+      newDateTime = datetime
+    }
+    return newDateTime
+  }
+
   render () {
     const {
       maintenance
@@ -73,7 +85,7 @@ export default class Maintenance extends React.Component {
                   </Link>
                 </ButtonGroup>
                 <span>
-                  <Badge style={{ fontSize: '2rem', marginRight: '20px' }} outline primary>
+                  <Badge style={{ fontSize: '2rem', marginRight: '20px' }} outline>
                     {maintenance.id}
                   </Badge>
                   <h2 style={{ display: 'inline-block', marginBottom: '0px' }}>{maintenance.name}</h2>
@@ -104,53 +116,55 @@ export default class Maintenance extends React.Component {
                       <Col>
                         <Row>
                           <Col style={{ width: '30vw' }}>
-                            <Form>
-                              <FormGroup>
-                                <label htmlFor='maileingang'>Mail Arrived</label>
-                                <FormInput id='maileingang-input' name='maileingang' type='text' value={maintenance.maileingang} />
-                              </FormGroup>
-                              <FormGroup>
-                                <label htmlFor='edited-by'>Edited By</label>
-                                <FormInput id='edited-by-input' name='edited-by' type='text' value={maintenance.bearbeitetvon} />
-                              </FormGroup>
-                              <FormGroup>
-                                <label htmlFor='supplier'>Supplier</label>
-                                <FormInput id='supplier-input' name='supplier' type='text' value={maintenance.name} />
-                              </FormGroup>
-                              <FormGroup>
-                                <label htmlFor='their-cid'>Their CID</label>
-                                <FormInput id='their-cid' name='their-cid' type='text' value={maintenance.derenCID} />
-                              </FormGroup>
-                              <FormGroup>
-                                <label htmlFor='impacted-customers'>Impacted Customer(s)</label>
-                                <FormInput id='impacted-customers' name='impacted-customers' type='text' value={maintenance.betroffeneKunden} />
-                              </FormGroup>
-                              <FormGroup>
-                                <label htmlFor='impacted-cids'>Impacted CID(s)</label>
-                                <FormInput id='impacted-cids' name='impacted-cids' type='text' value={maintenance.betroffeneCIDs} />
-                              </FormGroup>
-                            </Form>
+                            <FormGroup>
+                              <label htmlFor='edited-by'>Edited By</label>
+                              <FormInput id='edited-by-input' name='edited-by' type='text' value={maintenance.bearbeitetvon} />
+                            </FormGroup>
+                            <FormGroup>
+                              <label htmlFor='supplier'>Supplier</label>
+                              <FormInput id='supplier-input' name='supplier' type='text' value={maintenance.name} />
+                            </FormGroup>
+                            <FormGroup>
+                              <label htmlFor='start-datetime'>Start Date/Time</label>
+                              <FormInput id='start-datetime' name='start-datetime' type='text' value={this.convertDateTime(maintenance.startDateTime)} />
+                            </FormGroup>
+                            <FormGroup>
+                              <label htmlFor='their-cid'>Their CID</label>
+                              <FormInput id='their-cid' name='their-cid' type='text' value={maintenance.derenCID} />
+                            </FormGroup>
+                            <FormGroup>
+                              <label htmlFor='impacted-customers'>Impacted Customer(s)</label>
+                              <FormInput id='impacted-customers' name='impacted-customers' type='text' value={maintenance.betroffeneKunden} />
+                            </FormGroup>
                           </Col>
                           <Col style={{ width: '30vw' }}>
                             <FormGroup>
-                              <label htmlFor='start-datetime'>Start Date/Time</label>
-                              <FormInput id='start-datetime' name='start-datetime' type='text' value={maintenance.startDateTime} />
-                            </FormGroup>
-                            <FormGroup>
-                              <label htmlFor='end-datetime'>End Date/Time</label>
-                              <FormInput id='end-datetime' name='end-datetime' type='text' value={maintenance.endDateTime} />
-                            </FormGroup>
-                            <FormGroup>
-                              <label htmlFor='notes'>Notes</label>
-                              <FormInput id='notes' name='notes' type='text' value={maintenance.notes} />
+                              <label htmlFor='maileingang'>Mail Arrived</label>
+                              <FormInput id='maileingang-input' name='maileingang' type='text' value={this.convertDateTime(maintenance.maileingang)} />
                             </FormGroup>
                             <FormGroup>
                               <label htmlFor='updated-at'>Updated At</label>
-                              <FormInput id='updated-at' name='updated-at' type='text' value={maintenance.updatedAt} />
+                              <FormInput id='updated-at' name='updated-at' type='text' value={this.convertDateTime(maintenance.updatedAt)} />
+                            </FormGroup>
+                            <FormGroup>
+                              <label htmlFor='end-datetime'>End Date/Time</label>
+                              <FormInput id='end-datetime' name='end-datetime' type='text' value={this.convertDateTime(maintenance.endDateTime)} />
                             </FormGroup>
                             <FormGroup>
                               <label htmlFor='updated-by'>Updated By</label>
                               <FormInput id='updated-by' name='updated-by' type='text' value={maintenance.updatedBy} />
+                            </FormGroup>
+                            <FormGroup>
+                              <label htmlFor='impacted-cids'>Impacted CID(s)</label>
+                              <FormInput id='impacted-cids' name='impacted-cids' type='text' value={maintenance.betroffeneCIDs} />
+                            </FormGroup>
+                          </Col>
+                        </Row>
+                        <Row>
+                          <Col>
+                            <FormGroup>
+                              <label htmlFor='notes'>Notes</label>
+                              <FormTextarea id='notes' name='notes' size='lg' value={maintenance.notes} />
                             </FormGroup>
                           </Col>
                         </Row>
@@ -192,6 +206,10 @@ export default class Maintenance extends React.Component {
           <style jsx>{`
             * {
               font-family: Lato, Helvetica;
+            }
+            :global(#notes) {
+              width: 100%;
+              height:
             }
             :global(button.btn-primary) {
               max-height: 45px;

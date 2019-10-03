@@ -73,7 +73,7 @@ export default class Maintenance extends React.Component {
                   </Link>
                 </ButtonGroup>
                 <span>
-                  <Badge style={{ fontSize: '2rem', marginRight: '20px' }} outline primary>
+                  <Badge style={{ fontSize: '2rem', marginRight: '20px' }} outline>
                     {maintenance.id}
                   </Badge>
                   <h2 style={{ display: 'inline-block', marginBottom: '0px' }}>{maintenance.name}</h2>
