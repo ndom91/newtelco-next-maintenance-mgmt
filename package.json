@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "NODE_ENV=development PORT=4000 node index.js",
+    "dev:nodemon": "NODE_ENV=development nodemon server.js 4000 --exec",
     "start": "NODE_ENV=production PORT=4000 node index.js",
     "build": "next build",
     "export": "next export"
@@ -26,6 +27,7 @@
     "dotenv-webpack": "^1.7.0",
     "express-session": "^1.16.2",
     "fontfaceobserver": "^2.1.0",
+    "googleapis": "^43.0.0",
     "isomorphic-unfetch": "^3.0.0",
     "mongodb": "^3.3.2",
     "nedb": "^1.8.0",
@@ -54,6 +56,14 @@
   },
   "standard": {
     "parser": "babel-eslint",
+    "standard.validate": [
+      "javascript",
+      "javascriptreact",
+      {
+        "language": "html",
+        "autoFix": true
+      }
+    ],
     "ignore": [
       "node_modules/",
       "out",

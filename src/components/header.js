@@ -112,22 +112,30 @@ class Header extends React.Component {
                 </InputGroupText>
               </InputGroupAddon>
               <FormInput className='border-0 nav-search' placeholder='Search...' />
+              <NavItem>
+                <NavLink>
+                  <form id='signout' method='post' action='/auth/signout' onSubmit={this.handleSignOutSubmit}>
+                    <input name='_csrf' type='hidden' value={this.props.session.csrfToken} />
+                    <div className='logout-btn-wrapper'>
+                      <button className='logout-btn' type='submit'>
+                        <FontAwesomeIcon width='1.125em' className='menu-icon logout' icon={faPowerOff} />
+                      </button>
+                    </div>
+                  </form>
+                </NavLink>
+              </NavItem>
             </InputGroup>
-            <NavItem>
-              <NavLink>
-                <form id='signout' method='post' action='/auth/signout' onSubmit={this.handleSignOutSubmit}>
-                  <input name='_csrf' type='hidden' value={this.props.session.csrfToken} />
-                  <div className='logout-btn-wrapper'>
-                    <button className='logout-btn' type='submit'>
-                      <FontAwesomeIcon width='1.125em' className='menu-icon logout' icon={faPowerOff} />
-                    </button>
-                  </div>
-                </form>
-              </NavLink>
-            </NavItem>
           </Nav>
         </Collapse>
         <style jsx>{`
+            @media only screen and (max-width: 500px) {
+              :global(#search-group) {
+                margin: 10px 0;
+              }
+              :global(.logout-btn) {
+                margin-left: 10px;
+              }
+            }
           .menu-label {
             font-family: Poppins, Helvetica;
             font-weight: 300;

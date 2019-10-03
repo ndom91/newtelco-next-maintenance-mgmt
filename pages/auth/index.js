@@ -51,8 +51,7 @@ export default class App extends React.Component {
       return (
         <div className='container'>
           <div className='text-center'>
-            <h1 className='display-4 mt-3'>Newtelco Maintenance</h1>
-            <p className='lead mt-3 mb-1'>You are signed in as <span className='font-weight-bold'>{this.props.session.user.email}</span>.</p>
+            <img width='384px' src='/static/images/nt-black.png' alt='Newtelco Maintenance' />
           </div>
           <div className='row'>
             <div className='col-sm-5 mr-auto ml-auto'>
@@ -62,9 +61,18 @@ export default class App extends React.Component {
               />
             </div>
           </div>
-          <p className='text-center'>
-            <Link href='/'><a>Home</a></Link>
-          </p>
+          <style jsx>{`
+            .text-center {
+              margin: 100px 0 10px 0;
+            } 
+            :global(.btn) {
+              margin-bottom: 10px;
+            }
+            :global(.btn-primary) {
+              margin-bottom: 30px;
+            }
+          `}
+          </style>
         </div>
       )
     } else {
@@ -113,14 +121,20 @@ export default class App extends React.Component {
 export class LinkAccounts extends React.Component {
   render () {
     return (
-      <div className='card mt-3 mb-3'>
+      <div className='card mt-4 mb-3'>
         <h4 className='card-header'>Link Accounts</h4>
-        <div className='card-body pb-0'>
+        <div className='card-body pt-1 pb-0'>
+          <p className='mt-1 mb-3'>You are signed in as <span className='font-weight-bold'>{this.props.session.user.email}</span>.</p>
           {
             Object.keys(this.props.linkedAccounts).map((provider, i) => {
               return <LinkAccount key={i} provider={provider} session={this.props.session} linked={this.props.linkedAccounts[provider]} />
             })
           }
+          <Link href='/'>
+            <button className='btn btn-block btn-primary' type='submit'>
+                Back
+            </button>
+          </Link>
         </div>
       </div>
     )
@@ -133,11 +147,9 @@ export class LinkAccount extends React.Component {
       return (
         <form method='post' action={`/auth/oauth/${this.props.provider.toLowerCase()}/unlink`}>
           <input name='_csrf' type='hidden' value={this.props.session.csrfToken} />
-          <p>
-            <button className='btn btn-block btn-outline-danger' type='submit'>
+          <button className='btn btn-block btn-outline-danger' type='submit'>
               Unlink from {this.props.provider}
-            </button>
-          </p>
+          </button>
         </form>
       )
     } else {

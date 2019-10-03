@@ -1,23 +1,31 @@
 import React from 'react'
+import './style/history.css'
 import Layout from '../src/components/layout'
-import fetch from 'isomorphic-unfetch'
-import { NextAuth } from 'next-auth/client'
-import RequireLogin from '../src/components/require-login'
 import { AgGridReact } from 'ag-grid-react'
 import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-material.css'
+import Link from 'next/link'
+import fetch from 'isomorphic-unfetch'
+import { NextAuth } from 'next-auth/client'
+import RequireLogin from '../src/components/require-login'
 import EditBtn from '../src/components/ag-grid/edit-btn'
 import StartDateTime from '../src/components/ag-grid/startdatetime'
 import EndDateTime from '../src/components/ag-grid/enddatetime'
 import MailArrived from '../src/components/ag-grid/mailarrived'
 import UpdatedAt from '../src/components/ag-grid/updatedat'
 import Supplier from '../src/components/ag-grid/supplier'
-import './style/history.css'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import {
+  faSave
+} from '@fortawesome/free-solid-svg-icons'
 import {
   Card,
   CardHeader,
   CardBody,
-  CardFooter
+  CardFooter,
+  ButtonToolbar,
+  ButtonGroup,
+  Button
 } from 'shards-react'
 
 // { maintenances, page, pageCount }
@@ -40,7 +48,8 @@ export default class About extends React.Component {
         defaultColDef: {
           resizable: true,
           sortable: true,
-          filter: true
+          filter: true,
+          selectable: true
         },
         columnDefs: [
           {
@@ -104,6 +113,8 @@ export default class About extends React.Component {
           updatedAt: UpdatedAt,
           supplier: Supplier
         },
+        rowSelection: 'multiple',
+        rowMultiSelectWithClick: true,
         paginationPageSize: 20,
         rowClass: 'row-class',
         rowClassRules: {
@@ -137,12 +148,33 @@ export default class About extends React.Component {
     // params.columnApi.sizeColumnsToFit()
   }
 
+  exportData () {
+    const params = {
+      allColumns: true,
+      fileName: `maintenance${new Date()}`,
+      columnSeparator: ',',
+      onlySelected: true
+    }
+
+    this.state.gridOptions.api.exportDataAsCsv(params)
+  }
+
   render () {
     if (this.props.session.user) {
       return (
         <Layout session={this.props.session}>
           <Card style={{ maxWidth: '100%' }}>
-            <CardHeader><h2>History</h2></CardHeader>
+            <CardHeader>
+              <ButtonToolbar style={{ justifyContent: 'space-between' }}>
+                <h2 style={{ marginBottom: '0px' }}>History</h2>
+                <ButtonGroup size='md'>
+                  <Button onClick={this.exportData}>
+                    <FontAwesomeIcon icon={faSave} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
+                    Export
+                  </Button>
+                </ButtonGroup>
+              </ButtonToolbar>
+            </CardHeader>
             <CardBody>
               <div className='table-wrapper'>
                 <div
@@ -165,12 +197,6 @@ export default class About extends React.Component {
             </CardBody>
             <CardFooter>Card footer</CardFooter>
           </Card>
-          <style jsx>{`
-          .table-wrapper { 
-            width: 100%;
-          }
-        `}
-          </style>
         </Layout>
       )
     } else {

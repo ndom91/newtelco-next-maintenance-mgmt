@@ -30,10 +30,25 @@ export default class Layout extends React.Component {
         <Container fluid>
           <Row style={{ height: '20px' }} />
           <Row>
-            <Col style={{ flex: '1', margin: '0 30px' }} className='toplevel-col' sm='12' lg='12'>
+            <Col className='toplevel-col' sm='12' lg='12'>
               {this.props.children}
             </Col>
           </Row>
+          <style jsx>{`
+            @media only screen and (min-width: 1024px) {
+              :global(div.toplevel-col) {
+                flex: 1;
+                margin: 0 30px;
+              }
+            }
+            @media only screen and (max-width: 1024px) {
+              :global(div.toplevel-col) {
+                flex: 1;
+                margin: 0;
+              }
+            }
+          `}
+          </style>
         </Container>
         {/* <Footer /> */}
       </div>
