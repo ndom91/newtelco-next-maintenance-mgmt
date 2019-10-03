@@ -71,7 +71,9 @@ module.exports = () => {
   return new Promise((resolve, reject) => {
     if (process.env.MONGO_URI) {
       // Connect to MongoDB Database and return user connection
-      MongoClient.connect(process.env.MONGO_URI, (err, mongoClient) => {
+      MongoClient.connect(process.env.MONGO_URI, {
+        useNewUrlParser: true
+      }, (err, mongoClient) => {
         if (err) return reject(err)
         const dbName = process.env.MONGO_URI.split('/').pop().split('?').shift()
         const db = mongoClient.db(dbName)

@@ -11,7 +11,7 @@ export default class EditBtn extends Component {
     // console.log(this.props.node)
     return (
       <Link href={`/maintenance?id=${this.props.node.data.id}`}>
-        <Button size='sm' outline pill>
+        <Button size='sm' outline>
           <FontAwesomeIcon width='1.325em' className='edit-icon' icon={faPencilAlt} />
         </Button>
       </Link>

@@ -1,6 +1,5 @@
 import React from 'react'
 import Layout from '../src/components/layout'
-// import Link from 'next/link'
 import fetch from 'isomorphic-unfetch'
 import { NextAuth } from 'next-auth/client'
 import RequireLogin from '../src/components/require-login'
@@ -8,6 +7,11 @@ import { AgGridReact } from 'ag-grid-react'
 import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-material.css'
 import EditBtn from '../src/components/ag-grid/edit-btn'
+import StartDateTime from '../src/components/ag-grid/startdatetime'
+import EndDateTime from '../src/components/ag-grid/enddatetime'
+import MailArrived from '../src/components/ag-grid/mailarrived'
+import UpdatedAt from '../src/components/ag-grid/updatedat'
+import Supplier from '../src/components/ag-grid/supplier'
 import './style/history.css'
 import {
   Card,
@@ -57,47 +61,48 @@ export default class About extends React.Component {
             field: 'bearbeitetvon',
             width: 100
           }, {
+            headerName: 'Supplier',
+            field: 'name',
+            cellRenderer: 'supplier',
+            width: 120
+          }, {
             headerName: 'Their CID',
             field: 'derenCID',
             tooltipField: 'derenCID'
-            // width: 100
           }, {
             headerName: 'Start',
             field: 'startDateTime',
-            width: 100,
+            cellRenderer: 'startdateTime',
             tooltipField: 'startDateTime'
           }, {
             headerName: 'End',
             field: 'endDateTime',
-            width: 100,
+            cellRenderer: 'enddateTime',
             tooltipField: 'endDateTime'
           }, {
             headerName: 'Newtelco CIDs',
             field: 'betroffeneCIDs',
-            width: 120,
+            width: 0,
             tooltipField: 'betroffeneCIDs'
-          }, {
-            headerName: 'Supplier',
-            field: 'name',
-            width: 100
           }, {
             headerName: 'Mail Arrived',
             field: 'maileingang',
-            width: 100,
+            cellRenderer: 'mailArrived',
             tooltipField: 'maileingang'
           }, {
-            headerName: 'Postponed',
-            field: 'postponed',
-            width: 50
-          }, {
             headerName: 'Updated',
-            field: 'updatedAt'
-            // width: 100
+            field: 'updatedAt',
+            cellRenderer: 'updatedAt'
           }
         ],
         context: { componentParent: this },
         frameworkComponents: {
-          editBtn: EditBtn
+          editBtn: EditBtn,
+          startdateTime: StartDateTime,
+          enddateTime: EndDateTime,
+          mailArrived: MailArrived,
+          updatedAt: UpdatedAt,
+          supplier: Supplier
         },
         paginationPageSize: 20,
         rowClass: 'row-class',

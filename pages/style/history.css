@@ -11,5 +11,32 @@
 }
 
 .row-emergency {
-  background: rgba(246, 155, 155, 0.4) !important;
+  background: repeating-linear-gradient(
+    45deg,
+    #fff,
+    #fff 10px,
+    #c3565f2d 10px,
+    #c3565f2d 20px
+  );
+}
+
+.ag-filter-select {
+	position: relative;
+	font-family: inherit;
+	background-color: transparent;
+	width: 179px;
+	padding: 10px 10px 10px 0;
+	font-size: 12px;
+	border-radius: 0;
+	border: none;
+	border-bottom: 1px solid rgba(0,0,0, 0.12);
+}
+
+.ag-filter-select:focus {
+  outline: none;
+	border-bottom: 1px solid rgba(0,0,0, 0);
+}
+
+.ag-filter-select > option {
+
 }

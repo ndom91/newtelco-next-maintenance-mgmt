@@ -22,6 +22,7 @@
     "@zeit/next-css": "^1.0.1",
     "bootstrap": "^4.3.1",
     "connect-mongo": "^3.0.0",
+    "date-fns": "^2.4.1",
     "dotenv-webpack": "^1.7.0",
     "express-session": "^1.16.2",
     "fontfaceobserver": "^2.1.0",
