@@ -2,7 +2,7 @@ const FontFaceObserver = require('fontfaceobserver')
 
 const Fonts = () => {
   const link = document.createElement('link')
-  link.href = 'https://fonts.googleapis.com/css?family=Poppins:300,Lato:300,400,700,900'
+  link.href = 'https://fonts.googleapis.com/css?family=Poppins:100,300,Lato:300,400,700,900'
   link.rel = 'stylesheet'
 
   document.head.appendChild(link)
