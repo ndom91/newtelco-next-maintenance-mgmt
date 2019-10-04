@@ -1,6 +1,5 @@
 import React from 'react'
 import Link from 'next/link'
-import Fonts from './fonts'
 import {
   Navbar,
   NavbarToggler,
@@ -37,10 +36,6 @@ class Header extends React.Component {
       collapseOpen: false,
       open: false
     }
-  }
-
-  componentDidMount () {
-    Fonts()
   }
 
   toggle () {
@@ -107,8 +102,8 @@ class Header extends React.Component {
           <Nav style={{ justifyContent: 'flex-end' }} navbar className='ml-auto'>
             <InputGroup id='search-group' style={{ width: '100%', alignItems: 'center' }} size='sm' seamless>
               <InputGroupAddon type='prepend'>
-                <InputGroupText className='input-group-text'>
-                  <FontAwesomeIcon icon={faSearch} width='1em' style={{ color: 'secondary' }} />
+                <InputGroupText className='input-group-search'>
+                  <FontAwesomeIcon icon={faSearch} className='search-icon' width='1em' style={{ color: 'secondary' }} />
                 </InputGroupText>
               </InputGroupAddon>
               <FormInput className='border-0 nav-search' placeholder='Search...' />
@@ -136,22 +131,47 @@ class Header extends React.Component {
                 margin-left: 10px;
               }
             }
+          :global(.input-group-prepend) {
+            pointer-events: none !important;
+          }
+          :global(.input-group-search) {
+            pointer-events: none !important;
+            font-size: 18px !important;
+          }
+          :global(.nav-search::placeholder) {
+            color: transparent;
+          }
+          :global(.nav-search) {
+            padding-left: 0px !important;
+            padding-right: 0px !important;
+            width: 45px !important;
+            overflow: hidden;
+            background: transparent;
+
+            -webkit-transition: width 0.3s;
+            -moz-transition: width 0.3s;
+            transition: width 0.3s;
+
+            -webkit-backface-visibility: hidden;
+          }
+          :global(.nav-search:hover) {
+            cursor: pointer;
+          }
+          :global(.nav-search:focus) {
+            padding-left: 40px !important;
+            width: 230px !important;
+            background-color: #fff;
+            border-color: #66CC75;
+            cursor: text;
+            
+            -webkit-box-shadow: 0 0 5px rgba(109,207,246,.5);
+            -moz-box-shadow: 0 0 5px rgba(109,207,246,.5);
+            box-shadow: 0 0 5px rgba(109,207,246,.5);
+          }
           .menu-label {
             font-family: Poppins, Helvetica;
             font-weight: 300;
             cursor: pointer;
-          }
-          .input-group-text {
-            width: 50%;
-          }
-          .input-group-text:active,
-          .input-group-text:focus {
-            width: 100%;
-          }
-          .search-group {
-            width: 50%;
-            align-items: center;
-            justify-content: flex-end;
           }
           #signout {
             display: inline-block;

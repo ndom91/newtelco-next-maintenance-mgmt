@@ -115,7 +115,7 @@ export default class About extends React.Component {
         },
         rowSelection: 'multiple',
         rowMultiSelectWithClick: true,
-        paginationPageSize: 20,
+        paginationPageSize: 10,
         rowClass: 'row-class',
         rowClassRules: {
           'row-completed': function (params) { return params.data.done === 1 },

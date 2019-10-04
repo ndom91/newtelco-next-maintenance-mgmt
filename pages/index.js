@@ -3,6 +3,7 @@ import Layout from '../src/components/layout'
 import RequireLogin from '../src/components/require-login'
 import { NextAuth } from 'next-auth/client'
 import Router from 'next/router'
+import Fonts from '../src/components/fonts'
 import {
   Card,
   CardHeader,
@@ -28,8 +29,12 @@ export default class Blog extends React.Component {
     }
   }
 
+  componentDidMount () {
+    Fonts()
+  }
+
   render () {
-    console.log(this.props.session)
+    // console.log(this.props.session)
     if (this.props.session.user) {
       return (
         <Layout session={this.props.session}>
