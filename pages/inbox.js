@@ -133,8 +133,14 @@ export default class Inbox extends React.Component {
               min-width: 68px;
               transition: all 150ms ease-in-out;
             }
+            :global(.mail-edit-btn) {
+              height: 60px;
+              align-self: center;
+            }
             :global(.mail-badge) {
-              width: 68px;
+              min-width: 68px;
+              min-height: 64px;
+              align-self: center;
               transition: all 150ms ease-in-out;
             }
             :global(.list-group-item-heading) {
@@ -145,9 +151,8 @@ export default class Inbox extends React.Component {
             }
             :global(.mail-open-icon) {
               color: var(--primary);
-              position: absolute;
-              left: 50px;
-              top: 30px;
+              align-self: center;
+              margin-left: -50px;
               font-size: 24px;
               visibility: hidden;
               opacity: 0;
@@ -162,8 +167,9 @@ export default class Inbox extends React.Component {
             }
             .mail-icon {
               height: 50px;
-              transition: all 150ms ease-in-out;
               width: 50px;
+              transform: translate(-8px, 0px);
+              transition: all 150ms ease-in-out;
               transition: visibility 0s, opacity 200ms ease-in-out;
             }
             :global(.mail-badge:hover) > .mail-icon {
