@@ -58,12 +58,14 @@ export default class About extends React.Component {
             sortable: false,
             filter: false,
             resizable: false,
-            cellRenderer: 'editBtn'
+            cellRenderer: 'editBtn',
+            pinned: 'left'
           },
           {
             headerName: 'ID',
             field: 'id',
             width: 80,
+            pinned: 'left',
             sort: { direction: 'asc', priority: 0 }
           }, {
             headerName: 'Edited By',

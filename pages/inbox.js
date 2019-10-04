@@ -6,11 +6,14 @@ import { NextAuth } from 'next-auth/client'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
   faPencilAlt,
-  faEnvelopeOpenText
+  faEnvelopeOpenText,
+  faTrashAlt,
+  faLanguage
 } from '@fortawesome/free-solid-svg-icons'
 import {
   Badge,
   Button,
+  ButtonGroup,
   Card,
   CardHeader,
   CardBody,
@@ -45,9 +48,21 @@ export default class Inbox extends React.Component {
     super(props)
     this.state = {
       inboxMails: [],
-      open: false
+      open: false,
+      modalSubject: '',
+      modalFrom: '',
+      modalBody: '',
+      originalModayBody: '',
+      translated: false
     }
     this.toggle = this.toggle.bind(this)
+  }
+
+  componentDidMount () {
+    this.setState({
+      inboxMails: this.props.jsonData,
+      windowInnerHeight: window.innerHeight
+    })
   }
 
   toggle (mailId) {
@@ -70,11 +85,64 @@ export default class Inbox extends React.Component {
     }
   }
 
-  componentDidMount () {
-    this.setState({
-      inboxMails: this.props.jsonData,
-      windowInnerHeight: window.innerHeight
+  handleTranslate () {
+    const {
+      modalBody
+    } = this.state
+
+    if (this.state.translated) {
+      this.setState({ 
+        modalBody: this.state.originalModalBody,
+        translated: !this.state.translated
+      })
+    } else {
+      const host = window.location.host
+      fetch(`https://api.${host}/translate`, {
+        method: 'post',
+        body: JSON.stringify({ q: modalBody }),
+        mode: 'cors',
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Content-Type': 'application/json'
+        }
+      })
+        .then(resp => resp.json())
+        .then(data => {
+          const text = data.translatedText
+          this.setState({ 
+            originalModalBody: this.state.modalBody,
+            modalBody: text,
+            translated: !this.state.translated
+          })
+        })
+        .catch(err => console.error(`Error - ${err}`))
+    }
+  }
+
+  handleDelete (mailId) {
+    const host = window.location.host
+    fetch(`https://api.${host}/inbox/delete`, {
+      method: 'post',
+      body: JSON.stringify({ m: mailId }),
+      mode: 'cors',
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json'
+      }
     })
+      .then(resp => resp.json())
+      .then(data => {
+        console.log(data)
+        if (data.status === 'complete') {
+          const array = [...this.state.inboxMails]
+          const index = this.state.inboxMails.findIndex(el => el.id === data.id)
+          if (index !== -1) {
+            array.splice(index, 1)
+            this.setState({ inboxMails: array })
+          }
+        }
+      })
+      .catch(err => console.error(`Error - ${err}`))
   }
 
   render () {
@@ -109,15 +177,28 @@ export default class Inbox extends React.Component {
                             {mail.snippet}
                           </ListGroupItemText>
                         </div>
-                        <Button className='mail-edit-btn' outline>
-                          <FontAwesomeIcon width='1.425em' className='edit-icon' icon={faPencilAlt} />
-                        </Button>
+                        <ButtonGroup className='inbox-btn-group'>
+                          <Button className='mail-edit-btn' outline>
+                            <FontAwesomeIcon width='1.2em' className='edit-icon' icon={faPencilAlt} />
+                          </Button>
+                          <Button onClick={() => this.handleDelete(mail.id)} className='mail-edit-btn' outline>
+                            <FontAwesomeIcon width='1.2em' className='edit-icon' icon={faTrashAlt} />
+                          </Button>
+                        </ButtonGroup>
                       </div>
                     </ListGroupItem>
                   )
                 })}
-                <Modal className='mail-modal-body' animation open={open} size='lg' toggle={this.toggle}>
-                  <ModalHeader>{this.state.modalFrom} <br /><small className='mail-subject'>{this.state.modalSubject}</small></ModalHeader>
+                <Modal className='mail-modal-body' animation backdrop backdropClassName='modal-backdrop' open={open} size='lg' toggle={this.toggle}>
+                  <ModalHeader>
+                    <div className='modal-header-text'>
+                      {this.state.modalFrom} <br />
+                      <small className='mail-subject'>{this.state.modalSubject}</small>
+                    </div>
+                    <Button style={{ padding: '1em' }} onClick={this.handleTranslate.bind(this)}>
+                      <FontAwesomeIcon width='1.5em' className='translate-icon' icon={faLanguage} />
+                    </Button>
+                  </ModalHeader>
                   <ModalBody className='mail-body' dangerouslySetInnerHTML={{ __html: this.state.modalBody }} />
                 </Modal>
               </ListGroup>
@@ -134,7 +215,9 @@ export default class Inbox extends React.Component {
               transition: all 150ms ease-in-out;
             }
             :global(.mail-edit-btn) {
-              height: 60px;
+              height: 50px;
+              width: 50px;
+              padding: 0;
               align-self: center;
             }
             :global(.mail-badge) {
@@ -177,6 +260,9 @@ export default class Inbox extends React.Component {
               opacity: 0;
               transition: visibility 0s, opacity 200ms ease-in-out;
             }
+            .mail-btn-group {
+              display: flex;
+            }
             .mail-info {
               display: flex;
               flex-direction: column;
@@ -194,6 +280,22 @@ export default class Inbox extends React.Component {
             :global(.mail-body) {
               font-family: Poppins, Helvetica;
               overflow-y: scroll;
+            }
+            :global(.modal-backdrop) {
+              background-color: #000;
+              transition: all 150ms ease-in-out;
+            }
+            :global(.modal-backdrop.show) {
+              opacity: 0.5;
+            }
+            .modal-header-text {
+              flex-grow: 1;
+            }
+            :global(.modal-title) {
+              display: flex;
+              justify-content: space-between;
+              width: 100%;
+              align-items: center;
             }
           `}
           </style>
