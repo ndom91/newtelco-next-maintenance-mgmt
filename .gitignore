@@ -5,3 +5,4 @@ out
 .env
 oauth*.json
 serviceacct.json
+ecosystem.config.js.og
