@@ -45,6 +45,20 @@ export default class About extends React.Component {
   }
 
   componentDidMount () {
+    // const host = window.location.host
+    // const pageRequest = `https://api.${host}/inbox` // ?page=${query.page || 1}&limit=${query.limit || 41}`
+    // fetch(pageRequest, {
+    //   mode: 'cors',
+    //   headers: {
+    //     'Access-Control-Allow-Origin': `${host}`
+    //   }
+    // })
+    //   .then(response => {
+    //     response.json()
+    //   })
+    //   .then(data => {
+    //     this.setState({ inboxMails: data })
+    //   })
     this.setState({ inboxMails: this.props.jsonData })
   }
 
