@@ -3,10 +3,10 @@ import Layout from '../src/components/layout'
 import fetch from 'isomorphic-unfetch'
 import RequireLogin from '../src/components/require-login'
 import { NextAuth } from 'next-auth/client'
-import Link from 'next/link'
 import Router from 'next/router'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { de } from 'date-fns/locale'
+import ReactQuill from 'react-quill'
+import 'react-quill/dist/quill.snow.css'
 import { format, isValid } from 'date-fns'
 import {
   faSave,
@@ -71,10 +71,12 @@ export default class Maintenance extends React.Component {
       open: false,
       translateTooltipOpen: false,
       translated: false,
-      translatedBody: ''
+      translatedBody: '',
+      notesText: props.jsonData.profile.notes
     }
     this.toggle = this.toggle.bind(this)
     this.toggleTooltip = this.toggleTooltip.bind(this)
+    this.handleNotesChange = this.handleNotesChange.bind(this)
   }
 
   handleTranslate () {
@@ -124,7 +126,8 @@ export default class Maintenance extends React.Component {
       }
       this.setState({
         maintenance: maintenance,
-        width: window.innerWidth
+        width: window.innerWidth,
+        editorState: maintenance.notes
       })
     } else {
       this.setState({
@@ -142,6 +145,10 @@ export default class Maintenance extends React.Component {
       newDateTime = datetime
     }
     return newDateTime
+  }
+
+  handleNotesChange (value) {
+    this.setState({ notesText: value })
   }
 
   toggle () {
@@ -257,7 +264,12 @@ export default class Maintenance extends React.Component {
                           <Col>
                             <FormGroup>
                               <label htmlFor='notes'>Notes</label>
-                              <FormTextarea id='notes' name='notes' size='lg' value={maintenance.notes} />
+                              {/* <FormTextarea id='notes' name='notes' size='lg' value={maintenance.notes} /> */}
+                              <ReactQuill 
+                                value={maintenance.notes}
+                                onChange={this.handleNotesChange}
+                                theme='snow'
+                              />
                             </FormGroup>
                           </Col>
                         </Row>
@@ -320,9 +332,31 @@ export default class Maintenance extends React.Component {
             </Modal>
           </Card>
           <style jsx>{`
-            :global(#notes) {
-              width: 100%;
-              height:
+            :global(.rdw-option-active) {
+              box-shadow: none;
+              border: 2px solid var(--primary);
+              border-radius: 5px;
+            }
+            :global(.editor-toolbar) {
+              transition: all 150ms ease-in-out;
+            }
+            :global(.editor-dropdown) {
+              position: relative;
+              font-family: inherit;
+              background-color: transparent;
+              padding: 2px 2px 2px 0;
+              font-size: 10px;
+              border-radius: 0;
+              border: none;
+              border-bottom: 1px solid rgba(0,0,0, 0.12);
+              transition: all 150ms ease-in-out;
+            }
+            :global(.editor-wrapper) {
+              border: 1px solid var(--light);
+              border-radius: 5px;
+            }
+            :global(.editor-wrapper) {
+              padding: 5px;
             }
             :global(button.btn-primary) {
               max-height: 45px;

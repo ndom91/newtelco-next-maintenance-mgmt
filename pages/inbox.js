@@ -335,13 +335,17 @@ export default class Inbox extends React.Component {
               justify-content: center;
             }
             .inbox-from-text {
-
+              font-weight: 400;
+              letter-spacing: 1px;
             }
             .inbox-subject-text {
               max-height: 25px;
               overflow:hidden;
               font-weight: 700;
               letter-spacing: -1px;
+            }
+            :global(.list-group-item-heading > div) {
+              padding-bottom: 3px;
             }
             :global(.list-group-item-text) {
             }

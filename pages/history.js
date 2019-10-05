@@ -15,6 +15,7 @@ import EndDateTime from '../src/components/ag-grid/enddatetime'
 import MailArrived from '../src/components/ag-grid/mailarrived'
 import UpdatedAt from '../src/components/ag-grid/updatedat'
 import Supplier from '../src/components/ag-grid/supplier'
+import UseAnimations from 'react-useanimations';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
   faSave
@@ -150,7 +151,8 @@ export default class About extends React.Component {
     // params.columnApi.sizeColumnsToFit()
   }
 
-  exportData () {
+  exportData (data) {
+    console.log(data)
     const params = {
       allColumns: true,
       fileName: `maintenance${new Date()}`,
@@ -158,7 +160,7 @@ export default class About extends React.Component {
       onlySelected: true
     }
 
-    this.state.gridOptions.api.exportDataAsCsv(params)
+    // this.state.gridOptions.api.exportDataAsCsv(params)
   }
 
   render () {
@@ -170,9 +172,12 @@ export default class About extends React.Component {
               <ButtonToolbar style={{ justifyContent: 'space-between' }}>
                 <h2 style={{ marginBottom: '0px' }}>History</h2>
                 <ButtonGroup size='md'>
-                  <Button onClick={this.exportData}>
-                    <FontAwesomeIcon icon={faSave} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
-                    Export
+                  <Button outline theme='dark' className='export-btn' onClick={this.exportData}>
+                    {/* <FontAwesomeIcon icon={faSave} width='1em' style={{ marginRight: '10px', color: 'secondary' }} /> */}
+                    <UseAnimations animationKey='download' size={22} style={{ display: 'inline-block', fill: 'rgb(0,0,0)' }} />
+                    <span style={{ marginLeft: '5px' }}>
+                      Export
+                    </span>
                   </Button>
                 </ButtonGroup>
               </ButtonToolbar>
@@ -199,6 +204,13 @@ export default class About extends React.Component {
             </CardBody>
             <Footer />
           </Card>
+          <style jsx>{`
+            :global(.export-btn) {
+              display: flex;
+              align-items: center;
+            }
+          `}
+          </style>
         </Layout>
       )
     } else {
