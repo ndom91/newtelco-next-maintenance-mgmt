@@ -77,6 +77,7 @@ export default class Maintenance extends React.Component {
     this.toggle = this.toggle.bind(this)
     this.toggleTooltip = this.toggleTooltip.bind(this)
     this.handleNotesChange = this.handleNotesChange.bind(this)
+    this.reactQuillRef = null
   }
 
   handleTranslate () {
@@ -114,6 +115,10 @@ export default class Maintenance extends React.Component {
   }
 
   componentDidMount () {
+    this.attachQuillRefs()
+    const editor = this.reactQuillRef.getEditor()
+    const unprivilegedEditor = this.reactQuillRef.makeUnprivilegedEditor(editor)
+    const quillContents = unprivilegedEditor.getContents()
     if (this.props.jsonData.profile.id === 'NEW') {
       const {
         email
@@ -127,7 +132,7 @@ export default class Maintenance extends React.Component {
       this.setState({
         maintenance: maintenance,
         width: window.innerWidth,
-        editorState: maintenance.notes
+        notesText: quillContents
       })
     } else {
       this.setState({
@@ -135,6 +140,15 @@ export default class Maintenance extends React.Component {
         width: window.innerWidth
       })
     }
+  }
+
+  componentDidUpdate () {
+    this.attachQuillRefs()
+  }
+
+  attachQuillRefs = () => {
+    if (typeof this.reactQuillRef.getEditor !== 'function') return
+    this.quillRef = this.reactQuillRef.getEditor()
   }
 
   convertDateTime = (datetime) => {
@@ -147,8 +161,8 @@ export default class Maintenance extends React.Component {
     return newDateTime
   }
 
-  handleNotesChange (value) {
-    this.setState({ notesText: value })
+  handleNotesChange (content, delta, source, editor) {
+    this.setState({ notesText: editor.getContents() })
   }
 
   toggle () {
@@ -265,8 +279,10 @@ export default class Maintenance extends React.Component {
                             <FormGroup>
                               <label htmlFor='notes'>Notes</label>
                               {/* <FormTextarea id='notes' name='notes' size='lg' value={maintenance.notes} /> */}
-                              <ReactQuill 
-                                value={maintenance.notes}
+                              <ReactQuill
+                                value={this.state.notesText}
+                                ref={(el) => { this.reactQuillRef = el }}
+                                style={{ borderRadius: '5px' }}
                                 onChange={this.handleNotesChange}
                                 theme='snow'
                               />
