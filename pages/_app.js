@@ -6,12 +6,20 @@ import './style/app.css'
 // import bugsnagReact from '@bugsnag/plugin-react'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'shards-ui/dist/css/shards.min.css'
-
 // const bugsnagClient = bugsnag('cccea6dd356e289efb3eb14ddc48bc43')
 // bugsnagClient.use(bugsnagReact, React)
-// const ErrorBoundary = bugsnagClient.getPlugin('react')
 
-class MyApp extends App {
+export default class MyApp extends App {
+  static async getInitialProps ({ Component, ctx }) {
+    let pageProps = {}
+
+    if (Component.getInitialProps) {
+      pageProps = await Component.getInitialProps(ctx)
+    }
+
+    return { pageProps }
+  }
+
   render () {
     const { Component, pageProps } = this.props
 
@@ -41,5 +49,3 @@ class MyApp extends App {
     )
   }
 }
-
-export default MyApp

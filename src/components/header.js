@@ -30,8 +30,8 @@ class Header extends React.Component {
     super(props)
 
     this.toggleNavbar = this.toggleNavbar.bind(this)
+    this.toggle = this.toggle.bind(this)
 
-    this.toggle = this.toggle.bind(this),
     this.state = {
       collapseOpen: false,
       open: false

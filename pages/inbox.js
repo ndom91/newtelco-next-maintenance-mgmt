@@ -1,9 +1,12 @@
 import React from 'react'
 import Layout from '../src/components/layout'
+import Footer from '../src/components/footer'
 import Link from 'next/link'
 import RequireLogin from '../src/components/require-login'
 import fetch from 'isomorphic-unfetch'
 import { NextAuth } from 'next-auth/client'
+import cogoToast from 'cogo-toast'
+import { CSSTransition, TransitionGroup } from 'react-transition-group'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
   faPencilAlt,
@@ -18,14 +21,14 @@ import {
   Card,
   CardHeader,
   CardBody,
-  CardFooter,
   ListGroup,
   ListGroupItem,
   ListGroupItemHeading,
   ListGroupItemText,
   Modal,
   ModalBody,
-  ModalHeader
+  ModalHeader,
+  Tooltip
 } from 'shards-react'
 
 export default class Inbox extends React.Component {
@@ -54,9 +57,11 @@ export default class Inbox extends React.Component {
       modalFrom: '',
       modalBody: '',
       originalModayBody: '',
-      translated: false
+      translated: false,
+      translateTooltipOpen: false
     }
     this.toggle = this.toggle.bind(this)
+    this.toggleTooltip = this.toggleTooltip.bind(this)
   }
 
   componentDidMount () {
@@ -84,6 +89,12 @@ export default class Inbox extends React.Component {
         open: !this.state.open
       })
     }
+  }
+
+  toggleTooltip () {
+    this.setState({
+      translateTooltipOpen: !this.state.translateTooltipOpen
+    })
   }
 
   handleTranslate () {
@@ -133,8 +144,10 @@ export default class Inbox extends React.Component {
     })
       .then(resp => resp.json())
       .then(data => {
-        console.log(data)
         if (data.status === 'complete') {
+          cogoToast.success('Message Deleted!', {
+            position: 'top-right'
+          })
           const array = [...this.state.inboxMails]
           const index = this.state.inboxMails.findIndex(el => el.id === data.id)
           if (index !== -1) {
@@ -157,75 +170,109 @@ export default class Inbox extends React.Component {
           <Card style={{ maxWidth: '100%' }}>
             <CardHeader><h2>Inbox</h2></CardHeader>
             <CardBody>
-              {/* <CardTitle>Lorem Ipsum</CardTitle> */}
               <ListGroup>
-                {inboxMails && inboxMails.map(mail => {
-                  // console.log(mail)
-                  // https://github.com/mat/besticon
-                  return (
-                    <ListGroupItem key={mail.id}>
-                      <div className='mail-wrapper'>
-                        <Badge outline theme='light' className='mail-badge'>
-                          <img className='mail-icon' src={`https://besticon-demo.herokuapp.com/icon?size=40..100..360&url=${mail.domain}`} />
-                          {/* <img src={`https://www.google.com/s2/favicons?domain=${mail.domain}`} /> */}
-                          <FontAwesomeIcon onClick={() => this.toggle(mail.id)} width='1.325em' className='mail-open-icon' icon={faEnvelopeOpenText} />
-                        </Badge>
-                        <div className='mail-info'>
-                          <ListGroupItemHeading>
-                            <div className='inbox-from-text'>{mail.from}</div>
-                            <div className='inbox-subject-text'>{mail.subject}</div>
-                          </ListGroupItemHeading>
-                          <ListGroupItemText>
-                            {mail.snippet}
-                          </ListGroupItemText>
-                        </div>
-                        <ButtonGroup className='inbox-btn-group'>
-                          <Link
-                            href={{
-                              pathname: '/maintenance',
-                              query: {
-                                id: 'NEW',
-                                mailId: mail.id,
-                                name: mail.domain,
-                                from: mail.from,
-                                subject: mail.subject,
-                                maileingang: mail.date,
-                                body: mail.body
-                              }
-                            }}
-                            as='/m/new'
-                          >
-                            <Button className='mail-edit-btn' outline>
-                              <FontAwesomeIcon width='1.2em' className='edit-icon' icon={faPencilAlt} />
-                            </Button>
-                          </Link>
-                          <Button onClick={() => this.handleDelete(mail.id)} className='mail-edit-btn' outline>
-                            <FontAwesomeIcon width='1.2em' className='edit-icon' icon={faTrashAlt} />
-                          </Button>
-                        </ButtonGroup>
-                      </div>
-                    </ListGroupItem>
-                  )
-                })}
-                <Modal className='mail-modal-body' animation backdrop backdropClassName='modal-backdrop' open={open} size='lg' toggle={this.toggle}>
-                  <ModalHeader>
-                    <div className='modal-header-text'>
-                      <div className='modal-from-text'>{this.state.modalFrom}</div>
-                      <small className='modal-subject-text'>{this.state.modalSubject}</small>
-                    </div>
-                    <Button style={{ padding: '1em' }} onClick={this.handleTranslate.bind(this)}>
-                      <FontAwesomeIcon width='1.5em' className='translate-icon' icon={faLanguage} />
-                    </Button>
-                  </ModalHeader>
-                  <ModalBody className='mail-body' dangerouslySetInnerHTML={{ __html: this.state.modalBody }} />
-                </Modal>
+                <TransitionGroup>
+                  {inboxMails && inboxMails.map((mail, index) => {
+                    return (
+                      <CSSTransition
+                        key={mail.id}
+                        timeout={500}
+                        // timeout={200 * index}
+                        classNames='item'
+                      >
+                        <ListGroupItem key={mail.id}>
+                          <div className='mail-wrapper'>
+                            <Badge outline theme='light' className='mail-badge'>
+                              {/* https://github.com/mat/besticon */}
+                              <img className='mail-icon' src={`https://besticon-demo.herokuapp.com/icon?size=40..100..360&url=${mail.domain}`} />
+                              <FontAwesomeIcon onClick={() => this.toggle(mail.id)} width='1.325em' className='mail-open-icon' icon={faEnvelopeOpenText} />
+                            </Badge>
+                            <div className='mail-info'>
+                              <ListGroupItemHeading>
+                                <div className='inbox-from-text'>{mail.from}</div>
+                                <div className='inbox-subject-text'>{mail.subject}</div>
+                              </ListGroupItemHeading>
+                              <ListGroupItemText>
+                                {mail.snippet}
+                              </ListGroupItemText>
+                            </div>
+                            <ButtonGroup className='inbox-btn-group'>
+                              <Link
+                                href={{
+                                  pathname: '/maintenance',
+                                  query: {
+                                    id: 'NEW',
+                                    mailId: mail.id,
+                                    name: mail.domain,
+                                    from: mail.from,
+                                    subject: mail.subject,
+                                    maileingang: mail.date,
+                                    body: mail.body
+                                  }
+                                }}
+                                as='/m/new'
+                              >
+                                <Button className='mail-edit-btn' outline>
+                                  <FontAwesomeIcon width='1.2em' className='edit-icon' icon={faPencilAlt} />
+                                </Button>
+                              </Link>
+                              <Button onClick={() => this.handleDelete(mail.id)} className='mail-edit-btn' outline>
+                                <FontAwesomeIcon width='1.2em' className='edit-icon' icon={faTrashAlt} />
+                              </Button>
+                            </ButtonGroup>
+                          </div>
+                        </ListGroupItem>
+                      </CSSTransition>
+                    )
+                  })}
+                </TransitionGroup>
               </ListGroup>
+              <Modal className='mail-modal-body' animation backdrop backdropClassName='modal-backdrop' open={open} size='lg' toggle={this.toggle}>
+                <ModalHeader>
+                  <div className='modal-header-text'>
+                    <div className='modal-from-text'>{this.state.modalFrom}</div>
+                    <small className='modal-subject-text'>{this.state.modalSubject}</small>
+                  </div>
+                  <Button id='translate-tooltip' style={{ padding: '1em' }} onClick={this.handleTranslate.bind(this)}>
+                    <FontAwesomeIcon width='1.5em' className='translate-icon' icon={faLanguage} />
+                  </Button>
+                </ModalHeader>
+                <ModalBody className='mail-body' dangerouslySetInnerHTML={{ __html: this.state.modalBody }} />
+                <Tooltip
+                  open={this.state.translateTooltipOpen}
+                  target='#translate-tooltip'
+                  toggle={this.toggleTooltip}
+                  placement='bottom'
+                  noArrow
+                >
+                    Translate
+                </Tooltip>
+              </Modal>
             </CardBody>
-            <CardFooter />
+            <Footer />
           </Card>
           <style jsx>{`
+            :global(.item-enter) {
+              opacity: 0;
+            }
+            :global(.item-enter-active) {
+              opacity: 1;
+              transition: all 500ms ease-in;
+            }
+            :global(.item-exit) {
+              opacity: 1;
+              transform: translateX(0);
+            }
+            :global(.item-exit-active) {
+              opacity: 0;
+              transform: translateX(100vw);
+              transition: all 500ms ease-in;
+            }
             .mail-wrapper {
               display: flex;
+            }
+            :global(#translate-tooltip) {
+              transition: all 200ms ease-in-out;
             }
             :global(.mail-badge:hover) {
               min-height: 64px;

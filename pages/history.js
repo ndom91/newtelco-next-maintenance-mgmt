@@ -8,6 +8,7 @@ import Link from 'next/link'
 import fetch from 'isomorphic-unfetch'
 import { NextAuth } from 'next-auth/client'
 import RequireLogin from '../src/components/require-login'
+import Footer from '../src/components/footer'
 import EditBtn from '../src/components/ag-grid/edit-btn'
 import StartDateTime from '../src/components/ag-grid/startdatetime'
 import EndDateTime from '../src/components/ag-grid/enddatetime'
@@ -22,7 +23,6 @@ import {
   Card,
   CardHeader,
   CardBody,
-  CardFooter,
   ButtonToolbar,
   ButtonGroup,
   Button
@@ -197,7 +197,7 @@ export default class About extends React.Component {
                 </div>
               </div>
             </CardBody>
-            <CardFooter />
+            <Footer />
           </Card>
         </Layout>
       )

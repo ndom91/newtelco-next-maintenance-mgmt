@@ -6,6 +6,7 @@ import { NextAuth } from 'next-auth/client'
 import Link from 'next/link'
 import Router from 'next/router'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { de } from 'date-fns/locale'
 import { format, isValid } from 'date-fns'
 import {
   faSave,
@@ -31,7 +32,8 @@ import {
   FormTextarea,
   Modal,
   ModalHeader,
-  ModalBody
+  ModalBody,
+  Tooltip
 } from 'shards-react'
 
 export default class Maintenance extends React.Component {
@@ -67,10 +69,12 @@ export default class Maintenance extends React.Component {
       width: 0,
       maintenance: {},
       open: false,
+      translateTooltipOpen: false,
       translated: false,
       translatedBody: ''
     }
     this.toggle = this.toggle.bind(this)
+    this.toggleTooltip = this.toggleTooltip.bind(this)
   }
 
   handleTranslate () {
@@ -108,10 +112,26 @@ export default class Maintenance extends React.Component {
   }
 
   componentDidMount () {
-    this.setState({
-      maintenance: this.props.jsonData.profile,
-      width: window.innerWidth
-    })
+    if (this.props.jsonData.profile.id === 'NEW') {
+      const {
+        email
+      } = this.props.session.user
+      const username = email.substr(0, email.indexOf('@'))
+      const maintenance = {
+        ...this.props.jsonData.profile,
+        bearbeitetvon: username,
+        updatedAt: format(new Date(), 'MM.dd.yyyy HH:mm') //, { locale: de })
+      }
+      this.setState({
+        maintenance: maintenance,
+        width: window.innerWidth
+      })
+    } else {
+      this.setState({
+        maintenance: this.props.jsonData.profile,
+        width: window.innerWidth
+      })
+    }
   }
 
   convertDateTime = (datetime) => {
@@ -127,6 +147,12 @@ export default class Maintenance extends React.Component {
   toggle () {
     this.setState({
       open: !this.state.open
+    })
+  }
+
+  toggleTooltip () {
+    this.setState({
+      translateTooltipOpen: !this.state.translateTooltipOpen
     })
   }
 
@@ -170,7 +196,7 @@ export default class Maintenance extends React.Component {
                       </Button>
                     </ButtonGroup>
                   ) : (
-                    <span />
+                    <></>
                   )}
               </ButtonToolbar>
             </CardHeader>
@@ -256,7 +282,11 @@ export default class Maintenance extends React.Component {
               {this.state.width < 500
                 ? (
                   <ButtonGroup className='btn-group-2' size='md'>
-                    <Button>
+                    <Button onClick={this.toggle} outline>
+                      <FontAwesomeIcon icon={faEnvelopeOpenText} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
+                      Read
+                    </Button>
+                    <Button outline>
                       <FontAwesomeIcon icon={faCalendarAlt} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
                       Calendar
                     </Button>
@@ -275,17 +305,21 @@ export default class Maintenance extends React.Component {
                   {this.props.jsonData.profile.from} <br />
                   <small className='mail-subject'>{this.props.jsonData.profile.subject}</small>
                 </div>
-                <Button style={{ padding: '1em' }} onClick={this.handleTranslate.bind(this)}>
+                <Button id='translate-tooltip' style={{ padding: '1em' }} onClick={this.handleTranslate.bind(this)}>
                   <FontAwesomeIcon width='1.5em' className='translate-icon' icon={faLanguage} />
                 </Button>
               </ModalHeader>
+              <Tooltip
+                open={this.state.translateTooltipOpen}
+                target='#translate-tooltip'
+                toggle={this.toggleTooltip}
+              >
+                  Translate
+              </Tooltip>
               <ModalBody className='mail-body' dangerouslySetInnerHTML={{ __html: this.state.translatedBody || this.props.jsonData.profile.body }} />
             </Modal>
           </Card>
           <style jsx>{`
-            * {
-              font-family: Lato, Helvetica;
-            }
             :global(#notes) {
               width: 100%;
               height:
@@ -321,6 +355,32 @@ export default class Maintenance extends React.Component {
               justify-content: space-between;
               width: 100%;
               align-items: center;
+            }
+            @media only screen and (max-width: 500px) {
+              :global(div.btn-toolbar > .btn-group-md) {
+                margin-right: 20px;
+              }
+              :global(div.btn-toolbar) {
+                flex-wrap: no-wrap;
+              }
+              :global(div.btn-toolbar > span) {
+                display: flex;
+                justify-content: center;
+                flex-wrap: wrap;
+                flex-direction: column;
+                flex-grow: 1;
+              }
+              :global(div.btn-toolbar > span > h2) {
+                margin: 0 auto;
+                padding-right: 20px;
+              }
+              :global(.card-body) {
+                padding: 0px;
+              }
+              :global(.col) {
+                {/* padding-left: 5px;
+                padding-right: 5px; */}
+              }
             }
           `}
           </style>

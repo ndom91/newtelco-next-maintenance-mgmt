@@ -4,12 +4,12 @@ import RequireLogin from '../src/components/require-login'
 import { NextAuth } from 'next-auth/client'
 import Router from 'next/router'
 import Fonts from '../src/components/fonts'
+import Footer from '../src/components/footer'
 import {
   Card,
   CardHeader,
   CardTitle,
-  CardBody,
-  CardFooter
+  CardBody
 } from 'shards-react'
 
 export default class Blog extends React.Component {
@@ -44,7 +44,7 @@ export default class Blog extends React.Component {
               <CardTitle>Lorem Ipsum</CardTitle>
               <p>Lorem ipsum dolor sit amet.</p>
             </CardBody>
-            <CardFooter>Card footer</CardFooter>
+            <Footer />
           </Card>
         </Layout>
       )
