@@ -9,7 +9,9 @@ import { format, isValid } from 'date-fns'
 import {
   faSave,
   faCalendarAlt,
-  faArrowLeft
+  faArrowLeft,
+  faEnvelopeOpenText,
+  faLanguage
 } from '@fortawesome/free-solid-svg-icons'
 import {
   Container,
@@ -23,21 +25,38 @@ import {
   ButtonGroup,
   Button,
   Badge,
-  Form,
   FormGroup,
   FormInput,
-  FormTextarea
+  FormTextarea,
+  Modal,
+  ModalHeader,
+  ModalBody
 } from 'shards-react'
 
 export default class Maintenance extends React.Component {
   static async getInitialProps ({ req, query }) {
-    const host = req ? req.headers['x-forwarded-host'] : location.host
-    const pageRequest = `https://${host}/api/maintenances/${query.id}`
-    const res = await fetch(pageRequest)
-    const json = await res.json()
-    return {
-      jsonData: json,
-      session: await NextAuth.init({ req })
+    console.log('q', query)
+    if (query.id === 'NEW') {
+      // query all mail info about company, available CIDs, etc.
+      // combine with existing query object
+      //
+      // const host = req ? req.headers['x-forwarded-host'] : location.host
+      // const pageRequest = `https://${host}/api/maintenances/${query.id}`
+      // const res = await fetch(pageRequest)
+      // const json = await res.json()
+      return {
+        jsonData: { profile: query },
+        session: await NextAuth.init({ req })
+      }
+    } else {
+      const host = req ? req.headers['x-forwarded-host'] : location.host
+      const pageRequest = `https://${host}/api/maintenances/${query.id}`
+      const res = await fetch(pageRequest)
+      const json = await res.json()
+      return {
+        jsonData: json,
+        session: await NextAuth.init({ req })
+      }
     }
   }
 
@@ -45,7 +64,45 @@ export default class Maintenance extends React.Component {
     super(props)
     this.state = {
       width: 0,
-      maintenance: {}
+      maintenance: {},
+      open: false,
+      translated: false,
+      translatedBody: ''
+    }
+    this.toggle = this.toggle.bind(this)
+  }
+
+  handleTranslate () {
+    const {
+      body
+    } = this.props.jsonData.profile
+
+    if (this.state.translated) {
+      this.setState({
+        translatedBody: '',
+        translated: !this.state.translated
+      })
+    } else {
+      const host = window.location.host
+      fetch(`https://api.${host}/translate`, {
+        method: 'post',
+        body: JSON.stringify({ q: body }),
+        mode: 'cors',
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Content-Type': 'application/json'
+        }
+      })
+        .then(resp => resp.json())
+        .then(data => {
+          const text = data.translatedText
+          this.setState({
+            originalModalBody: this.props.jsonData.profile.body,
+            translatedBody: text,
+            translated: !this.state.translated
+          })
+        })
+        .catch(err => console.error(`Error - ${err}`))
     }
   }
 
@@ -66,9 +123,16 @@ export default class Maintenance extends React.Component {
     return newDateTime
   }
 
+  toggle () {
+    this.setState({
+      open: !this.state.open
+    })
+  }
+
   render () {
     const {
-      maintenance
+      maintenance,
+      open
     } = this.state
     if (this.props.session.user) {
       return (
@@ -78,14 +142,14 @@ export default class Maintenance extends React.Component {
               <ButtonToolbar style={{ justifyContent: 'space-between' }}>
                 <ButtonGroup size='md'>
                   <Link href='/history'>
-                    <Button>
+                    <Button outline>
                       <FontAwesomeIcon icon={faArrowLeft} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
                       Back
                     </Button>
                   </Link>
                 </ButtonGroup>
                 <span>
-                  <Badge style={{ fontSize: '2rem', marginRight: '20px' }} outline>
+                  <Badge theme='secondary' style={{ fontSize: '2rem', marginRight: '20px' }} outline>
                     {maintenance.id}
                   </Badge>
                   <h2 style={{ display: 'inline-block', marginBottom: '0px' }}>{maintenance.name}</h2>
@@ -93,7 +157,11 @@ export default class Maintenance extends React.Component {
                 {this.state.width > 500
                   ? (
                     <ButtonGroup className='btn-group-2' size='md'>
-                      <Button>
+                      <Button onClick={this.toggle} outline>
+                        <FontAwesomeIcon icon={faEnvelopeOpenText} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
+                      Read
+                      </Button>
+                      <Button outline>
                         <FontAwesomeIcon icon={faCalendarAlt} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
                       Calendar
                       </Button>
@@ -202,6 +270,18 @@ export default class Maintenance extends React.Component {
                   <span />
                 )}
             </CardFooter>
+            <Modal className='mail-modal-body' animation backdrop backdropClassName='modal-backdrop' open={open} size='lg' toggle={this.toggle}>
+              <ModalHeader>
+                <div className='modal-header-text'>
+                  {this.props.jsonData.profile.from} <br />
+                  <small className='mail-subject'>{this.props.jsonData.profile.subject}</small>
+                </div>
+                <Button style={{ padding: '1em' }} onClick={this.handleTranslate.bind(this)}>
+                  <FontAwesomeIcon width='1.5em' className='translate-icon' icon={faLanguage} />
+                </Button>
+              </ModalHeader>
+              <ModalBody className='mail-body' dangerouslySetInnerHTML={{ __html: this.state.translatedBody || this.props.jsonData.profile.body }} />
+            </Modal>
           </Card>
           <style jsx>{`
             * {
@@ -219,6 +299,29 @@ export default class Maintenance extends React.Component {
             }
             label {
               margin: 15px;
+            }
+            :global(.modal-content) {
+              max-height: calc(${this.state.windowInnerHeight}px - 50px);
+            }
+            :global(.mail-body) {
+              font-family: Poppins, Helvetica;
+              overflow-y: scroll;
+            }
+            :global(.modal-backdrop) {
+              background-color: #000;
+              transition: all 150ms ease-in-out;
+            }
+            :global(.modal-backdrop.show) {
+              opacity: 0.5;
+            }
+            .modal-header-text {
+              flex-grow: 1;
+            }
+            :global(.modal-title) {
+              display: flex;
+              justify-content: space-between;
+              width: 100%;
+              align-items: center;
             }
           `}
           </style>

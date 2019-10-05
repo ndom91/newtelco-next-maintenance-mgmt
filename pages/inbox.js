@@ -1,5 +1,6 @@
 import React from 'react'
 import Layout from '../src/components/layout'
+import Link from 'next/link'
 import RequireLogin from '../src/components/require-login'
 import fetch from 'isomorphic-unfetch'
 import { NextAuth } from 'next-auth/client'
@@ -91,7 +92,7 @@ export default class Inbox extends React.Component {
     } = this.state
 
     if (this.state.translated) {
-      this.setState({ 
+      this.setState({
         modalBody: this.state.originalModalBody,
         translated: !this.state.translated
       })
@@ -109,7 +110,7 @@ export default class Inbox extends React.Component {
         .then(resp => resp.json())
         .then(data => {
           const text = data.translatedText
-          this.setState({ 
+          this.setState({
             originalModalBody: this.state.modalBody,
             modalBody: text,
             translated: !this.state.translated
@@ -171,16 +172,33 @@ export default class Inbox extends React.Component {
                         </Badge>
                         <div className='mail-info'>
                           <ListGroupItemHeading>
-                            {mail.from} - <b style={{ fontWeight: '900' }}>{mail.subject}</b>
+                            <div className='inbox-from-text'>{mail.from}</div>
+                            <div className='inbox-subject-text'>{mail.subject}</div>
                           </ListGroupItemHeading>
                           <ListGroupItemText>
                             {mail.snippet}
                           </ListGroupItemText>
                         </div>
                         <ButtonGroup className='inbox-btn-group'>
-                          <Button className='mail-edit-btn' outline>
-                            <FontAwesomeIcon width='1.2em' className='edit-icon' icon={faPencilAlt} />
-                          </Button>
+                          <Link
+                            href={{
+                              pathname: '/maintenance',
+                              query: {
+                                id: 'NEW',
+                                mailId: mail.id,
+                                name: mail.domain,
+                                from: mail.from,
+                                subject: mail.subject,
+                                maileingang: mail.date,
+                                body: mail.body
+                              }
+                            }}
+                            as='/m/new'
+                          >
+                            <Button className='mail-edit-btn' outline>
+                              <FontAwesomeIcon width='1.2em' className='edit-icon' icon={faPencilAlt} />
+                            </Button>
+                          </Link>
                           <Button onClick={() => this.handleDelete(mail.id)} className='mail-edit-btn' outline>
                             <FontAwesomeIcon width='1.2em' className='edit-icon' icon={faTrashAlt} />
                           </Button>
@@ -192,8 +210,8 @@ export default class Inbox extends React.Component {
                 <Modal className='mail-modal-body' animation backdrop backdropClassName='modal-backdrop' open={open} size='lg' toggle={this.toggle}>
                   <ModalHeader>
                     <div className='modal-header-text'>
-                      {this.state.modalFrom} <br />
-                      <small className='mail-subject'>{this.state.modalSubject}</small>
+                      <div className='modal-from-text'>{this.state.modalFrom}</div>
+                      <small className='modal-subject-text'>{this.state.modalSubject}</small>
                     </div>
                     <Button style={{ padding: '1em' }} onClick={this.handleTranslate.bind(this)}>
                       <FontAwesomeIcon width='1.5em' className='translate-icon' icon={faLanguage} />
@@ -203,7 +221,7 @@ export default class Inbox extends React.Component {
                 </Modal>
               </ListGroup>
             </CardBody>
-            <CardFooter>Card footer</CardFooter>
+            <CardFooter />
           </Card>
           <style jsx>{`
             .mail-wrapper {
@@ -269,7 +287,18 @@ export default class Inbox extends React.Component {
               flex-grow: 1;
               justify-content: center;
             }
-            .mail-subject {
+            .inbox-from-text {
+
+            }
+            .inbox-subject-text {
+              max-height: 25px;
+              overflow:hidden;
+              font-weight: 700;
+              letter-spacing: -1px;
+            }
+            :global(.list-group-item-text) {
+            }
+            .modal-subject-text {
               font-weight: 100;
               letter-spacing: -0.5px;
               font-family: Poppins, Helvetica;

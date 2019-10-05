@@ -197,7 +197,7 @@ export default class About extends React.Component {
                 </div>
               </div>
             </CardBody>
-            <CardFooter>Card footer</CardFooter>
+            <CardFooter />
           </Card>
         </Layout>
       )
