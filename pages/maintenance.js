@@ -4,6 +4,7 @@ import fetch from 'isomorphic-unfetch'
 import RequireLogin from '../src/components/require-login'
 import { NextAuth } from 'next-auth/client'
 import Link from 'next/link'
+import Router from 'next/router'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { format, isValid } from 'date-fns'
 import {
@@ -141,12 +142,10 @@ export default class Maintenance extends React.Component {
             <CardHeader>
               <ButtonToolbar style={{ justifyContent: 'space-between' }}>
                 <ButtonGroup size='md'>
-                  <Link href='/history'>
-                    <Button outline>
-                      <FontAwesomeIcon icon={faArrowLeft} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
-                      Back
-                    </Button>
-                  </Link>
+                  <Button onClick={() => Router.back()} outline>
+                    <FontAwesomeIcon icon={faArrowLeft} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
+                    Back
+                  </Button>
                 </ButtonGroup>
                 <span>
                   <Badge theme='secondary' style={{ fontSize: '2rem', marginRight: '20px' }} outline>
