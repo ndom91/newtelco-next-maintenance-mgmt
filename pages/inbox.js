@@ -58,7 +58,9 @@ export default class Inbox extends React.Component {
       modalBody: '',
       originalModayBody: '',
       translated: false,
-      translateTooltipOpen: false
+      translateTooltipOpen: false,
+      windowInnerHeight: 0,
+      windowInnerWidth: 0
     }
     this.toggle = this.toggle.bind(this)
     this.toggleTooltip = this.toggleTooltip.bind(this)
@@ -67,7 +69,8 @@ export default class Inbox extends React.Component {
   componentDidMount () {
     this.setState({
       inboxMails: this.props.jsonData,
-      windowInnerHeight: window.innerHeight
+      windowInnerHeight: window.innerHeight,
+      windowInnerWidth: window.innerWidth
     })
   }
 
@@ -182,11 +185,16 @@ export default class Inbox extends React.Component {
                       >
                         <ListGroupItem key={mail.id}>
                           <div className='mail-wrapper'>
+                          {this.state.windowInnerWidth > 500
+                            ? (
                             <Badge outline theme='light' className='mail-badge'>
                               {/* https://github.com/mat/besticon */}
                               <img className='mail-icon' src={`https://besticon-demo.herokuapp.com/icon?size=40..100..360&url=${mail.domain}`} />
                               <FontAwesomeIcon onClick={() => this.toggle(mail.id)} width='1.325em' className='mail-open-icon' icon={faEnvelopeOpenText} />
                             </Badge>
+                            ) : (
+                              <></>
+                            )}
                             <div className='mail-info'>
                               <ListGroupItemHeading>
                                 <div className='inbox-from-text'>{mail.from}</div>
@@ -197,6 +205,16 @@ export default class Inbox extends React.Component {
                               </ListGroupItemText>
                             </div>
                             <ButtonGroup className='inbox-btn-group'>
+                            {this.state.windowInnerWidth < 500
+                              ? (
+                              <Badge outline theme='light' className='mail-badge'>
+                                {/* https://github.com/mat/besticon */}
+                                <img className='mail-icon' src={`https://besticon-demo.herokuapp.com/icon?size=40..100..360&url=${mail.domain}`} />
+                                <FontAwesomeIcon onClick={() => this.toggle(mail.id)} width='1.525em' className='mail-open-icon' icon={faEnvelopeOpenText} />
+                              </Badge>
+                              ) : (
+                                <></>
+                              )}
                               <Link
                                 href={{
                                   pathname: '/maintenance',
@@ -252,6 +270,30 @@ export default class Inbox extends React.Component {
             <Footer />
           </Card>
           <style jsx>{`
+            @media only screen and (max-width: 500px) {
+              :global(.inbox-btn-group) {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+              }
+              :global(.mail-open-icon) {
+                margin-left: -50px;
+              }
+              :global(.mail-edit-btn) {
+                margin-top: 10px;
+              }
+              :global(.list-group-item) {
+                padding: 0.5rem !important;
+              }
+              :global(.mail-badge) {
+                border: 1px solid var(--primary);
+              }
+              :global(.btn-group > .btn) {
+                flex: unset !important;
+                height: 66px;
+                width: 66px;
+              }
+            }
             :global(.item-enter) {
               opacity: 0;
             }
@@ -300,7 +342,7 @@ export default class Inbox extends React.Component {
             :global(.mail-open-icon) {
               color: var(--primary);
               align-self: center;
-              margin-left: -50px;
+              margin-left: -40px;
               font-size: 24px;
               visibility: hidden;
               opacity: 0;
