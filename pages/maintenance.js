@@ -1,6 +1,9 @@
 import React from 'react'
 import Layout from '../src/components/layout'
 import fetch from 'isomorphic-unfetch'
+import { AgGridReact } from 'ag-grid-react'
+import 'ag-grid-community/dist/styles/ag-grid.css'
+import 'ag-grid-community/dist/styles/ag-theme-material.css'
 import RequireLogin from '../src/components/require-login'
 import { NextAuth } from 'next-auth/client'
 import Toggle from 'react-toggle'
@@ -77,7 +80,51 @@ export default class Maintenance extends React.Component {
       translated: false,
       translatedBody: '',
       notesText: props.jsonData.profile.notes,
-      lieferantcids: {}
+      lieferantcids: {},
+      kundencids: [],
+      gridOptions: {
+        defaultColDef: {
+          resizable: true,
+          sortable: true,
+          filter: true,
+          selectable: true
+        },
+        columnDefs: [
+          {
+            headerName: 'Mail',
+            width: 80,
+            sortable: false,
+            filter: false,
+            resizable: false
+            // cellRenderer: 'sendMailBtn',
+          }, {
+            headerName: 'CID',
+            field: 'kundenCID',
+            width: 100,
+            sort: { direction: 'asc', priority: 0 }
+          }, {
+            headerName: 'Customer',
+            field: 'name'
+          }, {
+            headerName: 'Protected',
+            field: 'protected',
+            width: 130
+          }, {
+            headerName: 'Recipient',
+            field: 'maintenanceRecipient',
+            // cellRenderer: 'supplier',
+            width: 150
+          }
+        ],
+        context: { componentParent: this },
+        // frameworkComponents: {
+        //   sendMailBtn: sendMailBtn,
+        // },
+        // rowSelection: 'multiple',
+        // rowMultiSelectWithClick: true,
+        paginationPageSize: 10,
+        rowClass: 'row-class'
+      }
     }
     this.toggle = this.toggle.bind(this)
     this.toggleTooltip = this.toggleTooltip.bind(this)
@@ -175,6 +222,36 @@ export default class Maintenance extends React.Component {
       })
       .catch(err => console.error(`Error - ${err}`))
     // get available Newtelco CIDs based on supplier CID
+    this.fetchMailCIDs(lieferantId)
+  }
+
+  getUnique (arr, comp) {
+    const unique = arr
+      .map(e => e[comp])
+      .map((e, i, final) => final.indexOf(e) === i && i)
+      .filter(e => arr[e]).map(e => arr[e]);
+    return unique;
+  }
+
+  fetchMailCIDs (lieferantId) {
+    const host = window.location.host
+    fetch(`https://${host}/api/customercids/${lieferantId}`, {
+      method: 'get'
+    })
+      .then(resp => resp.json())
+      .then(data => {
+        console.log(data)
+        const existingKundenCids = [
+          data.kundenCIDsResult[0],
+          ...this.state.kundencids
+        ]
+        const uniqueKundenCids = this.getUnique(existingKundenCids, 'kundenCID')
+        this.setState({
+          kundencids: uniqueKundenCids
+        })
+        console.log(this.state.kundencids)
+      })
+      .catch(err => console.error(`Error - ${err}`))
   }
 
   componentDidUpdate () {
@@ -202,6 +279,9 @@ export default class Maintenance extends React.Component {
 
   handleSelectLieferantChange = selectedOption => {
     console.log(selectedOption)
+    selectedOption.forEach(option => {
+      this.fetchMailCIDs(option.value)
+    })
     this.setState({ selectedLieferant: selectedOption })
   }
 
@@ -217,7 +297,16 @@ export default class Maintenance extends React.Component {
     })
   }
 
-  renderQuill = () => {
+  onGridReady = params => {
+    this.gridApi = params.gridApi
+    this.gridColumnApi = params.gridColumnApi
+    // params.columnApi.sizeColumnsToFit()
+    params.columnApi.autoSizeColumns()
+  }
+
+  onFirstDataRendered (params) {
+    // params.columnApi.autoSizeColumns()
+    // params.columnApi.sizeColumnsToFit()
   }
 
   render () {
@@ -351,7 +440,7 @@ export default class Maintenance extends React.Component {
                               <FormGroup className='form-group-toggle'>
                                 <Badge theme='secondary' outline>
                                   <label>
-                                    <Toggle defaultChecked={maintenance.cancelled === 1 ? true : false} />
+                                    <Toggle defaultChecked={maintenance.cancelled === 1} />
                                     <div style={{ marginTop: '10px' }}>Cancelled</div>
                                   </label>
                                 </Badge>
@@ -360,20 +449,22 @@ export default class Maintenance extends React.Component {
                                     <Toggle
                                       icons={{
                                         checked: <FontAwesomeIcon icon={faFirstAid} width='0.5em' style={{ color: '#fff' }} />,
-                                        unchecked: null,
-                                      }} 
-                                      checked={maintenance.emergency === 1 ? true : false} />
+                                        unchecked: null
+                                      }}
+                                      checked={maintenance.emergency === 1}
+                                    />
                                     <div style={{ marginTop: '10px' }}>Emergency</div>
                                   </label>
                                 </Badge>
                                 <Badge theme='secondary'>
                                   <label>
-                                    <Toggle 
-                                      checked={maintenance.done === 1 ? true : false} />
+                                    <Toggle
+                                      checked={maintenance.done === 1}
+                                    />
                                     <div style={{ marginTop: '10px' }}>Done</div>
                                   </label>
                                 </Badge>
-                              </FormGroup> 
+                              </FormGroup>
                             </Col>
                           </Row>
                         </Container>
@@ -388,7 +479,8 @@ export default class Maintenance extends React.Component {
                                     ref={(el) => { this.reactQuillRef = el }}
                                     style={{ borderRadius: '5px' }}
                                     onChange={this.handleNotesChange}
-                                    theme='snow' />
+                                    theme='snow'
+                                    />
                                   : <textarea value={this.state.notesText} />}
                               </FormGroup>
                             </Col>
@@ -402,14 +494,23 @@ export default class Maintenance extends React.Component {
                       <Col>
                         <Container style={{ padding: '20px' }} className='maintenance-subcontainer'>
                           <Row>
-                            <Col>
-                              <ListGroup>
-                                <ListGroupItem>Cras justo odio</ListGroupItem>
-                                <ListGroupItem>Dapibus ac facilisis in</ListGroupItem>
-                                <ListGroupItem>Morbi leo risus</ListGroupItem>
-                                <ListGroupItem>Porta ac consectetur ac</ListGroupItem>
-                                <ListGroupItem>Vestibulum at eros</ListGroupItem>
-                              </ListGroup>
+                            <Col style={{ width: '100%', height: '600px' }}>
+                              <div
+                                className='ag-theme-material'
+                                style={{
+                                  height: '100%',
+                                  width: '100%'
+                                }}
+                              >
+                                <AgGridReact
+                                  gridOptions={this.state.gridOptions}
+                                  rowData={this.state.kundencids}
+                                  onGridReady={this.onGridReady}
+                                  animateRows
+                                  pagination
+                                  onFirstDataRendered={this.onFirstDataRendered.bind(this)}
+                                />
+                              </div>
                             </Col>
                           </Row>
                         </Container>
