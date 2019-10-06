@@ -25,6 +25,7 @@ class Settings extends React.Component {
 
   constructor (props) {
     super(props)
+    // todo: clean up active tab stuff - this is ugly!
     this.state = {
       active: {
         companies: props.router.query.tab === 'companies' ? true : false,
