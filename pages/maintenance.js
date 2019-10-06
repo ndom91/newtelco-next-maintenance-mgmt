@@ -5,6 +5,7 @@ import { AgGridReact } from 'ag-grid-react'
 import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-material.css'
 import RequireLogin from '../src/components/require-login'
+import ProtectedIcon from '../src/components/ag-grid/protected'
 import { NextAuth } from 'next-auth/client'
 import Toggle from 'react-toggle'
 import './style/maintenance.css'
@@ -12,14 +13,22 @@ import Select from 'react-select'
 import Router from 'next/router'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import 'react-quill/dist/quill.snow.css'
+// import { Editor } from 'slate-react'
+// import Plain from 'slate-plain-serializer'
+// import { KeyUtils } from 'slate'
+import Editor from '../src/components/nextEditor'
+
 import { format, isValid } from 'date-fns'
+import { zonedTimeToUtc, utcToZonedTime, format as formatTz } from 'date-fns-tz'
 import {
   faSave,
   faCalendarAlt,
   faArrowLeft,
   faEnvelopeOpenText,
   faLanguage,
-  faFirstAid
+  faFirstAid,
+  faSearch,
+  faPaperPlane
 } from '@fortawesome/free-solid-svg-icons'
 import {
   Container,
@@ -38,9 +47,7 @@ import {
   Modal,
   ModalHeader,
   ModalBody,
-  Tooltip,
-  ListGroup,
-  ListGroupItem
+  Tooltip
 } from 'shards-react'
 
 export default class Maintenance extends React.Component {
@@ -72,14 +79,19 @@ export default class Maintenance extends React.Component {
 
   constructor (props) {
     super(props)
+
+    // slate hack for SSR
+    // KeyUtils.resetGenerator()
     this.state = {
       width: 0,
       maintenance: {},
-      open: false,
+      openReadModal: false,
+      openPreviewModal: false,
       translateTooltipOpen: false,
       translated: false,
       translatedBody: '',
-      notesText: props.jsonData.profile.notes,
+      notesText: props.jsonData.profile.notes || '',
+      mailBodyText: '',
       lieferantcids: {},
       kundencids: [],
       gridOptions: {
@@ -95,8 +107,9 @@ export default class Maintenance extends React.Component {
             width: 80,
             sortable: false,
             filter: false,
-            resizable: false
-            // cellRenderer: 'sendMailBtn',
+            resizable: false,
+            cellRenderer: 'sendMailBtn',
+            cellStyle: { 'padding-right': '0px', 'padding-left': '10px' }
           }, {
             headerName: 'CID',
             field: 'kundenCID',
@@ -104,11 +117,14 @@ export default class Maintenance extends React.Component {
             sort: { direction: 'asc', priority: 0 }
           }, {
             headerName: 'Customer',
-            field: 'name'
+            field: 'name',
+            width: 170
           }, {
             headerName: 'Protected',
             field: 'protected',
-            width: 130
+            filter: false,
+            cellRenderer: 'protectedIcon',
+            width: 100
           }, {
             headerName: 'Recipient',
             field: 'maintenanceRecipient',
@@ -117,22 +133,38 @@ export default class Maintenance extends React.Component {
           }
         ],
         context: { componentParent: this },
-        // frameworkComponents: {
-        //   sendMailBtn: sendMailBtn,
-        // },
-        // rowSelection: 'multiple',
-        // rowMultiSelectWithClick: true,
+        frameworkComponents: {
+          sendMailBtn: this.sendMailBtns,
+          protectedIcon: ProtectedIcon
+        },
         paginationPageSize: 10,
         rowClass: 'row-class'
       }
     }
-    this.toggle = this.toggle.bind(this)
+    this.toggleReadModal = this.toggleReadModal.bind(this)
+    this.togglePreviewModal = this.togglePreviewModal.bind(this)
     this.toggleTooltip = this.toggleTooltip.bind(this)
     this.handleNotesChange = this.handleNotesChange.bind(this)
-    if (document) {
-      this.quill = require('react-quill')
-      this.reactQuillRef = null
-    }
+    this.handleMailPreviewChange = this.handleMailPreviewChange.bind(this)
+    // if (document) {
+    //   this.quill = require('react-quill')
+
+    //   this.reactQuillRef = null
+    //   this.reactQuillRef2 = null
+    // }
+  }
+
+  sendMailBtns = (row) => {
+    return (
+      <ButtonGroup>
+        <Button onClick={this.sendMail} style={{ padding: '0.7em' }} size='sm' outline>
+          <FontAwesomeIcon width='1.325em' icon={faPaperPlane} />
+        </Button>
+        <Button onClick={() => this.togglePreviewModal(row.data.maintenanceRecipient, row.data.kundenCID)} style={{ padding: '0.7em' }} size='sm' outline>
+          <FontAwesomeIcon width='1.325em' icon={faSearch} />
+        </Button>
+      </ButtonGroup>
+    )
   }
 
   handleTranslate () {
@@ -170,10 +202,10 @@ export default class Maintenance extends React.Component {
   }
 
   componentDidMount () {
-    this.attachQuillRefs()
-    const editor = this.reactQuillRef.getEditor()
-    const unprivilegedEditor = this.reactQuillRef.makeUnprivilegedEditor(editor)
-    const quillContents = unprivilegedEditor.getContents()
+    // this.attachQuillRefs()
+    // const editor = this.reactQuillRef.getEditor()
+    // const unprivilegedEditor = this.reactQuillRef.makeUnprivilegedEditor(editor)
+    // const quillContents = unprivilegedEditor.getContents()
     if (this.props.jsonData.profile.id === 'NEW') {
       const {
         email
@@ -186,8 +218,8 @@ export default class Maintenance extends React.Component {
       }
       this.setState({
         maintenance: maintenance,
-        width: window.innerWidth,
-        notesText: quillContents
+        width: window.innerWidth
+        // notesText: quillContents
       })
     } else {
       this.setState({
@@ -198,39 +230,40 @@ export default class Maintenance extends React.Component {
     // get available supplier CIDs
     let lieferantId
 
+    const host = window.location.host
     if (this.props.jsonData.profile.lieferant) {
       lieferantId = this.props.jsonData.profile.lieferant
+      fetch(`https://${host}/api/lieferantcids?id=${lieferantId}`, {
+        method: 'get'
+      })
+        .then(resp => resp.json())
+        .then(data => {
+          // console.log(data)
+          const selectedLieferantCIDid = parseInt(this.props.jsonData.profile.derenCIDid) || null
+          const selectedLieferantCIDvalue = this.props.jsonData.profile.derenCID || null
+          this.setState({
+            lieferantcids: data.lieferantCIDsResult,
+            selectedLieferant: {
+              label: selectedLieferantCIDvalue,
+              value: selectedLieferantCIDid
+            }
+          })
+        })
+        .catch(err => console.error(`Error - ${err}`))
+      // get available Newtelco CIDs based on supplier CID
+      this.fetchMailCIDs(lieferantId)
     } else {
       const lieferantDomain = this.props.jsonData.profile.name
+      // fetch id based on domain, then fetch available CIDs
     }
-    const host = window.location.host
-    fetch(`https://${host}/api/lieferantcids?id=${lieferantId}`, {
-      method: 'get'
-    })
-      .then(resp => resp.json())
-      .then(data => {
-        // console.log(data)
-        const selectedLieferantCIDid = parseInt(this.props.jsonData.profile.derenCIDid) || null
-        const selectedLieferantCIDvalue = this.props.jsonData.profile.derenCID || null
-        this.setState({
-          lieferantcids: data.lieferantCIDsResult,
-          selectedLieferant: {
-            label: selectedLieferantCIDvalue,
-            value: selectedLieferantCIDid
-          }
-        })
-      })
-      .catch(err => console.error(`Error - ${err}`))
-    // get available Newtelco CIDs based on supplier CID
-    this.fetchMailCIDs(lieferantId)
   }
 
   getUnique (arr, comp) {
     const unique = arr
       .map(e => e[comp])
       .map((e, i, final) => final.indexOf(e) === i && i)
-      .filter(e => arr[e]).map(e => arr[e]);
-    return unique;
+      .filter(e => arr[e]).map(e => arr[e])
+    return unique
   }
 
   fetchMailCIDs (lieferantId) {
@@ -240,7 +273,6 @@ export default class Maintenance extends React.Component {
     })
       .then(resp => resp.json())
       .then(data => {
-        console.log(data)
         const existingKundenCids = [
           data.kundenCIDsResult[0],
           ...this.state.kundencids
@@ -249,19 +281,25 @@ export default class Maintenance extends React.Component {
         this.setState({
           kundencids: uniqueKundenCids
         })
-        console.log(this.state.kundencids)
       })
       .catch(err => console.error(`Error - ${err}`))
   }
 
   componentDidUpdate () {
-    this.attachQuillRefs()
+    // this.attachQuillRefs()
   }
 
-  attachQuillRefs = () => {
-    if (typeof this.reactQuillRef.getEditor !== 'function') return
-    this.quillRef = this.reactQuillRef.getEditor()
-  }
+  // attachQuillRefs = () => {
+  //   if (typeof this.reactQuillRef.getEditor !== 'function') return
+  //   this.quillRef = this.reactQuillRef.getEditor()
+  // }
+
+  // attachQuillRefs2 = () => {
+  //   if (this.reactQuillRef2) {
+  //     if (typeof this.reactQuillRef2.getEditor !== 'function') return
+  //     this.quillRef2 = this.reactQuillRef2.getEditor()
+  //   }
+  // }
 
   convertDateTime = (datetime) => {
     let newDateTime
@@ -273,21 +311,41 @@ export default class Maintenance extends React.Component {
     return newDateTime
   }
 
-  handleNotesChange (content, delta, source, editor) {
-    this.setState({ notesText: editor.getContents() })
+  handleNotesChange (value) {
+    this.setState({ notesText: value })
+  }
+
+  handleMailPreviewChange (content, delta, source, editor) {
+    this.setState({ mailBodyText: editor.getContents() })
   }
 
   handleSelectLieferantChange = selectedOption => {
-    console.log(selectedOption)
-    selectedOption.forEach(option => {
-      this.fetchMailCIDs(option.value)
-    })
-    this.setState({ selectedLieferant: selectedOption })
+    if (selectedOption) {
+      selectedOption.forEach(option => {
+        this.fetchMailCIDs(option.value)
+      })
+      this.setState({ selectedLieferant: selectedOption })
+    }
   }
 
-  toggle () {
+  toggleReadModal () {
     this.setState({
-      open: !this.state.open
+      openReadModal: !this.state.openReadModal
+    })
+  }
+
+  togglePreviewModal = (recipient, customerCID) => {
+    // this.attachQuillRefs2()
+    // if (this.reactQuillRef2) {
+    //   const editor2 = this.reactQuillRef2.getEditor()
+    //   const unprivilegedEditor2 = this.reactQuillRef2.makeUnprivilegedEditor(editor2)
+    //   const quillContents2 = unprivilegedEditor2.getContents()
+    // }
+    const HtmlBody = this.generateMail(customerCID)
+    this.setState({
+      openPreviewModal: !this.state.openPreviewModal,
+      mailBodyText: HtmlBody,
+      mailPreviewHeaderText: recipient
     })
   }
 
@@ -309,13 +367,59 @@ export default class Maintenance extends React.Component {
     // params.columnApi.sizeColumnsToFit()
   }
 
+  generateMail = (customerCID) => {
+    const {
+      betroffeneCIDs,
+      id,
+      startDateTime,
+      endDateTime,
+      impact,
+      reason,
+      location
+    } = this.state.maintenance
+
+    const rescheduleText = ''
+
+    const timeZone = 'Europe/Berlin'
+    const startDateTimeDE = formatTz(utcToZonedTime(new Date(startDateTime), timeZone), 'dd.MM.yyyy HH:mm')
+    const endDateTimeDE = formatTz(utcToZonedTime(new Date(endDateTime), timeZone), 'dd.MM.yyyy HH:mm')
+    const tzSuffixRAW = 'CET / GMT+2:00'
+
+    let body = `<body style="color:#666666;"><div​​ ​style="​font-size:10pt;font-family:'Arial';"​​>${rescheduleText} Dear Colleagues,​​<p><span>We would like to inform you about planned work on the CID:<br><br> ${customerCID}. <br><br>The maintenance work is with the following details:</span></p><table border="0" cellspacing="2" cellpadding="2" width="975"><tr><td>Maintenance ID:</td><td><b>${id}</b></td></tr><tr><td>Start date and time:</td><td><b>${startDateTimeDE} (${tzSuffixRAW})</b></td></tr><tr><td>Finish date and time:</td><td><b>${endDateTimeDE} (${tzSuffixRAW})</b></td></tr>`
+
+    if (impact !== '') {
+      body = body + '<tr><td>Impact:</td><td>' + impact + '</td></tr>'
+    }
+
+    if (location !== '') {
+      body = body + '<tr><td>Location:</td><td>' + location + '</td></tr>'
+    }
+
+    if (reason !== '') {
+      body = body + '<tr><td>Reason:</td><td>' + reason + '</td></tr>'
+    }
+
+    body = body + '</table><p>We sincerely regret causing any inconveniences by this and hope for your understanding and the further mutually advantageous cooperation.</p><p>If you have any questions feel free to contact us at maintenance@newtelco.de.</p></div>​​</body>​​<footer>​<style>.sig{font-family:Century Gothic, sans-serif;font-size:9pt;color:#636266!important;}b.i{color:#4ca702;}.gray{color:#636266 !important;}a{text-decoration:none;color:#636266 !important;}</style><div class="sig"><div>Best regards <b class="i">|</b> Mit freundlichen Grüßen</div><br><div><b>Newtelco Maintenance Team</b></div><br><div>NewTelco GmbH <b class="i">|</b> Moenchhofsstr. 24 <b class="i">|</b> 60326 Frankfurt a.M. <b class="i">|</b> DE <br>www.newtelco.com <b class="i">|</b> 24/7 NOC  49 69 75 00 27 30 ​​<b class="i">|</b> <a style="color:#" href="mailto:service@newtelco.de">service@newtelco.de</a><br><br><div><img src="https://home.newtelco.de/sig.png" height="29" width="516"></div></div>​</footer>'
+
+    return body
+  }
+
+  sendMail (data) {
+    console.log(data)
+  }
+
+  handleSlateChange = ({ value }) => {
+    this.setState({ slateValue: value })
+  }
+
   render () {
     const {
       maintenance,
-      open
+      openReadModal,
+      openPreviewModal
     } = this.state
     console.log(maintenance)
-    const Quill = this.quill
+    // const Quill = this.quill
     if (this.props.session.user) {
       return (
         <Layout session={this.props.session}>
@@ -337,7 +441,7 @@ export default class Maintenance extends React.Component {
                 {this.state.width > 500
                   ? (
                     <ButtonGroup className='btn-group-2' size='md'>
-                      <Button onClick={this.toggle} outline>
+                      <Button onClick={this.toggleReadModal} outline>
                         <FontAwesomeIcon icon={faEnvelopeOpenText} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
                       Read
                       </Button>
@@ -473,7 +577,7 @@ export default class Maintenance extends React.Component {
                             <Col>
                               <FormGroup>
                                 <label htmlFor='notes'>Notes</label>
-                                {document
+                                {/* {document
                                   ? <Quill
                                     value={this.state.notesText}
                                     ref={(el) => { this.reactQuillRef = el }}
@@ -481,7 +585,8 @@ export default class Maintenance extends React.Component {
                                     onChange={this.handleNotesChange}
                                     theme='snow'
                                     />
-                                  : <textarea value={this.state.notesText} />}
+                                  : <textarea value={this.state.notesText} />} */}
+                                <Editor slateKey='notes' defaultValue={this.state.notesText}  />
                               </FormGroup>
                             </Col>
                           </Row>
@@ -541,7 +646,7 @@ export default class Maintenance extends React.Component {
                   <span />
                 )}
             </CardFooter>
-            <Modal className='mail-modal-body' animation backdrop backdropClassName='modal-backdrop' open={open} size='lg' toggle={this.toggle}>
+            <Modal className='mail-modal-body' animation backdrop backdropClassName='modal-backdrop' open={openReadModal} size='lg' toggle={this.toggleReadModal}>
               <ModalHeader>
                 <div className='modal-header-text'>
                   {this.props.jsonData.profile.from} <br />
@@ -559,6 +664,22 @@ export default class Maintenance extends React.Component {
                   Translate
               </Tooltip>
               <ModalBody className='mail-body' dangerouslySetInnerHTML={{ __html: this.state.translatedBody || this.props.jsonData.profile.body }} />
+            </Modal>
+            <Modal backdropClassName='modal-backdrop' animation backdrop size='lg' open={openPreviewModal} toggle={this.togglePreviewModal}>
+              <ModalHeader>To: {this.state.mailPreviewHeaderText}</ModalHeader>
+              <ModalBody>
+                {/* <Editor value={this.state.slateValue} onChange={this.handleSlateChange} /> */}
+                {/* {document
+                  ? <Quill
+                    value={this.state.mailBodyText}
+                    ref={(el) => { this.reactQuillRef2 = el }}
+                    style={{ borderRadius: '5px' }}
+                    onChange={this.handleMailPreviewChange}
+                    theme='snow'
+                    />
+                  : <textarea value={this.state.mailBodyText} />} */}
+
+              </ModalBody>
             </Modal>
           </Card>
           <style jsx>{`
