@@ -5,7 +5,6 @@ import RequireLogin from '../src/components/require-login'
 import { NextAuth } from 'next-auth/client'
 import Router from 'next/router'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import ReactQuill from 'react-quill'
 import 'react-quill/dist/quill.snow.css'
 import { format, isValid } from 'date-fns'
 import {
@@ -77,7 +76,10 @@ export default class Maintenance extends React.Component {
     this.toggle = this.toggle.bind(this)
     this.toggleTooltip = this.toggleTooltip.bind(this)
     this.handleNotesChange = this.handleNotesChange.bind(this)
-    this.reactQuillRef = null
+    if (document) {
+      this.quill = require('react-quill')
+      this.reactQuillRef = null
+    }
   }
 
   handleTranslate () {
@@ -177,11 +179,15 @@ export default class Maintenance extends React.Component {
     })
   }
 
+  renderQuill = () => {
+  }
+
   render () {
     const {
       maintenance,
       open
     } = this.state
+    const Quill = this.quill
     if (this.props.session.user) {
       return (
         <Layout session={this.props.session}>
@@ -278,14 +284,15 @@ export default class Maintenance extends React.Component {
                           <Col>
                             <FormGroup>
                               <label htmlFor='notes'>Notes</label>
-                              {/* <FormTextarea id='notes' name='notes' size='lg' value={maintenance.notes} /> */}
-                              <ReactQuill
-                                value={this.state.notesText}
-                                ref={(el) => { this.reactQuillRef = el }}
-                                style={{ borderRadius: '5px' }}
-                                onChange={this.handleNotesChange}
-                                theme='snow'
-                              />
+                              {document
+                                ? <Quill
+                                  value={this.state.notesText}
+                                  ref={(el) => { this.reactQuillRef = el }}
+                                  style={{ borderRadius: '5px' }}
+                                  onChange={this.handleNotesChange}
+                                  theme='snow'
+                                  />
+                                : <textarea value={this.state.notesText} />}
                             </FormGroup>
                           </Col>
                         </Row>
