@@ -125,18 +125,11 @@ export default class About extends React.Component {
           'row-cancelled': function (params) { return params.data.cancelled === 1 },
           'row-emergency': function (params) { return params.data.emergency === 1 }
         }
-
-        // rowModelType: 'infinite',
-        // cacheOverflowSize: 2,
-        // maxConcurrentDatasourceRequests: 2,
-        // infiniteInitialRowCount: 1
-
       }
     }
   }
 
   componentDidMount () {
-    // console.log(this.props.jsonData.maintenances)
     this.setState({ rowData: this.props.jsonData.maintenances })
   }
 

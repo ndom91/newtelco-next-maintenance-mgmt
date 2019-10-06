@@ -3,6 +3,9 @@ import Layout from '../src/components/layout'
 import fetch from 'isomorphic-unfetch'
 import RequireLogin from '../src/components/require-login'
 import { NextAuth } from 'next-auth/client'
+import Toggle from 'react-toggle'
+import './style/maintenance.css'
+import Select from 'react-select'
 import Router from 'next/router'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import 'react-quill/dist/quill.snow.css'
@@ -12,7 +15,8 @@ import {
   faCalendarAlt,
   faArrowLeft,
   faEnvelopeOpenText,
-  faLanguage
+  faLanguage,
+  faFirstAid
 } from '@fortawesome/free-solid-svg-icons'
 import {
   Container,
@@ -28,11 +32,12 @@ import {
   Badge,
   FormGroup,
   FormInput,
-  FormTextarea,
   Modal,
   ModalHeader,
   ModalBody,
-  Tooltip
+  Tooltip,
+  ListGroup,
+  ListGroupItem
 } from 'shards-react'
 
 export default class Maintenance extends React.Component {
@@ -71,7 +76,8 @@ export default class Maintenance extends React.Component {
       translateTooltipOpen: false,
       translated: false,
       translatedBody: '',
-      notesText: props.jsonData.profile.notes
+      notesText: props.jsonData.profile.notes,
+      lieferantcids: {}
     }
     this.toggle = this.toggle.bind(this)
     this.toggleTooltip = this.toggleTooltip.bind(this)
@@ -142,6 +148,33 @@ export default class Maintenance extends React.Component {
         width: window.innerWidth
       })
     }
+    // get available supplier CIDs
+    let lieferantId
+
+    if (this.props.jsonData.profile.lieferant) {
+      lieferantId = this.props.jsonData.profile.lieferant
+    } else {
+      const lieferantDomain = this.props.jsonData.profile.name
+    }
+    const host = window.location.host
+    fetch(`https://${host}/api/lieferantcids?id=${lieferantId}`, {
+      method: 'get'
+    })
+      .then(resp => resp.json())
+      .then(data => {
+        // console.log(data)
+        const selectedLieferantCIDid = parseInt(this.props.jsonData.profile.derenCIDid) || null
+        const selectedLieferantCIDvalue = this.props.jsonData.profile.derenCID || null
+        this.setState({
+          lieferantcids: data.lieferantCIDsResult,
+          selectedLieferant: {
+            label: selectedLieferantCIDvalue,
+            value: selectedLieferantCIDid
+          }
+        })
+      })
+      .catch(err => console.error(`Error - ${err}`))
+    // get available Newtelco CIDs based on supplier CID
   }
 
   componentDidUpdate () {
@@ -167,6 +200,11 @@ export default class Maintenance extends React.Component {
     this.setState({ notesText: editor.getContents() })
   }
 
+  handleSelectLieferantChange = selectedOption => {
+    console.log(selectedOption)
+    this.setState({ selectedLieferant: selectedOption })
+  }
+
   toggle () {
     this.setState({
       open: !this.state.open
@@ -187,6 +225,7 @@ export default class Maintenance extends React.Component {
       maintenance,
       open
     } = this.state
+    console.log(maintenance)
     const Quill = this.quill
     if (this.props.session.user) {
       return (
@@ -234,79 +273,146 @@ export default class Maintenance extends React.Component {
                   <Col sm='12' lg='6'>
                     <Row>
                       <Col>
-                        <Row>
-                          <Col style={{ width: '30vw' }}>
-                            <FormGroup>
-                              <label htmlFor='edited-by'>Edited By</label>
-                              <FormInput id='edited-by-input' name='edited-by' type='text' value={maintenance.bearbeitetvon} />
-                            </FormGroup>
-                            <FormGroup>
-                              <label htmlFor='supplier'>Supplier</label>
-                              <FormInput id='supplier-input' name='supplier' type='text' value={maintenance.name} />
-                            </FormGroup>
-                            <FormGroup>
-                              <label htmlFor='start-datetime'>Start Date/Time</label>
-                              <FormInput id='start-datetime' name='start-datetime' type='text' value={this.convertDateTime(maintenance.startDateTime)} />
-                            </FormGroup>
-                            <FormGroup>
-                              <label htmlFor='their-cid'>Their CID</label>
-                              <FormInput id='their-cid' name='their-cid' type='text' value={maintenance.derenCID} />
-                            </FormGroup>
-                            <FormGroup>
-                              <label htmlFor='impacted-customers'>Impacted Customer(s)</label>
-                              <FormInput id='impacted-customers' name='impacted-customers' type='text' value={maintenance.betroffeneKunden} />
-                            </FormGroup>
-                          </Col>
-                          <Col style={{ width: '30vw' }}>
-                            <FormGroup>
-                              <label htmlFor='maileingang'>Mail Arrived</label>
-                              <FormInput id='maileingang-input' name='maileingang' type='text' value={this.convertDateTime(maintenance.maileingang)} />
-                            </FormGroup>
-                            <FormGroup>
-                              <label htmlFor='updated-at'>Updated At</label>
-                              <FormInput id='updated-at' name='updated-at' type='text' value={this.convertDateTime(maintenance.updatedAt)} />
-                            </FormGroup>
-                            <FormGroup>
-                              <label htmlFor='end-datetime'>End Date/Time</label>
-                              <FormInput id='end-datetime' name='end-datetime' type='text' value={this.convertDateTime(maintenance.endDateTime)} />
-                            </FormGroup>
-                            <FormGroup>
-                              <label htmlFor='updated-by'>Updated By</label>
-                              <FormInput id='updated-by' name='updated-by' type='text' value={maintenance.updatedBy} />
-                            </FormGroup>
-                            <FormGroup>
-                              <label htmlFor='impacted-cids'>Impacted CID(s)</label>
-                              <FormInput id='impacted-cids' name='impacted-cids' type='text' value={maintenance.betroffeneCIDs} />
-                            </FormGroup>
-                          </Col>
-                        </Row>
-                        <Row>
-                          <Col>
-                            <FormGroup>
-                              <label htmlFor='notes'>Notes</label>
-                              {document
-                                ? <Quill
-                                  value={this.state.notesText}
-                                  ref={(el) => { this.reactQuillRef = el }}
-                                  style={{ borderRadius: '5px' }}
-                                  onChange={this.handleNotesChange}
-                                  theme='snow'
-                                  />
-                                : <textarea value={this.state.notesText} />}
-                            </FormGroup>
-                          </Col>
-                        </Row>
+                        <Container className='maintenance-subcontainer'>
+                          <Row>
+                            <Col style={{ width: '30vw' }}>
+                              <FormGroup>
+                                <label htmlFor='edited-by'>Created By</label>
+                                <FormInput id='edited-by-input' name='edited-by' type='text' value={maintenance.bearbeitetvon} />
+                              </FormGroup>
+                              <FormGroup>
+                                <label htmlFor='supplier'>Supplier</label>
+                                <FormInput id='supplier-input' name='supplier' type='text' value={maintenance.name} />
+                              </FormGroup>
+                              <FormGroup>
+                                <label htmlFor='start-datetime'>Start Date/Time</label>
+                                <FormInput id='start-datetime' name='start-datetime' type='text' value={this.convertDateTime(maintenance.startDateTime)} />
+                              </FormGroup>
+                              {/* todo: Timezone after Start/End Time */}
+                              <FormGroup>
+                                <label htmlFor='their-cid'>Their CID</label>
+                                <Select
+                                  value={this.state.selectedLieferant}
+                                  onChange={this.handleSelectLieferantChange}
+                                  options={this.state.lieferantcids}
+                                  isMulti
+                                  noOptionsMessage='No CIDs for this Supplier'
+                                  placeholder='Please select a CID'
+                                />
+                              </FormGroup>
+                            </Col>
+                            <Col style={{ width: '30vw' }}>
+                              <FormGroup>
+                                <label htmlFor='maileingang'>Mail Arrived</label>
+                                <FormInput id='maileingang-input' name='maileingang' type='text' value={this.convertDateTime(maintenance.maileingang)} />
+                              </FormGroup>
+                              <FormGroup>
+                                <label htmlFor='updated-at'>Updated At</label>
+                                <FormInput id='updated-at' name='updated-at' type='text' value={this.convertDateTime(maintenance.updatedAt)} />
+                              </FormGroup>
+                              <FormGroup>
+                                <label htmlFor='end-datetime'>End Date/Time</label>
+                                <FormInput id='end-datetime' name='end-datetime' type='text' value={this.convertDateTime(maintenance.endDateTime)} />
+                              </FormGroup>
+                              <FormGroup>
+                                <label htmlFor='updated-by'>Last Updated By</label>
+                                <FormInput id='updated-by' name='updated-by' type='text' value={maintenance.updatedBy} />
+                              </FormGroup>
+                            </Col>
+                          </Row>
+                        </Container>
+                        <Container className='maintenance-subcontainer'>
+                          <Row>
+                            <Col>
+                              <Row>
+                                <Col>
+                                  <FormGroup>
+                                    <label htmlFor='updated-by'>Impact</label>
+                                    <FormInput id='updated-by' name='updated-by' type='text' value={maintenance.impact} />
+                                  </FormGroup>
+                                </Col>
+                                <Col>
+                                  <FormGroup>
+                                    <label htmlFor='updated-by'>Location</label>
+                                    <FormInput id='updated-by' name='updated-by' type='text' value={maintenance.location} />
+                                  </FormGroup>
+                                </Col>
+                              </Row>
+                              <FormGroup>
+                                <label htmlFor='updated-by'>Reason</label>
+                                <FormInput id='updated-by' name='updated-by' type='text' value={maintenance.reason} />
+                              </FormGroup>
+                            </Col>
+                          </Row>
+                        </Container>
+                        <Container style={{ paddingTop: '20px' }} className='maintenance-subcontainer'>
+                          <Row>
+                            <Col>
+                              <FormGroup className='form-group-toggle'>
+                                <Badge theme='secondary' outline>
+                                  <label>
+                                    <Toggle defaultChecked={maintenance.cancelled === 1 ? true : false} />
+                                    <div style={{ marginTop: '10px' }}>Cancelled</div>
+                                  </label>
+                                </Badge>
+                                <Badge theme='secondary' outline>
+                                  <label>
+                                    <Toggle
+                                      icons={{
+                                        checked: <FontAwesomeIcon icon={faFirstAid} width='0.5em' style={{ color: '#fff' }} />,
+                                        unchecked: null,
+                                      }} 
+                                      checked={maintenance.emergency === 1 ? true : false} />
+                                    <div style={{ marginTop: '10px' }}>Emergency</div>
+                                  </label>
+                                </Badge>
+                                <Badge theme='secondary'>
+                                  <label>
+                                    <Toggle 
+                                      checked={maintenance.done === 1 ? true : false} />
+                                    <div style={{ marginTop: '10px' }}>Done</div>
+                                  </label>
+                                </Badge>
+                              </FormGroup> 
+                            </Col>
+                          </Row>
+                        </Container>
+                        <Container className='maintenance-subcontainer'>
+                          <Row>
+                            <Col>
+                              <FormGroup>
+                                <label htmlFor='notes'>Notes</label>
+                                {document
+                                  ? <Quill
+                                    value={this.state.notesText}
+                                    ref={(el) => { this.reactQuillRef = el }}
+                                    style={{ borderRadius: '5px' }}
+                                    onChange={this.handleNotesChange}
+                                    theme='snow' />
+                                  : <textarea value={this.state.notesText} />}
+                              </FormGroup>
+                            </Col>
+                          </Row>
+                        </Container>
                       </Col>
                     </Row>
                   </Col>
                   <Col sm='12' lg='6'>
                     <Row>
                       <Col>
-                        <Row>
-                          <div style={{ width: '100%', height: '100%', color: '#000' }}>
-                            Placeholder
-                          </div>
-                        </Row>
+                        <Container style={{ padding: '20px' }} className='maintenance-subcontainer'>
+                          <Row>
+                            <Col>
+                              <ListGroup>
+                                <ListGroupItem>Cras justo odio</ListGroupItem>
+                                <ListGroupItem>Dapibus ac facilisis in</ListGroupItem>
+                                <ListGroupItem>Morbi leo risus</ListGroupItem>
+                                <ListGroupItem>Porta ac consectetur ac</ListGroupItem>
+                                <ListGroupItem>Vestibulum at eros</ListGroupItem>
+                              </ListGroup>
+                            </Col>
+                          </Row>
+                        </Container>
                       </Col>
                     </Row>
                   </Col>
@@ -355,6 +461,26 @@ export default class Maintenance extends React.Component {
             </Modal>
           </Card>
           <style jsx>{`
+            :global(.maintenance-subcontainer) {
+              border: 1px solid var(--light);
+              border-radius: 0.325rem;
+              margin: 10px 0;
+            }
+            :global(.form-group-toggle > label) {
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+            }
+            :global(.form-group-toggle) {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            }
+            .toggle-done {
+              border: 1px solid var(--secondary);
+              border-radius: 0.325rem;
+              padding: 20px;
+            }
             :global(.rdw-option-active) {
               box-shadow: none;
               border: 2px solid var(--primary);
