@@ -9,15 +9,11 @@ import ProtectedIcon from '../src/components/ag-grid/protected'
 import { NextAuth } from 'next-auth/client'
 import Toggle from 'react-toggle'
 import './style/maintenance.css'
+import cogoToast from 'cogo-toast'
 import Select from 'react-select'
 import Router from 'next/router'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import 'react-quill/dist/quill.snow.css'
-// import { Editor } from 'slate-react'
-// import Plain from 'slate-plain-serializer'
-// import { KeyUtils } from 'slate'
-import Editor from '../src/components/nextEditor'
-
+import { Editor as TinyEditor } from '@tinymce/tinymce-react'
 import { format, isValid } from 'date-fns'
 import { zonedTimeToUtc, utcToZonedTime, format as formatTz } from 'date-fns-tz'
 import {
@@ -79,12 +75,11 @@ export default class Maintenance extends React.Component {
 
   constructor (props) {
     super(props)
-
-    // slate hack for SSR
-    // KeyUtils.resetGenerator()
     this.state = {
       width: 0,
-      maintenance: {},
+      maintenance: {
+        incomingBody: this.props.jsonData.profile.body
+      },
       openReadModal: false,
       openPreviewModal: false,
       translateTooltipOpen: false,
@@ -94,6 +89,7 @@ export default class Maintenance extends React.Component {
       mailBodyText: '',
       lieferantcids: {},
       kundencids: [],
+      windowInnerHeight: 0,
       gridOptions: {
         defaultColDef: {
           resizable: true,
@@ -174,10 +170,9 @@ export default class Maintenance extends React.Component {
 
     if (this.state.translated) {
       this.setState({
-        translatedBody: '',
         translated: !this.state.translated
       })
-    } else {
+    } else if (this.state.maintenance.incomingBody) {
       const host = window.location.host
       fetch(`https://api.${host}/translate`, {
         method: 'post',
@@ -192,20 +187,19 @@ export default class Maintenance extends React.Component {
         .then(data => {
           const text = data.translatedText
           this.setState({
-            originalModalBody: this.props.jsonData.profile.body,
             translatedBody: text,
             translated: !this.state.translated
           })
         })
         .catch(err => console.error(`Error - ${err}`))
+    } else {
+      cogoToast.warning('No Mail Body Available!', {
+        position: 'top-right'
+      })
     }
   }
 
   componentDidMount () {
-    // this.attachQuillRefs()
-    // const editor = this.reactQuillRef.getEditor()
-    // const unprivilegedEditor = this.reactQuillRef.makeUnprivilegedEditor(editor)
-    // const quillContents = unprivilegedEditor.getContents()
     if (this.props.jsonData.profile.id === 'NEW') {
       const {
         email
@@ -214,12 +208,16 @@ export default class Maintenance extends React.Component {
       const maintenance = {
         ...this.props.jsonData.profile,
         bearbeitetvon: username,
+        incomingBody: this.props.jsonData.profile.body,
+        incomingSubject: this.props.jsonData.profile.subject,
+        incomingFrom: this.props.jsonData.profile.from,
+        incomingDate: this.props.jsonData.profile.maileingang,
+        incomingDomain: this.props.jsonData.profile.name,
         updatedAt: format(new Date(), 'MM.dd.yyyy HH:mm') //, { locale: de })
       }
       this.setState({
         maintenance: maintenance,
         width: window.innerWidth
-        // notesText: quillContents
       })
     } else {
       this.setState({
@@ -256,6 +254,9 @@ export default class Maintenance extends React.Component {
       const lieferantDomain = this.props.jsonData.profile.name
       // fetch id based on domain, then fetch available CIDs
     }
+    this.setState({
+      windowInnerHeight: window.innerHeight
+    })
   }
 
   getUnique (arr, comp) {
@@ -286,20 +287,7 @@ export default class Maintenance extends React.Component {
   }
 
   componentDidUpdate () {
-    // this.attachQuillRefs()
   }
-
-  // attachQuillRefs = () => {
-  //   if (typeof this.reactQuillRef.getEditor !== 'function') return
-  //   this.quillRef = this.reactQuillRef.getEditor()
-  // }
-
-  // attachQuillRefs2 = () => {
-  //   if (this.reactQuillRef2) {
-  //     if (typeof this.reactQuillRef2.getEditor !== 'function') return
-  //     this.quillRef2 = this.reactQuillRef2.getEditor()
-  //   }
-  // }
 
   convertDateTime = (datetime) => {
     let newDateTime
@@ -329,23 +317,41 @@ export default class Maintenance extends React.Component {
   }
 
   toggleReadModal () {
-    this.setState({
-      openReadModal: !this.state.openReadModal
-    })
+    if (!this.state.maintenance.incomingBody) {
+      const host = window.location.host
+      fetch(`https://api.${host}/mail/${this.state.maintenance.receivedmail}`, {
+        method: 'get'
+      })
+        .then(resp => resp.json())
+        .then(data => {
+          console.log(data)
+          this.setState({
+            openReadModal: !this.state.openReadModal,
+            maintenance: {
+              incomingBody: data.body,
+              incomingFrom: data.from,
+              incomingSubject: data.subject,
+              incomingDate: data.date,
+              incomingDomain: this.props.jsonData.profile.mailDomain,
+              ...this.state.maintenance
+            }
+          })
+        })
+        .catch(err => console.error(`Error - ${err}`))
+    } else {
+      this.setState({
+        openReadModal: !this.state.openReadModal
+      })
+    }
   }
 
   togglePreviewModal = (recipient, customerCID) => {
-    // this.attachQuillRefs2()
-    // if (this.reactQuillRef2) {
-    //   const editor2 = this.reactQuillRef2.getEditor()
-    //   const unprivilegedEditor2 = this.reactQuillRef2.makeUnprivilegedEditor(editor2)
-    //   const quillContents2 = unprivilegedEditor2.getContents()
-    // }
     const HtmlBody = this.generateMail(customerCID)
     this.setState({
       openPreviewModal: !this.state.openPreviewModal,
       mailBodyText: HtmlBody,
-      mailPreviewHeaderText: recipient
+      mailPreviewHeaderText: recipient,
+      mailPreviewSubjectText: `Planned Work Notification - ${this.state.maintenance.id}`
     })
   }
 
@@ -355,7 +361,7 @@ export default class Maintenance extends React.Component {
     })
   }
 
-  onGridReady = params => {
+  handleGridReady = params => {
     this.gridApi = params.gridApi
     this.gridColumnApi = params.gridColumnApi
     // params.columnApi.sizeColumnsToFit()
@@ -369,7 +375,6 @@ export default class Maintenance extends React.Component {
 
   generateMail = (customerCID) => {
     const {
-      betroffeneCIDs,
       id,
       startDateTime,
       endDateTime,
@@ -385,7 +390,7 @@ export default class Maintenance extends React.Component {
     const endDateTimeDE = formatTz(utcToZonedTime(new Date(endDateTime), timeZone), 'dd.MM.yyyy HH:mm')
     const tzSuffixRAW = 'CET / GMT+2:00'
 
-    let body = `<body style="color:#666666;"><div​​ ​style="​font-size:10pt;font-family:'Arial';"​​>${rescheduleText} Dear Colleagues,​​<p><span>We would like to inform you about planned work on the CID:<br><br> ${customerCID}. <br><br>The maintenance work is with the following details:</span></p><table border="0" cellspacing="2" cellpadding="2" width="975"><tr><td>Maintenance ID:</td><td><b>${id}</b></td></tr><tr><td>Start date and time:</td><td><b>${startDateTimeDE} (${tzSuffixRAW})</b></td></tr><tr><td>Finish date and time:</td><td><b>${endDateTimeDE} (${tzSuffixRAW})</b></td></tr>`
+    let body = `<body style="color:#666666;">${rescheduleText} Dear Colleagues,​​<p><span>We would like to inform you about planned work on the CID:<br><br> ${customerCID}. <br><br>The maintenance work is with the following details:</span></p><table border="0" cellspacing="2" cellpadding="2" width="975"><tr><td>Maintenance ID:</td><td><b>${id}</b></td></tr><tr><td>Start date and time:</td><td><b>${startDateTimeDE} (${tzSuffixRAW})</b></td></tr><tr><td>Finish date and time:</td><td><b>${endDateTimeDE} (${tzSuffixRAW})</b></td></tr>`
 
     if (impact !== '') {
       body = body + '<tr><td>Impact:</td><td>' + impact + '</td></tr>'
@@ -404,8 +409,46 @@ export default class Maintenance extends React.Component {
     return body
   }
 
+  handleEditorChange (data) {
+    console.log(data)
+    this.setState({
+      mailBodyText: data.level.content
+    })
+  }
+
   sendMail (data) {
     console.log(data)
+    const body = this.state.mailBodyText
+    const subject = this.state.mailPreviewSubjectText
+    const to = this.state.mailPreviewHeaderText
+
+    fetch(`https://api.${host}/mail/send`, {
+      method: 'post',
+      body: JSON.stringify({ 
+        body: body,
+        subject: subject,
+        to: to
+      }),
+      mode: 'cors',
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json'
+      }
+    })
+      .then(resp => resp.json())
+      .then(data => {
+        console.log(data)
+        const text = data.translatedText
+        // this.setState({
+        //   maintenance: {
+
+        //   }
+        // })
+        cogoToast.info('Mail Sent!', {
+          position: 'top-right'
+        })
+      })
+      .catch(err => console.error(`Error - ${err}`))
   }
 
   handleSlateChange = ({ value }) => {
@@ -555,7 +598,7 @@ export default class Maintenance extends React.Component {
                                         checked: <FontAwesomeIcon icon={faFirstAid} width='0.5em' style={{ color: '#fff' }} />,
                                         unchecked: null
                                       }}
-                                      checked={maintenance.emergency === 1}
+                                      defaultChecked={maintenance.emergency === 1}
                                     />
                                     <div style={{ marginTop: '10px' }}>Emergency</div>
                                   </label>
@@ -563,7 +606,7 @@ export default class Maintenance extends React.Component {
                                 <Badge theme='secondary'>
                                   <label>
                                     <Toggle
-                                      checked={maintenance.done === 1}
+                                      defaultChecked={maintenance.done === 1}
                                     />
                                     <div style={{ marginTop: '10px' }}>Done</div>
                                   </label>
@@ -577,16 +620,24 @@ export default class Maintenance extends React.Component {
                             <Col>
                               <FormGroup>
                                 <label htmlFor='notes'>Notes</label>
-                                {/* {document
-                                  ? <Quill
-                                    value={this.state.notesText}
-                                    ref={(el) => { this.reactQuillRef = el }}
-                                    style={{ borderRadius: '5px' }}
-                                    onChange={this.handleNotesChange}
-                                    theme='snow'
-                                    />
-                                  : <textarea value={this.state.notesText} />} */}
-                                <Editor slateKey='notes' defaultValue={this.state.notesText}  />
+                                <TinyEditor
+                                  initialValue={this.state.notesText}
+                                  apiKey='ttv2x1is9joc0fi7v6f6rzi0u98w2mpehx53mnc1277omr7s'
+                                  init={{
+                                    height: 500,
+                                    menubar: false,
+                                    plugins: [
+                                      'advlist autolink lists link image print preview anchor',
+                                      'searchreplace code',
+                                      'insertdatetime table paste code help wordcount'
+                                    ],
+                                    toolbar:
+                                      `undo redo | formatselect | bold italic backcolor | 
+                                      alignleft aligncenter alignright alignjustify | 
+                                      bullist numlist outdent indent | removeformat | help`
+                                  }}
+                                  onChange={this.handleEditorChange}
+                                />
                               </FormGroup>
                             </Col>
                           </Row>
@@ -610,7 +661,7 @@ export default class Maintenance extends React.Component {
                                 <AgGridReact
                                   gridOptions={this.state.gridOptions}
                                   rowData={this.state.kundencids}
-                                  onGridReady={this.onGridReady}
+                                  onGridReady={this.handleGridReady}
                                   animateRows
                                   pagination
                                   onFirstDataRendered={this.onFirstDataRendered.bind(this)}
@@ -648,11 +699,13 @@ export default class Maintenance extends React.Component {
             </CardFooter>
             <Modal className='mail-modal-body' animation backdrop backdropClassName='modal-backdrop' open={openReadModal} size='lg' toggle={this.toggleReadModal}>
               <ModalHeader>
-                <div className='modal-header-text'>
-                  {this.props.jsonData.profile.from} <br />
-                  <small className='mail-subject'>{this.props.jsonData.profile.subject}</small>
+                <img className='mail-icon' src={`https://besticon-demo.herokuapp.com/icon?size=40..100..360&url=${this.state.maintenance.incomingDomain}`} />
+                <div className='modal-incoming-header-text'>
+                  <h5 className='modal-incoming-from'>{this.state.maintenance.incomingFrom}</h5>
+                  <small className='modal-incoming-subject'>{this.state.maintenance.incomingSubject}</small><br />
+                  <small className='modal-incoming-datetime'>{this.state.maintenance.incomingDate}</small>
                 </div>
-                <Button id='translate-tooltip' style={{ padding: '1em' }} onClick={this.handleTranslate.bind(this)}>
+                <Button id='translate-tooltip' style={{ padding: '0.7em 0.9em' }} onClick={this.handleTranslate.bind(this)}>
                   <FontAwesomeIcon width='1.5em' className='translate-icon' icon={faLanguage} />
                 </Button>
               </ModalHeader>
@@ -660,29 +713,74 @@ export default class Maintenance extends React.Component {
                 open={this.state.translateTooltipOpen}
                 target='#translate-tooltip'
                 toggle={this.toggleTooltip}
+                placement='bottom'
+                noArrow
               >
                   Translate
               </Tooltip>
-              <ModalBody className='mail-body' dangerouslySetInnerHTML={{ __html: this.state.translatedBody || this.props.jsonData.profile.body }} />
+              <ModalBody className='mail-body' dangerouslySetInnerHTML={{ __html: this.state.translated ? this.state.translatedBody : this.state.maintenance.incomingBody }} />
             </Modal>
             <Modal backdropClassName='modal-backdrop' animation backdrop size='lg' open={openPreviewModal} toggle={this.togglePreviewModal}>
-              <ModalHeader>To: {this.state.mailPreviewHeaderText}</ModalHeader>
+              <ModalHeader>
+                <div className='modal-preview-text-wrapper'>
+                  <div className='modal-preview-to-text'>
+                    To: {this.state.mailPreviewHeaderText}
+                  </div>
+                  <div className='modal-preview-Subject-text'>
+                    Subject: {this.state.mailPreviewSubjectText}
+                  </div>
+                </div>
+                <Button id='send-mail-btn' style={{ padding: '0.9em 1.1em' }} onClick={this.sendMail}>
+                  <FontAwesomeIcon width='1.5em' style={{ fontSize: '20px' }} className='modal-preview-send-icon' icon={faPaperPlane} />
+                </Button>
+              </ModalHeader>
               <ModalBody>
-                {/* <Editor value={this.state.slateValue} onChange={this.handleSlateChange} /> */}
-                {/* {document
-                  ? <Quill
-                    value={this.state.mailBodyText}
-                    ref={(el) => { this.reactQuillRef2 = el }}
-                    style={{ borderRadius: '5px' }}
-                    onChange={this.handleMailPreviewChange}
-                    theme='snow'
-                    />
-                  : <textarea value={this.state.mailBodyText} />} */}
+                <TinyEditor
+                  initialValue={this.state.mailBodyText}
+                  apiKey='ttv2x1is9joc0fi7v6f6rzi0u98w2mpehx53mnc1277omr7s'
+                  init={{
+                    height: 500,
+                    menubar: false,
+                    plugins: [
+                      'advlist autolink lists link image print preview anchor',
+                      'searchreplace code',
+                      'insertdatetime table paste code help wordcount'
+                    ],
+                    toolbar:
+                      `undo redo | formatselect | bold italic backcolor | 
+                      alignleft aligncenter alignright alignjustify | 
+                      bullist numlist outdent indent | removeformat | help`
+                  }}
+                  onChange={this.handleEditorChange}
+                />
 
               </ModalBody>
             </Modal>
           </Card>
           <style jsx>{`
+            .mail-icon {
+              width: 96px;
+              height: 96px;
+              border: 2px solid var(--primary);
+              padding: 10px;
+              border-radius: 5px;
+              margin-right: 10px;
+            }
+            :global(.fa-language) {
+              font-size: 20px;
+            }
+            :global(.modal-lg) {
+              max-width: 1000px !important;
+            }
+            :global(.tox-toolbar__group) {
+              border-right: none !important;
+            }
+            :global(.tox-tinymce) {
+              border-radius: 5px !important;
+            }
+            :global(.tox-toolbar) {
+              background: none !important;
+            }
             :global(.maintenance-subcontainer) {
               border: 1px solid var(--light);
               border-radius: 0.325rem;
@@ -752,7 +850,7 @@ export default class Maintenance extends React.Component {
             :global(.modal-backdrop.show) {
               opacity: 0.5;
             }
-            .modal-header-text {
+            .modal-incoming-header-text {
               flex-grow: 1;
             }
             :global(.modal-title) {
@@ -760,6 +858,9 @@ export default class Maintenance extends React.Component {
               justify-content: space-between;
               width: 100%;
               align-items: center;
+            }
+            :global(.modal-content) {
+              max-height: calc(${this.state.windowInnerHeight}px - 50px);
             }
             @media only screen and (max-width: 500px) {
               :global(div.btn-toolbar > .btn-group-md) {

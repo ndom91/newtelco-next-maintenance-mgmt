@@ -185,16 +185,16 @@ export default class Inbox extends React.Component {
                       >
                         <ListGroupItem key={mail.id}>
                           <div className='mail-wrapper'>
-                          {this.state.windowInnerWidth > 500
-                            ? (
-                            <Badge outline theme='light' className='mail-badge'>
-                              {/* https://github.com/mat/besticon */}
-                              <img className='mail-icon' src={`https://besticon-demo.herokuapp.com/icon?size=40..100..360&url=${mail.domain}`} />
-                              <FontAwesomeIcon onClick={() => this.toggle(mail.id)} width='1.325em' className='mail-open-icon' icon={faEnvelopeOpenText} />
-                            </Badge>
-                            ) : (
-                              <></>
-                            )}
+                            {this.state.windowInnerWidth > 500
+                              ? (
+                                <Badge outline theme='light' className='mail-badge'>
+                                  {/* https://github.com/mat/besticon */}
+                                  <img className='mail-icon' src={`https://besticon-demo.herokuapp.com/icon?size=40..100..360&url=${mail.domain}`} />
+                                  <FontAwesomeIcon onClick={() => this.toggle(mail.id)} width='1.325em' className='mail-open-icon' icon={faEnvelopeOpenText} />
+                                </Badge>
+                              ) : (
+                                <></>
+                              )}
                             <div className='mail-info'>
                               <ListGroupItemHeading>
                                 <div className='inbox-from-text'>{mail.from}</div>
@@ -205,16 +205,16 @@ export default class Inbox extends React.Component {
                               </ListGroupItemText>
                             </div>
                             <ButtonGroup className='inbox-btn-group'>
-                            {this.state.windowInnerWidth < 500
-                              ? (
-                              <Badge outline theme='light' className='mail-badge'>
-                                {/* https://github.com/mat/besticon */}
-                                <img className='mail-icon' src={`https://besticon-demo.herokuapp.com/icon?size=40..100..360&url=${mail.domain}`} />
-                                <FontAwesomeIcon onClick={() => this.toggle(mail.id)} width='1.525em' className='mail-open-icon' icon={faEnvelopeOpenText} />
-                              </Badge>
-                              ) : (
-                                <></>
-                              )}
+                              {this.state.windowInnerWidth < 500
+                                ? (
+                                  <Badge outline theme='light' className='mail-badge'>
+                                    {/* https://github.com/mat/besticon */}
+                                    <img className='mail-icon' src={`https://besticon-demo.herokuapp.com/icon?size=40..100..360&url=${mail.domain}`} />
+                                    <FontAwesomeIcon onClick={() => this.toggle(mail.id)} width='1.525em' className='mail-open-icon' icon={faEnvelopeOpenText} />
+                                  </Badge>
+                                ) : (
+                                  <></>
+                                )}
                               <Link
                                 href={{
                                   pathname: '/maintenance',
@@ -230,11 +230,11 @@ export default class Inbox extends React.Component {
                                 }}
                                 as='/m/new'
                               >
-                                <Button className='mail-edit-btn' outline>
+                                <Button className='mail-edit-btn pencil-icon' outline>
                                   <FontAwesomeIcon width='1.2em' className='edit-icon' icon={faPencilAlt} />
                                 </Button>
                               </Link>
-                              <Button onClick={() => this.handleDelete(mail.id)} className='mail-edit-btn' outline>
+                              <Button onClick={() => this.handleDelete(mail.id)} className='mail-edit-btn trash-icon' outline>
                                 <FontAwesomeIcon width='1.2em' className='edit-icon' icon={faTrashAlt} />
                               </Button>
                             </ButtonGroup>
@@ -280,19 +280,36 @@ export default class Inbox extends React.Component {
                 margin-left: -50px;
               }
               :global(.mail-edit-btn) {
-                margin-top: 10px;
+                border-radius: 0px;
               }
               :global(.list-group-item) {
                 padding: 0.5rem !important;
               }
               :global(.mail-badge) {
                 border: 1px solid var(--primary);
+                min-width: 66px !important;
+                width: 66px;
+                border-radius: 5px 5px 0px 0px;
+              }
+              :global(.pencil-icon) {
+                border-top: none;
+                border-bottom: none;
+              }
+              :global(.trash-icon) {
+                border-radius: 0px 0px 5px 5px !important;
               }
               :global(.btn-group > .btn) {
                 flex: unset !important;
                 height: 66px;
                 width: 66px;
               }
+              :global(.fa-pencil-alt),
+              :global(.fa-trash-alt) {
+                font-size: 25px;
+              }
+            }
+            :global(.fa-language) {
+              font-size: 20px;
             }
             :global(.item-enter) {
               opacity: 0;
@@ -342,7 +359,8 @@ export default class Inbox extends React.Component {
             :global(.mail-open-icon) {
               color: var(--primary);
               align-self: center;
-              margin-left: -40px;
+              margin-left: -50px;
+              margin-bottom: -5px;
               font-size: 24px;
               visibility: hidden;
               opacity: 0;
@@ -358,7 +376,7 @@ export default class Inbox extends React.Component {
             .mail-icon {
               height: 50px;
               width: 50px;
-              transform: translate(-8px, 0px);
+              transform: translate(-13px, 0px);
               transition: all 150ms ease-in-out;
               transition: visibility 0s, opacity 200ms ease-in-out;
             }

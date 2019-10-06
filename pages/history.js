@@ -15,7 +15,7 @@ import EndDateTime from '../src/components/ag-grid/enddatetime'
 import MailArrived from '../src/components/ag-grid/mailarrived'
 import UpdatedAt from '../src/components/ag-grid/updatedat'
 import Supplier from '../src/components/ag-grid/supplier'
-import UseAnimations from 'react-useanimations';
+import UseAnimations from 'react-useanimations'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
   faSave
@@ -117,7 +117,7 @@ export default class About extends React.Component {
           supplier: Supplier
         },
         rowSelection: 'multiple',
-        rowMultiSelectWithClick: true,
+        // rowMultiSelectWithClick: true,
         paginationPageSize: 10,
         rowClass: 'row-class',
         rowClassRules: {
@@ -133,18 +133,19 @@ export default class About extends React.Component {
     this.setState({ rowData: this.props.jsonData.maintenances })
   }
 
-  onGridReady = params => {
+  handleGridReady = params => {
     this.gridApi = params.gridApi
     this.gridColumnApi = params.gridColumnApi
     // params.columnApi.sizeColumnsToFit()
   }
 
   onFirstDataRendered (params) {
+    console.log(params)
     // params.columnApi.autoSizeColumns()
     // params.columnApi.sizeColumnsToFit()
   }
 
-  exportData (data) {
+  handleGridExport (data) {
     console.log(data)
     const params = {
       allColumns: true,
@@ -156,6 +157,11 @@ export default class About extends React.Component {
     // this.state.gridOptions.api.exportDataAsCsv(params)
   }
 
+  handleRowDoubleClick (event) {
+    console.log(event.api)
+    // this.gridApi.getDisplayedRowAtIndex(event.rowIndex).setSelected(true)
+  }
+
   render () {
     if (this.props.session.user) {
       return (
@@ -165,7 +171,7 @@ export default class About extends React.Component {
               <ButtonToolbar style={{ justifyContent: 'space-between' }}>
                 <h2 style={{ marginBottom: '0px' }}>History</h2>
                 <ButtonGroup size='md'>
-                  <Button outline theme='dark' className='export-btn' onClick={this.exportData}>
+                  <Button disabled outline theme='dark' className='export-btn' onClick={this.handleGridExport}>
                     {/* <FontAwesomeIcon icon={faSave} width='1em' style={{ marginRight: '10px', color: 'secondary' }} /> */}
                     <UseAnimations animationKey='download' size={22} style={{ display: 'inline-block', fill: 'rgb(0,0,0)' }} />
                     <span style={{ marginLeft: '5px' }}>
@@ -187,9 +193,10 @@ export default class About extends React.Component {
                   <AgGridReact
                     gridOptions={this.state.gridOptions}
                     rowData={this.state.rowData}
-                    onGridReady={this.onGridReady}
+                    onGridReady={this.handleGridReady}
                     animateRows
                     pagination
+                    // onRowDoubleClicked={this.handleRowDoubleClick}
                     onFirstDataRendered={this.onFirstDataRendered.bind(this)}
                   />
                 </div>
