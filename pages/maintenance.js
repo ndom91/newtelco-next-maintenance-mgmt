@@ -776,6 +776,7 @@ export default class Maintenance extends React.Component {
                                   init={{
                                     height: 500,
                                     menubar: false,
+                                    statusbar: false,
                                     plugins: [
                                       'advlist autolink lists link image print preview anchor',
                                       'searchreplace code',
@@ -892,6 +893,7 @@ export default class Maintenance extends React.Component {
                   init={{
                     height: 500,
                     menubar: false,
+                    statusbar: false,
                     plugins: [
                       'advlist autolink lists link image print preview anchor',
                       'searchreplace code',
