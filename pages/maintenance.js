@@ -209,7 +209,7 @@ export default class Maintenance extends React.Component {
         })
         .catch(err => console.error(`Error - ${err}`))
     } else {
-      cogoToast.warning('No Mail Body Available', {
+      cogoToast.warn('No Mail Body Available', {
         position: 'top-right'
       })
     }
@@ -390,7 +390,7 @@ export default class Maintenance extends React.Component {
   togglePreviewModal = (recipient, customerCID) => {
     if (recipient && customerCID) {
       const HtmlBody = this.generateMail(customerCID)
-      this.setState({
+      HtmlBody && this.setState({
         openPreviewModal: !this.state.openPreviewModal,
         mailBodyText: HtmlBody,
         mailPreviewHeaderText: recipient || this.state.mailPreviewHeaderText,
@@ -429,6 +429,13 @@ export default class Maintenance extends React.Component {
       reason,
       location
     } = this.state.maintenance
+
+    if (!id || !startDateTime || !endDateTime) {
+      cogoToast.warn('Missing required fields', {
+        position: 'top-right'
+      })
+      return
+    }
 
     const rescheduleText = ''
     const timeZone = 'Europe/Berlin'
@@ -520,14 +527,14 @@ export default class Maintenance extends React.Component {
           }
         } else {
           if (customerCid) {
-            cogoToast.warning('Error Sending Mail', {
+            cogoToast.warn('Error Sending Mail', {
               position: 'top-right'
             })
           } else {
             this.setState({
               openPreviewModal: !this.state.openPreviewModal
             })
-            cogoToast.warning('Error Sending Mail', {
+            cogoToast.warn('Error Sending Mail', {
               position: 'top-right'
             })
           }
@@ -575,7 +582,7 @@ export default class Maintenance extends React.Component {
             position: 'top-right'
           })
         } else if (statusText === 'failed') {
-          cogoToast.warning('Error creating Calendar Entry', data.error, {
+          cogoToast.warn(`Error creating Calendar Entry - ${data.error}`, {
             position: 'top-right'
           })
         }
