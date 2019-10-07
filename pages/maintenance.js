@@ -6,6 +6,7 @@ import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-material.css'
 import RequireLogin from '../src/components/require-login'
 import ProtectedIcon from '../src/components/ag-grid/protected'
+import SentIcon from '../src/components/ag-grid/sent'
 import { NextAuth } from 'next-auth/client'
 import Toggle from 'react-toggle'
 import './style/maintenance.css'
@@ -120,18 +121,24 @@ export default class Maintenance extends React.Component {
             field: 'protected',
             filter: false,
             cellRenderer: 'protectedIcon',
-            width: 100
+            width: 120
           }, {
             headerName: 'Recipient',
             field: 'maintenanceRecipient',
             // cellRenderer: 'supplier',
             width: 150
+          }, {
+            headerName: 'Sent',
+            field: 'sent',
+            cellRenderer: 'sentIcon',
+            width: 100
           }
         ],
         context: { componentParent: this },
         frameworkComponents: {
           sendMailBtn: this.sendMailBtns,
-          protectedIcon: ProtectedIcon
+          protectedIcon: ProtectedIcon,
+          sentIcon: SentIcon
         },
         paginationPageSize: 10,
         rowClass: 'row-class'
@@ -271,6 +278,9 @@ export default class Maintenance extends React.Component {
     })
       .then(resp => resp.json())
       .then(data => {
+        // console.log(data.kundenCIDsResult[0])
+        data.kundenCIDsResult[0].sent = 0
+
         const existingKundenCids = [
           data.kundenCIDsResult[0],
           ...this.state.kundencids
@@ -343,13 +353,19 @@ export default class Maintenance extends React.Component {
   }
 
   togglePreviewModal = (recipient, customerCID) => {
-    const HtmlBody = this.generateMail(customerCID)
-    this.setState({
-      openPreviewModal: !this.state.openPreviewModal,
-      mailBodyText: HtmlBody,
-      mailPreviewHeaderText: recipient || this.state.mailPreviewHeaderText,
-      mailPreviewSubjectText: `Planned Work Notification - ${this.state.maintenance.id}`
-    })
+    if (recipient && customerCID) {
+      const HtmlBody = this.generateMail(customerCID)
+      this.setState({
+        openPreviewModal: !this.state.openPreviewModal,
+        mailBodyText: HtmlBody,
+        mailPreviewHeaderText: recipient || this.state.mailPreviewHeaderText,
+        mailPreviewSubjectText: `Planned Work Notification - ${this.state.maintenance.id}`
+      })
+    } else {
+      this.setState({
+        openPreviewModal: !this.state.openPreviewModal
+      })
+    }
   }
 
   toggleTooltip () {
@@ -410,7 +426,7 @@ export default class Maintenance extends React.Component {
     })
   }
 
-  sendMail (recipient, subj, htmlBody) {
+  sendMail (recipient, customerCid, subj, htmlBody) {
     const host = window.location.host
     const body = this.state.mailBodyText || htmlBody
     const subject = this.state.mailPreviewSubjectText || subj
@@ -434,14 +450,62 @@ export default class Maintenance extends React.Component {
         const status = data.response.status
         const statusText = data.response.statusText
 
+        const getUnique = (arr, comp) => {
+          const unique = arr
+            .map(e => e[comp])
+            .map((e, i, final) => final.indexOf(e) === i && i)
+            .filter(e => arr[e]).map(e => arr[e])
+          return unique
+        }
+
         if (status === 200 && statusText === 'OK') {
-          cogoToast.info('Mail Sent!', {
-            position: 'top-right'
-          })
+          if (customerCid) {
+
+            const activeRowIndex = this.state.kundencids.findIndex(el => el.kundenCID === customerCid)
+            console.log('1', activeRowIndex)
+
+            const kundenCidRow = this.state.kundencids[activeRowIndex]
+            console.log('2', kundenCidRow)
+            
+            kundenCidRow.sent = 1
+            console.log('3', kundenCidRow)
+
+            const updatedKundenCids = [
+              kundenCidRow,
+              ...this.state.kundencids
+            ]
+            console.log('4', updatedKundenCids)
+
+            const deduplicatedKundenCids = getUnique(updatedKundenCids, 'kundenCID')
+            console.log('5', deduplicatedKundenCids)
+
+            this.setState({
+              kundencids: deduplicatedKundenCids
+            })
+            cogoToast.info('Mail Sent!', {
+              position: 'top-right'
+            })
+          } else {
+            this.setState({
+              openPreviewModal: !this.state.openPreviewModal
+            })
+            cogoToast.info('Mail Sent!', {
+              position: 'top-right'
+            })
+          }
         } else {
-          cogoToast.warning('Error Sending Mail', {
-            position: 'top-right'
-          })
+          if (customerCid) {
+            cogoToast.warning('Error Sending Mail', {
+              position: 'top-right'
+            })
+          } else {
+            this.setState({
+              openPreviewModal: !this.state.openPreviewModal
+            })
+            cogoToast.warning('Error Sending Mail', {
+              position: 'top-right'
+            })
+          }
         }
       })
       .catch(err => console.error(`Error - ${err}`))
@@ -495,6 +559,7 @@ export default class Maintenance extends React.Component {
   }
 
   prepareDirectSend (recipient, customerCID) {
+    console.log(customerCID)
     if (!this.state.mailBodyText) {
       const HtmlBody = this.generateMail(customerCID)
       const subject = `Planned Work Notification - ${this.state.maintenance.id}`
@@ -503,9 +568,9 @@ export default class Maintenance extends React.Component {
         mailPreviewHeaderText: recipient,
         mailPreviewSubjectText: subject
       })
-      this.sendMail(recipient, subject, HtmlBody)
+      this.sendMail(recipient, customerCID, subject, HtmlBody)
     } else {
-      this.sendMail(recipient)
+      this.sendMail(recipient, customerCID)
     }
   }
 
