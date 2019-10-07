@@ -12,15 +12,15 @@ export default class SentIcon extends Component {
   render () {
     if (this.props.node.data.sent === 1) {
       return (
-        <FontAwesomeIcon width='1.5em' icon={faCheck} />
+        <FontAwesomeIcon style={{ fontSize: '18px' }} width='1.5em' icon={faCheck} />
       )
     } else if (this.props.node.data.sent === 0) {
       return (
-        <FontAwesomeIcon width='1.5em' icon={faCircle} />
+        <FontAwesomeIcon style={{ fontSize: '18px' }} width='1.5em' icon={faCircle} />
       )
     } else {
       return (
-        <FontAwesomeIcon width='1.5em' icon={faQuestion} />
+        <FontAwesomeIcon style={{ fontSize: '18px' }} width='1.5em' icon={faQuestion} />
       )
     }
   }

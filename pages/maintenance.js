@@ -121,7 +121,13 @@ export default class Maintenance extends React.Component {
             field: 'protected',
             filter: false,
             cellRenderer: 'protectedIcon',
-            width: 120
+            width: 120,
+            cellStyle: {
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              height: '100%'
+            }
           }, {
             headerName: 'Recipient',
             field: 'maintenanceRecipient',
@@ -131,7 +137,13 @@ export default class Maintenance extends React.Component {
             headerName: 'Sent',
             field: 'sent',
             cellRenderer: 'sentIcon',
-            width: 100
+            width: 100,
+            cellStyle: {
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              height: '100%'
+            }
           }
         ],
         context: { componentParent: this },
@@ -197,10 +209,31 @@ export default class Maintenance extends React.Component {
         })
         .catch(err => console.error(`Error - ${err}`))
     } else {
-      cogoToast.warning('No Mail Body Available!', {
+      cogoToast.warning('No Mail Body Available', {
         position: 'top-right'
       })
     }
+  }
+
+  fetchLieferantCIDs (lieferantId) {
+    const host = window.location.host
+    fetch(`https://${host}/api/lieferantcids?id=${lieferantId}`, {
+      method: 'get'
+    })
+      .then(resp => resp.json())
+      .then(data => {
+        // console.log(data)
+        const selectedLieferantCIDid = parseInt(this.props.jsonData.profile.derenCIDid) || null
+        const selectedLieferantCIDvalue = this.props.jsonData.profile.derenCID || null
+        this.setState({
+          lieferantcids: data.lieferantCIDsResult,
+          selectedLieferant: {
+            label: selectedLieferantCIDvalue,
+            value: selectedLieferantCIDid
+          }
+        })
+      })
+      .catch(err => console.error(`Error - ${err}`))
   }
 
   componentDidMount () {
@@ -230,33 +263,36 @@ export default class Maintenance extends React.Component {
       })
     }
     // get available supplier CIDs
-    let lieferantId
 
     const host = window.location.host
     if (this.props.jsonData.profile.lieferant) {
-      lieferantId = this.props.jsonData.profile.lieferant
-      fetch(`https://${host}/api/lieferantcids?id=${lieferantId}`, {
-        method: 'get'
-      })
-        .then(resp => resp.json())
-        .then(data => {
-          // console.log(data)
-          const selectedLieferantCIDid = parseInt(this.props.jsonData.profile.derenCIDid) || null
-          const selectedLieferantCIDvalue = this.props.jsonData.profile.derenCID || null
-          this.setState({
-            lieferantcids: data.lieferantCIDsResult,
-            selectedLieferant: {
-              label: selectedLieferantCIDvalue,
-              value: selectedLieferantCIDid
-            }
-          })
-        })
-        .catch(err => console.error(`Error - ${err}`))
+      const lieferantId = this.props.jsonData.profile.lieferant
       // get available Newtelco CIDs based on supplier CID
+
+      this.fetchLieferantCIDs(lieferantId)
       this.fetchMailCIDs(lieferantId)
     } else {
       const lieferantDomain = this.props.jsonData.profile.name
       // fetch id based on domain, then fetch available CIDs
+      fetch(`https://${host}/api/companies/domain?id=${lieferantDomain}`, {
+        method: 'get'
+      })
+        .then(resp => resp.json())
+        .then(data => {
+          const companyId = data.companyResults[0].id
+          const companyName = data.companyResults[0].name
+          // const selectedLieferantCIDid = parseInt(this.props.jsonData.profile.derenCIDid) || null
+          // const selectedLieferantCIDvalue = this.props.jsonData.profile.derenCID || null
+          this.setState({
+            maintenance: {
+              ...this.state.maintenance,
+              name: companyName,
+              lieferant: companyId
+            }
+          })
+          this.fetchLieferantCIDs(companyId)
+        })
+        .catch(err => console.error(`Error - ${err}`))
     }
     this.setState({
       windowInnerHeight: window.innerHeight
@@ -278,7 +314,6 @@ export default class Maintenance extends React.Component {
     })
       .then(resp => resp.json())
       .then(data => {
-        // console.log(data.kundenCIDsResult[0])
         data.kundenCIDsResult[0].sent = 0
 
         const existingKundenCids = [
@@ -375,9 +410,9 @@ export default class Maintenance extends React.Component {
   }
 
   handleGridReady = params => {
-    this.gridApi = params.gridApi
-    this.gridColumnApi = params.gridColumnApi
-    params.columnApi.autoSizeColumns()
+    // this.gridApi = params.gridApi
+    // this.gridColumnApi = params.gridColumnApi
+    // params.columnApi.autoSizeColumns()
   }
 
   onFirstDataRendered (params) {
@@ -460,36 +495,26 @@ export default class Maintenance extends React.Component {
 
         if (status === 200 && statusText === 'OK') {
           if (customerCid) {
-
             const activeRowIndex = this.state.kundencids.findIndex(el => el.kundenCID === customerCid)
-            console.log('1', activeRowIndex)
-
             const kundenCidRow = this.state.kundencids[activeRowIndex]
-            console.log('2', kundenCidRow)
-            
             kundenCidRow.sent = 1
-            console.log('3', kundenCidRow)
-
             const updatedKundenCids = [
               kundenCidRow,
               ...this.state.kundencids
             ]
-            console.log('4', updatedKundenCids)
-
             const deduplicatedKundenCids = getUnique(updatedKundenCids, 'kundenCID')
-            console.log('5', deduplicatedKundenCids)
-
             this.setState({
               kundencids: deduplicatedKundenCids
             })
-            cogoToast.info('Mail Sent!', {
+            this.gridApi.refreshCells()
+            cogoToast.success('Mail Sent', {
               position: 'top-right'
             })
           } else {
             this.setState({
               openPreviewModal: !this.state.openPreviewModal
             })
-            cogoToast.info('Mail Sent!', {
+            cogoToast.success('Mail Sent', {
               position: 'top-right'
             })
           }
@@ -542,15 +567,15 @@ export default class Maintenance extends React.Component {
     })
       .then(resp => resp.json())
       .then(data => {
-        const status = data.response.status
-        const statusText = data.response.statusText
+        const status = data.status
+        const statusText = data.statusText
 
         if (status === 200 && statusText === 'OK') {
-          cogoToast.info('Mail Sent!', {
+          cogoToast.success('Calendar Entry Created', {
             position: 'top-right'
           })
-        } else {
-          cogoToast.warning('Error Sending Mail', {
+        } else if (statusText === 'failed') {
+          cogoToast.warning('Error creating Calendar Entry', data.error, {
             position: 'top-right'
           })
         }
@@ -703,13 +728,13 @@ export default class Maintenance extends React.Component {
                           <Row>
                             <Col>
                               <FormGroup className='form-group-toggle'>
-                                <Badge theme='secondary' outline>
+                                <Badge theme='light' outline>
                                   <label>
                                     <Toggle defaultChecked={maintenance.cancelled === 1} />
                                     <div style={{ marginTop: '10px' }}>Cancelled</div>
                                   </label>
                                 </Badge>
-                                <Badge theme='secondary' outline>
+                                <Badge theme='light' outline>
                                   <label>
                                     <Toggle
                                       icons={{
@@ -721,7 +746,7 @@ export default class Maintenance extends React.Component {
                                     <div style={{ marginTop: '10px' }}>Emergency</div>
                                   </label>
                                 </Badge>
-                                <Badge theme='secondary'>
+                                <Badge theme='secondary' outline>
                                   <label>
                                     <Toggle
                                       defaultChecked={maintenance.done === 1}
@@ -779,7 +804,8 @@ export default class Maintenance extends React.Component {
                                 <AgGridReact
                                   gridOptions={this.state.gridOptions}
                                   rowData={this.state.kundencids}
-                                  onGridReady={this.handleGridReady}
+                                  // onGridReady={this.handleGridReady}
+                                  onGridReady={ params => this.gridApi = params.api }
                                   animateRows
                                   pagination
                                   onFirstDataRendered={this.onFirstDataRendered.bind(this)}
@@ -911,7 +937,7 @@ export default class Maintenance extends React.Component {
             }
             :global(.form-group-toggle) {
               display: flex;
-              justify-content: space-between;
+              justify-content: space-around;
               align-items: center;
             }
             .toggle-done {

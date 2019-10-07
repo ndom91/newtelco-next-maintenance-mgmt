@@ -12,15 +12,15 @@ export default class ProtectedIcon extends Component {
   render () {
     if (this.props.node.data.protected === '1') {
       return (
-        <FontAwesomeIcon width='1.5em' icon={faLock} />
+        <FontAwesomeIcon style={{ fontSize: '18px' }} width='1.5em' icon={faLock} />
       )
     } else if (this.props.node.data.protected === '0') {
       return (
-        <FontAwesomeIcon width='1.5em' icon={faCircle} />
+        <FontAwesomeIcon style={{ fontSize: '18px' }} width='1.5em' icon={faCircle} />
       )
     } else {
       return (
-        <FontAwesomeIcon width='1.5em' icon={faQuestion} />
+        <FontAwesomeIcon style={{ fontSize: '18px' }} width='1.5em' icon={faQuestion} />
       )
     }
   }
