@@ -142,6 +142,8 @@ export default class Maintenance extends React.Component {
     this.toggleTooltip = this.toggleTooltip.bind(this)
     this.handleNotesChange = this.handleNotesChange.bind(this)
     this.handleMailPreviewChange = this.handleMailPreviewChange.bind(this)
+    this.sendMail = this.sendMail.bind(this)
+    this.handleEditorChange = this.handleEditorChange.bind(this)
     // if (document) {
     //   this.quill = require('react-quill')
 
@@ -153,7 +155,7 @@ export default class Maintenance extends React.Component {
   sendMailBtns = (row) => {
     return (
       <ButtonGroup>
-        <Button onClick={this.sendMail} style={{ padding: '0.7em' }} size='sm' outline>
+        <Button onClick={() => this.prepareDirectSend(row.data.maintenanceRecipient, row.data.kundenCID)} style={{ padding: '0.7em' }} size='sm' outline>
           <FontAwesomeIcon width='1.325em' icon={faPaperPlane} />
         </Button>
         <Button onClick={() => this.togglePreviewModal(row.data.maintenanceRecipient, row.data.kundenCID)} style={{ padding: '0.7em' }} size='sm' outline>
@@ -390,7 +392,7 @@ export default class Maintenance extends React.Component {
     const endDateTimeDE = formatTz(utcToZonedTime(new Date(endDateTime), timeZone), 'dd.MM.yyyy HH:mm')
     const tzSuffixRAW = 'CET / GMT+2:00'
 
-    let body = `<body style="color:#666666;">${rescheduleText} Dear Colleagues,​​<p><span>We would like to inform you about planned work on the CID:<br><br> ${customerCID}. <br><br>The maintenance work is with the following details:</span></p><table border="0" cellspacing="2" cellpadding="2" width="975"><tr><td>Maintenance ID:</td><td><b>${id}</b></td></tr><tr><td>Start date and time:</td><td><b>${startDateTimeDE} (${tzSuffixRAW})</b></td></tr><tr><td>Finish date and time:</td><td><b>${endDateTimeDE} (${tzSuffixRAW})</b></td></tr>`
+    let body = `<body style="color:#666666;">${rescheduleText} Dear Colleagues,​​<p><span>We would like to inform you about planned work on the following CID(s):<br><br> <b>${customerCID}</b> <br><br>The maintenance work is with the following details:</span></p><table border="0" cellspacing="2" cellpadding="2" width="775px"><tr><td style='width: 205px;'>Maintenance ID:</td><td><b>${id}</b></td></tr><tr><td>Start date and time:</td><td><b>${startDateTimeDE} (${tzSuffixRAW})</b></td></tr><tr><td>Finish date and time:</td><td><b>${endDateTimeDE} (${tzSuffixRAW})</b></td></tr>`
 
     if (impact !== '') {
       body = body + '<tr><td>Impact:</td><td>' + impact + '</td></tr>'
@@ -404,27 +406,26 @@ export default class Maintenance extends React.Component {
       body = body + '<tr><td>Reason:</td><td>' + reason + '</td></tr>'
     }
 
-    body = body + '</table><p>We sincerely regret causing any inconveniences by this and hope for your understanding and the further mutually advantageous cooperation.</p><p>If you have any questions feel free to contact us at maintenance@newtelco.de.</p></div>​​</body>​​<footer>​<style>.sig{font-family:Century Gothic, sans-serif;font-size:9pt;color:#636266!important;}b.i{color:#4ca702;}.gray{color:#636266 !important;}a{text-decoration:none;color:#636266 !important;}</style><div class="sig"><div>Best regards <b class="i">|</b> Mit freundlichen Grüßen</div><br><div><b>Newtelco Maintenance Team</b></div><br><div>NewTelco GmbH <b class="i">|</b> Moenchhofsstr. 24 <b class="i">|</b> 60326 Frankfurt a.M. <b class="i">|</b> DE <br>www.newtelco.com <b class="i">|</b> 24/7 NOC  49 69 75 00 27 30 ​​<b class="i">|</b> <a style="color:#" href="mailto:service@newtelco.de">service@newtelco.de</a><br><br><div><img src="https://home.newtelco.de/sig.png" height="29" width="516"></div></div>​</footer>'
+    body = body + '</table><p>We sincerely regret any inconvenience that may be caused by this and hope for further mutually advantageous cooperation.</p><p>If you have any questions feel free to contact us at maintenance@newtelco.de.</p></div>​​</body>​​<footer>​<style>.sig{font-family:Century Gothic, sans-serif;font-size:9pt;color:#636266!important;}b.i{color:#4ca702;}.gray{color:#636266 !important;}a{text-decoration:none;color:#636266 !important;}</style><div class="sig"><div>Best regards <b class="i">|</b> Mit freundlichen Grüßen</div><br><div><b>Newtelco Maintenance Team</b></div><br><div>NewTelco GmbH <b class="i">|</b> Moenchhofsstr. 24 <b class="i">|</b> 60326 Frankfurt a.M. <b class="i">|</b> DE <br>www.newtelco.com <b class="i">|</b> 24/7 NOC  49 69 75 00 27 30 ​​<b class="i">|</b> <a style="color:#" href="mailto:service@newtelco.de">service@newtelco.de</a><br><br><div><img src="https://home.newtelco.de/sig.png" height="29" width="516"></div></div>​</footer>'
 
     return body
   }
 
   handleEditorChange (data) {
-    console.log(data)
     this.setState({
       mailBodyText: data.level.content
     })
   }
 
-  sendMail (data) {
-    console.log(data)
-    const body = this.state.mailBodyText
-    const subject = this.state.mailPreviewSubjectText
-    const to = this.state.mailPreviewHeaderText
+  sendMail (htmlBody, recipient, subj) {
+    const host = window.location.host
+    const body = this.state.mailBodyText || htmlBody
+    const subject = this.state.mailPreviewSubjectText || subj
+    const to = this.state.mailPreviewHeaderText || recipient
 
     fetch(`https://api.${host}/mail/send`, {
       method: 'post',
-      body: JSON.stringify({ 
+      body: JSON.stringify({
         body: body,
         subject: subject,
         to: to
@@ -437,22 +438,43 @@ export default class Maintenance extends React.Component {
     })
       .then(resp => resp.json())
       .then(data => {
-        console.log(data)
-        const text = data.translatedText
-        // this.setState({
-        //   maintenance: {
+        const status = data.response.status
+        const statusText = data.response.statusText
 
-        //   }
-        // })
-        cogoToast.info('Mail Sent!', {
-          position: 'top-right'
-        })
+        if (status === 200 && statusText === 'OK') {
+          cogoToast.info('Mail Sent!', {
+            position: 'top-right'
+          })
+        } else {
+          cogoToast.warning('Error Sending Mail', {
+            position: 'top-right'
+          })
+        }
       })
       .catch(err => console.error(`Error - ${err}`))
   }
 
-  handleSlateChange = ({ value }) => {
-    this.setState({ slateValue: value })
+  handleCreatedByChange (data) {
+    console.log(data.nativeEvent)
+  }
+
+  prepareDirectSend (recipient, customerCID) {
+    if (!this.state.mailBodyText) {
+      const HtmlBody = this.generateMail(customerCID)
+      const subject = `Planned Work Notification - ${this.state.maintenance.id}`
+      this.setState({
+        mailBodyText: HtmlBody,
+        mailPreviewHeaderText: recipient,
+        mailPreviewSubjectText: subject
+      })
+      this.sendMail(HtmlBody, recipient, subject)
+    } else {
+      this.sendMail()
+      // this.setState({
+      //   mailPreviewHeaderText: recipient,
+      //   mailPreviewSubjectText: `Planned Work Notification - ${this.state.maintenance.id}`
+      // })
+    }
   }
 
   render () {
@@ -514,7 +536,7 @@ export default class Maintenance extends React.Component {
                             <Col style={{ width: '30vw' }}>
                               <FormGroup>
                                 <label htmlFor='edited-by'>Created By</label>
-                                <FormInput id='edited-by-input' name='edited-by' type='text' value={maintenance.bearbeitetvon} />
+                                <FormInput id='edited-by-input' name='edited-by' type='text' value={maintenance.bearbeitetvon} onChange={this.handleCreatedByChange} />
                               </FormGroup>
                               <FormGroup>
                                 <label htmlFor='supplier'>Supplier</label>
