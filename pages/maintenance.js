@@ -144,6 +144,7 @@ export default class Maintenance extends React.Component {
     this.handleMailPreviewChange = this.handleMailPreviewChange.bind(this)
     this.sendMail = this.sendMail.bind(this)
     this.handleEditorChange = this.handleEditorChange.bind(this)
+    this.handleCalendarCreate = this.handleCalendarCreate.bind(this)
   }
 
   sendMailBtns = (row) => {
@@ -450,6 +451,49 @@ export default class Maintenance extends React.Component {
     // console.log(data.nativeEvent)
   }
 
+  handleCalendarCreate () {
+    const host = window.location.host
+    const company = this.state.maintenance.name
+    const cids = this.state.maintenance.betroffeneCIDs || ''
+    const supplierCID = this.state.maintenance.derenCID
+    const maintId = this.state.maintenance.id
+    const startDateTime = this.state.maintenance.startDateTime
+    const endDateTime = this.state.maintenance.endDateTime
+
+    fetch(`https://api.${host}/calendar/create`, {
+      method: 'post',
+      body: JSON.stringify({
+        company: company,
+        cids: cids,
+        supplierCID: supplierCID,
+        maintId: maintId,
+        startDateTime: startDateTime,
+        endDateTime: endDateTime
+      }),
+      mode: 'cors',
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json'
+      }
+    })
+      .then(resp => resp.json())
+      .then(data => {
+        const status = data.response.status
+        const statusText = data.response.statusText
+
+        if (status === 200 && statusText === 'OK') {
+          cogoToast.info('Mail Sent!', {
+            position: 'top-right'
+          })
+        } else {
+          cogoToast.warning('Error Sending Mail', {
+            position: 'top-right'
+          })
+        }
+      })
+      .catch(err => console.error(`Error - ${err}`))
+  }
+
   prepareDirectSend (recipient, customerCID) {
     if (!this.state.mailBodyText) {
       const HtmlBody = this.generateMail(customerCID)
@@ -497,7 +541,7 @@ export default class Maintenance extends React.Component {
                         <FontAwesomeIcon icon={faEnvelopeOpenText} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
                       Read
                       </Button>
-                      <Button outline>
+                      <Button onClick={this.handleCalendarCreate} outline>
                         <FontAwesomeIcon icon={faCalendarAlt} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
                       Calendar
                       </Button>
