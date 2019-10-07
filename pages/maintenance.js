@@ -16,6 +16,8 @@ import Router from 'next/router'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Editor as TinyEditor } from '@tinymce/tinymce-react'
 import { format, isValid } from 'date-fns'
+import DateFnsUtils from '@date-io/date-fns'
+import { KeyboardDateTimePicker, MuiPickersUtilsProvider } from '@material-ui/pickers'
 import { zonedTimeToUtc, utcToZonedTime, format as formatTz } from 'date-fns-tz'
 import {
   faSave,
@@ -40,6 +42,7 @@ import {
   Button,
   Badge,
   FormGroup,
+  FormTextarea,
   FormInput,
   Modal,
   ModalHeader,
@@ -216,6 +219,13 @@ export default class Maintenance extends React.Component {
   }
 
   fetchLieferantCIDs (lieferantId) {
+    if (!lieferantId) {
+      this.setState({
+        lieferantcids: [{ label: 'No CIDs available for this Supplier', value: '1' }]
+      //   selectedLieferant: { label: 'No CIDs available', value: '1' }
+      })
+      return
+    }
     const host = window.location.host
     fetch(`https://${host}/api/lieferantcids?id=${lieferantId}`, {
       method: 'get'
@@ -223,6 +233,13 @@ export default class Maintenance extends React.Component {
       .then(resp => resp.json())
       .then(data => {
         // console.log(data)
+        if (!data.lieferantCIDsResult) {
+          this.setState({
+            lieferantcids: [{ label: 'No CIDs available for this Supplier', value: '1' }]
+          //   selectedLieferant: { label: 'No CIDs available', value: '1' }
+          })
+          return
+        }
         const selectedLieferantCIDid = parseInt(this.props.jsonData.profile.derenCIDid) || null
         const selectedLieferantCIDvalue = this.props.jsonData.profile.derenCID || null
         this.setState({
@@ -279,6 +296,10 @@ export default class Maintenance extends React.Component {
       })
         .then(resp => resp.json())
         .then(data => {
+          if (!data.companyResults[0]) {
+            this.fetchLieferantCIDs()
+            return
+          }
           const companyId = data.companyResults[0].id
           const companyName = data.companyResults[0].name
           // const selectedLieferantCIDid = parseInt(this.props.jsonData.profile.derenCIDid) || null
@@ -606,6 +627,24 @@ export default class Maintenance extends React.Component {
     }
   }
 
+  handleStartDate (date) {
+    this.setState({
+      maintenance: {
+        ...this.state.maintenance,
+        startDateTime: date
+      }
+    })
+  }
+
+  handleEndDate (date) {
+    this.setState({
+      maintenance: {
+        ...this.state.maintenance,
+        endDateTime: date
+      }
+    })
+  }
+
   render () {
     const {
       maintenance,
@@ -615,435 +654,484 @@ export default class Maintenance extends React.Component {
     // console.log(maintenance)
     if (this.props.session.user) {
       return (
-        <Layout session={this.props.session}>
-          <Card style={{ maxWidth: '100%' }}>
-            <CardHeader>
-              <ButtonToolbar style={{ justifyContent: 'space-between' }}>
-                <ButtonGroup size='md'>
-                  <Button onClick={() => Router.back()} outline>
-                    <FontAwesomeIcon icon={faArrowLeft} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
-                    Back
-                  </Button>
-                </ButtonGroup>
-                <span>
-                  <Badge theme='secondary' style={{ fontSize: '2rem', marginRight: '20px' }} outline>
-                    {maintenance.id}
-                  </Badge>
-                  <h2 style={{ display: 'inline-block', marginBottom: '0px' }}>{maintenance.name}</h2>
-                </span>
-                {this.state.width > 500
+        <MuiPickersUtilsProvider utils={DateFnsUtils}>
+          <Layout session={this.props.session}>
+            <Card style={{ maxWidth: '100%' }}>
+              <CardHeader>
+                <ButtonToolbar style={{ justifyContent: 'space-between' }}>
+                  <ButtonGroup size='md'>
+                    <Button onClick={() => Router.back()} outline>
+                      <FontAwesomeIcon icon={faArrowLeft} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
+                      Back
+                    </Button>
+                  </ButtonGroup>
+                  <span>
+                    <Badge theme='secondary' style={{ fontSize: '2rem', marginRight: '20px' }} outline>
+                      {maintenance.id}
+                    </Badge>
+                    <h2 style={{ display: 'inline-block', marginBottom: '0px' }}>{maintenance.name}</h2>
+                  </span>
+                  {this.state.width > 500
+                    ? (
+                      <ButtonGroup className='btn-group-2' size='md'>
+                        <Button onClick={this.toggleReadModal} outline>
+                          <FontAwesomeIcon icon={faEnvelopeOpenText} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
+                        Read
+                        </Button>
+                        <Button onClick={this.handleCalendarCreate} outline>
+                          <FontAwesomeIcon icon={faCalendarAlt} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
+                        Calendar
+                        </Button>
+                        <Button>
+                          <FontAwesomeIcon icon={faSave} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
+                        Save
+                        </Button>
+                      </ButtonGroup>
+                    ) : (
+                      <></>
+                    )}
+                </ButtonToolbar>
+              </CardHeader>
+              <CardBody>
+                <Container fluid>
+                  <Row style={{ height: '20px' }} />
+                  <Row>
+                    <Col sm='12' lg='6'>
+                      <Row>
+                        <Col>
+                          <Container className='maintenance-subcontainer'>
+                            <Row>
+                              <Col style={{ width: '30vw' }}>
+                                <FormGroup>
+                                  <label htmlFor='edited-by'>Created By</label>
+                                  <FormInput id='edited-by-input' name='edited-by' type='text' value={maintenance.bearbeitetvon} onChange={this.handleCreatedByChange} />
+                                </FormGroup>
+                                <FormGroup>
+                                  <label htmlFor='supplier'>Supplier</label>
+                                  <FormInput id='supplier-input' name='supplier' type='text' value={maintenance.name} />
+                                </FormGroup>
+                                <FormGroup>
+                                  <label htmlFor='start-datetime'>Start Date/Time</label>
+                                  {/* <FormInput id='start-datetime' name='start-datetime' type='text' value={this.convertDateTime(maintenance.startDateTime)} /> */}
+                                  <KeyboardDateTimePicker
+                                    value={maintenance.startDateTime}
+                                    onChange={date => this.handleStartDate(date)}
+                                    animateYearScrolling
+                                    autoOk
+                                    ampm={false}
+                                    format='dd.MM.yyyy HH:mm'
+                                    // onAccept={this.handleSave}
+                                    variant='inline'
+                                    disableToolbar
+                                    inputVariant='outlined'
+                                  />
+                                </FormGroup>
+                                {/* todo: Timezone after Start/End Time */}
+                                <FormGroup>
+                                  <label htmlFor='their-cid'>Their CID</label>
+                                  <Select
+                                    value={this.state.selectedLieferant}
+                                    onChange={this.handleSelectLieferantChange}
+                                    options={this.state.lieferantcids}
+                                    isMulti
+                                    noOptionsMessage={() => 'No CIDs for this Supplier'}
+                                    placeholder='Please select a CID'
+                                  />
+                                </FormGroup>
+                              </Col>
+                              <Col style={{ width: '30vw' }}>
+                                <FormGroup>
+                                  <label htmlFor='maileingang'>Mail Arrived</label>
+                                  <FormInput id='maileingang-input' name='maileingang' type='text' value={this.convertDateTime(maintenance.maileingang)} />
+                                </FormGroup>
+                                <FormGroup>
+                                  <label htmlFor='updated-at'>Updated At</label>
+                                  <FormInput id='updated-at' name='updated-at' type='text' value={this.convertDateTime(maintenance.updatedAt)} />
+                                </FormGroup>
+                                <FormGroup>
+                                  <label htmlFor='end-datetime'>End Date/Time</label>
+                                  {/* <FormInput id='end-datetime' name='end-datetime' type='text' value={this.convertDateTime(maintenance.endDateTime)} /> */}
+                                  <KeyboardDateTimePicker
+                                    selected={maintenance.endDateTime}
+                                    onChange={date => this.handleEndDate(date)}
+                                    animateYearScrolling
+                                    autoOk
+                                    ampm={false}
+                                    format='dd.MM.yyyy HH:mm'
+                                    // onAccept={this.handleSave}
+                                    variant='inline'
+                                    disableToolbar
+                                    inputVariant='outlined'
+                                  />
+                                </FormGroup>
+                                <FormGroup>
+                                  <label htmlFor='updated-by'>Last Updated By</label>
+                                  <FormInput id='updated-by' name='updated-by' type='text' value={maintenance.updatedBy} />
+                                </FormGroup>
+                              </Col>
+                            </Row>
+                          </Container>
+                          <Container className='maintenance-subcontainer'>
+                            <Row>
+                              <Col>
+                                <Row>
+                                  <Col>
+                                    <FormGroup>
+                                      <label htmlFor='impact'>Impact</label>
+                                      <FormInput id='impact' name='impact' type='text' value={maintenance.impact} />
+                                    </FormGroup>
+                                  </Col>
+                                  <Col>
+                                    <FormGroup>
+                                      <label htmlFor='location'>Location</label>
+                                      <FormInput id='location' name='location' type='text' value={maintenance.location} />
+                                    </FormGroup>
+                                  </Col>
+                                </Row>
+                                <FormGroup>
+                                  <label htmlFor='reason'>Reason</label>
+                                  <FormTextarea id='reason' name='reason' type='text' value={maintenance.reason} />
+                                </FormGroup>
+                              </Col>
+                            </Row>
+                          </Container>
+                          <Container style={{ paddingTop: '20px' }} className='maintenance-subcontainer'>
+                            <Row>
+                              <Col>
+                                <FormGroup className='form-group-toggle'>
+                                  <Badge theme='light' outline>
+                                    <label>
+                                      <Toggle defaultChecked={maintenance.cancelled === 1} />
+                                      <div style={{ marginTop: '10px' }}>Cancelled</div>
+                                    </label>
+                                  </Badge>
+                                  <Badge theme='light' outline>
+                                    <label>
+                                      <Toggle
+                                        icons={{
+                                          checked: <FontAwesomeIcon icon={faFirstAid} width='0.5em' style={{ color: '#fff' }} />,
+                                          unchecked: null
+                                        }}
+                                        defaultChecked={maintenance.emergency === 1}
+                                      />
+                                      <div style={{ marginTop: '10px' }}>Emergency</div>
+                                    </label>
+                                  </Badge>
+                                  <Badge theme='secondary' outline>
+                                    <label>
+                                      <Toggle
+                                        defaultChecked={maintenance.done === 1}
+                                      />
+                                      <div style={{ marginTop: '10px' }}>Done</div>
+                                    </label>
+                                  </Badge>
+                                </FormGroup>
+                              </Col>
+                            </Row>
+                          </Container>
+                          <Container className='maintenance-subcontainer'>
+                            <Row>
+                              <Col>
+                                <FormGroup>
+                                  <label htmlFor='notes'>Notes</label>
+                                  <TinyEditor
+                                    initialValue={this.state.notesText}
+                                    apiKey='ttv2x1is9joc0fi7v6f6rzi0u98w2mpehx53mnc1277omr7s'
+                                    init={{
+                                      height: 300,
+                                      menubar: false,
+                                      statusbar: false,
+                                      plugins: [
+                                        'advlist autolink lists link image print preview anchor',
+                                        'searchreplace code',
+                                        'insertdatetime table paste code help wordcount'
+                                      ],
+                                      toolbar:
+                                        `undo redo | formatselect | bold italic backcolor | 
+                                        alignleft aligncenter alignright alignjustify | 
+                                        bullist numlist outdent indent | removeformat | help`
+                                    }}
+                                    onChange={this.handleEditorChange}
+                                  />
+                                </FormGroup>
+                              </Col>
+                            </Row>
+                          </Container>
+                        </Col>
+                      </Row>
+                    </Col>
+                    <Col sm='12' lg='6'>
+                      <Row>
+                        <Col>
+                          <Container style={{ padding: '20px' }} className='maintenance-subcontainer'>
+                            <Row>
+                              <Col style={{ width: '100%', height: '600px' }}>
+                                <div
+                                  className='ag-theme-material'
+                                  style={{
+                                    height: '100%',
+                                    width: '100%'
+                                  }}
+                                >
+                                  <AgGridReact
+                                    gridOptions={this.state.gridOptions}
+                                    rowData={this.state.kundencids}
+                                    // onGridReady={this.handleGridReady}
+                                    onGridReady={params => this.gridApi = params.api}
+                                    animateRows
+                                    pagination
+                                    onFirstDataRendered={this.onFirstDataRendered.bind(this)}
+                                  />
+                                </div>
+                              </Col>
+                            </Row>
+                          </Container>
+                        </Col>
+                      </Row>
+                    </Col>
+                  </Row>
+                </Container>
+              </CardBody>
+              <CardFooter className='card-footer'>
+                {this.state.width < 500
                   ? (
                     <ButtonGroup className='btn-group-2' size='md'>
-                      <Button onClick={this.toggleReadModal} outline>
+                      <Button onClick={this.toggle} outline>
                         <FontAwesomeIcon icon={faEnvelopeOpenText} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
-                      Read
+                        Read
                       </Button>
-                      <Button onClick={this.handleCalendarCreate} outline>
+                      <Button outline>
                         <FontAwesomeIcon icon={faCalendarAlt} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
-                      Calendar
+                        Calendar
                       </Button>
                       <Button>
                         <FontAwesomeIcon icon={faSave} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
-                      Save
+                        Save
                       </Button>
                     </ButtonGroup>
                   ) : (
-                    <></>
+                    <span />
                   )}
-              </ButtonToolbar>
-            </CardHeader>
-            <CardBody>
-              <Container fluid>
-                <Row style={{ height: '20px' }} />
-                <Row>
-                  <Col sm='12' lg='6'>
-                    <Row>
-                      <Col>
-                        <Container className='maintenance-subcontainer'>
-                          <Row>
-                            <Col style={{ width: '30vw' }}>
-                              <FormGroup>
-                                <label htmlFor='edited-by'>Created By</label>
-                                <FormInput id='edited-by-input' name='edited-by' type='text' value={maintenance.bearbeitetvon} onChange={this.handleCreatedByChange} />
-                              </FormGroup>
-                              <FormGroup>
-                                <label htmlFor='supplier'>Supplier</label>
-                                <FormInput id='supplier-input' name='supplier' type='text' value={maintenance.name} />
-                              </FormGroup>
-                              <FormGroup>
-                                <label htmlFor='start-datetime'>Start Date/Time</label>
-                                <FormInput id='start-datetime' name='start-datetime' type='text' value={this.convertDateTime(maintenance.startDateTime)} />
-                              </FormGroup>
-                              {/* todo: Timezone after Start/End Time */}
-                              <FormGroup>
-                                <label htmlFor='their-cid'>Their CID</label>
-                                <Select
-                                  value={this.state.selectedLieferant}
-                                  onChange={this.handleSelectLieferantChange}
-                                  options={this.state.lieferantcids}
-                                  isMulti
-                                  noOptionsMessage='No CIDs for this Supplier'
-                                  placeholder='Please select a CID'
-                                />
-                              </FormGroup>
-                            </Col>
-                            <Col style={{ width: '30vw' }}>
-                              <FormGroup>
-                                <label htmlFor='maileingang'>Mail Arrived</label>
-                                <FormInput id='maileingang-input' name='maileingang' type='text' value={this.convertDateTime(maintenance.maileingang)} />
-                              </FormGroup>
-                              <FormGroup>
-                                <label htmlFor='updated-at'>Updated At</label>
-                                <FormInput id='updated-at' name='updated-at' type='text' value={this.convertDateTime(maintenance.updatedAt)} />
-                              </FormGroup>
-                              <FormGroup>
-                                <label htmlFor='end-datetime'>End Date/Time</label>
-                                <FormInput id='end-datetime' name='end-datetime' type='text' value={this.convertDateTime(maintenance.endDateTime)} />
-                              </FormGroup>
-                              <FormGroup>
-                                <label htmlFor='updated-by'>Last Updated By</label>
-                                <FormInput id='updated-by' name='updated-by' type='text' value={maintenance.updatedBy} />
-                              </FormGroup>
-                            </Col>
-                          </Row>
-                        </Container>
-                        <Container className='maintenance-subcontainer'>
-                          <Row>
-                            <Col>
-                              <Row>
-                                <Col>
-                                  <FormGroup>
-                                    <label htmlFor='updated-by'>Impact</label>
-                                    <FormInput id='updated-by' name='updated-by' type='text' value={maintenance.impact} />
-                                  </FormGroup>
-                                </Col>
-                                <Col>
-                                  <FormGroup>
-                                    <label htmlFor='updated-by'>Location</label>
-                                    <FormInput id='updated-by' name='updated-by' type='text' value={maintenance.location} />
-                                  </FormGroup>
-                                </Col>
-                              </Row>
-                              <FormGroup>
-                                <label htmlFor='updated-by'>Reason</label>
-                                <FormInput id='updated-by' name='updated-by' type='text' value={maintenance.reason} />
-                              </FormGroup>
-                            </Col>
-                          </Row>
-                        </Container>
-                        <Container style={{ paddingTop: '20px' }} className='maintenance-subcontainer'>
-                          <Row>
-                            <Col>
-                              <FormGroup className='form-group-toggle'>
-                                <Badge theme='light' outline>
-                                  <label>
-                                    <Toggle defaultChecked={maintenance.cancelled === 1} />
-                                    <div style={{ marginTop: '10px' }}>Cancelled</div>
-                                  </label>
-                                </Badge>
-                                <Badge theme='light' outline>
-                                  <label>
-                                    <Toggle
-                                      icons={{
-                                        checked: <FontAwesomeIcon icon={faFirstAid} width='0.5em' style={{ color: '#fff' }} />,
-                                        unchecked: null
-                                      }}
-                                      defaultChecked={maintenance.emergency === 1}
-                                    />
-                                    <div style={{ marginTop: '10px' }}>Emergency</div>
-                                  </label>
-                                </Badge>
-                                <Badge theme='secondary' outline>
-                                  <label>
-                                    <Toggle
-                                      defaultChecked={maintenance.done === 1}
-                                    />
-                                    <div style={{ marginTop: '10px' }}>Done</div>
-                                  </label>
-                                </Badge>
-                              </FormGroup>
-                            </Col>
-                          </Row>
-                        </Container>
-                        <Container className='maintenance-subcontainer'>
-                          <Row>
-                            <Col>
-                              <FormGroup>
-                                <label htmlFor='notes'>Notes</label>
-                                <TinyEditor
-                                  initialValue={this.state.notesText}
-                                  apiKey='ttv2x1is9joc0fi7v6f6rzi0u98w2mpehx53mnc1277omr7s'
-                                  init={{
-                                    height: 500,
-                                    menubar: false,
-                                    statusbar: false,
-                                    plugins: [
-                                      'advlist autolink lists link image print preview anchor',
-                                      'searchreplace code',
-                                      'insertdatetime table paste code help wordcount'
-                                    ],
-                                    toolbar:
-                                      `undo redo | formatselect | bold italic backcolor | 
-                                      alignleft aligncenter alignright alignjustify | 
-                                      bullist numlist outdent indent | removeformat | help`
-                                  }}
-                                  onChange={this.handleEditorChange}
-                                />
-                              </FormGroup>
-                            </Col>
-                          </Row>
-                        </Container>
-                      </Col>
-                    </Row>
-                  </Col>
-                  <Col sm='12' lg='6'>
-                    <Row>
-                      <Col>
-                        <Container style={{ padding: '20px' }} className='maintenance-subcontainer'>
-                          <Row>
-                            <Col style={{ width: '100%', height: '600px' }}>
-                              <div
-                                className='ag-theme-material'
-                                style={{
-                                  height: '100%',
-                                  width: '100%'
-                                }}
-                              >
-                                <AgGridReact
-                                  gridOptions={this.state.gridOptions}
-                                  rowData={this.state.kundencids}
-                                  // onGridReady={this.handleGridReady}
-                                  onGridReady={ params => this.gridApi = params.api }
-                                  animateRows
-                                  pagination
-                                  onFirstDataRendered={this.onFirstDataRendered.bind(this)}
-                                />
-                              </div>
-                            </Col>
-                          </Row>
-                        </Container>
-                      </Col>
-                    </Row>
-                  </Col>
-                </Row>
-              </Container>
-            </CardBody>
-            <CardFooter className='card-footer'>
-              {this.state.width < 500
-                ? (
-                  <ButtonGroup className='btn-group-2' size='md'>
-                    <Button onClick={this.toggle} outline>
-                      <FontAwesomeIcon icon={faEnvelopeOpenText} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
-                      Read
-                    </Button>
-                    <Button outline>
-                      <FontAwesomeIcon icon={faCalendarAlt} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
-                      Calendar
-                    </Button>
-                    <Button>
-                      <FontAwesomeIcon icon={faSave} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
-                      Save
-                    </Button>
-                  </ButtonGroup>
-                ) : (
-                  <span />
-                )}
-            </CardFooter>
-            <Modal className='mail-modal-body' animation backdrop backdropClassName='modal-backdrop' open={openReadModal} size='lg' toggle={this.toggleReadModal}>
-              <ModalHeader>
-                <img className='mail-icon' src={`https://besticon-demo.herokuapp.com/icon?size=40..100..360&url=${this.state.maintenance.incomingDomain}`} />
-                <div className='modal-incoming-header-text'>
-                  <h5 className='modal-incoming-from'>{this.state.maintenance.incomingFrom}</h5>
-                  <small className='modal-incoming-subject'>{this.state.maintenance.incomingSubject}</small><br />
-                  <small className='modal-incoming-datetime'>{this.state.maintenance.incomingDate}</small>
-                </div>
-                <Button id='translate-tooltip' style={{ padding: '0.7em 0.9em' }} onClick={this.handleTranslate.bind(this)}>
-                  <FontAwesomeIcon width='1.5em' className='translate-icon' icon={faLanguage} />
-                </Button>
-              </ModalHeader>
-              <Tooltip
-                open={this.state.translateTooltipOpen}
-                target='#translate-tooltip'
-                toggle={this.toggleTooltip}
-                placement='bottom'
-                noArrow
-              >
-                  Translate
-              </Tooltip>
-              <ModalBody className='mail-body' dangerouslySetInnerHTML={{ __html: this.state.translated ? this.state.translatedBody : this.state.maintenance.incomingBody }} />
-            </Modal>
-            <Modal backdropClassName='modal-backdrop' animation backdrop size='lg' open={openPreviewModal} toggle={this.togglePreviewModal}>
-              <ModalHeader>
-                <div className='modal-preview-text-wrapper'>
-                  <div className='modal-preview-to-text'>
-                    To: {this.state.mailPreviewHeaderText}
+              </CardFooter>
+              <Modal className='mail-modal-body' animation backdrop backdropClassName='modal-backdrop' open={openReadModal} size='lg' toggle={this.toggleReadModal}>
+                <ModalHeader>
+                  <img className='mail-icon' src={`https://besticon-demo.herokuapp.com/icon?size=40..100..360&url=${this.state.maintenance.incomingDomain}`} />
+                  <div className='modal-incoming-header-text'>
+                    <h5 className='modal-incoming-from'>{this.state.maintenance.incomingFrom}</h5>
+                    <small className='modal-incoming-subject'>{this.state.maintenance.incomingSubject}</small><br />
+                    <small className='modal-incoming-datetime'>{this.state.maintenance.incomingDate}</small>
                   </div>
-                  <div className='modal-preview-Subject-text'>
-                    Subject: {this.state.mailPreviewSubjectText}
+                  <Button id='translate-tooltip' style={{ padding: '0.7em 0.9em' }} onClick={this.handleTranslate.bind(this)}>
+                    <FontAwesomeIcon width='1.5em' className='translate-icon' icon={faLanguage} />
+                  </Button>
+                </ModalHeader>
+                <Tooltip
+                  open={this.state.translateTooltipOpen}
+                  target='#translate-tooltip'
+                  toggle={this.toggleTooltip}
+                  placement='bottom'
+                  noArrow
+                >
+                    Translate
+                </Tooltip>
+                <ModalBody className='mail-body' dangerouslySetInnerHTML={{ __html: this.state.translated ? this.state.translatedBody : this.state.maintenance.incomingBody }} />
+              </Modal>
+              <Modal backdropClassName='modal-backdrop' animation backdrop size='lg' open={openPreviewModal} toggle={this.togglePreviewModal}>
+                <ModalHeader>
+                  <div className='modal-preview-text-wrapper'>
+                    <div className='modal-preview-to-text'>
+                      To: {this.state.mailPreviewHeaderText}
+                    </div>
+                    <div className='modal-preview-Subject-text'>
+                      Subject: {this.state.mailPreviewSubjectText}
+                    </div>
                   </div>
-                </div>
-                <Button id='send-mail-btn' style={{ padding: '0.9em 1.1em' }} onClick={this.sendMail}>
-                  <FontAwesomeIcon width='1.5em' style={{ fontSize: '20px' }} className='modal-preview-send-icon' icon={faPaperPlane} />
-                </Button>
-              </ModalHeader>
-              <ModalBody>
-                <TinyEditor
-                  initialValue={this.state.mailBodyText}
-                  apiKey='ttv2x1is9joc0fi7v6f6rzi0u98w2mpehx53mnc1277omr7s'
-                  init={{
-                    height: 500,
-                    menubar: false,
-                    statusbar: false,
-                    plugins: [
-                      'advlist autolink lists link image print preview anchor',
-                      'searchreplace code',
-                      'insertdatetime table paste code help wordcount'
-                    ],
-                    toolbar:
-                      `undo redo | formatselect | bold italic backcolor | 
-                      alignleft aligncenter alignright alignjustify | 
-                      bullist numlist outdent indent | removeformat | help`
-                  }}
-                  onChange={this.handleEditorChange}
-                />
+                  <Button id='send-mail-btn' style={{ padding: '0.9em 1.1em' }} onClick={this.sendMail}>
+                    <FontAwesomeIcon width='1.5em' style={{ fontSize: '20px' }} className='modal-preview-send-icon' icon={faPaperPlane} />
+                  </Button>
+                </ModalHeader>
+                <ModalBody>
+                  <TinyEditor
+                    initialValue={this.state.mailBodyText}
+                    apiKey='ttv2x1is9joc0fi7v6f6rzi0u98w2mpehx53mnc1277omr7s'
+                    init={{
+                      height: 500,
+                      menubar: false,
+                      statusbar: false,
+                      plugins: [
+                        'advlist autolink lists link image print preview anchor',
+                        'searchreplace code',
+                        'insertdatetime table paste code help wordcount'
+                      ],
+                      toolbar:
+                        `undo redo | formatselect | bold italic backcolor | 
+                        alignleft aligncenter alignright alignjustify | 
+                        bullist numlist outdent indent | removeformat | help`
+                    }}
+                    onChange={this.handleEditorChange}
+                  />
 
-              </ModalBody>
-            </Modal>
-          </Card>
-          <style jsx>{`
-            .mail-icon {
-              width: 96px;
-              height: 96px;
-              border: 2px solid var(--primary);
-              padding: 10px;
-              border-radius: 5px;
-              margin-right: 10px;
-            }
-            :global(.fa-language) {
-              font-size: 20px;
-            }
-            :global(.modal-lg) {
-              max-width: 1000px !important;
-            }
-            :global(.tox-toolbar__group) {
-              border-right: none !important;
-            }
-            :global(.tox-tinymce) {
-              border-radius: 5px !important;
-            }
-            :global(.tox-toolbar) {
-              background: none !important;
-            }
-            :global(.maintenance-subcontainer) {
-              border: 1px solid var(--light);
-              border-radius: 0.325rem;
-              margin: 10px 0;
-            }
-            :global(.form-group-toggle > label) {
-              display: flex;
-              flex-direction: column;
-              align-items: center;
-            }
-            :global(.form-group-toggle) {
-              display: flex;
-              justify-content: space-around;
-              align-items: center;
-            }
-            .toggle-done {
-              border: 1px solid var(--secondary);
-              border-radius: 0.325rem;
-              padding: 20px;
-            }
-            :global(.rdw-option-active) {
-              box-shadow: none;
-              border: 2px solid var(--primary);
-              border-radius: 5px;
-            }
-            :global(.editor-toolbar) {
-              transition: all 150ms ease-in-out;
-            }
-            :global(.editor-dropdown) {
-              position: relative;
-              font-family: inherit;
-              background-color: transparent;
-              padding: 2px 2px 2px 0;
-              font-size: 10px;
-              border-radius: 0;
-              border: none;
-              border-bottom: 1px solid rgba(0,0,0, 0.12);
-              transition: all 150ms ease-in-out;
-            }
-            :global(.editor-wrapper) {
-              border: 1px solid var(--light);
-              border-radius: 5px;
-            }
-            :global(.editor-wrapper) {
-              padding: 5px;
-            }
-            :global(button.btn-primary) {
-              max-height: 45px;
-            }
-            input {
-              display: block;
-            }
-            label {
-              margin: 15px;
-            }
-            :global(.modal-content) {
-              max-height: calc(${this.state.windowInnerHeight}px - 50px);
-            }
-            :global(.mail-body) {
-              font-family: Poppins, Helvetica;
-              overflow-y: scroll;
-            }
-            :global(.modal-backdrop) {
-              background-color: #000;
-              transition: all 150ms ease-in-out;
-            }
-            :global(.modal-backdrop.show) {
-              opacity: 0.5;
-            }
-            .modal-incoming-header-text {
-              flex-grow: 1;
-            }
-            :global(.modal-title) {
-              display: flex;
-              justify-content: space-between;
-              width: 100%;
-              align-items: center;
-            }
-            :global(.modal-content) {
-              max-height: calc(${this.state.windowInnerHeight}px - 50px);
-            }
-            @media only screen and (max-width: 500px) {
-              :global(div.btn-toolbar > .btn-group-md) {
-                margin-right: 20px;
+                </ModalBody>
+              </Modal>
+            </Card>
+            <style jsx>{`
+              .mail-icon {
+                width: 96px;
+                height: 96px;
+                border: 2px solid var(--primary);
+                padding: 10px;
+                border-radius: 5px;
+                margin-right: 10px;
               }
-              :global(div.btn-toolbar) {
-                flex-wrap: no-wrap;
+              :global(.MuiFormControl-root) {
+                width: 100%;
               }
-              :global(div.btn-toolbar > span) {
+              :global(.MuiInputBase-root) {
+                color: #495057;
+              }
+              :global(.MuiInputBase-root:hover) {
+                border-color: #8fa4b8 !important;
+              }
+              :global(.MuiOutlinedInput-input) {
+                padding: 12.5px 14px;
+                transition: box-shadow 250ms cubic-bezier(.27,.01,.38,1.06),border 250ms cubic-bezier(.27,.01,.38,1.06);
+              }
+              :global(.Mui-focused) {
+                border: none !important;
+              }
+              :global(.MuiInputBase-root:focus-within) {
+                color: #495057;
+                background-color: #fff;
+                border: 1px solid #007bff !important;
+                border-radius: 0.325rem;
+                box-shadow: 0 0.313rem 0.719rem rgba(0,123,255,.1), 0 0.156rem 0.125rem rgba(0,0,0,.06);
+              }
+              :global(.fa-language) {
+                font-size: 20px;
+              }
+              :global(.modal-lg) {
+                max-width: 1000px !important;
+              }
+              :global(.tox-toolbar__group) {
+                border-right: none !important;
+              }
+              :global(.tox-tinymce) {
+                border-radius: 5px !important;
+              }
+              :global(.tox-toolbar) {
+                background: none !important;
+              }
+              :global(.maintenance-subcontainer) {
+                border: 1px solid var(--light);
+                border-radius: 0.325rem;
+                margin: 10px 0;
+              }
+              :global(.form-group-toggle > label) {
                 display: flex;
-                justify-content: center;
-                flex-wrap: wrap;
                 flex-direction: column;
+                align-items: center;
+              }
+              :global(.form-group-toggle) {
+                display: flex;
+                justify-content: space-around;
+                align-items: center;
+              }
+              .toggle-done {
+                border: 1px solid var(--secondary);
+                border-radius: 0.325rem;
+                padding: 20px;
+              }
+              :global(.rdw-option-active) {
+                box-shadow: none;
+                border: 2px solid var(--primary);
+                border-radius: 5px;
+              }
+              :global(.editor-toolbar) {
+                transition: all 150ms ease-in-out;
+              }
+              :global(.editor-dropdown) {
+                position: relative;
+                font-family: inherit;
+                background-color: transparent;
+                padding: 2px 2px 2px 0;
+                font-size: 10px;
+                border-radius: 0;
+                border: none;
+                border-bottom: 1px solid rgba(0,0,0, 0.12);
+                transition: all 150ms ease-in-out;
+              }
+              :global(.editor-wrapper) {
+                border: 1px solid var(--light);
+                border-radius: 5px;
+              }
+              :global(.editor-wrapper) {
+                padding: 5px;
+              }
+              :global(button.btn-primary) {
+                max-height: 45px;
+              }
+              input {
+                display: block;
+              }
+              label {
+                margin: 15px;
+              }
+              :global(.modal-content) {
+                max-height: calc(${this.state.windowInnerHeight}px - 50px);
+              }
+              :global(.mail-body) {
+                font-family: Poppins, Helvetica;
+                overflow-y: scroll;
+              }
+              :global(.modal-backdrop) {
+                background-color: #000;
+                transition: all 150ms ease-in-out;
+              }
+              :global(.modal-backdrop.show) {
+                opacity: 0.5;
+              }
+              .modal-incoming-header-text {
                 flex-grow: 1;
               }
-              :global(div.btn-toolbar > span > h2) {
-                margin: 0 auto;
-                padding-right: 20px;
+              :global(.modal-title) {
+                display: flex;
+                justify-content: space-between;
+                width: 100%;
+                align-items: center;
               }
-              :global(.card-body) {
-                padding: 0px;
+              :global(.modal-content) {
+                max-height: calc(${this.state.windowInnerHeight}px - 50px);
               }
-              :global(.col) {
-                {/* padding-left: 5px;
-                padding-right: 5px; */}
+              @media only screen and (max-width: 500px) {
+                :global(div.btn-toolbar > .btn-group-md) {
+                  margin-right: 20px;
+                }
+                :global(div.btn-toolbar) {
+                  flex-wrap: no-wrap;
+                }
+                :global(div.btn-toolbar > span) {
+                  display: flex;
+                  justify-content: center;
+                  flex-wrap: wrap;
+                  flex-direction: column;
+                  flex-grow: 1;
+                }
+                :global(div.btn-toolbar > span > h2) {
+                  margin: 0 auto;
+                  padding-right: 20px;
+                }
+                :global(.card-body) {
+                  padding: 0px;
+                }
+                :global(.col) {
+                  {/* padding-left: 5px;
+                  padding-right: 5px; */}
+                }
               }
-            }
-          `}
-          </style>
-        </Layout>
+            `}
+            </style>
+          </Layout>
+        </MuiPickersUtilsProvider>
       )
     } else {
       return <RequireLogin />
