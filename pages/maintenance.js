@@ -144,12 +144,6 @@ export default class Maintenance extends React.Component {
     this.handleMailPreviewChange = this.handleMailPreviewChange.bind(this)
     this.sendMail = this.sendMail.bind(this)
     this.handleEditorChange = this.handleEditorChange.bind(this)
-    // if (document) {
-    //   this.quill = require('react-quill')
-
-    //   this.reactQuillRef = null
-    //   this.reactQuillRef2 = null
-    // }
   }
 
   sendMailBtns = (row) => {
@@ -326,7 +320,7 @@ export default class Maintenance extends React.Component {
       })
         .then(resp => resp.json())
         .then(data => {
-          console.log(data)
+          // console.log(data)
           this.setState({
             openReadModal: !this.state.openReadModal,
             maintenance: {
@@ -352,7 +346,7 @@ export default class Maintenance extends React.Component {
     this.setState({
       openPreviewModal: !this.state.openPreviewModal,
       mailBodyText: HtmlBody,
-      mailPreviewHeaderText: recipient,
+      mailPreviewHeaderText: recipient || this.state.mailPreviewHeaderText,
       mailPreviewSubjectText: `Planned Work Notification - ${this.state.maintenance.id}`
     })
   }
@@ -366,7 +360,6 @@ export default class Maintenance extends React.Component {
   handleGridReady = params => {
     this.gridApi = params.gridApi
     this.gridColumnApi = params.gridColumnApi
-    // params.columnApi.sizeColumnsToFit()
     params.columnApi.autoSizeColumns()
   }
 
@@ -386,7 +379,6 @@ export default class Maintenance extends React.Component {
     } = this.state.maintenance
 
     const rescheduleText = ''
-
     const timeZone = 'Europe/Berlin'
     const startDateTimeDE = formatTz(utcToZonedTime(new Date(startDateTime), timeZone), 'dd.MM.yyyy HH:mm')
     const endDateTimeDE = formatTz(utcToZonedTime(new Date(endDateTime), timeZone), 'dd.MM.yyyy HH:mm')
@@ -417,7 +409,7 @@ export default class Maintenance extends React.Component {
     })
   }
 
-  sendMail (htmlBody, recipient, subj) {
+  sendMail (recipient, subj, htmlBody) {
     const host = window.location.host
     const body = this.state.mailBodyText || htmlBody
     const subject = this.state.mailPreviewSubjectText || subj
@@ -455,7 +447,7 @@ export default class Maintenance extends React.Component {
   }
 
   handleCreatedByChange (data) {
-    console.log(data.nativeEvent)
+    // console.log(data.nativeEvent)
   }
 
   prepareDirectSend (recipient, customerCID) {
@@ -467,13 +459,9 @@ export default class Maintenance extends React.Component {
         mailPreviewHeaderText: recipient,
         mailPreviewSubjectText: subject
       })
-      this.sendMail(HtmlBody, recipient, subject)
+      this.sendMail(recipient, subject, HtmlBody)
     } else {
-      this.sendMail()
-      // this.setState({
-      //   mailPreviewHeaderText: recipient,
-      //   mailPreviewSubjectText: `Planned Work Notification - ${this.state.maintenance.id}`
-      // })
+      this.sendMail(recipient)
     }
   }
 
@@ -483,8 +471,7 @@ export default class Maintenance extends React.Component {
       openReadModal,
       openPreviewModal
     } = this.state
-    console.log(maintenance)
-    // const Quill = this.quill
+    // console.log(maintenance)
     if (this.props.session.user) {
       return (
         <Layout session={this.props.session}>
