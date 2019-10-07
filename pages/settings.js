@@ -1,6 +1,7 @@
 import React from 'react'
 import { NextAuth } from 'next-auth/client'
 import Link from 'next/link'
+import fetch from 'isomorphic-unfetch'
 import { withRouter } from 'next/router'
 import RequireLogin from '../src/components/require-login'
 import Layout from '../src/components/layout'
@@ -18,7 +19,12 @@ import {
 
 class Settings extends React.Component {
   static async getInitialProps ({ req }) {
+    const host = req ? req.headers['x-forwarded-host'] : location.host
+    const pageRequest2 = `https://api.${host}/inbox/count`
+    const res2 = await fetch(pageRequest2)
+    const count = await res2.json()
     return {
+      unread: count,
       session: await NextAuth.init({ req })
     }
   }
@@ -77,7 +83,7 @@ class Settings extends React.Component {
 
     if (this.props.session.user) {
       return (
-        <Layout session={this.props.session}>
+        <Layout unread={this.props.unread.count} session={this.props.session}>
           <Card style={{ maxWidth: '100%' }}>
             <CardHeader>
               <h2>Settings</h2>

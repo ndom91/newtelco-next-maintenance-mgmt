@@ -1,7 +1,6 @@
 import React from 'react'
 import Header from './header'
 import Router from 'next/router'
-import Link from 'next/link'
 import { NextAuth } from 'next-auth/client'
 import { Container, Row, Col } from 'shards-react'
 
@@ -26,7 +25,7 @@ export default class Layout extends React.Component {
   render () {
     return (
       <div>
-        <Header session={this.props.session} />
+        <Header unread={this.props.unread} session={this.props.session} />
         <Container fluid>
           <Row style={{ height: '20px' }} />
           <Row>

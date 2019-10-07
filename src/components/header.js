@@ -7,12 +7,12 @@ import {
   Nav,
   NavItem,
   NavLink,
+  Badge,
   InputGroup,
   InputGroupAddon,
   InputGroupText,
   FormInput,
-  Collapse,
-  Tooltip
+  Collapse
 } from 'shards-react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
@@ -21,11 +21,6 @@ import {
 } from '@fortawesome/free-solid-svg-icons'
 
 class Header extends React.Component {
-  // static async getInitialProps ({ req }) {
-  //   return {
-  //     session: await NextAuth.init({ req })
-  //   }
-  // }
   constructor (props) {
     super(props)
 
@@ -77,10 +72,13 @@ class Header extends React.Component {
                 </NavLink>
               </Link>
             </NavItem>
-            <NavItem>
+            <NavItem style={{ position: 'relative' }}>
               <Link href='/inbox'>
                 <NavLink>
-                  <span className='menu-label'>Inbox</span>
+                  <Badge className='unread-badge' theme='dark'>
+                    {this.props.unread}
+                  </Badge>
+                  <span style={{ position: 'relative', zIndex: '2' }} className='menu-label'>Inbox</span>
                 </NavLink>
               </Link>
             </NavItem>
@@ -131,6 +129,12 @@ class Header extends React.Component {
                 margin-left: 10px;
               }
             }
+          :global(.unread-badge) {
+            position: absolute;
+            top: -2px;
+            right: 2px;
+            z-index: 1;
+          }
           :global(.input-group-prepend) {
             pointer-events: none !important;
           }

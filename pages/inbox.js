@@ -42,8 +42,12 @@ export default class Inbox extends React.Component {
       }
     })
     const json = await res.json()
+    const pageRequest2 = `https://api.${host}/inbox/count` 
+    const res2 = await fetch(pageRequest2)
+    const count = await res2.json()
     return {
       jsonData: json,
+      unread: count,
       session: await NextAuth.init({ req })
     }
   }
@@ -169,7 +173,7 @@ export default class Inbox extends React.Component {
         open
       } = this.state
       return (
-        <Layout session={this.props.session}>
+        <Layout unread={this.props.unread.count} session={this.props.session}>
           <Card style={{ maxWidth: '100%' }}>
             <CardHeader><h2>Inbox</h2></CardHeader>
             <CardBody>

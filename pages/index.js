@@ -6,6 +6,8 @@ import Router from 'next/router'
 import fetch from 'isomorphic-unfetch'
 import Fonts from '../src/components/fonts'
 import Footer from '../src/components/footer'
+import { Chart, SplineSeries } from '@devexpress/dx-react-chart-material-ui'
+import { Animation, ValueScale, ArgumentScale } from '@devexpress/dx-react-chart'
 import UseAnimations from 'react-useanimations'
 import {
   Badge,
@@ -14,6 +16,9 @@ import {
   CardHeader,
   CardBody
 } from 'shards-react'
+
+const people = ['fwaleska', 'alissitsin', 'sstergiou']
+const modifyValueDomain = () => [0, 30];
 
 export default class Blog extends React.Component {
   static async getInitialProps ({ res, req }) {
@@ -36,48 +41,131 @@ export default class Blog extends React.Component {
         Router.push('/auth')
       }
     }
+    const pageRequest2 = `https://api.${host}/inbox/count` 
+    const res2 = await fetch(pageRequest2)
+    const count = await res2.json()
     return {
       jsonData: json,
+      unread: count,
       session: await NextAuth.init({ req })
     }
   }
 
+  constructor (props) {
+    super(props)
+
+    this.state = {
+      alissitsin: {
+        total: 0,
+        weeks: []
+      },
+      fwaleska: {
+        total: 0,
+        weeks: []
+      },
+      sstergiou: {
+        total: 0,
+        weeks: []
+      }
+    }
+  }
+
+  fetchPersonStats (person) {
+    const host = window.location.host
+    fetch(`https://${host}/api/homepage/week?person=${person}`, {
+      method: 'get'
+    })
+      .then(resp => resp.json())
+      .then(data => {
+        // console.log(data)
+
+        this.setState({
+          [person]: {
+            total: data.totalCount.maints,
+            weeks: data.weekCountResults
+          }
+        })
+      })
+      .catch(err => console.error(`Error - ${err}`))
+  }
+
   componentDidMount () {
     Fonts()
+
+    people.forEach(person => {
+      this.fetchPersonStats(person)
+    })
   }
 
   render () {
     // console.log(this.props.session)
     if (this.props.session.user) {
       return (
-        <Layout session={this.props.session}>
+        <Layout unread={this.props.unread.count} session={this.props.session}>
           <Card style={{ maxWidth: '100%' }}>
             <CardHeader><h2>Newtelco Maintenance</h2></CardHeader>
             <CardBody>
               <Container className='card-container'>
                 <Card className='card-inboxUnread'>
-                  <Badge className='card-badge' outline>{this.props.jsonData.count}</Badge>
+                  <Badge className='card-badge'>{this.props.jsonData.count}</Badge>
                   <CardBody>
-                    <p className='card-body-text'>Unread Mails</p>
-                    <UseAnimations animationKey='activity' size={24} className='card-inbox-activity' />
+                    <p className='card-body-text'>Unread</p>
+                    <UseAnimations animationKey='activity' size={96} className='card-inbox-activity' />
                   </CardBody>
                 </Card>
+                {people.map(person => {
+                  return (
+                    <Card key={person} className='card-stats'>
+                      <Badge className='card-person-badge' outline>
+                        {eval(`this.state.${person}.total`)}
+                        {/* <Chart
+                          data={eval(`this.state.${person}.weeks`)}
+                        >
+                          <SplineSeries valueField='value' argumentField='argument' />
+                          <ValueScale name='value' modifyDomain={modifyValueDomain} />
+                          <Animation />
+                        </Chart> */}
+                      </Badge>
+                      <CardBody className='card-person-body'>
+                        <p className='card-body-text'>{person}</p>
+                      </CardBody>
+                    </Card>
+                  )
+                }, this)}
               </Container>
             </CardBody>
             <Footer />
           </Card>
           <style jsx>{`
+            :global([class^="Component-root"]) {
+              top: 0px;
+              left: -5px;
+              height: 200px !important;
+              width: 250px;
+              position: absolute;
+            }
             :global(.card-badge) {
+              font-size: 196px;
+            }
+            :global(.card-person-badge) {
+              padding: 40px;
               font-size: 128px;
             }
             :global(.card-container) {
               display: flex;
-              justify-content: flex-start;
+              justify-content: space-around;
             }
             :global(.card-inboxUnread) {
               max-width: 350px;
             }
+            :global(.card-person-body) {
+              display: flex;
+              justify-content: center;
+              padding: 1.275rem !important;
+            }
             :global(.card-body) {
+              display: flex;
+              justify-content: center;
               padding: 1.275rem !important;
             }
             :global(.card-body-text) {
@@ -85,9 +173,9 @@ export default class Blog extends React.Component {
             }
             :global(.card-inbox-activity) {
               position: absolute; 
-              top: 110px;
-              left: 73%;
-              opacity: 0.3;
+              top: 60px;
+              left: 13%;
+              opacity: 0.1;
             }
           `}
           </style>

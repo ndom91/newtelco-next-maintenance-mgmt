@@ -16,10 +16,6 @@ import MailArrived from '../src/components/ag-grid/mailarrived'
 import UpdatedAt from '../src/components/ag-grid/updatedat'
 import Supplier from '../src/components/ag-grid/supplier'
 import UseAnimations from 'react-useanimations'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import {
-  faSave
-} from '@fortawesome/free-solid-svg-icons'
 import {
   Card,
   CardHeader,
@@ -33,11 +29,15 @@ import {
 export default class About extends React.Component {
   static async getInitialProps ({ req, query }) {
     const host = req ? req.headers['x-forwarded-host'] : location.host
-    const pageRequest = `https://${host}/api/maintenances` // ?page=${query.page || 1}&limit=${query.limit || 41}`
+    const pageRequest = `https://${host}/api/maintenances`
     const res = await fetch(pageRequest)
     const json = await res.json()
+    const pageRequest2 = `https://api.${host}/inbox/count` 
+    const res2 = await fetch(pageRequest2)
+    const count = await res2.json()
     return {
       jsonData: json,
+      unread: count,
       session: await NextAuth.init({ req })
     }
   }
@@ -165,7 +165,7 @@ export default class About extends React.Component {
   render () {
     if (this.props.session.user) {
       return (
-        <Layout session={this.props.session}>
+        <Layout unread={this.props.unread.count} session={this.props.session}>
           <Card style={{ maxWidth: '100%' }}>
             <CardHeader>
               <ButtonToolbar style={{ justifyContent: 'space-between' }}>
