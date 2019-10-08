@@ -1,0 +1,24 @@
+const db = require('../../../../../lib/db')
+const escape = require('sql-template-strings')
+
+module.exports = async (req, res) => {
+  const element = req.query.element
+  const maintId = req.query.maintId
+  const value = req.query.value
+  let cidIdsQuery
+  if (element === 'start') {
+    cidIdsQuery = await db.query(escape`
+      UPDATE maintenancedb SET startDateTime = ${value} WHERE id = ${maintId}
+    `)
+  } else if (element === 'end') {
+    cidIdsQuery = await db.query(escape`
+      UPDATE maintenancedb SET endDateTime = ${value} WHERE id = ${maintId}
+    `)
+  }
+  console.log(cidIdsQuery)
+  if (cidIdsQuery.affectedRows >= 1) {
+    res.status(200).json({ statusText: 'OK', status: 200 })
+  } else {
+    res.status(200).json({ statusText: 'FAIL', status: 500, err: 'Save Failed' })
+  }
+}

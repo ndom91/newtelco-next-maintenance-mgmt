@@ -12,13 +12,14 @@ import Toggle from 'react-toggle'
 import './style/maintenance.css'
 import cogoToast from 'cogo-toast'
 import Select from 'react-select'
+import _, {debounce} from 'lodash'
 import Router from 'next/router'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Editor as TinyEditor } from '@tinymce/tinymce-react'
 import { format, isValid } from 'date-fns'
 import DateFnsUtils from '@date-io/date-fns'
 import { KeyboardDateTimePicker, MuiPickersUtilsProvider } from '@material-ui/pickers'
-import { createMuiTheme } from '@material-ui/core/styles';
+import { createMuiTheme } from '@material-ui/core/styles'
 import { zonedTimeToUtc, utcToZonedTime, format as formatTz } from 'date-fns-tz'
 import {
   faSave,
@@ -185,6 +186,12 @@ export default class Maintenance extends React.Component {
     this.sendMail = this.sendMail.bind(this)
     this.handleEditorChange = this.handleEditorChange.bind(this)
     this.handleCalendarCreate = this.handleCalendarCreate.bind(this)
+    this.handleCIDBlur = this.handleCIDBlur.bind(this)
+    this.handleDateTimeSave = this.handleDateTimeSave.bind(this)
+    this.handleTextInputBlur = this.handleTextInputBlur.bind(this)
+    this.handleImpactChange = this.handleImpactChange.bind(this)
+    this.handleReasonChange = this.handleReasonChange.bind(this)
+    this.handleLocationChange = this.handleLocationChange.bind(this)
   }
 
   sendMailBtns = (row) => {
@@ -261,9 +268,6 @@ export default class Maintenance extends React.Component {
         const derenCIDidField = this.props.jsonData.profile.derenCIDid
         const commaRegex = new RegExp(',')
         if (commaRegex.test(derenCIDidField)) {
-          // multi CID String
-          const cidArray = derenCIDidField.split(',')
-          console.log('commaz', cidArray)
           this.setState({
             lieferantcids: data.lieferantCIDsResult
           })
@@ -272,15 +276,11 @@ export default class Maintenance extends React.Component {
           })
             .then(resp => resp.json())
             .then(data => {
-              cidArray.forEach(cid => {
-                // grab CID Label
-                console.log(cid)
-                console.log(data)
-                const existingSelectedCids = this.state.selectedLieferant || []
-                existingSelectedCids.push({ value: cid, label: data.label.label })
-                this.setState({
-                  selectedLieferant: existingSelectedCids
-                })
+              data.respArray.forEach(respCid => {
+                this.fetchMailCIDs(respCid.value)
+              })
+              this.setState({
+                selectedLieferant: data.respArray
               })
             })
         } else {
@@ -706,12 +706,153 @@ export default class Maintenance extends React.Component {
     })
   }
 
+  handleDateTimeSave (element) {
+    let newValue
+    const maintId = this.state.maintenance.id
+    const host = window.location.host
+    if (element === 'start') {
+      newValue = this.state.maintenance.startDateTime
+    } else if (element === 'end') {
+      newValue = this.state.maintenance.endDateTime
+    }
+    const sendMail = (host, maintId, element, newValue) => {
+      console.log('1', newValue)
+      const newISOTime = new Date(newValue)
+      const newISOTimeString = format(newISOTime, 'yyyy-MM-dd HH:mm:ss')
+      console.log('2', newISOTime)
+      fetch(`https://${host}/api/maintenances/save/dateTime?maintId=${maintId}&element=${element}&value=${newISOTimeString}`, {
+        method: 'get',
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          _csrf: this.props.session.csrfToken
+        }
+      })
+        .then(resp => resp.json())
+        .then(data => {
+          if (data.status === 200 && data.statusText === 'OK') {
+            cogoToast.success('Save Success', {
+              position: 'top-right'
+            })
+          } else {
+            cogoToast.warn(`Error - ${data.err}`, {
+              position: 'top-right'
+            })
+          }
+        })
+        .catch(err => console.error(err))
+    }
+    // const debouncedSendMail = (host, maintId, element, newValue) => {
+    // const debouncedSendMail = _.debounce(() => sendMail(host, maintId, element, newValue), 1000, {
+    //   leading: false,
+    //   trailing: true
+    // })
+    // }
+    // debouncedSendMail()
+    // debouncedSendMail(host, maintId, element, newValue)
+    sendMail(host, maintId, element, newValue)
+  }
+
   handleToggleChange (event) {
     console.log(event)
   }
 
   handleCIDBlur (ev) {
-    console.log(ev)
+    const postSelection = (id) => {
+      const host = window.location.host
+      let idParameter
+      if (Array.isArray(id)) {
+        idParameter = id.join(',')
+      } else {
+        idParameter = id
+      }
+      fetch(`https://${host}/api/maintenances/save/lieferant?maintId=${this.state.maintenance.id}&cid=${idParameter}`, {
+        method: 'get',
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          _csrf: this.props.session.csrfToken
+        }
+      })
+        .then(resp => resp.json())
+        .then(data => {
+          if (data.status === 200 && data.statusText === 'OK') {
+            cogoToast.success('Save Success', {
+              position: 'top-right'
+            })
+          } else {
+            cogoToast.warn(`Error - ${data.err}`, {
+              position: 'top-right'
+            })
+          }
+        })
+        .catch(err => console.error(err))
+    }
+    const selectedSupplierCids = this.state.selectedLieferant
+    if (Array.isArray(selectedSupplierCids)) {
+      const arrayToSend = []
+      selectedSupplierCids.forEach(cid => {
+        const selectedId = cid.value
+        arrayToSend.push(selectedId)
+      })
+      postSelection(arrayToSend)
+    } else if (selectedSupplierCids.value) {
+      const selectedId = selectedSupplierCids.value
+      postSelection(selectedId)
+    }
+  }
+  
+  handleReasonChange (event) {
+    this.setState({
+      maintenance: {
+        ...this.state.maintenance,
+        reason: event.target.value
+      }
+    })
+  }
+
+  handleLocationChange (event) {
+    this.setState({
+      maintenance: {
+        ...this.state.maintenance,
+        location: event.target.value
+      }
+    })
+  }
+
+  handleImpactChange (event) {
+    this.setState({
+      maintenance: {
+        ...this.state.maintenance,
+        impact: event.target.value
+      }
+    })
+  }
+
+  handleTextInputBlur (element) {
+    const host = window.location.host
+    const newValue = eval(`this.state.maintenance.${element}`)
+    console.log(newValue)
+    const maintId = this.state.maintenance.id
+
+    fetch(`https://${host}/api/maintenances/save/textinput?maintId=${maintId}&element=${element}&value=${newValue}`, {
+      method: 'get',
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        _csrf: this.props.session.csrfToken
+      }
+    })
+      .then(resp => resp.json())
+      .then(data => {
+        if (data.status === 200 && data.statusText === 'OK') {
+          cogoToast.success('Save Success', {
+            position: 'top-right'
+          })
+        } else {
+          cogoToast.warn(`Error - ${data.err}`, {
+            position: 'top-right'
+          })
+        }
+      })
+      .catch(err => console.error(err))
   }
 
   render () {
@@ -793,7 +934,8 @@ export default class Maintenance extends React.Component {
                                     autoOk
                                     ampm={false}
                                     format='dd.MM.yyyy HH:mm'
-                                    // onAccept={this.handleSave}
+                                    // onClose={() => this.handleDateTimeSave('start')}
+                                    onBlur={() => this.handleDateTimeSave('start')}
                                     variant='inline'
                                     disableToolbar
                                     inputVariant='outlined'
@@ -832,13 +974,14 @@ export default class Maintenance extends React.Component {
                                     autoOk
                                     ampm={false}
                                     format='dd.MM.yyyy HH:mm'
-                                    // onAccept={this.handleSave}
+                                    // onClose={() => this.handleDateTimeSave('end')}
+                                    onBlur={() => this.handleDateTimeSave('end')}
                                     variant='inline'
                                     disableToolbar
                                     inputVariant='outlined'
                                     InputProps={{
                                       style: {
-                                        "&$hover": {
+                                        '&$hover': {
                                           border: 'none'
                                         }
                                       }
@@ -855,19 +998,19 @@ export default class Maintenance extends React.Component {
                                   <Col>
                                     <FormGroup>
                                       <label htmlFor='impact'>Impact</label>
-                                      <FormInput id='impact' name='impact' type='text' value={maintenance.impact} />
+                                      <FormInput onBlur={() => this.handleTextInputBlur('impact')} id='impact' name='impact' type='text' onChange={this.handleImpactChange} value={maintenance.impact} />
                                     </FormGroup>
                                   </Col>
                                   <Col>
                                     <FormGroup>
                                       <label htmlFor='location'>Location</label>
-                                      <FormInput id='location' name='location' type='text' value={maintenance.location} />
+                                      <FormInput onBlur={() => this.handleTextInputBlur('location')} id='location' name='location' type='text' onChange={this.handleLocationChange} value={maintenance.location} />
                                     </FormGroup>
                                   </Col>
                                 </Row>
                                 <FormGroup>
                                   <label htmlFor='reason'>Reason</label>
-                                  <FormTextarea id='reason' name='reason' type='text' value={maintenance.reason} />
+                                  <FormTextarea id='reason' name='reason' onChange={this.handleReasonChange} type='text' value={maintenance.reason} />
                                 </FormGroup>
                               </Col>
                             </Row>
@@ -878,9 +1021,10 @@ export default class Maintenance extends React.Component {
                                 <FormGroup className='form-group-toggle'>
                                   <Badge theme='light' outline>
                                     <label>
-                                      <Toggle 
-                                        checked={maintenance.cancelled === 1} 
-                                        onChange={this.handleToggleChange} />
+                                      <Toggle
+                                        checked={maintenance.cancelled === 1}
+                                        onChange={this.handleToggleChange}
+                                      />
                                       <div style={{ marginTop: '10px' }}>Cancelled</div>
                                     </label>
                                   </Badge>
