@@ -43,9 +43,18 @@ export default class Blog extends React.Component {
     const pageRequest2 = `https://api.${host}/inbox/count`
     const res2 = await fetch(pageRequest2)
     const count = await res2.json()
+    console.log(count)
+    let display
+    if (count === 'No unread emails') {
+      console.log('1')
+      display = 0
+    } else {
+      console.log('2')
+      display = count
+    }
     return {
       jsonData: json,
-      unread: count,
+      unread: display,
       session: await NextAuth.init({ req })
     }
   }
@@ -100,13 +109,13 @@ export default class Blog extends React.Component {
     // console.log(this.props.session)
     if (this.props.session.user) {
       return (
-        <Layout unread={this.props.unread.count} session={this.props.session}>
+        <Layout unread={this.props.unread} session={this.props.session}>
           <Card style={{ maxWidth: '100%' }}>
             <CardHeader><h2>Newtelco Maintenance</h2></CardHeader>
             <CardBody>
               <Container className='card-container'>
                 <Card className='card-inboxUnread'>
-                  <Badge className='card-badge'>{this.props.jsonData.count}</Badge>
+                  <Badge className='card-badge'>{this.props.unread}</Badge>
                   <CardBody>
                     <p className='card-body-text'>Unread</p>
                     <UseAnimations animationKey='activity' size={96} className='card-inbox-activity' />

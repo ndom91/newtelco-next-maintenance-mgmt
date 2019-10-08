@@ -172,82 +172,87 @@ export default class Inbox extends React.Component {
         inboxMails,
         open
       } = this.state
+      console.log(inboxMails)
       return (
         <Layout unread={this.props.unread.count} session={this.props.session}>
           <Card style={{ maxWidth: '100%' }}>
             <CardHeader><h2>Inbox</h2></CardHeader>
             <CardBody>
               <ListGroup>
-                <TransitionGroup>
-                  {inboxMails && inboxMails.map((mail, index) => {
-                    return (
-                      <CSSTransition
-                        key={mail.id}
-                        timeout={500}
-                        // timeout={200 * index}
-                        classNames='item'
-                      >
-                        <ListGroupItem key={mail.id}>
-                          <div className='mail-wrapper'>
-                            {this.state.windowInnerWidth > 500
-                              ? (
-                                <Badge outline theme='light' className='mail-badge'>
-                                  {/* https://github.com/mat/besticon */}
-                                  <img className='mail-icon' src={`https://besticon-demo.herokuapp.com/icon?size=40..100..360&url=${mail.domain}`} />
-                                  <FontAwesomeIcon onClick={() => this.toggle(mail.id)} width='1.325em' className='mail-open-icon' icon={faEnvelopeOpenText} />
-                                </Badge>
-                              ) : (
-                                <></>
-                              )}
-                            <div className='mail-info'>
-                              <ListGroupItemHeading>
-                                <div className='inbox-from-text'>{mail.from}</div>
-                                <div className='inbox-subject-text'>{mail.subject}</div>
-                              </ListGroupItemHeading>
-                              <ListGroupItemText>
-                                {mail.snippet}
-                              </ListGroupItemText>
-                            </div>
-                            <ButtonGroup className='inbox-btn-group'>
-                              {this.state.windowInnerWidth < 500
-                                ? (
-                                  <Badge outline theme='light' className='mail-badge'>
-                                    {/* https://github.com/mat/besticon */}
-                                    <img className='mail-icon' src={`https://besticon-demo.herokuapp.com/icon?size=40..100..360&url=${mail.domain}`} />
-                                    <FontAwesomeIcon onClick={() => this.toggle(mail.id)} width='1.525em' className='mail-open-icon' icon={faEnvelopeOpenText} />
-                                  </Badge>
-                                ) : (
-                                  <></>
-                                )}
-                              <Link
-                                href={{
-                                  pathname: '/maintenance',
-                                  query: {
-                                    id: 'NEW',
-                                    mailId: mail.id,
-                                    name: mail.domain,
-                                    from: mail.from,
-                                    subject: mail.subject,
-                                    maileingang: mail.date,
-                                    body: mail.body
-                                  }
-                                }}
-                                as='/maintenance/new'
-                              >
-                                <Button className='mail-edit-btn pencil-icon' outline>
-                                  <FontAwesomeIcon width='1.2em' className='edit-icon' icon={faPencilAlt} />
-                                </Button>
-                              </Link>
-                              <Button onClick={() => this.handleDelete(mail.id)} className='mail-edit-btn trash-icon' outline>
-                                <FontAwesomeIcon width='1.2em' className='edit-icon' icon={faTrashAlt} />
-                              </Button>
-                            </ButtonGroup>
-                          </div>
-                        </ListGroupItem>
-                      </CSSTransition>
-                    )
-                  })}
-                </TransitionGroup>
+                  {Array.isArray(inboxMails) && inboxMails.length !== 0 ? 
+                    inboxMails.map((mail, index) => {
+                      return (
+                        <TransitionGroup>
+                          <CSSTransition
+                            key={mail.id}
+                            timeout={500}
+                            // timeout={200 * index}
+                            classNames='item'
+                          >
+                            <ListGroupItem key={mail.id}>
+                              <div className='mail-wrapper'>
+                                {this.state.windowInnerWidth > 500
+                                  ? (
+                                    <Badge outline theme='light' className='mail-badge'>
+                                      {/* https://github.com/mat/besticon */}
+                                      <img className='mail-icon' src={`https://besticon-demo.herokuapp.com/icon?size=40..100..360&url=${mail.domain}`} />
+                                      <FontAwesomeIcon onClick={() => this.toggle(mail.id)} width='1.325em' className='mail-open-icon' icon={faEnvelopeOpenText} />
+                                    </Badge>
+                                  ) : (
+                                    <></>
+                                  )}
+                                <div className='mail-info'>
+                                  <ListGroupItemHeading>
+                                    <div className='inbox-from-text'>{mail.from}</div>
+                                    <div className='inbox-subject-text'>{mail.subject}</div>
+                                  </ListGroupItemHeading>
+                                  <ListGroupItemText>
+                                    {mail.snippet}
+                                  </ListGroupItemText>
+                                </div>
+                                <ButtonGroup className='inbox-btn-group'>
+                                  {this.state.windowInnerWidth < 500
+                                    ? (
+                                      <Badge outline theme='light' className='mail-badge'>
+                                        {/* https://github.com/mat/besticon */}
+                                        <img className='mail-icon' src={`https://besticon-demo.herokuapp.com/icon?size=40..100..360&url=${mail.domain}`} />
+                                        <FontAwesomeIcon onClick={() => this.toggle(mail.id)} width='1.525em' className='mail-open-icon' icon={faEnvelopeOpenText} />
+                                      </Badge>
+                                    ) : (
+                                      <></>
+                                    )}
+                                  <Link
+                                    href={{
+                                      pathname: '/maintenance',
+                                      query: {
+                                        id: 'NEW',
+                                        mailId: mail.id,
+                                        name: mail.domain,
+                                        from: mail.from,
+                                        subject: mail.subject,
+                                        maileingang: mail.date,
+                                        body: mail.body
+                                      }
+                                    }}
+                                    as='/maintenance/new'
+                                  >
+                                    <Button className='mail-edit-btn pencil-icon' outline>
+                                      <FontAwesomeIcon width='1.2em' className='edit-icon' icon={faPencilAlt} />
+                                    </Button>
+                                  </Link>
+                                  <Button onClick={() => this.handleDelete(mail.id)} className='mail-edit-btn trash-icon' outline>
+                                    <FontAwesomeIcon width='1.2em' className='edit-icon' icon={faTrashAlt} />
+                                  </Button>
+                                </ButtonGroup>
+                              </div>
+                            </ListGroupItem>
+                          </CSSTransition>
+                        </TransitionGroup>
+                      )
+                    })
+                   : (
+                    <h2>No Unread Mails!</h2>
+                  )}
               </ListGroup>
               <Modal className='mail-modal-body' animation backdrop backdropClassName='modal-backdrop' open={open} size='lg' toggle={this.toggle}>
                 <ModalHeader>
