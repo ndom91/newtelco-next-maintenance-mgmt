@@ -10,3 +10,7 @@ ALTER TABLE maintenancedb CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_gener
 ALTER TABLE notificationSubs CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 ALTER TABLE persistence CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 ALTER TABLE reschedule CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+
+ALTER TABLE `maintenancedb` CHANGE `done` `done` TINYTEXT NOT NULL DEFAULT '0';
+ALTER TABLE `maintenancedb` CHANGE `cancelled` `cancelled` TINYTEXT NOT NULL DEFAULT '0';
+ALTER TABLE `maintenancedb` CHANGE `emergency` `emergency` TINYTEXT NOT NULL DEFAULT '0';

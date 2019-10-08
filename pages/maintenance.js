@@ -12,7 +12,7 @@ import Toggle from 'react-toggle'
 import './style/maintenance.css'
 import cogoToast from 'cogo-toast'
 import Select from 'react-select'
-import _, {debounce} from 'lodash'
+// import _, {debounce} from 'lodash'
 import Router from 'next/router'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Editor as TinyEditor } from '@tinymce/tinymce-react'
@@ -192,6 +192,8 @@ export default class Maintenance extends React.Component {
     this.handleImpactChange = this.handleImpactChange.bind(this)
     this.handleReasonChange = this.handleReasonChange.bind(this)
     this.handleLocationChange = this.handleLocationChange.bind(this)
+    // this.handleToggleBlur = this.handleToggleBlur.bind(this)
+    this.handleNotesBlur = this.handleNotesBlur.bind(this)
   }
 
   sendMailBtns = (row) => {
@@ -306,6 +308,18 @@ export default class Maintenance extends React.Component {
   }
 
   componentDidMount () {
+    const convertBool = (input) => {
+      if (input === 1 || input === 0) {
+        if (input === 1) {
+          return true
+        } else if (input === 0) {
+          return false
+        }
+      } else {
+        return input
+      }
+    }
+
     if (this.props.jsonData.profile.id === 'NEW') {
       const {
         email
@@ -326,8 +340,21 @@ export default class Maintenance extends React.Component {
         width: window.innerWidth
       })
     } else {
+      const {
+        cancelled,
+        emergency,
+        done
+      } = this.props.jsonData.profile
+
+      const newMaintenance = {
+        ...this.props.jsonData.profile,
+        cancelled: convertBool(cancelled),
+        emergency: convertBool(emergency),
+        done: convertBool(done)
+      }
+
       this.setState({
-        maintenance: this.props.jsonData.profile,
+        maintenance: newMaintenance,
         width: window.innerWidth
       })
     }
@@ -387,16 +414,22 @@ export default class Maintenance extends React.Component {
     })
       .then(resp => resp.json())
       .then(data => {
-        data.kundenCIDsResult[0].sent = 0
+        if (data.kundenCIDsResult[0]) {
+          if (this.state.maintenance.done === 1 || true) {
+            data.kundenCIDsResult[0].sent = 1
+          } else {
+            data.kundenCIDsResult[0].sent = 0
+          }
 
-        const existingKundenCids = [
-          data.kundenCIDsResult[0],
-          ...this.state.kundencids
-        ]
-        const uniqueKundenCids = this.getUnique(existingKundenCids, 'kundenCID')
-        this.setState({
-          kundencids: uniqueKundenCids
-        })
+          const existingKundenCids = [
+            data.kundenCIDsResult[0],
+            ...this.state.kundencids
+          ]
+          const uniqueKundenCids = this.getUnique(existingKundenCids, 'kundenCID')
+          this.setState({
+            kundencids: uniqueKundenCids
+          })
+        }
       })
       .catch(err => console.error(`Error - ${err}`))
   }
@@ -752,8 +785,37 @@ export default class Maintenance extends React.Component {
     sendMail(host, maintId, element, newValue)
   }
 
-  handleToggleChange (event) {
-    console.log(event)
+  handleToggleChange (element, event) {
+    const host = window.location.host
+    const maintId = this.state.maintenance.id
+    const newValue = !eval(`this.state.maintenance.${element}`)
+    this.setState({
+      maintenance: {
+        ...this.state.maintenance,
+        [element]: newValue
+      }
+    })
+
+    fetch(`https://${host}/api/maintenances/save/toggle?maintId=${maintId}&element=${element}&value=${newValue}`, {
+      method: 'get',
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        _csrf: this.props.session.csrfToken
+      }
+    })
+      .then(resp => resp.json())
+      .then(data => {
+        if (data.status === 200 && data.statusText === 'OK') {
+          cogoToast.success('Save Success', {
+            position: 'top-right'
+          })
+        } else {
+          cogoToast.warn(`Error - ${data.err}`, {
+            position: 'top-right'
+          })
+        }
+      })
+      .catch(err => console.error(err))
   }
 
   handleCIDBlur (ev) {
@@ -799,7 +861,7 @@ export default class Maintenance extends React.Component {
       postSelection(selectedId)
     }
   }
-  
+
   handleReasonChange (event) {
     this.setState({
       maintenance: {
@@ -834,6 +896,60 @@ export default class Maintenance extends React.Component {
     const maintId = this.state.maintenance.id
 
     fetch(`https://${host}/api/maintenances/save/textinput?maintId=${maintId}&element=${element}&value=${newValue}`, {
+      method: 'get',
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        _csrf: this.props.session.csrfToken
+      }
+    })
+      .then(resp => resp.json())
+      .then(data => {
+        if (data.status === 200 && data.statusText === 'OK') {
+          cogoToast.success('Save Success', {
+            position: 'top-right'
+          })
+        } else {
+          cogoToast.warn(`Error - ${data.err}`, {
+            position: 'top-right'
+          })
+        }
+      })
+      .catch(err => console.error(err))
+  }
+
+  // handleToggleBlur (element) {
+  //   const host = window.location.host
+  //   const newValue = eval(`this.state.maintenance.${element}`)
+  //   const maintId = this.state.maintenance.id
+
+  //   fetch(`https://${host}/api/maintenances/save/toggle?maintId=${maintId}&element=${element}&value=${newValue}`, {
+  //     method: 'get',
+  //     headers: {
+  //       'Access-Control-Allow-Origin': '*',
+  //       _csrf: this.props.session.csrfToken
+  //     }
+  //   })
+  //     .then(resp => resp.json())
+  //     .then(data => {
+  //       if (data.status === 200 && data.statusText === 'OK') {
+  //         cogoToast.success('Save Success', {
+  //           position: 'top-right'
+  //         })
+  //       } else {
+  //         cogoToast.warn(`Error - ${data.err}`, {
+  //           position: 'top-right'
+  //         })
+  //       }
+  //     })
+  //     .catch(err => console.error(err))
+  // }
+
+  handleNotesBlur (event) {
+    console.log(event)
+    const host = window.location.host
+    const newValue = this.state.maintenance.notes
+    const maintId = this.state.maintenance.id
+    fetch(`https://${host}/api/maintenances/save/notes?maintId=${maintId}&value=${newValue}`, {
       method: 'get',
       headers: {
         'Access-Control-Allow-Origin': '*',
@@ -1022,8 +1138,8 @@ export default class Maintenance extends React.Component {
                                   <Badge theme='light' outline>
                                     <label>
                                       <Toggle
-                                        checked={maintenance.cancelled === 1}
-                                        onChange={this.handleToggleChange}
+                                        checked={maintenance.cancelled === "false" ? false : !!maintenance.cancelled}
+                                        onChange={(event) => this.handleToggleChange('cancelled', event)}
                                       />
                                       <div style={{ marginTop: '10px' }}>Cancelled</div>
                                     </label>
@@ -1035,8 +1151,8 @@ export default class Maintenance extends React.Component {
                                           checked: <FontAwesomeIcon icon={faFirstAid} width='0.5em' style={{ color: '#fff' }} />,
                                           unchecked: null
                                         }}
-                                        checked={maintenance.emergency === 1}
-                                        onChange={this.handleToggleChange}
+                                        checked={maintenance.emergency === "false" ? false : !!maintenance.emergency}
+                                        onChange={(event) => this.handleToggleChange('emergency', event)}
                                       />
                                       <div style={{ marginTop: '10px' }}>Emergency</div>
                                     </label>
@@ -1044,8 +1160,8 @@ export default class Maintenance extends React.Component {
                                   <Badge theme='secondary' outline>
                                     <label>
                                       <Toggle
-                                        checked={maintenance.done === 1}
-                                        onChange={this.handleToggleChange}
+                                        checked={maintenance.done === "false" ? false : !!maintenance.done}
+                                        onChange={(event) => this.handleToggleChange('done', event)}
                                       />
                                       <div style={{ marginTop: '10px' }}>Done</div>
                                     </label>
@@ -1062,6 +1178,7 @@ export default class Maintenance extends React.Component {
                                   <TinyEditor
                                     initialValue={this.state.notesText}
                                     apiKey='ttv2x1is9joc0fi7v6f6rzi0u98w2mpehx53mnc1277omr7s'
+                                    onBlur={this.handleNotesBlur}
                                     init={{
                                       height: 300,
                                       menubar: false,
