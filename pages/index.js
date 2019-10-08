@@ -6,9 +6,7 @@ import Router from 'next/router'
 import fetch from 'isomorphic-unfetch'
 import Fonts from '../src/components/fonts'
 import Footer from '../src/components/footer'
-import { Chart, SplineSeries } from '@devexpress/dx-react-chart-material-ui'
-import { Animation, ValueScale, ArgumentScale } from '@devexpress/dx-react-chart'
-import { Sparklines, SparklinesLine, SparklinesSpots } from 'react-sparklines'
+import { Sparklines, SparklinesLine } from 'react-sparklines'
 import UseAnimations from 'react-useanimations'
 import {
   Badge,
@@ -123,9 +121,6 @@ export default class Blog extends React.Component {
                         </span>
                         <Sparklines data={eval(`this.state.${person}.weeks`)} limit={10} width={100} height={40} margin={1}>
                           <SparklinesLine style={{ strokeWidth: 2, stroke: 'rgba(0, 123, 255, 0.5)', fill: '#007bff', fillOpacity: '0.1' }} />
-                          {/* <SparklinesSpots
-                            size={2} style={{ stroke: '#007bff', strokeWidth: 2, fill: 'white' }}
-                          /> */}
                         </Sparklines>
                       </Badge>
                       <CardBody className='card-person-body'>

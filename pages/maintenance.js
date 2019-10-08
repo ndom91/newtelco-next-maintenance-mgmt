@@ -18,6 +18,7 @@ import { Editor as TinyEditor } from '@tinymce/tinymce-react'
 import { format, isValid } from 'date-fns'
 import DateFnsUtils from '@date-io/date-fns'
 import { KeyboardDateTimePicker, MuiPickersUtilsProvider } from '@material-ui/pickers'
+import { createMuiTheme } from '@material-ui/core/styles';
 import { zonedTimeToUtc, utcToZonedTime, format as formatTz } from 'date-fns-tz'
 import {
   faSave,
@@ -50,6 +51,23 @@ import {
   Tooltip
 } from 'shards-react'
 
+const theme = createMuiTheme({
+  props: {
+    MuiButtonBase: {
+      disableRipple: true
+    }
+  },
+  overrides: {
+    MuiOutlinedInput: {
+      root: {
+        '&$focused $outline': {
+          borderColor: 'green',
+          borderWidth: 3
+        }
+      }
+    }
+  }
+})
 export default class Maintenance extends React.Component {
   static async getInitialProps ({ req, query }) {
     console.log('q', query)
@@ -240,15 +258,49 @@ export default class Maintenance extends React.Component {
           })
           return
         }
-        const selectedLieferantCIDid = parseInt(this.props.jsonData.profile.derenCIDid) || null
-        const selectedLieferantCIDvalue = this.props.jsonData.profile.derenCID || null
-        this.setState({
-          lieferantcids: data.lieferantCIDsResult,
-          selectedLieferant: {
-            label: selectedLieferantCIDvalue,
-            value: selectedLieferantCIDid
+        const derenCIDidField = this.props.jsonData.profile.derenCIDid
+        const commaRegex = new RegExp(',')
+        if (commaRegex.test(derenCIDidField)) {
+          // multi CID String
+          const cidArray = derenCIDidField.split(',')
+          console.log('commaz', cidArray)
+          this.setState({
+            lieferantcids: data.lieferantCIDsResult
+          })
+          fetch(`https://${host}/api/lieferantcids/label?id=${derenCIDidField}`, {
+            method: 'get'
+          })
+            .then(resp => resp.json())
+            .then(data => {
+              cidArray.forEach(cid => {
+                // grab CID Label
+                console.log(cid)
+                console.log(data)
+                const existingSelectedCids = this.state.selectedLieferant || []
+                existingSelectedCids.push({ value: cid, label: data.label.label })
+                this.setState({
+                  selectedLieferant: existingSelectedCids
+                })
+              })
+            })
+        } else {
+          // Single CID String
+          const selectedLieferantCIDid = parseInt(derenCIDidField) || null
+          const selectedLieferantCIDvalue = this.props.jsonData.profile.derenCID || null
+          if (selectedLieferantCIDid) {
+            this.setState({
+              lieferantcids: data.lieferantCIDsResult,
+              selectedLieferant: {
+                label: selectedLieferantCIDvalue,
+                value: selectedLieferantCIDid
+              }
+            })
+          } else {
+            this.setState({
+              lieferantcids: data.lieferantCIDsResult
+            })
           }
-        })
+        }
       })
       .catch(err => console.error(`Error - ${err}`))
   }
@@ -466,15 +518,15 @@ export default class Maintenance extends React.Component {
 
     let body = `<body style="color:#666666;">${rescheduleText} Dear Colleagues,​​<p><span>We would like to inform you about planned work on the following CID(s):<br><br> <b>${customerCID}</b> <br><br>The maintenance work is with the following details:</span></p><table border="0" cellspacing="2" cellpadding="2" width="775px"><tr><td style='width: 205px;'>Maintenance ID:</td><td><b>${id}</b></td></tr><tr><td>Start date and time:</td><td><b>${startDateTimeDE} (${tzSuffixRAW})</b></td></tr><tr><td>Finish date and time:</td><td><b>${endDateTimeDE} (${tzSuffixRAW})</b></td></tr>`
 
-    if (impact !== '') {
+    if (impact) {
       body = body + '<tr><td>Impact:</td><td>' + impact + '</td></tr>'
     }
 
-    if (location !== '') {
+    if (location) {
       body = body + '<tr><td>Location:</td><td>' + location + '</td></tr>'
     }
 
-    if (reason !== '') {
+    if (reason) {
       body = body + '<tr><td>Reason:</td><td>' + reason + '</td></tr>'
     }
 
@@ -627,6 +679,15 @@ export default class Maintenance extends React.Component {
     }
   }
 
+  renderDateTimeLabel = (date) => {
+    console.log(date)
+    if (isValid(date)) {
+      return format(new Date(date), 'dd.MM.yyyy HH:mm')
+    } else {
+      return ''
+    }
+  }
+
   handleStartDate (date) {
     this.setState({
       maintenance: {
@@ -643,6 +704,14 @@ export default class Maintenance extends React.Component {
         endDateTime: date
       }
     })
+  }
+
+  handleToggleChange (event) {
+    console.log(event)
+  }
+
+  handleCIDBlur (ev) {
+    console.log(ev)
   }
 
   render () {
@@ -704,7 +773,11 @@ export default class Maintenance extends React.Component {
                               <Col style={{ width: '30vw' }}>
                                 <FormGroup>
                                   <label htmlFor='edited-by'>Created By</label>
-                                  <FormInput id='edited-by-input' name='edited-by' type='text' value={maintenance.bearbeitetvon} onChange={this.handleCreatedByChange} />
+                                  <FormInput readOnly id='edited-by-input' name='edited-by' type='text' value={maintenance.bearbeitetvon} onChange={this.handleCreatedByChange} />
+                                </FormGroup>
+                                <FormGroup>
+                                  <label htmlFor='updated-by'>Last Updated By</label>
+                                  <FormInput readOnly id='updated-by' name='updated-by' type='text' value={maintenance.updatedBy} />
                                 </FormGroup>
                                 <FormGroup>
                                   <label htmlFor='supplier'>Supplier</label>
@@ -714,7 +787,7 @@ export default class Maintenance extends React.Component {
                                   <label htmlFor='start-datetime'>Start Date/Time</label>
                                   {/* <FormInput id='start-datetime' name='start-datetime' type='text' value={this.convertDateTime(maintenance.startDateTime)} /> */}
                                   <KeyboardDateTimePicker
-                                    value={maintenance.startDateTime}
+                                    value={maintenance.startDateTime || null}
                                     onChange={date => this.handleStartDate(date)}
                                     animateYearScrolling
                                     autoOk
@@ -727,32 +800,33 @@ export default class Maintenance extends React.Component {
                                   />
                                 </FormGroup>
                                 {/* todo: Timezone after Start/End Time */}
+                              </Col>
+                              <Col style={{ width: '30vw' }}>
+                                <FormGroup>
+                                  <label htmlFor='maileingang'>Mail Arrived</label>
+                                  <FormInput readOnly id='maileingang-input' name='maileingang' type='text' value={this.convertDateTime(maintenance.maileingang)} />
+                                </FormGroup>
+                                <FormGroup>
+                                  <label htmlFor='updated-at'>Updated At</label>
+                                  <FormInput readOnly id='updated-at' name='updated-at' type='text' value={this.convertDateTime(maintenance.updatedAt)} />
+                                </FormGroup>
                                 <FormGroup>
                                   <label htmlFor='their-cid'>Their CID</label>
                                   <Select
-                                    value={this.state.selectedLieferant}
+                                    value={this.state.selectedLieferant || undefined}
                                     onChange={this.handleSelectLieferantChange}
                                     options={this.state.lieferantcids}
                                     isMulti
                                     noOptionsMessage={() => 'No CIDs for this Supplier'}
                                     placeholder='Please select a CID'
+                                    onBlur={this.handleCIDBlur}
                                   />
-                                </FormGroup>
-                              </Col>
-                              <Col style={{ width: '30vw' }}>
-                                <FormGroup>
-                                  <label htmlFor='maileingang'>Mail Arrived</label>
-                                  <FormInput id='maileingang-input' name='maileingang' type='text' value={this.convertDateTime(maintenance.maileingang)} />
-                                </FormGroup>
-                                <FormGroup>
-                                  <label htmlFor='updated-at'>Updated At</label>
-                                  <FormInput id='updated-at' name='updated-at' type='text' value={this.convertDateTime(maintenance.updatedAt)} />
                                 </FormGroup>
                                 <FormGroup>
                                   <label htmlFor='end-datetime'>End Date/Time</label>
                                   {/* <FormInput id='end-datetime' name='end-datetime' type='text' value={this.convertDateTime(maintenance.endDateTime)} /> */}
                                   <KeyboardDateTimePicker
-                                    selected={maintenance.endDateTime}
+                                    value={maintenance.endDateTime || null}
                                     onChange={date => this.handleEndDate(date)}
                                     animateYearScrolling
                                     autoOk
@@ -762,11 +836,14 @@ export default class Maintenance extends React.Component {
                                     variant='inline'
                                     disableToolbar
                                     inputVariant='outlined'
+                                    InputProps={{
+                                      style: {
+                                        "&$hover": {
+                                          border: 'none'
+                                        }
+                                      }
+                                    }}
                                   />
-                                </FormGroup>
-                                <FormGroup>
-                                  <label htmlFor='updated-by'>Last Updated By</label>
-                                  <FormInput id='updated-by' name='updated-by' type='text' value={maintenance.updatedBy} />
                                 </FormGroup>
                               </Col>
                             </Row>
@@ -801,7 +878,9 @@ export default class Maintenance extends React.Component {
                                 <FormGroup className='form-group-toggle'>
                                   <Badge theme='light' outline>
                                     <label>
-                                      <Toggle defaultChecked={maintenance.cancelled === 1} />
+                                      <Toggle 
+                                        checked={maintenance.cancelled === 1} 
+                                        onChange={this.handleToggleChange} />
                                       <div style={{ marginTop: '10px' }}>Cancelled</div>
                                     </label>
                                   </Badge>
@@ -812,7 +891,8 @@ export default class Maintenance extends React.Component {
                                           checked: <FontAwesomeIcon icon={faFirstAid} width='0.5em' style={{ color: '#fff' }} />,
                                           unchecked: null
                                         }}
-                                        defaultChecked={maintenance.emergency === 1}
+                                        checked={maintenance.emergency === 1}
+                                        onChange={this.handleToggleChange}
                                       />
                                       <div style={{ marginTop: '10px' }}>Emergency</div>
                                     </label>
@@ -820,7 +900,8 @@ export default class Maintenance extends React.Component {
                                   <Badge theme='secondary' outline>
                                     <label>
                                       <Toggle
-                                        defaultChecked={maintenance.done === 1}
+                                        checked={maintenance.done === 1}
+                                        onChange={this.handleToggleChange}
                                       />
                                       <div style={{ marginTop: '10px' }}>Done</div>
                                     </label>
@@ -993,7 +1074,7 @@ export default class Maintenance extends React.Component {
                 border-color: #8fa4b8 !important;
               }
               :global(.MuiOutlinedInput-input) {
-                padding: 12.5px 14px;
+                padding: 10.5px 14px;
                 transition: box-shadow 250ms cubic-bezier(.27,.01,.38,1.06),border 250ms cubic-bezier(.27,.01,.38,1.06);
               }
               :global(.Mui-focused) {
@@ -1005,6 +1086,9 @@ export default class Maintenance extends React.Component {
                 border: 1px solid #007bff !important;
                 border-radius: 0.325rem;
                 box-shadow: 0 0.313rem 0.719rem rgba(0,123,255,.1), 0 0.156rem 0.125rem rgba(0,0,0,.06);
+              }
+              :global(.MuiIconButton-root:hover) {
+                background-color: none !important;
               }
               :global(.fa-language) {
                 font-size: 20px;

@@ -232,6 +232,7 @@ export default class Inbox extends React.Component {
                                     body: mail.body
                                   }
                                 }}
+                                as='/maintenance/new'
                               >
                                 <Button className='mail-edit-btn pencil-icon' outline>
                                   <FontAwesomeIcon width='1.2em' className='edit-icon' icon={faPencilAlt} />
