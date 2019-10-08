@@ -42,7 +42,7 @@ export default class Inbox extends React.Component {
       }
     })
     const json = await res.json()
-    const pageRequest2 = `https://api.${host}/inbox/count` 
+    const pageRequest2 = `https://api.${host}/inbox/count`
     const res2 = await fetch(pageRequest2)
     const count = await res2.json()
     return {
@@ -232,7 +232,6 @@ export default class Inbox extends React.Component {
                                     body: mail.body
                                   }
                                 }}
-                                as='/m/new'
                               >
                                 <Button className='mail-edit-btn pencil-icon' outline>
                                   <FontAwesomeIcon width='1.2em' className='edit-icon' icon={faPencilAlt} />

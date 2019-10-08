@@ -8,6 +8,7 @@ import Fonts from '../src/components/fonts'
 import Footer from '../src/components/footer'
 import { Chart, SplineSeries } from '@devexpress/dx-react-chart-material-ui'
 import { Animation, ValueScale, ArgumentScale } from '@devexpress/dx-react-chart'
+import { Sparklines, SparklinesLine, SparklinesSpots } from 'react-sparklines'
 import UseAnimations from 'react-useanimations'
 import {
   Badge,
@@ -18,7 +19,7 @@ import {
 } from 'shards-react'
 
 const people = ['fwaleska', 'alissitsin', 'sstergiou']
-const modifyValueDomain = () => [0, 30];
+const modifyValueDomain = () => [0, 30]
 
 export default class Blog extends React.Component {
   static async getInitialProps ({ res, req }) {
@@ -41,7 +42,7 @@ export default class Blog extends React.Component {
         Router.push('/auth')
       }
     }
-    const pageRequest2 = `https://api.${host}/inbox/count` 
+    const pageRequest2 = `https://api.${host}/inbox/count`
     const res2 = await fetch(pageRequest2)
     const count = await res2.json()
     return {
@@ -78,11 +79,11 @@ export default class Blog extends React.Component {
       .then(resp => resp.json())
       .then(data => {
         // console.log(data)
-
+        const keyArray = data.weekCountResults.map(item => item.yValue)
         this.setState({
           [person]: {
             total: data.totalCount.maints,
-            weeks: data.weekCountResults
+            weeks: keyArray
           }
         })
       })
@@ -117,14 +118,15 @@ export default class Blog extends React.Component {
                   return (
                     <Card key={person} className='card-stats'>
                       <Badge className='card-person-badge' outline>
-                        {eval(`this.state.${person}.total`)}
-                        {/* <Chart
-                          data={eval(`this.state.${person}.weeks`)}
-                        >
-                          <SplineSeries valueField='value' argumentField='argument' />
-                          <ValueScale name='value' modifyDomain={modifyValueDomain} />
-                          <Animation />
-                        </Chart> */}
+                        <span>
+                          {eval(`this.state.${person}.total`)}
+                        </span>
+                        <Sparklines data={eval(`this.state.${person}.weeks`)} limit={10} width={100} height={40} margin={1}>
+                          <SparklinesLine style={{ strokeWidth: 2, stroke: 'rgba(0, 123, 255, 0.5)', fill: '#007bff', fillOpacity: '0.1' }} />
+                          {/* <SparklinesSpots
+                            size={2} style={{ stroke: '#007bff', strokeWidth: 2, fill: 'white' }}
+                          /> */}
+                        </Sparklines>
                       </Badge>
                       <CardBody className='card-person-body'>
                         <p className='card-body-text'>{person}</p>
@@ -137,6 +139,11 @@ export default class Blog extends React.Component {
             <Footer />
           </Card>
           <style jsx>{`
+            :global(.card-person-badge > svg) {
+              position: absolute;
+              left: 0px;
+              bottom: 64px;
+            }
             :global([class^="Component-root"]) {
               top: 0px;
               left: -5px;
