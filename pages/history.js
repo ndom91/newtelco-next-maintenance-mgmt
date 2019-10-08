@@ -121,9 +121,9 @@ export default class About extends React.Component {
         paginationPageSize: 10,
         rowClass: 'row-class',
         rowClassRules: {
-          'row-completed': function (params) { return params.data.done === 1 },
-          'row-cancelled': function (params) { return params.data.cancelled === 1 },
-          'row-emergency': function (params) { return params.data.emergency === 1 }
+          'row-completed': function (params) { return params.data.done === "1" },
+          'row-cancelled': function (params) { return params.data.cancelled === "1" },
+          'row-emergency': function (params) { return params.data.emergency === "1" }
         }
       }
     }

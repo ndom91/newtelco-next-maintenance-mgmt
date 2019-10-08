@@ -1,9 +1,9 @@
-
 const db = require('../../../../../lib/db')
 
 module.exports = async (req, res) => {
   const maintId = req.query.maintId
   const value = req.query.value
+  console.log(value)
   const cidIdsQuery = await db.query(`UPDATE maintenancedb SET notes = '${value}' WHERE id = ${maintId}`)
   console.log(cidIdsQuery)
   if (cidIdsQuery.affectedRows >= 1) {

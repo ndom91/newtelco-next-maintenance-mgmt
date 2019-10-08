@@ -193,6 +193,7 @@ export default class Maintenance extends React.Component {
     this.handleReasonChange = this.handleReasonChange.bind(this)
     this.handleLocationChange = this.handleLocationChange.bind(this)
     // this.handleToggleBlur = this.handleToggleBlur.bind(this)
+    this.handleSaveOnClick = this.handleSaveOnClick.bind(this)
     this.handleNotesBlur = this.handleNotesBlur.bind(this)
   }
 
@@ -309,10 +310,10 @@ export default class Maintenance extends React.Component {
 
   componentDidMount () {
     const convertBool = (input) => {
-      if (input === 1 || input === 0) {
-        if (input === 1) {
+      if (input === '1' || input === '0') {
+        if (input === '1') {
           return true
-        } else if (input === 0) {
+        } else if (input === '0') {
           return false
         }
       } else {
@@ -447,9 +448,9 @@ export default class Maintenance extends React.Component {
     return newDateTime
   }
 
-  handleNotesChange (value) {
-    this.setState({ notesText: value })
-  }
+  // handleNotesChange (value) {
+  //   this.setState({ notesText: value })
+  // }
 
   handleMailPreviewChange (content, delta, source, editor) {
     this.setState({ mailBodyText: editor.getContents() })
@@ -571,6 +572,17 @@ export default class Maintenance extends React.Component {
   handleEditorChange (data) {
     this.setState({
       mailBodyText: data.level.content
+    })
+  }
+
+  handleNotesChange (data) {
+    const newMaint = {
+      ...this.state.maintenance,
+      notes: data.level.content
+    }
+
+    this.setState({
+      maintenance: newMaint
     })
   }
 
@@ -856,7 +868,7 @@ export default class Maintenance extends React.Component {
         arrayToSend.push(selectedId)
       })
       postSelection(arrayToSend)
-    } else if (selectedSupplierCids.value) {
+    } else if (selectedSupplierCids && selectedSupplierCids.value) {
       const selectedId = selectedSupplierCids.value
       postSelection(selectedId)
     }
@@ -917,6 +929,54 @@ export default class Maintenance extends React.Component {
       .catch(err => console.error(err))
   }
 
+  handleSaveOnClick (event) {
+    const {
+      bearbeitetvon,
+      incomingDate,
+      lieferant,
+      mailId,
+      updatedAt
+    } = this.state.maintenance
+
+    // console.log(Date.parse(incomingDate))
+    // const incomingFormatted = format(incomingDate, 'YYYY-MM-DD HH:mm:ss')
+    const updatedAtFormatted = format(new Date(updatedAt), 'yyyy-MM-dd HH:mm:ss')
+
+    const host = window.location.host
+    // const formData = new FormData()
+    // formData.append('_csrf', this.props.session.csrfToken)
+    // formData.append('bearbeitetvon', bearbeitetvon)
+    fetch(`https://${host}/api/maintenances/save/create?bearbeitetvon=${bearbeitetvon}&lieferant=${lieferant}&mailId=${mailId}&updatedAt=${updatedAtFormatted}`, {
+      method: 'get'
+      // body: formData,
+      // body: new URLSearchParams(new FormData(`_csrf=${this.props.session.csrfToken}&bearbeitetvon=${bearbeitetvon}&incomingDate=${incomingDate}&lieferant=${lieferant}&mailId=${mailId}&updatedAt=${updatedAt}`)),
+      // headers: {
+      // 'Content-Type': 'form/multipart'
+      // 'Access-Control-Allow-Origin': '*'
+      // }
+    })
+      .then(resp => resp.json())
+      .then(data => {
+        const newId = data.newId["LAST_INSERT_ID()"]
+        const newMaint = {
+          ...this.state.maintenance,
+          id: newId
+        }
+        this.setState({
+          maintenance: newMaint
+        })
+        if (data.status === 200 && data.statusText === 'OK') {
+          cogoToast.success('Save Success', {
+            position: 'top-right'
+          })
+        } else {
+          cogoToast.warn(`Error - ${data.err}`, {
+            position: 'top-right'
+          })
+        }
+      })
+      .catch(err => console.error(err))
+  }
   // handleToggleBlur (element) {
   //   const host = window.location.host
   //   const newValue = eval(`this.state.maintenance.${element}`)
@@ -948,6 +1008,7 @@ export default class Maintenance extends React.Component {
     console.log(event)
     const host = window.location.host
     const newValue = this.state.maintenance.notes
+    console.log(newValue)
     const maintId = this.state.maintenance.id
     fetch(`https://${host}/api/maintenances/save/notes?maintId=${maintId}&value=${newValue}`, {
       method: 'get',
@@ -1008,7 +1069,7 @@ export default class Maintenance extends React.Component {
                           <FontAwesomeIcon icon={faCalendarAlt} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
                         Calendar
                         </Button>
-                        <Button>
+                        <Button onClick={this.handleSaveOnClick}>
                           <FontAwesomeIcon icon={faSave} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
                         Save
                         </Button>
@@ -1193,7 +1254,7 @@ export default class Maintenance extends React.Component {
                                         alignleft aligncenter alignright alignjustify | 
                                         bullist numlist outdent indent | removeformat | help`
                                     }}
-                                    onChange={this.handleEditorChange}
+                                    onChange={this.handleNotesChange}
                                   />
                                 </FormGroup>
                               </Col>
