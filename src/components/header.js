@@ -136,7 +136,6 @@ class Header extends React.Component {
             z-index: 1;
             color: #fff;
             opacity: 0.5;
-            border: 1px solid var(--light);
             
           }
           :global(.input-group-prepend) {

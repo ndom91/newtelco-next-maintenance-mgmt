@@ -12,7 +12,6 @@ import Toggle from 'react-toggle'
 import './style/maintenance.css'
 import cogoToast from 'cogo-toast'
 import Select from 'react-select'
-// import _, {debounce} from 'lodash'
 import Router from 'next/router'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Editor as TinyEditor } from '@tinymce/tinymce-react'
@@ -20,6 +19,7 @@ import { format, isValid } from 'date-fns'
 import DateFnsUtils from '@date-io/date-fns'
 import { zonedTimeToUtc, utcToZonedTime, format as formatTz } from 'date-fns-tz'
 import ReactModal from 'react-modal-resizable-draggable'
+import { Rnd } from 'react-rnd'
 import SelectTimezone, { getTimezoneProps } from '@capaj/react-select-timezone'
 import { KeyboardDateTimePicker, MuiPickersUtilsProvider } from '@material-ui/pickers'
 import { createMuiTheme } from '@material-ui/core/styles'
@@ -31,7 +31,8 @@ import {
   faLanguage,
   faFirstAid,
   faSearch,
-  faPaperPlane
+  faPaperPlane,
+  faTimesCircle
 } from '@fortawesome/free-solid-svg-icons'
 import {
   Container,
@@ -74,7 +75,6 @@ const theme = createMuiTheme({
 
 export default class Maintenance extends React.Component {
   static async getInitialProps ({ req, query }) {
-    // console.log('q', query)
     const host = req ? req.headers['x-forwarded-host'] : location.host
     const pageRequest2 = `https://api.${host}/inbox/count`
     const res2 = await fetch(pageRequest2)
@@ -86,13 +86,6 @@ export default class Maintenance extends React.Component {
       display = count.count
     }
     if (query.id === 'NEW') {
-      // query all mail info about company, available CIDs, etc.
-      // combine with existing query object
-      //
-      // const host = req ? req.headers['x-forwarded-host'] : location.host
-      // const pageRequest = `https://${host}/api/maintenances/${query.id}`
-      // const res = await fetch(pageRequest)
-      // const json = await res.json()
       return {
         jsonData: { profile: query },
         unread: display,
@@ -150,10 +143,6 @@ export default class Maintenance extends React.Component {
             width: 100,
             sort: { direction: 'asc', priority: 0 }
           }, {
-            headerName: '',
-            field: 'lieferantCID',
-            hidden: true
-          }, {
             headerName: 'Customer',
             field: 'name',
             width: 170
@@ -172,7 +161,6 @@ export default class Maintenance extends React.Component {
           }, {
             headerName: 'Recipient',
             field: 'maintenanceRecipient',
-            // cellRenderer: 'supplier',
             width: 150
           }, {
             headerName: 'Sent',
@@ -211,7 +199,6 @@ export default class Maintenance extends React.Component {
     this.handleImpactChange = this.handleImpactChange.bind(this)
     this.handleReasonChange = this.handleReasonChange.bind(this)
     this.handleLocationChange = this.handleLocationChange.bind(this)
-    // this.handleToggleBlur = this.handleToggleBlur.bind(this)
     this.handleSaveOnClick = this.handleSaveOnClick.bind(this)
     this.handleNotesBlur = this.handleNotesBlur.bind(this)
     this.handleTimezoneChange = this.handleTimezoneChange.bind(this)
@@ -280,7 +267,6 @@ export default class Maintenance extends React.Component {
     })
       .then(resp => resp.json())
       .then(data => {
-        console.log(data)
         if (!data.lieferantCIDsResult) {
           this.setState({
             lieferantcids: [{ label: 'No CIDs available for this Supplier', value: '1' }]
@@ -290,6 +276,7 @@ export default class Maintenance extends React.Component {
         const derenCIDidField = this.props.jsonData.profile.derenCIDid
         const commaRegex = new RegExp(',')
         if (commaRegex.test(derenCIDidField)) {
+          // multiple CID string (comma separated)
           this.setState({
             lieferantcids: data.lieferantCIDsResult
           })
@@ -298,7 +285,6 @@ export default class Maintenance extends React.Component {
           })
             .then(resp => resp.json())
             .then(data => {
-              console.log('data2', data)
               data.respArray.forEach(respCid => {
                 this.fetchMailCIDs(respCid.value)
               })
@@ -314,10 +300,10 @@ export default class Maintenance extends React.Component {
           if (selectedLieferantCIDid) {
             this.setState({
               lieferantcids: data.lieferantCIDsResult,
-              selectedLieferant: {
+              selectedLieferant: [{
                 label: selectedLieferantCIDvalue,
                 value: selectedLieferantCIDid
-              }
+              }]
             })
           } else {
             this.setState({
@@ -380,18 +366,14 @@ export default class Maintenance extends React.Component {
         width: window.innerWidth
       })
     }
-    // get available supplier CIDs
 
     const host = window.location.host
     if (this.props.jsonData.profile.lieferant) {
       const lieferantId = this.props.jsonData.profile.lieferant
-      // get available Newtelco CIDs based on supplier CID
 
       this.fetchLieferantCIDs(lieferantId)
-      // this.fetchMailCIDs(lieferantId)
     } else {
       const lieferantDomain = this.props.jsonData.profile.mailDomain
-      // fetch id based on domain, then fetch available CIDs
       fetch(`https://${host}/api/companies/domain?id=${lieferantDomain}`, {
         method: 'get'
       })
@@ -431,15 +413,15 @@ export default class Maintenance extends React.Component {
 
   fetchMailCIDs (lieferantCidId) {
     const host = window.location.host
-    // const newMailCidState = []
-    console.log('Arr', lieferantCidId)
-    // Array.isArray(lieferantCidId) && lieferantCidId.forEach(cid => {
+    if (!lieferantCidId) {
+      return
+    }
+    // @param1 - int -1 single LIeferantCID ID
     fetch(`https://${host}/api/customercids/${lieferantCidId}`, {
       method: 'get'
     })
       .then(resp => resp.json())
       .then(data => {
-        console.log('data', data)
         const {
           done
         } = this.state.maintenance
@@ -449,10 +431,7 @@ export default class Maintenance extends React.Component {
           } else {
             data.kundenCIDsResult[0].sent = '0'
           }
-          // MUST CHECK THEIR CID SELECTION
-          console.log('result', data.kundenCIDsResult)
 
-          // newMailCidState.push(data.kundenCIDsResult[0])
           const existingKundenCids = [
             ...this.state.kundencids,
             data.kundenCIDsResult[0]
@@ -464,12 +443,6 @@ export default class Maintenance extends React.Component {
         }
       })
       .catch(err => console.error(`Error - ${err}`))
-    // })
-    // if (Array.isArray(newMailCidState) && newMailCidState !== []) {
-      // this.setState({
-      //   kundencids: newMailCidState
-      // })
-    // }
   }
 
   componentDidUpdate () {
@@ -485,38 +458,22 @@ export default class Maintenance extends React.Component {
     return newDateTime
   }
 
-  // handleNotesChange (value) {
-  //   this.setState({ notesText: value })
-  // }
-
   handleMailPreviewChange (content, delta, source, editor) {
     this.setState({ mailBodyText: editor.getContents() })
   }
 
   handleSelectLieferantChange = selectedOption => {
     if (selectedOption) {
-      console.log('sO', selectedOption)
-      this.fetchMailCIDs(selectedOption)
-      // selectedOption.forEach(option => {
-      //   this.fetchMailCIDs(option.value)
-      // })
-      const leftOverMailIds = []
-      if (this.state.kundencids) {
-        this.state.kundencids.forEach(cid => {
-          const existingKundenCid = this.state.selectedLieferant.find(el => {
-            return el.value === cid.lieferantCID
-          })
-          existingKundenCid && leftOverMailIds.push(existingKundenCid)
-        })
-        // console.log(selectedOption, leftOverMailIds)
-        this.setState({
-          selectedLieferant: selectedOption
-        })
-      } else {
-        this.setState({ selectedLieferant: selectedOption })
-      }
+      this.setState({
+        kundencids: []
+      })
+      selectedOption.forEach(option => {
+        this.fetchMailCIDs(option.value)
+      })
+      this.setState({
+        selectedLieferant: selectedOption
+      })
     }
-    // todo: fetchMailCIDs
   }
 
   toggleReadModal () {
@@ -764,7 +721,6 @@ export default class Maintenance extends React.Component {
   }
 
   prepareDirectSend (recipient, customerCID) {
-    console.log(customerCID)
     if (!this.state.mailBodyText) {
       const HtmlBody = this.generateMail(customerCID)
       const subject = `Planned Work Notification - ${this.state.maintenance.id}`
@@ -780,7 +736,6 @@ export default class Maintenance extends React.Component {
   }
 
   renderDateTimeLabel = (date) => {
-    console.log(date)
     if (isValid(date)) {
       return format(new Date(date), 'dd.MM.yyyy HH:mm')
     } else {
@@ -864,14 +819,6 @@ export default class Maintenance extends React.Component {
           .catch(err => console.error(err))
       }
     }
-    // const debouncedSendMail = (host, maintId, element, newValue) => {
-    // const debouncedSendMail = _.debounce(() => sendMail(host, maintId, element, newValue), 1000, {
-    //   leading: false,
-    //   trailing: true
-    // })
-    // }
-    // debouncedSendMail()
-    // debouncedSendMail(host, maintId, element, newValue)
     sendMail(host, maintId, element, newValue)
   }
 
@@ -1088,17 +1035,8 @@ export default class Maintenance extends React.Component {
     const updatedAtFormatted = format(new Date(updatedAt), 'yyyy-MM-dd HH:mm:ss')
 
     const host = window.location.host
-    // const formData = new FormData()
-    // formData.append('_csrf', this.props.session.csrfToken)
-    // formData.append('bearbeitetvon', bearbeitetvon)
     fetch(`https://${host}/api/maintenances/save/create?bearbeitetvon=${bearbeitetvon}&lieferant=${lieferant}&mailId=${mailId}&updatedAt=${updatedAtFormatted}`, {
       method: 'get'
-      // body: formData,
-      // body: new URLSearchParams(new FormData(`_csrf=${this.props.session.csrfToken}&bearbeitetvon=${bearbeitetvon}&incomingDate=${incomingDate}&lieferant=${lieferant}&mailId=${mailId}&updatedAt=${updatedAt}`)),
-      // headers: {
-      // 'Content-Type': 'form/multipart'
-      // 'Access-Control-Allow-Origin': '*'
-      // }
     })
       .then(resp => resp.json())
       .then(data => {
@@ -1122,32 +1060,6 @@ export default class Maintenance extends React.Component {
       })
       .catch(err => console.error(err))
   }
-  // handleToggleBlur (element) {
-  //   const host = window.location.host
-  //   const newValue = eval(`this.state.maintenance.${element}`)
-  //   const maintId = this.state.maintenance.id
-
-  //   fetch(`https://${host}/api/maintenances/save/toggle?maintId=${maintId}&element=${element}&value=${newValue}`, {
-  //     method: 'get',
-  //     headers: {
-  //       'Access-Control-Allow-Origin': '*',
-  //       _csrf: this.props.session.csrfToken
-  //     }
-  //   })
-  //     .then(resp => resp.json())
-  //     .then(data => {
-  //       if (data.status === 200 && data.statusText === 'OK') {
-  //         cogoToast.success('Save Success', {
-  //           position: 'top-right'
-  //         })
-  //       } else {
-  //         cogoToast.warn(`Error - ${data.err}`, {
-  //           position: 'top-right'
-  //         })
-  //       }
-  //     })
-  //     .catch(err => console.error(err))
-  // }
 
   handleNotesBlur (event) {
     const host = window.location.host
@@ -1489,31 +1401,55 @@ export default class Maintenance extends React.Component {
                     <span />
                   )}
               </CardFooter>
-              {/* <ReactModal initWidth={800} initHeight={400} onRequestClose={this.toggleReadModal} isOpen={openReadModal}>
-                <ModalHeader>
-                  <img className='mail-icon' src={`https://besticon-demo.herokuapp.com/icon?size=40..100..360&url=${this.state.maintenance.incomingDomain}`} />
-                  <div className='modal-incoming-header-text'>
-                    <h5 className='modal-incoming-from'>{this.state.maintenance.incomingFrom}</h5>
-                    <small className='modal-incoming-subject'>{this.state.maintenance.incomingSubject}</small><br />
-                    <small className='modal-incoming-datetime'>{this.state.maintenance.incomingDate}</small>
-                  </div>
-                  <Button id='translate-tooltip' style={{ padding: '0.7em 0.9em' }} onClick={this.handleTranslate.bind(this)}>
-                    <FontAwesomeIcon width='1.5em' className='translate-icon' icon={faLanguage} />
-                  </Button>
-                </ModalHeader>
-                <Tooltip
-                  open={this.state.translateTooltipOpen}
-                  target='#translate-tooltip'
-                  toggle={this.toggleTooltip}
-                  placement='bottom'
-                  noArrow
-                >
-                    Translate
-                </Tooltip>
-                <ModalBody className='mail-body' dangerouslySetInnerHTML={{ __html: this.state.translated ? this.state.translatedBody : this.state.maintenance.incomingBody }} />
-              </ReactModal> */}
+              {typeof window !== 'undefined'
+                ? (
+                  <Rnd
+                    default={{
+                      x: 900,
+                      y: 5,
+                      width: 800,
+                      height: 600
+                    }}
+                    style={{
+                      visibility: openReadModal ? 'visible' : 'hidden',
+                      background: 'var(--light)',
+                      overflowY: 'hidden',
+                      border: '5px solid #007bff',
+                      borderRadius: '15px',
+                      height: 'auto',
+                      zIndex: '3'
+                    }}
+                    minWidth={500}
+                    minHeight={590}
+                    bounds="window"
+                    >
+                    <div style={{ position: 'relative' }}>
+                      <ModalHeader style={{
+                        background: '#5a6169'
+                      }}>
+                        <img className='mail-icon' src={`https://besticon-demo.herokuapp.com/icon?size=40..100..360&url=${this.state.maintenance.incomingDomain}`} />
+                        <div className='modal-incoming-header-text'>
+                          <h5 className='modal-incoming-from'>{this.state.maintenance.incomingFrom}</h5>
+                          <small className='modal-incoming-subject'>{this.state.maintenance.incomingSubject}</small><br />
+                          <small className='modal-incoming-datetime'>{this.state.maintenance.incomingDate}</small>
+                        </div>
+                        <ButtonGroup style={{ display: 'flex', flexDirection: 'column' }}>
+                          <Button outline theme='light' style={{ borderRadius: '5px 5px 0 0', padding: '0.7em 0.9em' }} onClick={this.toggleReadModal}>
+                            <FontAwesomeIcon width='1.5em' style={{ fontSize: '20px' }}className='translate-icon' icon={faTimesCircle} />
+                          </Button>
+                          <Button theme='light' style={{ borderRadius: '0 0 5px 5px', padding: '0.7em 0.9em' }} onClick={this.handleTranslate.bind(this)}>
+                            <FontAwesomeIcon width='1.5em' style={{ fontSize: '20px' }}className='translate-icon' icon={faLanguage} />
+                          </Button>
+                        </ButtonGroup>
+                      </ModalHeader>
+                      <ModalBody className='mail-body' dangerouslySetInnerHTML={{ __html: this.state.translated ? this.state.translatedBody : this.state.maintenance.incomingBody }} />
+                    </div>
+                  </Rnd>
+                ) : (
+                  <></>
+                )}
 
-              <Modal className='mail-modal-body' animation backdrop backdropClassName='modal-backdrop' open={openReadModal} size='lg' toggle={this.toggleReadModal}>
+              {/* <Modal className='mail-modal-body' animation backdrop backdropClassName='modal-backdrop' open={openReadModal} size='lg' toggle={this.toggleReadModal}>
                 <ModalHeader>
                   <img className='mail-icon' src={`https://besticon-demo.herokuapp.com/icon?size=40..100..360&url=${this.state.maintenance.incomingDomain}`} />
                   <div className='modal-incoming-header-text'>
@@ -1535,7 +1471,7 @@ export default class Maintenance extends React.Component {
                     Translate
                 </Tooltip>
                 <ModalBody className='mail-body' dangerouslySetInnerHTML={{ __html: this.state.translated ? this.state.translatedBody : this.state.maintenance.incomingBody }} />
-              </Modal>
+              </Modal> */}
               <Modal backdropClassName='modal-backdrop' animation backdrop size='lg' open={openPreviewModal} toggle={this.togglePreviewModal}>
                 <ModalHeader>
                   <div className='modal-preview-text-wrapper'>
@@ -1723,7 +1659,6 @@ export default class Maintenance extends React.Component {
                 z-index: 1;
                 border: 1px solid #ccc;
                 background: white;
-                overflow-y: scroll;
               }
               :global(.flexible-modal-mask) {
                 position: fixed;
