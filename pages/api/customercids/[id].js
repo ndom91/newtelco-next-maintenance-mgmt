@@ -6,6 +6,7 @@ module.exports = async (req, res) => {
   const kundenCIDsResult = await db.query(escape`
     SELECT kundenCID.kundenCID, kundenCID.protected, companies.name, kundenCID.kunde, companies.maintenanceRecipient, kundenCID.lieferantCID FROM kundenCID LEFT JOIN companies ON kundenCID.kunde = companies.id LEFT JOIN lieferantCID ON lieferantCID.id = kundenCID.lieferantCID WHERE lieferantCID.id LIKE ${lieferantId}
   `)
+  console.log('dbResult', kundenCIDsResult)
   const count = await db.query(escape`
       SELECT COUNT(*)
       AS kundenCIDsCount

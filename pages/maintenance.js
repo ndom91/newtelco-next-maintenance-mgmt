@@ -284,7 +284,6 @@ export default class Maintenance extends React.Component {
         if (!data.lieferantCIDsResult) {
           this.setState({
             lieferantcids: [{ label: 'No CIDs available for this Supplier', value: '1' }]
-          //   selectedLieferant: { label: 'No CIDs available', value: '1' }
           })
           return
         }
@@ -299,6 +298,7 @@ export default class Maintenance extends React.Component {
           })
             .then(resp => resp.json())
             .then(data => {
+              console.log('data2', data)
               data.respArray.forEach(respCid => {
                 this.fetchMailCIDs(respCid.value)
               })
@@ -309,6 +309,7 @@ export default class Maintenance extends React.Component {
         } else {
           // Single CID String
           const selectedLieferantCIDid = parseInt(derenCIDidField) || null
+          this.fetchMailCIDs(selectedLieferantCIDid)
           const selectedLieferantCIDvalue = this.props.jsonData.profile.derenCID || null
           if (selectedLieferantCIDid) {
             this.setState({
@@ -438,6 +439,7 @@ export default class Maintenance extends React.Component {
     })
       .then(resp => resp.json())
       .then(data => {
+        console.log('data', data)
         const {
           done
         } = this.state.maintenance
@@ -448,7 +450,8 @@ export default class Maintenance extends React.Component {
             data.kundenCIDsResult[0].sent = '0'
           }
           // MUST CHECK THEIR CID SELECTION
-          console.log(data.kundenCIDsResult)
+          console.log('result', data.kundenCIDsResult)
+
           // newMailCidState.push(data.kundenCIDsResult[0])
           const existingKundenCids = [
             ...this.state.kundencids,
@@ -492,7 +495,7 @@ export default class Maintenance extends React.Component {
 
   handleSelectLieferantChange = selectedOption => {
     if (selectedOption) {
-      console.log(selectedOption)
+      console.log('sO', selectedOption)
       this.fetchMailCIDs(selectedOption)
       // selectedOption.forEach(option => {
       //   this.fetchMailCIDs(option.value)
