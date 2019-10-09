@@ -75,7 +75,7 @@ class Header extends React.Component {
             <NavItem style={{ position: 'relative' }}>
               <Link href='/inbox'>
                 <NavLink>
-                  <Badge className='unread-badge' theme='dark'>
+                  <Badge className='unread-badge' pill theme='dark'>
                     {this.props.unread}
                   </Badge>
                   <span style={{ position: 'relative', zIndex: '2' }} className='menu-label'>Inbox</span>
@@ -134,6 +134,10 @@ class Header extends React.Component {
             top: -2px;
             right: 2px;
             z-index: 1;
+            color: #fff;
+            opacity: 0.5;
+            border: 1px solid var(--light);
+            
           }
           :global(.input-group-prepend) {
             pointer-events: none !important;

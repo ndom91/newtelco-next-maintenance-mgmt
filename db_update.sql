@@ -1,5 +1,5 @@
 ALTER TABLE `maintenancedb` ADD `mailBody` LONGTEXT NULL DEFAULT NULL AFTER `betroffeneCIDs`;
-ALTER TABLE `maintenancedb` CHANGE `notes` `notes` LONGTEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL;
+ALTER TABLE `maintenancedb` CHANGE `notes` `notes` LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL;
 
 ALTER DATABASE maintenance_dev CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 ALTER TABLE authentication CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;

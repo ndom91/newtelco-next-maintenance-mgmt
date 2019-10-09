@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useCallback } from 'react'
 import Layout from '../src/components/layout'
 import fetch from 'isomorphic-unfetch'
 import { AgGridReact } from 'ag-grid-react'
@@ -18,11 +18,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Editor as TinyEditor } from '@tinymce/tinymce-react'
 import { format, isValid } from 'date-fns'
 import DateFnsUtils from '@date-io/date-fns'
+import { zonedTimeToUtc, utcToZonedTime, format as formatTz } from 'date-fns-tz'
+import ReactModal from 'react-modal-resizable-draggable'
+import SelectTimezone, { getTimezoneProps } from '@capaj/react-select-timezone'
 import { KeyboardDateTimePicker, MuiPickersUtilsProvider } from '@material-ui/pickers'
 import { createMuiTheme } from '@material-ui/core/styles'
-import { zonedTimeToUtc, utcToZonedTime, format as formatTz } from 'date-fns-tz'
 import {
-  faSave,
+  faPlusCircle,
   faCalendarAlt,
   faArrowLeft,
   faEnvelopeOpenText,
@@ -69,9 +71,20 @@ const theme = createMuiTheme({
     }
   }
 })
+
 export default class Maintenance extends React.Component {
   static async getInitialProps ({ req, query }) {
-    console.log('q', query)
+    // console.log('q', query)
+    const host = req ? req.headers['x-forwarded-host'] : location.host
+    const pageRequest2 = `https://api.${host}/inbox/count`
+    const res2 = await fetch(pageRequest2)
+    const count = await res2.json()
+    let display
+    if (count === 'No unread emails') {
+      display = 0
+    } else {
+      display = count.count
+    }
     if (query.id === 'NEW') {
       // query all mail info about company, available CIDs, etc.
       // combine with existing query object
@@ -82,15 +95,16 @@ export default class Maintenance extends React.Component {
       // const json = await res.json()
       return {
         jsonData: { profile: query },
+        unread: display,
         session: await NextAuth.init({ req })
       }
     } else {
-      const host = req ? req.headers['x-forwarded-host'] : location.host
       const pageRequest = `https://${host}/api/maintenances/${query.id}`
       const res = await fetch(pageRequest)
       const json = await res.json()
       return {
         jsonData: json,
+        unread: display,
         session: await NextAuth.init({ req })
       }
     }
@@ -101,7 +115,8 @@ export default class Maintenance extends React.Component {
     this.state = {
       width: 0,
       maintenance: {
-        incomingBody: this.props.jsonData.profile.body
+        incomingBody: this.props.jsonData.profile.body,
+        incomingTimezone: 'Europe/Berlin'
       },
       openReadModal: false,
       openPreviewModal: false,
@@ -135,11 +150,15 @@ export default class Maintenance extends React.Component {
             width: 100,
             sort: { direction: 'asc', priority: 0 }
           }, {
+            headerName: '',
+            field: 'lieferantCID',
+            hidden: true
+          }, {
             headerName: 'Customer',
             field: 'name',
             width: 170
           }, {
-            headerName: 'Protected',
+            headerName: 'Protection',
             field: 'protected',
             filter: false,
             cellRenderer: 'protectedIcon',
@@ -195,6 +214,8 @@ export default class Maintenance extends React.Component {
     // this.handleToggleBlur = this.handleToggleBlur.bind(this)
     this.handleSaveOnClick = this.handleSaveOnClick.bind(this)
     this.handleNotesBlur = this.handleNotesBlur.bind(this)
+    this.handleTimezoneChange = this.handleTimezoneChange.bind(this)
+    this.handleTimezoneBlur = this.handleTimezoneBlur.bind(this)
   }
 
   sendMailBtns = (row) => {
@@ -250,7 +271,6 @@ export default class Maintenance extends React.Component {
     if (!lieferantId) {
       this.setState({
         lieferantcids: [{ label: 'No CIDs available for this Supplier', value: '1' }]
-      //   selectedLieferant: { label: 'No CIDs available', value: '1' }
       })
       return
     }
@@ -260,7 +280,7 @@ export default class Maintenance extends React.Component {
     })
       .then(resp => resp.json())
       .then(data => {
-        // console.log(data)
+        console.log(data)
         if (!data.lieferantCIDsResult) {
           this.setState({
             lieferantcids: [{ label: 'No CIDs available for this Supplier', value: '1' }]
@@ -367,9 +387,9 @@ export default class Maintenance extends React.Component {
       // get available Newtelco CIDs based on supplier CID
 
       this.fetchLieferantCIDs(lieferantId)
-      this.fetchMailCIDs(lieferantId)
+      // this.fetchMailCIDs(lieferantId)
     } else {
-      const lieferantDomain = this.props.jsonData.profile.name
+      const lieferantDomain = this.props.jsonData.profile.mailDomain
       // fetch id based on domain, then fetch available CIDs
       fetch(`https://${host}/api/companies/domain?id=${lieferantDomain}`, {
         method: 'get'
@@ -408,23 +428,31 @@ export default class Maintenance extends React.Component {
     return unique
   }
 
-  fetchMailCIDs (lieferantId) {
+  fetchMailCIDs (lieferantCidId) {
     const host = window.location.host
-    fetch(`https://${host}/api/customercids/${lieferantId}`, {
+    // const newMailCidState = []
+    console.log('Arr', lieferantCidId)
+    // Array.isArray(lieferantCidId) && lieferantCidId.forEach(cid => {
+    fetch(`https://${host}/api/customercids/${lieferantCidId}`, {
       method: 'get'
     })
       .then(resp => resp.json())
       .then(data => {
+        const {
+          done
+        } = this.state.maintenance
         if (data.kundenCIDsResult[0]) {
-          if (this.state.maintenance.done === 1 || true) {
-            data.kundenCIDsResult[0].sent = 1
+          if (done === 1 || done === true || done === '1') {
+            data.kundenCIDsResult[0].sent = '1'
           } else {
-            data.kundenCIDsResult[0].sent = 0
+            data.kundenCIDsResult[0].sent = '0'
           }
-
+          // MUST CHECK THEIR CID SELECTION
+          console.log(data.kundenCIDsResult)
+          // newMailCidState.push(data.kundenCIDsResult[0])
           const existingKundenCids = [
-            data.kundenCIDsResult[0],
-            ...this.state.kundencids
+            ...this.state.kundencids,
+            data.kundenCIDsResult[0]
           ]
           const uniqueKundenCids = this.getUnique(existingKundenCids, 'kundenCID')
           this.setState({
@@ -433,6 +461,12 @@ export default class Maintenance extends React.Component {
         }
       })
       .catch(err => console.error(`Error - ${err}`))
+    // })
+    // if (Array.isArray(newMailCidState) && newMailCidState !== []) {
+      // this.setState({
+      //   kundencids: newMailCidState
+      // })
+    // }
   }
 
   componentDidUpdate () {
@@ -458,11 +492,28 @@ export default class Maintenance extends React.Component {
 
   handleSelectLieferantChange = selectedOption => {
     if (selectedOption) {
-      selectedOption.forEach(option => {
-        this.fetchMailCIDs(option.value)
-      })
-      this.setState({ selectedLieferant: selectedOption })
+      console.log(selectedOption)
+      this.fetchMailCIDs(selectedOption)
+      // selectedOption.forEach(option => {
+      //   this.fetchMailCIDs(option.value)
+      // })
+      const leftOverMailIds = []
+      if (this.state.kundencids) {
+        this.state.kundencids.forEach(cid => {
+          const existingKundenCid = this.state.selectedLieferant.find(el => {
+            return el.value === cid.lieferantCID
+          })
+          existingKundenCid && leftOverMailIds.push(existingKundenCid)
+        })
+        // console.log(selectedOption, leftOverMailIds)
+        this.setState({
+          selectedLieferant: selectedOption
+        })
+      } else {
+        this.setState({ selectedLieferant: selectedOption })
+      }
     }
+    // todo: fetchMailCIDs
   }
 
   toggleReadModal () {
@@ -534,7 +585,8 @@ export default class Maintenance extends React.Component {
       endDateTime,
       impact,
       reason,
-      location
+      location,
+      incomingTimezone
     } = this.state.maintenance
 
     if (!id || !startDateTime || !endDateTime) {
@@ -545,12 +597,12 @@ export default class Maintenance extends React.Component {
     }
 
     const rescheduleText = ''
-    const timeZone = 'Europe/Berlin'
+    const timeZone = incomingTimezone || 'Europe/Berlin'
     const startDateTimeDE = formatTz(utcToZonedTime(new Date(startDateTime), timeZone), 'dd.MM.yyyy HH:mm')
     const endDateTimeDE = formatTz(utcToZonedTime(new Date(endDateTime), timeZone), 'dd.MM.yyyy HH:mm')
     const tzSuffixRAW = 'CET / GMT+2:00'
 
-    let body = `<body style="color:#666666;">${rescheduleText} Dear Colleagues,​​<p><span>We would like to inform you about planned work on the following CID(s):<br><br> <b>${customerCID}</b> <br><br>The maintenance work is with the following details:</span></p><table border="0" cellspacing="2" cellpadding="2" width="775px"><tr><td style='width: 205px;'>Maintenance ID:</td><td><b>${id}</b></td></tr><tr><td>Start date and time:</td><td><b>${startDateTimeDE} (${tzSuffixRAW})</b></td></tr><tr><td>Finish date and time:</td><td><b>${endDateTimeDE} (${tzSuffixRAW})</b></td></tr>`
+    let body = `<body style="color:#666666;">${rescheduleText} Dear Colleagues,​​<p><span>We would like to inform you about planned work on the following CID(s):<br><br> <b>${customerCID}</b> <br><br>The maintenance work is with the following details:</span></p><table border="0" cellspacing="2" cellpadding="2" width="775px"><tr><td style='width: 205px;'>Maintenance ID:</td><td><b>NT-${id}</b></td></tr><tr><td>Start date and time:</td><td><b>${startDateTimeDE} (${tzSuffixRAW})</b></td></tr><tr><td>Finish date and time:</td><td><b>${endDateTimeDE} (${tzSuffixRAW})</b></td></tr>`
 
     if (impact) {
       body = body + '<tr><td>Impact:</td><td>' + impact + '</td></tr>'
@@ -756,35 +808,58 @@ export default class Maintenance extends React.Component {
     const maintId = this.state.maintenance.id
     const host = window.location.host
     if (element === 'start') {
-      newValue = this.state.maintenance.startDateTime
+      if (isValid(this.state.maintenance.startDateTime)) {
+        newValue = this.state.maintenance.startDateTime
+        const newCompareValue = new Date(newValue).toISOString()
+        if (newCompareValue === this.props.jsonData.profile.startDateTime) {
+          return
+        }
+      }
     } else if (element === 'end') {
-      newValue = this.state.maintenance.endDateTime
+      if (isValid(this.state.maintenance.endDateTime)) {
+        newValue = this.state.maintenance.endDateTime
+        const newCompareValue = new Date(newValue).toISOString()
+        if (newCompareValue === this.props.jsonData.profile.endDateTime) {
+          return
+        }
+      }
     }
     const sendMail = (host, maintId, element, newValue) => {
-      console.log('1', newValue)
-      const newISOTime = new Date(newValue)
-      const newISOTimeString = format(newISOTime, 'yyyy-MM-dd HH:mm:ss')
-      console.log('2', newISOTime)
-      fetch(`https://${host}/api/maintenances/save/dateTime?maintId=${maintId}&element=${element}&value=${newISOTimeString}`, {
-        method: 'get',
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-          _csrf: this.props.session.csrfToken
+      let newISOTime = new Date(newValue)
+      const selectedTimezone = this.state.maintenance.incomingTimezone
+      if (selectedTimezone !== 'Europe/Berlin' && isValid(newISOTime)) {
+        newISOTime = zonedTimeToUtc(newISOTime, selectedTimezone)
+      }
+      let newISOTimeString
+      if (isValid(newISOTime)) {
+        const maintId = this.state.maintenance.id
+        if (maintId === 'NEW') {
+          cogoToast.warn('No CID assigned - Cannot Save', {
+            position: 'top-right'
+          })
+          return
         }
-      })
-        .then(resp => resp.json())
-        .then(data => {
-          if (data.status === 200 && data.statusText === 'OK') {
-            cogoToast.success('Save Success', {
-              position: 'top-right'
-            })
-          } else {
-            cogoToast.warn(`Error - ${data.err}`, {
-              position: 'top-right'
-            })
+        fetch(`https://${host}/api/maintenances/save/dateTime?maintId=${maintId}&element=${element}&value=${newISOTimeString}`, {
+          method: 'get',
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            _csrf: this.props.session.csrfToken
           }
         })
-        .catch(err => console.error(err))
+          .then(resp => resp.json())
+          .then(data => {
+            if (data.status === 200 && data.statusText === 'OK') {
+              cogoToast.success('Save Success', {
+                position: 'top-right'
+              })
+            } else {
+              cogoToast.warn(`Error - ${data.err}`, {
+                position: 'top-right'
+              })
+            }
+          })
+          .catch(err => console.error(err))
+      }
     }
     // const debouncedSendMail = (host, maintId, element, newValue) => {
     // const debouncedSendMail = _.debounce(() => sendMail(host, maintId, element, newValue), 1000, {
@@ -808,6 +883,38 @@ export default class Maintenance extends React.Component {
       }
     })
 
+    if (element === 'done') {
+      // mark mail as unread as well
+      fetch(`https://api.${host}/inbox/delete`, {
+        method: 'post',
+        body: JSON.stringify({ m: this.state.maintenance.mailId }),
+        mode: 'cors',
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Content-Type': 'application/json'
+        }
+      })
+        .then(resp => resp.json())
+        .then(data => {
+          if (data.status === 'complete') {
+            cogoToast.success('Message Marked Complete', {
+              position: 'top-right'
+            })
+          } else {
+            cogoToast.warn('Error marking as complete', {
+              position: 'top-right'
+            })
+          }
+        })
+        .catch(err => console.error(`Error - ${err}`))
+    }
+
+    if (maintId === 'NEW') {
+      cogoToast.warn('No CID assigned - Cannot Save', {
+        position: 'top-right'
+      })
+      return
+    }
     fetch(`https://${host}/api/maintenances/save/toggle?maintId=${maintId}&element=${element}&value=${newValue}`, {
       method: 'get',
       headers: {
@@ -839,7 +946,17 @@ export default class Maintenance extends React.Component {
       } else {
         idParameter = id
       }
-      fetch(`https://${host}/api/maintenances/save/lieferant?maintId=${this.state.maintenance.id}&cid=${idParameter}`, {
+      if (idParameter === this.state.maintenance.derenCIDid) {
+        return true
+      }
+      const maintId = this.state.maintenance.id
+      if (maintId === 'NEW') {
+        cogoToast.warn('No CID assigned - Cannot Save', {
+          position: 'top-right'
+        })
+        return
+      }
+      fetch(`https://${host}/api/maintenances/save/lieferant?maintId=${maintId}&cid=${idParameter}`, {
         method: 'get',
         headers: {
           'Access-Control-Allow-Origin': '*',
@@ -901,12 +1018,37 @@ export default class Maintenance extends React.Component {
     })
   }
 
+  handleTimezoneChange (val) {
+    const timezoneProps = getTimezoneProps(val)
+    const zoneLabel = timezoneProps.value
+    this.setState({
+      maintenance: {
+        ...this.state.maintenance,
+        incomingTimezone: zoneLabel
+      }
+    })
+  }
+
+  handleTimezoneBlur (ev) {
+    // console.log(ev)
+  }
+
   handleTextInputBlur (element) {
     const host = window.location.host
     const newValue = eval(`this.state.maintenance.${element}`)
-    console.log(newValue)
+    const originalValue = eval(`this.props.jsonData.profile.${element}`)
     const maintId = this.state.maintenance.id
 
+    if (newValue === originalValue) {
+      return
+    }
+
+    if (maintId === 'NEW') {
+      cogoToast.warn('No CID assigned - Cannot Save', {
+        position: 'top-right'
+      })
+      return
+    }
     fetch(`https://${host}/api/maintenances/save/textinput?maintId=${maintId}&element=${element}&value=${newValue}`, {
       method: 'get',
       headers: {
@@ -957,7 +1099,7 @@ export default class Maintenance extends React.Component {
     })
       .then(resp => resp.json())
       .then(data => {
-        const newId = data.newId["LAST_INSERT_ID()"]
+        const newId = data.newId['LAST_INSERT_ID()']
         const newMaint = {
           ...this.state.maintenance,
           id: newId
@@ -966,7 +1108,7 @@ export default class Maintenance extends React.Component {
           maintenance: newMaint
         })
         if (data.status === 200 && data.statusText === 'OK') {
-          cogoToast.success('Save Success', {
+          cogoToast.success('Create Success', {
             position: 'top-right'
           })
         } else {
@@ -1005,11 +1147,19 @@ export default class Maintenance extends React.Component {
   // }
 
   handleNotesBlur (event) {
-    console.log(event)
     const host = window.location.host
     const newValue = this.state.maintenance.notes
-    console.log(newValue)
+    const originalValue = this.props.jsonData.profile.notes
+    if (newValue === originalValue) {
+      return
+    }
     const maintId = this.state.maintenance.id
+    if (maintId === 'NEW') {
+      cogoToast.warn('No CID assigned - Cannot Save', {
+        position: 'top-right'
+      })
+      return
+    }
     fetch(`https://${host}/api/maintenances/save/notes?maintId=${maintId}&value=${newValue}`, {
       method: 'get',
       headers: {
@@ -1039,10 +1189,17 @@ export default class Maintenance extends React.Component {
       openPreviewModal
     } = this.state
     // console.log(maintenance)
+    let maintenanceIdDisplay
+    if (maintenance.id === 'NEW') {
+      maintenanceIdDisplay = maintenance.id
+    } else {
+      maintenanceIdDisplay = `NT-${maintenance.id}`
+    }
+
     if (this.props.session.user) {
       return (
         <MuiPickersUtilsProvider utils={DateFnsUtils}>
-          <Layout session={this.props.session}>
+          <Layout unread={this.props.unread} session={this.props.session}>
             <Card style={{ maxWidth: '100%' }}>
               <CardHeader>
                 <ButtonToolbar style={{ justifyContent: 'space-between' }}>
@@ -1054,7 +1211,7 @@ export default class Maintenance extends React.Component {
                   </ButtonGroup>
                   <span>
                     <Badge theme='secondary' style={{ fontSize: '2rem', marginRight: '20px' }} outline>
-                      {maintenance.id}
+                      {maintenanceIdDisplay}
                     </Badge>
                     <h2 style={{ display: 'inline-block', marginBottom: '0px' }}>{maintenance.name}</h2>
                   </span>
@@ -1070,8 +1227,8 @@ export default class Maintenance extends React.Component {
                         Calendar
                         </Button>
                         <Button onClick={this.handleSaveOnClick}>
-                          <FontAwesomeIcon icon={faSave} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
-                        Save
+                          <FontAwesomeIcon icon={faPlusCircle} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
+                        Create
                         </Button>
                       </ButtonGroup>
                     ) : (
@@ -1091,19 +1248,14 @@ export default class Maintenance extends React.Component {
                               <Col style={{ width: '30vw' }}>
                                 <FormGroup>
                                   <label htmlFor='edited-by'>Created By</label>
-                                  <FormInput readOnly id='edited-by-input' name='edited-by' type='text' value={maintenance.bearbeitetvon} onChange={this.handleCreatedByChange} />
+                                  <FormInput tabIndex='-1' readOnly id='edited-by-input' name='edited-by' type='text' value={maintenance.bearbeitetvon} onChange={this.handleCreatedByChange} />
                                 </FormGroup>
                                 <FormGroup>
                                   <label htmlFor='updated-by'>Last Updated By</label>
                                   <FormInput readOnly id='updated-by' name='updated-by' type='text' value={maintenance.updatedBy} />
                                 </FormGroup>
                                 <FormGroup>
-                                  <label htmlFor='supplier'>Supplier</label>
-                                  <FormInput id='supplier-input' name='supplier' type='text' value={maintenance.name} />
-                                </FormGroup>
-                                <FormGroup>
                                   <label htmlFor='start-datetime'>Start Date/Time</label>
-                                  {/* <FormInput id='start-datetime' name='start-datetime' type='text' value={this.convertDateTime(maintenance.startDateTime)} /> */}
                                   <KeyboardDateTimePicker
                                     value={maintenance.startDateTime || null}
                                     onChange={date => this.handleStartDate(date)}
@@ -1111,23 +1263,65 @@ export default class Maintenance extends React.Component {
                                     autoOk
                                     ampm={false}
                                     format='dd.MM.yyyy HH:mm'
-                                    // onClose={() => this.handleDateTimeSave('start')}
                                     onBlur={() => this.handleDateTimeSave('start')}
                                     variant='inline'
                                     disableToolbar
                                     inputVariant='outlined'
                                   />
                                 </FormGroup>
-                                {/* todo: Timezone after Start/End Time */}
+                                <FormGroup>
+                                  <label htmlFor='supplier'>Timezone</label>
+                                  {/* <Select
+                                    value={maintenance.incomingTimezone}
+                                    onChange={this.handleTimezoneChange}
+                                    options={this.state.lieferantcids}
+                                    isMulti
+                                    noOptionsMessage={() => 'No CIDs for this Supplier'}
+                                    placeholder='Please select a CID'
+                                    onBlur={this.handleTimezoneBlur}
+                                  /> */}
+                                  <SelectTimezone
+                                    value={maintenance.incomingTimezone} // the default, so you can omit if you don't need other value
+                                    isClearable // allows user to have null value in this select
+                                    guess // this will fill the input with user's timezone guessed by moment. A "value" prop has always bigger priority than guessed TZ
+                                    onChange={(val) => { this.handleTimezoneChange(val) }}
+                                  />
+                                </FormGroup>
+                                <FormGroup>
+                                  <label htmlFor='supplier'>Supplier</label>
+                                  <FormInput id='supplier-input' name='supplier' type='text' value={maintenance.name} />
+                                </FormGroup>
                               </Col>
                               <Col style={{ width: '30vw' }}>
                                 <FormGroup>
                                   <label htmlFor='maileingang'>Mail Arrived</label>
-                                  <FormInput readOnly id='maileingang-input' name='maileingang' type='text' value={this.convertDateTime(maintenance.maileingang)} />
+                                  <FormInput tabIndex='-1' readOnly id='maileingang-input' name='maileingang' type='text' value={this.convertDateTime(maintenance.maileingang)} />
                                 </FormGroup>
                                 <FormGroup>
                                   <label htmlFor='updated-at'>Updated At</label>
-                                  <FormInput readOnly id='updated-at' name='updated-at' type='text' value={this.convertDateTime(maintenance.updatedAt)} />
+                                  <FormInput tabIndex='-1' readOnly id='updated-at' name='updated-at' type='text' value={this.convertDateTime(maintenance.updatedAt)} />
+                                </FormGroup>
+                                <FormGroup>
+                                  <label htmlFor='end-datetime'>End Date/Time</label>
+                                  <KeyboardDateTimePicker
+                                    value={maintenance.endDateTime || null}
+                                    onChange={date => this.handleEndDate(date)}
+                                    animateYearScrolling
+                                    autoOk
+                                    ampm={false}
+                                    format='dd.MM.yyyy HH:mm'
+                                    onBlur={() => this.handleDateTimeSave('end')}
+                                    variant='inline'
+                                    // disableToolbar
+                                    inputVariant='outlined'
+                                    InputProps={{
+                                      style: {
+                                        '&$hover': {
+                                          border: 'none'
+                                        }
+                                      }
+                                    }}
+                                  />
                                 </FormGroup>
                                 <FormGroup>
                                   <label htmlFor='their-cid'>Their CID</label>
@@ -1139,30 +1333,6 @@ export default class Maintenance extends React.Component {
                                     noOptionsMessage={() => 'No CIDs for this Supplier'}
                                     placeholder='Please select a CID'
                                     onBlur={this.handleCIDBlur}
-                                  />
-                                </FormGroup>
-                                <FormGroup>
-                                  <label htmlFor='end-datetime'>End Date/Time</label>
-                                  {/* <FormInput id='end-datetime' name='end-datetime' type='text' value={this.convertDateTime(maintenance.endDateTime)} /> */}
-                                  <KeyboardDateTimePicker
-                                    value={maintenance.endDateTime || null}
-                                    onChange={date => this.handleEndDate(date)}
-                                    animateYearScrolling
-                                    autoOk
-                                    ampm={false}
-                                    format='dd.MM.yyyy HH:mm'
-                                    // onClose={() => this.handleDateTimeSave('end')}
-                                    onBlur={() => this.handleDateTimeSave('end')}
-                                    variant='inline'
-                                    disableToolbar
-                                    inputVariant='outlined'
-                                    InputProps={{
-                                      style: {
-                                        '&$hover': {
-                                          border: 'none'
-                                        }
-                                      }
-                                    }}
                                   />
                                 </FormGroup>
                               </Col>
@@ -1187,7 +1357,7 @@ export default class Maintenance extends React.Component {
                                 </Row>
                                 <FormGroup>
                                   <label htmlFor='reason'>Reason</label>
-                                  <FormTextarea id='reason' name='reason' onChange={this.handleReasonChange} type='text' value={maintenance.reason} />
+                                  <FormTextarea id='reason' name='reason' onBlur={() => this.handleTextInputBlur('reason')} onChange={this.handleReasonChange} type='text' value={maintenance.reason} />
                                 </FormGroup>
                               </Col>
                             </Row>
@@ -1199,7 +1369,7 @@ export default class Maintenance extends React.Component {
                                   <Badge theme='light' outline>
                                     <label>
                                       <Toggle
-                                        checked={maintenance.cancelled === "false" ? false : !!maintenance.cancelled}
+                                        checked={maintenance.cancelled === 'false' ? false : !!maintenance.cancelled}
                                         onChange={(event) => this.handleToggleChange('cancelled', event)}
                                       />
                                       <div style={{ marginTop: '10px' }}>Cancelled</div>
@@ -1212,7 +1382,7 @@ export default class Maintenance extends React.Component {
                                           checked: <FontAwesomeIcon icon={faFirstAid} width='0.5em' style={{ color: '#fff' }} />,
                                           unchecked: null
                                         }}
-                                        checked={maintenance.emergency === "false" ? false : !!maintenance.emergency}
+                                        checked={maintenance.emergency === 'false' ? false : !!maintenance.emergency}
                                         onChange={(event) => this.handleToggleChange('emergency', event)}
                                       />
                                       <div style={{ marginTop: '10px' }}>Emergency</div>
@@ -1221,7 +1391,7 @@ export default class Maintenance extends React.Component {
                                   <Badge theme='secondary' outline>
                                     <label>
                                       <Toggle
-                                        checked={maintenance.done === "false" ? false : !!maintenance.done}
+                                        checked={maintenance.done === 'false' ? false : !!maintenance.done}
                                         onChange={(event) => this.handleToggleChange('done', event)}
                                       />
                                       <div style={{ marginTop: '10px' }}>Done</div>
@@ -1308,14 +1478,38 @@ export default class Maintenance extends React.Component {
                         Calendar
                       </Button>
                       <Button>
-                        <FontAwesomeIcon icon={faSave} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
-                        Save
+                        <FontAwesomeIcon icon={faPlusCircle} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
+                        Create
                       </Button>
                     </ButtonGroup>
                   ) : (
                     <span />
                   )}
               </CardFooter>
+              {/* <ReactModal initWidth={800} initHeight={400} onRequestClose={this.toggleReadModal} isOpen={openReadModal}>
+                <ModalHeader>
+                  <img className='mail-icon' src={`https://besticon-demo.herokuapp.com/icon?size=40..100..360&url=${this.state.maintenance.incomingDomain}`} />
+                  <div className='modal-incoming-header-text'>
+                    <h5 className='modal-incoming-from'>{this.state.maintenance.incomingFrom}</h5>
+                    <small className='modal-incoming-subject'>{this.state.maintenance.incomingSubject}</small><br />
+                    <small className='modal-incoming-datetime'>{this.state.maintenance.incomingDate}</small>
+                  </div>
+                  <Button id='translate-tooltip' style={{ padding: '0.7em 0.9em' }} onClick={this.handleTranslate.bind(this)}>
+                    <FontAwesomeIcon width='1.5em' className='translate-icon' icon={faLanguage} />
+                  </Button>
+                </ModalHeader>
+                <Tooltip
+                  open={this.state.translateTooltipOpen}
+                  target='#translate-tooltip'
+                  toggle={this.toggleTooltip}
+                  placement='bottom'
+                  noArrow
+                >
+                    Translate
+                </Tooltip>
+                <ModalBody className='mail-body' dangerouslySetInnerHTML={{ __html: this.state.translated ? this.state.translatedBody : this.state.maintenance.incomingBody }} />
+              </ReactModal> */}
+
               <Modal className='mail-modal-body' animation backdrop backdropClassName='modal-backdrop' open={openReadModal} size='lg' toggle={this.toggleReadModal}>
                 <ModalHeader>
                   <img className='mail-icon' src={`https://besticon-demo.herokuapp.com/icon?size=40..100..360&url=${this.state.maintenance.incomingDomain}`} />
@@ -1378,6 +1572,19 @@ export default class Maintenance extends React.Component {
               </Modal>
             </Card>
             <style jsx>{`
+              :global(div[class$="-singleValue"]) {
+                font-size: 0.95rem;
+                color: #495057;
+              }
+              :global(.form-group > label) {
+                margin: 10px !important;
+              }
+              :global(.form-group) {
+                margin-bottom: 0px !important;
+              }
+              :global(.container) {
+                padding: 15px;
+              }
               .mail-icon {
                 width: 96px;
                 height: 96px;
@@ -1508,6 +1715,39 @@ export default class Maintenance extends React.Component {
               :global(.modal-content) {
                 max-height: calc(${this.state.windowInnerHeight}px - 50px);
               }
+              :global(.flexible-modal) {
+                position: absolute;
+                z-index: 1;
+                border: 1px solid #ccc;
+                background: white;
+                overflow-y: scroll;
+              }
+              :global(.flexible-modal-mask) {
+                position: fixed;
+                height: 100%;
+                background: rgba(55, 55, 55, 0.6);
+                top:0;
+                left:0;
+                right:0;
+                bottom:0;
+              }
+              :global(.flexible-modal-resizer) {
+                position:absolute;
+                right:0;
+                bottom:0;
+                cursor:se-resize;
+                margin:5px;
+                border-bottom: solid 2px #333;
+                border-right: solid 2px #333;
+              }
+              :global(.flexible-modal-drag-area) {
+                background: #007bff;
+                height: 50px;
+                position:absolute;
+                right:0;
+                top:0;
+                cursor:move;
+              }
               @media only screen and (max-width: 500px) {
                 :global(div.btn-toolbar > .btn-group-md) {
                   margin-right: 20px;
@@ -1528,10 +1768,6 @@ export default class Maintenance extends React.Component {
                 }
                 :global(.card-body) {
                   padding: 0px;
-                }
-                :global(.col) {
-                  {/* padding-left: 5px;
-                  padding-right: 5px; */}
                 }
               }
             `}

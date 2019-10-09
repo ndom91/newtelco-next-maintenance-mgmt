@@ -34,6 +34,9 @@ export default class Layout extends React.Component {
             </Col>
           </Row>
           <style jsx>{`
+            :global(.toplevel-col) {
+              margin-bottom: 50px !important;
+            }
             @media only screen and (min-width: 1024px) {
               :global(div.toplevel-col) {
                 flex: 1;

@@ -6,3 +6,4 @@ out
 oauth*.json
 serviceacct.json
 ecosystem.config.js.og
+ecosystem.config.js

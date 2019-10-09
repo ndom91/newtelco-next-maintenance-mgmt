@@ -4,8 +4,9 @@ import Layout from '../src/components/layout'
 import { AgGridReact } from 'ag-grid-react'
 import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-material.css'
-import Link from 'next/link'
 import fetch from 'isomorphic-unfetch'
+import Select from 'react-select'
+import Link from 'next/link'
 import { NextAuth } from 'next-auth/client'
 import RequireLogin from '../src/components/require-login'
 import Footer from '../src/components/footer'
@@ -15,6 +16,7 @@ import EndDateTime from '../src/components/ag-grid/enddatetime'
 import MailArrived from '../src/components/ag-grid/mailarrived'
 import UpdatedAt from '../src/components/ag-grid/updatedat'
 import Supplier from '../src/components/ag-grid/supplier'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import UseAnimations from 'react-useanimations'
 import {
   Card,
@@ -22,22 +24,39 @@ import {
   CardBody,
   ButtonToolbar,
   ButtonGroup,
-  Button
+  Button,
+  Modal,
+  ModalHeader,
+  ModalBody,
+  Container,
+  FormGroup,
+  Col,
+  Row,
+  FormInput
 } from 'shards-react'
+import {
+  faPlusCircle
+} from '@fortawesome/free-solid-svg-icons'
 
 // { maintenances, page, pageCount }
-export default class About extends React.Component {
+export default class History extends React.Component {
   static async getInitialProps ({ req, query }) {
     const host = req ? req.headers['x-forwarded-host'] : location.host
     const pageRequest = `https://${host}/api/maintenances`
     const res = await fetch(pageRequest)
     const json = await res.json()
-    const pageRequest2 = `https://api.${host}/inbox/count` 
+    const pageRequest2 = `https://api.${host}/inbox/count`
     const res2 = await fetch(pageRequest2)
     const count = await res2.json()
+    let display
+    if (count === 'No unread emails') {
+      display = 0
+    } else {
+      display = count.count
+    }
     return {
       jsonData: json,
-      unread: count,
+      unread: display,
       session: await NextAuth.init({ req })
     }
   }
@@ -45,6 +64,10 @@ export default class About extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
+      openNewModal: false,
+      newMaintenanceCompany: '',
+      newCompMailDomain: '',
+      newMaintCompanies: [],
       gridOptions: {
         defaultColDef: {
           resizable: true,
@@ -117,16 +140,35 @@ export default class About extends React.Component {
           supplier: Supplier
         },
         rowSelection: 'multiple',
-        // rowMultiSelectWithClick: true,
         paginationPageSize: 10,
         rowClass: 'row-class',
         rowClassRules: {
-          'row-completed': function (params) { return params.data.done === "1" },
-          'row-cancelled': function (params) { return params.data.cancelled === "1" },
-          'row-emergency': function (params) { return params.data.emergency === "1" }
+          'row-completed': function (params) {
+            const completed = params.data.completed
+            if (completed === 'true' || completed === '1') {
+              return true
+            }
+            return false
+          },
+          'row-cancelled': function (params) {
+            const cancelled = params.data.cancelled
+            if (cancelled === 'true' || cancelled === '1') {
+              return true
+            }
+            return false
+          },
+          'row-emergency': function (params) {
+            const emergency = params.data.emergency
+            if (emergency === 'true' || emergency === '1') {
+              return true
+            }
+            return false
+          }
         }
       }
     }
+    this.toggleNewModal = this.toggleNewModal.bind(this)
+    this.handleNewCompanySelect = this.handleNewCompanySelect.bind(this)
   }
 
   componentDidMount () {
@@ -140,7 +182,6 @@ export default class About extends React.Component {
   }
 
   onFirstDataRendered (params) {
-    console.log(params)
     // params.columnApi.autoSizeColumns()
     // params.columnApi.sizeColumnsToFit()
   }
@@ -158,25 +199,49 @@ export default class About extends React.Component {
   }
 
   handleRowDoubleClick (event) {
-    console.log(event.api)
     // this.gridApi.getDisplayedRowAtIndex(event.rowIndex).setSelected(true)
+  }
+
+  toggleNewModal () {
+    this.setState({
+      openNewModal: !this.state.openNewModal
+    })
+    const host = window.location.host
+    fetch(`https://${host}/api/companies/select`, {
+      method: 'get'
+    })
+      .then(resp => resp.json())
+      .then(data => {
+        this.setState({
+          newMaintCompanies: data.companiesDomains
+        })
+      })
+  }
+
+  handleNewCompanySelect (selectedOption) {
+    this.setState({
+      newCompMailDomain: selectedOption.value
+    })
   }
 
   render () {
     if (this.props.session.user) {
       return (
-        <Layout unread={this.props.unread.count} session={this.props.session}>
+        <Layout unread={this.props.unread} session={this.props.session}>
           <Card style={{ maxWidth: '100%' }}>
             <CardHeader>
               <ButtonToolbar style={{ justifyContent: 'space-between' }}>
                 <h2 style={{ marginBottom: '0px' }}>History</h2>
                 <ButtonGroup size='md'>
                   <Button disabled outline theme='dark' className='export-btn' onClick={this.handleGridExport}>
-                    {/* <FontAwesomeIcon icon={faSave} width='1em' style={{ marginRight: '10px', color: 'secondary' }} /> */}
                     <UseAnimations animationKey='download' size={22} style={{ display: 'inline-block', fill: 'rgb(0,0,0)' }} />
                     <span style={{ marginLeft: '5px' }}>
                       Export
                     </span>
+                  </Button>
+                  <Button onClick={this.toggleNewModal} theme='dark'>
+                    <FontAwesomeIcon icon={faPlusCircle} width='1.5em' style={{ marginRight: '10px', color: 'secondary' }} />
+                    New
                   </Button>
                 </ButtonGroup>
               </ButtonToolbar>
@@ -211,6 +276,49 @@ export default class About extends React.Component {
             }
           `}
           </style>
+          <Modal className='mail-modal-body' animation backdrop backdropClassName='modal-backdrop' open={this.state.openNewModal} size='lg' toggle={this.toggleNewModal}>
+            <ModalHeader />
+            <ModalBody className='mail-body'>
+              <Container>
+                <Row>
+                  <h2>New Maintenance</h2>
+                </Row>
+                <Row>
+                  <Col>
+                    <FormGroup>
+                      <label htmlFor='selectCompany'>
+                        Company
+                      </label>
+                      <Select
+                        value={this.state.newMaintenanceCompany || undefined}
+                        onChange={this.handleNewCompanySelect}
+                        options={this.state.newMaintCompanies}
+                        placeholder='Please select a Company'
+                      />
+                    </FormGroup>
+                  </Col>
+                </Row>
+                <Row>
+                  <Link
+                    href={{
+                      pathname: '/maintenance',
+                      query: {
+                        id: 'NEW',
+                        mailId: null,
+                        name: this.state.newCompMailDomain
+                      }
+                    }}
+                    as='/maintenance/new'
+                  >
+                    <Button outline theme='primary'>
+                      Go
+                    </Button>
+                  </Link>
+                </Row>
+
+              </Container>
+            </ModalBody>
+          </Modal>
         </Layout>
       )
     } else {

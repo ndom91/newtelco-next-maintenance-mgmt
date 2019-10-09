@@ -125,6 +125,7 @@ export default class CustomerCIDs extends React.Component {
               gridOptions={this.state.gridOptions}
               onGridReady={this.handleGridReady}
               animateRows
+              stopEditingWhenGridLosesFocus
               onFirstDataRendered={this.onFirstDataRendered.bind(this)}
             />
           </div>

@@ -23,8 +23,14 @@ class Settings extends React.Component {
     const pageRequest2 = `https://api.${host}/inbox/count`
     const res2 = await fetch(pageRequest2)
     const count = await res2.json()
+    let display
+    if (count === 'No unread emails') {
+      display = 0
+    } else {
+      display = count.count
+    }
     return {
-      unread: count,
+      unread: display,
       session: await NextAuth.init({ req })
     }
   }
@@ -83,7 +89,7 @@ class Settings extends React.Component {
 
     if (this.props.session.user) {
       return (
-        <Layout unread={this.props.unread.count} session={this.props.session}>
+        <Layout unread={this.props.unread} session={this.props.session}>
           <Card style={{ maxWidth: '100%' }}>
             <CardHeader>
               <h2>Settings</h2>

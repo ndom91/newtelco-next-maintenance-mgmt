@@ -3,7 +3,7 @@ const escape = require('sql-template-strings')
 
 module.exports = async (req, res) => {
   const lieferantId = req.query.id
-  const lieferantCIDsResult = await db.query(escape`
+  const lieferantCIDsResult = await db.query(`
     SELECT lieferantCID.id as value, lieferantCID.derenCID as label FROM lieferantCID WHERE lieferantCID.lieferant LIKE ${lieferantId}
   `)
   const count = await db.query(escape`

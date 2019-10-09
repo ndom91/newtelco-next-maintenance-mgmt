@@ -17,7 +17,6 @@ import {
 } from 'shards-react'
 
 const people = ['fwaleska', 'alissitsin', 'sstergiou']
-const modifyValueDomain = () => [0, 30]
 
 export default class Blog extends React.Component {
   static async getInitialProps ({ res, req }) {
@@ -43,14 +42,11 @@ export default class Blog extends React.Component {
     const pageRequest2 = `https://api.${host}/inbox/count`
     const res2 = await fetch(pageRequest2)
     const count = await res2.json()
-    console.log(count)
     let display
     if (count === 'No unread emails') {
-      console.log('1')
       display = 0
     } else {
-      console.log('2')
-      display = count
+      display = count.count
     }
     return {
       jsonData: json,
@@ -76,6 +72,29 @@ export default class Blog extends React.Component {
         weeks: []
       }
     }
+    this.checkUnreadCount = this.checkUnreadCount.bind(this)
+  }
+
+  checkUnreadCount () {
+    const host = window.location.host
+    fetch(`https://api.${host}/inbox/count`, {
+      method: 'get'
+    })
+      .then(resp => resp.json())
+      .then(data => {
+        let display
+        console.log(data)
+        if (data === 'No unread emails') {
+          display = 0
+        } else {
+          display = data.count
+        }
+        console.log('loop ' + new Date())
+        this.setState({
+          unread: display
+        })
+      })
+      .catch(err => console.error(`Error - ${err}`))
   }
 
   fetchPersonStats (person) {
@@ -85,7 +104,6 @@ export default class Blog extends React.Component {
     })
       .then(resp => resp.json())
       .then(data => {
-        // console.log(data)
         const keyArray = data.weekCountResults.map(item => item.yValue)
         this.setState({
           [person]: {
@@ -100,9 +118,15 @@ export default class Blog extends React.Component {
   componentDidMount () {
     Fonts()
 
+    // Keep Inbox Count uptodate
+    this.unreadInterval = setTimeout(() => this.checkUnreadCount, 60 * 100000)
     people.forEach(person => {
       this.fetchPersonStats(person)
     })
+  }
+
+  componentWillUnmount () {
+    clearInterval(this.unreadInterval)
   }
 
   render () {
@@ -143,6 +167,31 @@ export default class Blog extends React.Component {
             <Footer />
           </Card>
           <style jsx>{`
+            @media only screen and (max-width: 500px) {
+              :global(.card-container) {
+                flex-wrap: wrap;
+              }
+              :global(.card-container > div) {
+                margin: 20px 0;
+              }
+              :global(.card-badge) {
+                font-size: 151px !important;
+              }
+              :global(.card-person-badge:first-of-type) {
+                height: 160px;
+              }
+              :global(.card-person-badge) {
+                font-size: 58px !important;
+              }
+              :global(.card-person-badge > svg) {
+                bottom: 61px !important;
+              }
+              :global(.card-inbox-activity) {
+                top: 50px !important;
+                left: 12% !important;
+                width: 76px !important;
+              }
+            }
             :global(.card-person-badge > svg) {
               position: absolute;
               left: 0px;

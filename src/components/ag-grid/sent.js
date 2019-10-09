@@ -10,11 +10,15 @@ import {
 
 export default class SentIcon extends Component {
   render () {
-    if (this.props.node.data.sent === 1) {
+    const {
+      sent
+    } = this.props.node.data
+
+    if (sent === '1' || sent === 'true') {
       return (
         <FontAwesomeIcon style={{ fontSize: '18px' }} width='1.5em' icon={faCheck} />
       )
-    } else if (this.props.node.data.sent === 0) {
+    } else if (sent === '0' || sent === 'false') {
       return (
         <FontAwesomeIcon style={{ fontSize: '18px' }} width='1.5em' icon={faCircle} />
       )
