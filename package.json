@@ -15,7 +15,6 @@
   "dependencies": {
     "@bugsnag/js": "^6.4.1",
     "@bugsnag/plugin-react": "^6.4.0",
-    "@capaj/react-select-timezone": "^2.0.1",
     "@date-io/date-fns": "^1.3.11",
     "@fortawesome/fontawesome-svg-core": "^1.2.25",
     "@fortawesome/free-brands-svg-icons": "^5.11.2",

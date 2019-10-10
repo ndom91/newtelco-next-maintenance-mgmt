@@ -7,8 +7,9 @@ module.exports = async (req, res) => {
   const lieferant = req.query.lieferant
   const mailId = req.query.mailId
   const updatedAt = req.query.updatedAt
+  const incomingMailDate = req.query.maileingang
 
-  const insertQuery = await db.query(escape`INSERT INTO maintenancedb (bearbeitetvon, receivedmail, lieferant, updatedAt) VALUES (${bearbeitetvon}, ${mailId}, ${lieferant}, ${updatedAt});`)
+  const insertQuery = await db.query(escape`INSERT INTO maintenancedb (bearbeitetvon, receivedmail, lieferant, updatedAt, maileingang) VALUES (${bearbeitetvon}, ${mailId}, ${lieferant}, ${updatedAt}), ${incomingMailDate};`)
   const getLastInsertedID = await db.query('SELECT LAST_INSERT_ID();')
   const newId = getLastInsertedID[0]
 

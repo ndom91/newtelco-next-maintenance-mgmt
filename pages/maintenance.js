@@ -12,15 +12,16 @@ import Toggle from 'react-toggle'
 import './style/maintenance.css'
 import cogoToast from 'cogo-toast'
 import Select from 'react-select'
+import makeAnimated from 'react-select/animated'
 import Router from 'next/router'
-import {Helmet} from "react-helmet";
+import { Helmet } from 'react-helmet'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Editor as TinyEditor } from '@tinymce/tinymce-react'
 import { format, isValid } from 'date-fns'
 import DateFnsUtils from '@date-io/date-fns'
 import { zonedTimeToUtc, format as formatTz } from 'date-fns-tz'
 import { Rnd } from 'react-rnd'
-import SelectTimezone, { getTimezoneProps } from '@capaj/react-select-timezone'
+import { Timezones } from '../src/components/timezone/timezones.js'
 import { KeyboardDateTimePicker, MuiPickersUtilsProvider } from '@material-ui/pickers'
 import { createMuiTheme } from '@material-ui/core/styles'
 import {
@@ -51,8 +52,7 @@ import {
   FormInput,
   Modal,
   ModalHeader,
-  ModalBody,
-  Tooltip
+  ModalBody
 } from 'shards-react'
 
 const theme = createMuiTheme({
@@ -72,6 +72,8 @@ const theme = createMuiTheme({
     }
   }
 })
+
+const animatedComponents = makeAnimated()
 
 export default class Maintenance extends React.Component {
   static async getInitialProps ({ req, query }) {
@@ -328,7 +330,6 @@ export default class Maintenance extends React.Component {
       }
     }
 
-
     if (this.props.jsonData.profile.id === 'NEW') {
       const {
         email
@@ -485,7 +486,6 @@ export default class Maintenance extends React.Component {
       })
         .then(resp => resp.json())
         .then(data => {
-
           let mailBody
           const htmlRegex = new RegExp(/<(?:"[^"]*"[`"]*|'[^']*'['"]*|[^'">])+>/, 'gi')
           // const htmlRegex2 = new RegExp('<([a-z]+)[^>]*(?<!/)>', 'gi')
@@ -994,9 +994,8 @@ export default class Maintenance extends React.Component {
     })
   }
 
-  handleTimezoneChange (val) {
-    const timezoneProps = getTimezoneProps(val)
-    const zoneLabel = timezoneProps.value
+  handleTimezoneChange (selection) {
+    const zoneLabel = selection.value
     this.setState({
       maintenance: {
         ...this.state.maintenance,
@@ -1050,7 +1049,7 @@ export default class Maintenance extends React.Component {
   handleSaveOnClick (event) {
     const {
       bearbeitetvon,
-      incomingDate,
+      maileingang,
       lieferant,
       mailId,
       updatedAt
@@ -1058,10 +1057,11 @@ export default class Maintenance extends React.Component {
 
     // console.log(Date.parse(incomingDate))
     // const incomingFormatted = format(incomingDate, 'YYYY-MM-DD HH:mm:ss')
+    const incomingFormatted = format(new Date(maileingang), 'YYYY-MM-DD HH:mm:ss')
     const updatedAtFormatted = format(new Date(updatedAt), 'yyyy-MM-dd HH:mm:ss')
 
     const host = window.location.host
-    fetch(`https://${host}/api/maintenances/save/create?bearbeitetvon=${bearbeitetvon}&lieferant=${lieferant}&mailId=${mailId}&updatedAt=${updatedAtFormatted}`, {
+    fetch(`https://${host}/api/maintenances/save/create?bearbeitetvon=${bearbeitetvon}&lieferant=${lieferant}&mailId=${mailId}&updatedAt=${updatedAtFormatted}&maileingang=${incomingFormatted}`, {
       method: 'get'
     })
       .then(resp => resp.json())
@@ -1121,6 +1121,12 @@ export default class Maintenance extends React.Component {
         }
       })
       .catch(err => console.error(err))
+  }
+
+  handleLoadTimezones = input => {
+    new Promise(resolve => {
+      resolve(Timezones)
+    })
   }
 
   render () {
@@ -1215,21 +1221,24 @@ export default class Maintenance extends React.Component {
                                 </FormGroup>
                                 <FormGroup>
                                   <label htmlFor='supplier'>Timezone</label>
-                                  {/* <Select
-                                    value={maintenance.incomingTimezone}
-                                    onChange={this.handleTimezoneChange}
-                                    options={this.state.lieferantcids}
-                                    isMulti
-                                    noOptionsMessage={() => 'No CIDs for this Supplier'}
-                                    placeholder='Please select a CID'
-                                    onBlur={this.handleTimezoneBlur}
+                                  {/* <AsyncSelect
+                                    // value={maintenance.incomingTimezone}
+                                    // onChange={(val) => this.handleTimezoneChange(val)}
+                                    // loadOptions={Timezones}
+                                    cacheOptions
+                                    defaultOptions
                                   /> */}
-                                  <SelectTimezone
+                                  <Select
+                                    value={this.state.incomingTimezone}
+                                    onChange={this.handleTimezoneChange}
+                                    options={Timezones}
+                                  />
+                                  {/* <SelectTimezone
                                     value={maintenance.incomingTimezone} // the default, so you can omit if you don't need other value
                                     isClearable // allows user to have null value in this select
                                     guess // this will fill the input with user's timezone guessed by moment. A "value" prop has always bigger priority than guessed TZ
                                     onChange={(val) => { this.handleTimezoneChange(val) }}
-                                  />
+                                  /> */}
                                 </FormGroup>
                                 <FormGroup>
                                   <label htmlFor='supplier'>Supplier</label>
@@ -1273,6 +1282,7 @@ export default class Maintenance extends React.Component {
                                     value={this.state.selectedLieferant || undefined}
                                     onChange={this.handleSelectLieferantChange}
                                     options={this.state.lieferantcids}
+                                    components={animatedComponents}
                                     isMulti
                                     noOptionsMessage={() => 'No CIDs for this Supplier'}
                                     placeholder='Please select a CID'
@@ -1466,11 +1476,13 @@ export default class Maintenance extends React.Component {
                         </div>
                         <ButtonGroup style={{ display: 'flex', flexDirection: 'column' }}>
                           <Button outline className='close-read-modal-btn' theme='light' style={{ borderRadius: '5px 5px 0 0', padding: '0.7em 0.9em' }} onClick={this.toggleReadModal}>
-                            <FontAwesomeIcon className='close-read-modal-icon' width='1.5em' style={{ color: 'var(--light)', fontSize: '20px'}}
-                            icon={faTimesCircle} />
+                            <FontAwesomeIcon
+                              className='close-read-modal-icon' width='1.5em' style={{ color: 'var(--light)', fontSize: '12px' }}
+                              icon={faTimesCircle}
+                            />
                           </Button>
                           <Button theme='light' style={{ borderRadius: '0 0 5px 5px', padding: '0.7em 0.9em' }} onClick={this.handleTranslate.bind(this)}>
-                            <FontAwesomeIcon width='1.5em' style={{ fontSize: '20px' }} className='translate-icon' icon={faLanguage} />
+                            <FontAwesomeIcon width='1.5em' style={{ fontSize: '12px' }} className='translate-icon' icon={faLanguage} />
                           </Button>
                         </ButtonGroup>
                       </ModalHeader>
@@ -1494,7 +1506,7 @@ export default class Maintenance extends React.Component {
                     </div>
                   </div>
                   <Button id='send-mail-btn' style={{ padding: '0.9em 1.1em' }} onClick={this.sendMail}>
-                    <FontAwesomeIcon width='1.5em' style={{ fontSize: '20px' }} className='modal-preview-send-icon' icon={faPaperPlane} />
+                    <FontAwesomeIcon width='1.5em' style={{ fontSize: '12px' }} className='modal-preview-send-icon' icon={faPaperPlane} />
                   </Button>
                 </ModalHeader>
                 <ModalBody>

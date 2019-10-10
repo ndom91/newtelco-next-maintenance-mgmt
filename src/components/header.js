@@ -136,7 +136,9 @@ class Header extends React.Component {
             z-index: 1;
             color: #fff;
             opacity: 0.5;
-            
+          }
+          :global(.nav-link) {
+            text-decoration: none;
           }
           :global(.input-group-prepend) {
             pointer-events: none !important;

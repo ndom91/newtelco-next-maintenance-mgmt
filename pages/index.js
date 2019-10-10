@@ -141,12 +141,18 @@ export default class Blog extends React.Component {
               <Container className='card-container'>
                 <Card className='card-inboxUnread'>
                   <Link href='/inbox'>
-                    <Badge className='card-badge'>{this.props.unread}</Badge>
+                    <a href='/inbox'>
+                      <Badge className='card-badge'>{this.props.unread}</Badge>
+                    </a>
                   </Link>
-                  <CardBody>
-                    <p className='card-body-text'>Unread</p>
-                    <UseAnimations animationKey='activity' size={96} className='card-inbox-activity' />
-                  </CardBody>
+                  <Link href='/inbox'>
+                    <a href='/inbox'>
+                      <CardBody className='card-unread-body'>
+                        <UseAnimations animationKey='activity' size={96} className='card-inbox-activity' />
+                        <p className='card-body-text'>Unread</p>
+                      </CardBody>
+                    </a>
+                  </Link>
                 </Card>
                 {people.map(person => {
                   return (
@@ -190,6 +196,7 @@ export default class Blog extends React.Component {
                 bottom: 61px !important;
               }
               :global(.card-inbox-activity) {
+                pointer-events: none;
                 top: 50px !important;
                 left: 12% !important;
                 width: 76px !important;
@@ -209,6 +216,12 @@ export default class Blog extends React.Component {
             }
             :global(.card-badge) {
               font-size: 196px;
+              cursor: pointer;
+            }
+            :global(.card-unread-body) {
+              cursor: pointer;
+              text-decoration: none;
+              color: var(--secondary);
             }
             :global(.card-person-badge) {
               padding: 40px;

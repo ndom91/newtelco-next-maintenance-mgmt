@@ -16,15 +16,15 @@ export default class SentIcon extends Component {
 
     if (sent === '1' || sent === 'true') {
       return (
-        <FontAwesomeIcon style={{ fontSize: '18px' }} width='1.5em' icon={faCheck} />
+        <FontAwesomeIcon style={{ fontSize: '12px' }} width='1.5em' icon={faCheck} />
       )
     } else if (sent === '0' || sent === 'false') {
       return (
-        <FontAwesomeIcon style={{ fontSize: '18px' }} width='1.5em' icon={faCircle} />
+        <FontAwesomeIcon style={{ fontSize: '12px' }} width='1.5em' icon={faCircle} />
       )
     } else {
       return (
-        <FontAwesomeIcon style={{ fontSize: '18px' }} width='1.5em' icon={faQuestion} />
+        <FontAwesomeIcon style={{ fontSize: '12px' }} width='1.5em' icon={faQuestion} />
       )
     }
   }
