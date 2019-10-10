@@ -7,7 +7,7 @@ module.exports = async (req, res) => {
     select count(*) as yValue,
           str_to_date(concat(yearweek(maileingang), ' monday'), '%X%V %W') as \`xValue\`
     from maintenancedb 
-    where bearbeitetvon like ${person} AND active LIKE '1'
+    where bearbeitetvon like ${person} AND active LIKE '1' AND done LIKE '1'
     group by yearweek(maileingang)  
     ORDER BY \`xValue\` DESC
     LIMIT 10

@@ -91,11 +91,31 @@ export default class Inbox extends React.Component {
 
     if (mailId) {
       const activeMail = inboxMails.findIndex(el => el.id === mailId)
+
+      let mailBody = inboxMails[activeMail].body
+      const htmlRegex = new RegExp(/<(?:"[^"]*"[`"]*|'[^']*'['"]*|[^'">])+>/, 'gi')
+      // const htmlRegex2 = new RegExp('<([a-z]+)[^>]*(?<!/)>', 'gi')
+      // const htmlRegex3 = new RegExp('<meta .*>', 'gi')
+
+      // console.log(htmlRegex.test(data.body))
+
+      if (htmlRegex.test(mailBody)) {
+        console.log('html true')
+        this.setState({
+          incomingMailIsHtml: true
+        })
+      } else {
+        console.log('html false')
+        mailBody = `<pre>${mailBody}</pre>`
+        this.setState({
+          incomingMailIsHtml: false
+        })
+      }
       this.setState({
         open: !this.state.open,
         modalSubject: inboxMails[activeMail].subject,
         modalFrom: inboxMails[activeMail].from,
-        modalBody: inboxMails[activeMail].body
+        modalBody: mailBody
       })
     } else {
       this.setState({
@@ -350,6 +370,7 @@ export default class Inbox extends React.Component {
             }
             :global(#translate-tooltip) {
               transition: all 200ms ease-in-out;
+              min-height: 60px;
             }
             :global(.mail-badge:hover) {
               min-height: 64px;
@@ -394,7 +415,7 @@ export default class Inbox extends React.Component {
             .mail-icon {
               height: 50px;
               width: 50px;
-              transform: translate(-13px, 0px);
+              transform: translate(-9px, 0px);
               transition: all 150ms ease-in-out;
               transition: visibility 0s, opacity 200ms ease-in-out;
             }
@@ -437,7 +458,17 @@ export default class Inbox extends React.Component {
             }
             :global(.mail-body) {
               font-family: Poppins, Helvetica;
-              overflow-y: scroll;
+              height: 550px;
+              overflow-y: ${this.state.incomingMailIsHtml ? 'scroll' : 'hidden'};
+            }
+            :global(.mail-body > :first-child) {
+              position: absolute;
+              top: 0;
+              left: 0;
+              height: 100%;
+              width: 100%;
+              padding: 40px;
+              overflow-y: ${this.state.incomingMailIsHtml ? 'hidden' : 'scroll'};
             }
             :global(.modal-backdrop) {
               background-color: #000;

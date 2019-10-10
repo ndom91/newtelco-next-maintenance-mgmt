@@ -13,6 +13,7 @@ import './style/maintenance.css'
 import cogoToast from 'cogo-toast'
 import Select from 'react-select'
 import Router from 'next/router'
+import {Helmet} from "react-helmet";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Editor as TinyEditor } from '@tinymce/tinymce-react'
 import { format, isValid } from 'date-fns'
@@ -336,7 +337,7 @@ export default class Maintenance extends React.Component {
       const maintenance = {
         ...this.props.jsonData.profile,
         bearbeitetvon: username,
-        incomingBody: mailBody,
+        incomingBody: '',
         incomingSubject: this.props.jsonData.profile.subject,
         incomingFrom: this.props.jsonData.profile.from,
         incomingDate: this.props.jsonData.profile.maileingang,
@@ -820,6 +821,8 @@ export default class Maintenance extends React.Component {
           })
           return
         }
+        console.log(newISOTime)
+        console.log(newISOTimeString)
         fetch(`https://${host}/api/maintenances/save/dateTime?maintId=${maintId}&element=${element}&value=${newISOTimeString}`, {
           method: 'get',
           headers: {
@@ -1137,6 +1140,9 @@ export default class Maintenance extends React.Component {
     if (this.props.session.user) {
       return (
         <MuiPickersUtilsProvider utils={DateFnsUtils}>
+          <Helmet>
+            <title>{`Newtelco Maintenance - NT-${maintenance.id}`}</title>
+          </Helmet>
           <Layout unread={this.props.unread} session={this.props.session}>
             <Card style={{ maxWidth: '100%' }}>
               <CardHeader>
@@ -1262,7 +1268,7 @@ export default class Maintenance extends React.Component {
                                   />
                                 </FormGroup>
                                 <FormGroup>
-                                  <label htmlFor='their-cid'>Their CID</label>
+                                  <label htmlFor='their-cid'>{maintenance.name} CID</label>
                                   <Select
                                     value={this.state.selectedLieferant || undefined}
                                     onChange={this.handleSelectLieferantChange}
@@ -1448,7 +1454,7 @@ export default class Maintenance extends React.Component {
                   >
                     <div style={{ position: 'relative' }}>
                       <ModalHeader style={{
-                        background: '#5a6169',
+                        background: 'var(--dark)',
                         borderRadius: '0px'
                       }}
                       >
@@ -1459,8 +1465,9 @@ export default class Maintenance extends React.Component {
                           <small className='modal-incoming-datetime'>{this.state.maintenance.incomingDate}</small>
                         </div>
                         <ButtonGroup style={{ display: 'flex', flexDirection: 'column' }}>
-                          <Button outline theme='light' style={{ borderRadius: '5px 5px 0 0', padding: '0.7em 0.9em' }} onClick={this.toggleReadModal}>
-                            <FontAwesomeIcon width='1.5em' style={{ fontSize: '20px' }} className='translate-icon' icon={faTimesCircle} />
+                          <Button outline className='close-read-modal-btn' theme='light' style={{ borderRadius: '5px 5px 0 0', padding: '0.7em 0.9em' }} onClick={this.toggleReadModal}>
+                            <FontAwesomeIcon className='close-read-modal-icon' width='1.5em' style={{ color: 'var(--light)', fontSize: '20px'}}
+                            icon={faTimesCircle} />
                           </Button>
                           <Button theme='light' style={{ borderRadius: '0 0 5px 5px', padding: '0.7em 0.9em' }} onClick={this.handleTranslate.bind(this)}>
                             <FontAwesomeIcon width='1.5em' style={{ fontSize: '20px' }} className='translate-icon' icon={faLanguage} />
@@ -1473,38 +1480,17 @@ export default class Maintenance extends React.Component {
                 ) : (
                   <></>
                 )}
-
-              {/* <Modal className='mail-modal-body' animation backdrop backdropClassName='modal-backdrop' open={openReadModal} size='lg' toggle={this.toggleReadModal}>
-                <ModalHeader>
-                  <img className='mail-icon' src={`https://besticon-demo.herokuapp.com/icon?size=40..100..360&url=${this.state.maintenance.incomingDomain}`} />
-                  <div className='modal-incoming-header-text'>
-                    <h5 className='modal-incoming-from'>{this.state.maintenance.incomingFrom}</h5>
-                    <small className='modal-incoming-subject'>{this.state.maintenance.incomingSubject}</small><br />
-                    <small className='modal-incoming-datetime'>{this.state.maintenance.incomingDate}</small>
-                  </div>
-                  <Button id='translate-tooltip' style={{ padding: '0.7em 0.9em' }} onClick={this.handleTranslate.bind(this)}>
-                    <FontAwesomeIcon width='1.5em' className='translate-icon' icon={faLanguage} />
-                  </Button>
-                </ModalHeader>
-                <Tooltip
-                  open={this.state.translateTooltipOpen}
-                  target='#translate-tooltip'
-                  toggle={this.toggleTooltip}
-                  placement='bottom'
-                  noArrow
-                >
-                    Translate
-                </Tooltip>
-                <ModalBody className='mail-body' dangerouslySetInnerHTML={{ __html: this.state.translated ? this.state.translatedBody : this.state.maintenance.incomingBody }} />
-              </Modal> */}
               <Modal backdropClassName='modal-backdrop' animation backdrop size='lg' open={openPreviewModal} toggle={this.togglePreviewModal}>
                 <ModalHeader>
                   <div className='modal-preview-text-wrapper'>
                     <div className='modal-preview-to-text'>
                       To: {this.state.mailPreviewHeaderText}
                     </div>
+                    <div className='modal-preview-to-text'>
+                      Cc: service@newtelco.de
+                    </div>
                     <div className='modal-preview-Subject-text'>
-                      Subject: {this.state.mailPreviewSubjectText}
+                      Subject: NT-{this.state.mailPreviewSubjectText}
                     </div>
                   </div>
                   <Button id='send-mail-btn' style={{ padding: '0.9em 1.1em' }} onClick={this.sendMail}>
@@ -1726,6 +1712,9 @@ export default class Maintenance extends React.Component {
               }
               .modal-incoming-header-text > * {
                 color: #fff;
+              }
+              :global(.close-read-modal-btn:hover > .close-read-modal-icon) {
+                color: var(--dark) !important;
               }
               @media only screen and (max-width: 500px) {
                 :global(div.btn-toolbar > .btn-group-md) {

@@ -1,5 +1,6 @@
 import React from 'react'
 import Layout from '../src/components/layout'
+import Link from 'next/link'
 import RequireLogin from '../src/components/require-login'
 import { NextAuth } from 'next-auth/client'
 import Router from 'next/router'
@@ -139,7 +140,9 @@ export default class Blog extends React.Component {
             <CardBody>
               <Container className='card-container'>
                 <Card className='card-inboxUnread'>
-                  <Badge className='card-badge'>{this.props.unread}</Badge>
+                  <Link href='/inbox'>
+                    <Badge className='card-badge'>{this.props.unread}</Badge>
+                  </Link>
                   <CardBody>
                     <p className='card-body-text'>Unread</p>
                     <UseAnimations animationKey='activity' size={96} className='card-inbox-activity' />
