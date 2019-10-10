@@ -5,10 +5,10 @@ import { CardTitle, Button } from 'shards-react'
 import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-material.css'
 
-export default class CustomerCIDs extends React.Component {
+export default class SupplierCIDs extends React.Component {
   static async getInitialProps ({ req, query }) {
     const host = req ? req.headers['x-forwarded-host'] : location.host
-    const pageRequest = `https://${host}/api/settings/theircids` // ?page=${query.page || 1}&limit=${query.limit || 41}`
+    const pageRequest = `https://${host}/api/settings/lieferantcids`
     const res = await fetch(pageRequest)
     const json = await res.json()
     return {
@@ -31,29 +31,18 @@ export default class CustomerCIDs extends React.Component {
           {
             headerName: 'ID',
             field: 'id',
-            width: 200,
+            width: 80,
             editable: false
           },
           {
-            headerName: 'Newtelco CID',
-            field: 'kundenCID',
-            width: 200
-          },
-          {
-            headerName: 'Customer',
+            headerName: 'Company',
             field: 'name',
-            width: 200,
-            sort: { direction: 'asc', priority: 0 }
+            width: 200
           },
           {
-            headerName: 'Their CID',
+            headerName: 'Supplier CID',
             field: 'derenCID',
-            width: 200
-          },
-          {
-            headerName: 'Protected',
-            field: 'protected',
-            width: 200
+            width: 200,
           }
         ],
         rowBuffer: 0,
@@ -62,7 +51,7 @@ export default class CustomerCIDs extends React.Component {
         paginationPageSize: 100,
         cacheOverflowSize: 2,
         maxConcurrentDatasourceRequests: 1,
-        infiniteInitialRowCount: 355,
+        infiniteInitialRowCount: 154,
         maxBlocksInCache: 10
       }
     }
@@ -77,7 +66,7 @@ export default class CustomerCIDs extends React.Component {
 
     const httpRequest = new XMLHttpRequest()
     const updateData = data => {
-      const companies = data.customercids
+      const companies = data.lieferantCIDsResult
       var dataSource = {
         rowCount: null,
         getRows: function (params) {
@@ -94,7 +83,7 @@ export default class CustomerCIDs extends React.Component {
 
     httpRequest.open(
       'GET',
-      `https://${host}/api/customercids`
+      `https://${host}/api/lieferantcids/settings`
     )
     httpRequest.send()
     httpRequest.onreadystatechange = () => {
@@ -113,7 +102,7 @@ export default class CustomerCIDs extends React.Component {
     return (
       <>
         <CardTitle>
-          <span className='section-title'>Customer CIDs</span>
+          <span className='section-title'>Newtelco CIDs</span>
           <Button outline theme='primary'>Add</Button>
         </CardTitle>
         <div className='table-wrapper'>

@@ -1,7 +1,7 @@
 import React from 'react'
 import fetch from 'isomorphic-unfetch'
 import { AgGridReact } from 'ag-grid-react'
-import { CardTitle } from 'shards-react'
+import { CardTitle, Button } from 'shards-react'
 import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-material.css'
 
@@ -107,7 +107,10 @@ export default class Companies extends React.Component {
   render () {
     return (
       <>
-        <CardTitle>Companies</CardTitle>
+        <CardTitle>
+          <span className='section-title'>Companies</span>
+          <Button outline theme='primary'>Add</Button>
+        </CardTitle>
         <div className='table-wrapper'>
           <div
             className='ag-theme-material'
@@ -126,6 +129,11 @@ export default class Companies extends React.Component {
           </div>
         </div>
         <style jsx>{`
+            :global(.card-title) {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            }
             :global(.ag-cell.ag-cell-inline-editing) {
               padding: 10px !important;
               height: inherit !important;

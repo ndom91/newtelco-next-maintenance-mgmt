@@ -7,6 +7,7 @@ import RequireLogin from '../src/components/require-login'
 import Layout from '../src/components/layout'
 import Companies from '../src/components/settings/companies'
 import CustomerCIDs from '../src/components/settings/customercids'
+import SupplierCIDs from '../src/components/settings/suppliercids'
 import Footer from '../src/components/footer'
 import {
   Nav,
@@ -42,7 +43,7 @@ class Settings extends React.Component {
       active: {
         companies: props.router.query.tab === 'companies' ? true : false,
         customercids: props.router.query.tab === 'customercids' ? true : false,
-        ourcids: props.router.query.tab === 'ourcids' ? true : false,
+        suppliercids: props.router.query.tab === 'ourcids' ? true : false,
         templates: props.router.query.tab === 'templates' ? true : false
       }
     }
@@ -57,15 +58,13 @@ class Settings extends React.Component {
     const active = {
       companies: tab === 'companies' ? true : false,
       customercids: tab === 'customercids' ? true : false,
-      ourcids: tab === 'ourcids' ? true : false,
+      suppliercids: tab === 'suppliercids' ? true : false,
       templates: tab === 'templates' ? true : false
     }
 
-    console.log(prevState.active, active)
-
     if (prevState.active.companies !== active.companies ||
       prevState.active.customercids !== active.customercids ||
-      prevState.active.ourcids !== active.ourcids ||
+      prevState.active.suppliercids !== active.suppliercids ||
       prevState.active.templates !== active.templates) {
       this.setState({
         active: active
@@ -78,7 +77,7 @@ class Settings extends React.Component {
       active: {
         companies,
         customercids,
-        ourcids,
+        suppliercids,
         templates
       }
     } = this.state
@@ -101,12 +100,12 @@ class Settings extends React.Component {
                 </NavItem>
                 <NavItem active={customercids}>
                   <Link href={{ pathname: '/settings', query: { tab: 'customercids' } }} as='/settings/customercids'>
-                    <NavLink href=''>Their CIDs</NavLink>
+                    <NavLink href=''>Customer CIDs</NavLink>
                   </Link>
                 </NavItem>
-                <NavItem active={ourcids}>
-                  <Link href={{ pathname: '/settings', query: { tab: 'ourcids' } }} as='/settings/ourcids'>
-                    <NavLink href=''>Our CIDs</NavLink>
+                <NavItem active={suppliercids}>
+                  <Link href={{ pathname: '/settings', query: { tab: 'suppliercids' } }} as='/settings/suppliercids'>
+                    <NavLink href=''>Supplier CIDs</NavLink>
                   </Link>
                 </NavItem>
                 <NavItem active={templates}>
@@ -119,6 +118,7 @@ class Settings extends React.Component {
             <CardBody>
               {tab === 'companies' && <Companies />}
               {tab === 'customercids' && <CustomerCIDs />}
+              {tab === 'suppliercids' && <SupplierCIDs />}
             </CardBody>
             <Footer />
           </Card>

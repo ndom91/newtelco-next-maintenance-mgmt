@@ -9,6 +9,7 @@ module.exports = async (req, res) => {
   // FROM maintenancedb
   // ORDER BY id
   // LIMIT ${(page - 1) * limit}, ${limit}
+
   const customercids = await db.query(escape`
       SELECT kundenCID.id, kundenCID.kundenCID, kundenCID.protected, lieferantCID.derenCID, companies.name FROM kundenCID LEFT JOIN companies ON kundenCID.kunde = companies.id LEFT JOIN lieferantCID ON kundenCID.lieferantCID = lieferantCID.id
     `)
