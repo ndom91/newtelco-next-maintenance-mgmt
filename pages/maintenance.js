@@ -17,7 +17,7 @@ import Router from 'next/router'
 import { Helmet } from 'react-helmet'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Editor as TinyEditor } from '@tinymce/tinymce-react'
-import { format, isValid } from 'date-fns'
+import { format, isValid, formatDistance } from 'date-fns'
 import DateFnsUtils from '@date-io/date-fns'
 import { zonedTimeToUtc, format as formatTz } from 'date-fns-tz'
 import { Rnd } from 'react-rnd'
@@ -774,6 +774,15 @@ export default class Maintenance extends React.Component {
         startDateTime: date
       }
     })
+    const startDateTime = this.state.maintenance.startDateTime
+    const endDateTime = this.state.maintenance.endDateTime
+
+    if (startDateTime && endDateTime && isValid(startDateTime) && isValid(endDateTime)) {
+      const impactCalculation = formatDistance(endDateTime, startDateTime)
+      this.setState({
+        impactPlaceholder: impactCalculation
+      })
+    }
   }
 
   handleEndDate (date) {
@@ -783,6 +792,15 @@ export default class Maintenance extends React.Component {
         endDateTime: date
       }
     })
+    const startDateTime = this.state.maintenance.startDateTime
+    const endDateTime = this.state.maintenance.endDateTime
+
+    if (startDateTime && endDateTime && isValid(startDateTime) && isValid(endDateTime)) {
+      const impactCalculation = formatDistance(endDateTime, startDateTime)
+      this.setState({
+        impactPlaceholder: impactCalculation
+      })
+    }
   }
 
   handleDateTimeSave (element) {
@@ -1299,7 +1317,7 @@ export default class Maintenance extends React.Component {
                                   <Col>
                                     <FormGroup>
                                       <label htmlFor='impact'>Impact</label>
-                                      <FormInput onBlur={() => this.handleTextInputBlur('impact')} id='impact' name='impact' type='text' onChange={this.handleImpactChange} value={maintenance.impact} />
+                                      <FormInput onBlur={() => this.handleTextInputBlur('impact')} id='impact' name='impact' type='text' onChange={this.handleImpactChange} placeholder={this.state.impactPlaceholder} value={maintenance.impact} />
                                     </FormGroup>
                                   </Col>
                                   <Col>

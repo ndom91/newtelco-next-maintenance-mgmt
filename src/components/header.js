@@ -138,7 +138,7 @@ class Header extends React.Component {
             opacity: 0.5;
           }
           :global(.nav-link) {
-            text-decoration: none;
+            text-decoration: none !important;
           }
           :global(.input-group-prepend) {
             pointer-events: none !important;
