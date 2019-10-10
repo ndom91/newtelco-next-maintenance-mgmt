@@ -4,6 +4,7 @@ import Link from 'next/link'
 import RequireLogin from '../src/components/require-login'
 import { NextAuth } from 'next-auth/client'
 import Router from 'next/router'
+import Helmet from 'react-helmet'
 import fetch from 'isomorphic-unfetch'
 import Fonts from '../src/components/fonts'
 import Footer from '../src/components/footer'
@@ -84,11 +85,47 @@ export default class Blog extends React.Component {
       .then(resp => resp.json())
       .then(data => {
         let display
-        console.log(data)
         if (data === 'No unread emails') {
           display = 0
         } else {
           display = data.count
+          if (document !== undefined) {
+            const favicon = document.getElementById('favicon')
+            const faviconSize = 16
+
+            const canvas = document.createElement('canvas')
+            canvas.width = faviconSize
+            canvas.height = faviconSize
+
+            const context = canvas.getContext('2d')
+            const img = document.createElement('img')
+            img.src = favicon.href
+
+            img.onload = () => {
+              // Draw Original Favicon as Background
+              context.drawImage(img, 0, 0, faviconSize, faviconSize)
+
+              // Draw Notification Circle
+              context.beginPath()
+              context.arc(canvas.width - faviconSize / 4, faviconSize / 4, faviconSize / 4, 0, 2 * Math.PI)
+              context.fillStyle = '#FF0000'
+              context.fill()
+
+              // Draw Notification Number
+              // context.font = '9px "helvetica", sans-serif'
+              // context.textAlign = 'center'
+              // context.textBaseline = 'middle'
+              // context.fillStyle = '#FFFFFF'
+              // context.fillText(display, canvas.width - faviconSize / 3, faviconSize / 3)
+
+              // Replace favicon
+              favicon.href = canvas.toDataURL('image/png')
+              console.log('favicon', favicon)
+              this.setState({
+                faviconEl: favicon
+              })
+            }
+          }
         }
         console.log('loop ' + new Date())
         this.setState({
@@ -120,7 +157,8 @@ export default class Blog extends React.Component {
     Fonts()
 
     // Keep Inbox Count uptodate
-    this.unreadInterval = setTimeout(() => this.checkUnreadCount, 60 * 100000)
+    this.checkUnreadCount()
+    this.unreadInterval = setTimeout(() => this.checkUnreadCount, 60 * 1000)
     people.forEach(person => {
       this.fetchPersonStats(person)
     })
@@ -135,6 +173,9 @@ export default class Blog extends React.Component {
     if (this.props.session.user) {
       return (
         <Layout unread={this.props.unread} session={this.props.session}>
+          <Helmet>
+            <head>{`${this.state.faviconEl}`}</head>
+          </Helmet>
           <Card style={{ maxWidth: '100%' }}>
             <CardHeader><h2>Newtelco Maintenance</h2></CardHeader>
             <CardBody>
