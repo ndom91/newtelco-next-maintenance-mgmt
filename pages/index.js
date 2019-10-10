@@ -120,14 +120,13 @@ export default class Blog extends React.Component {
 
               // Replace favicon
               favicon.href = canvas.toDataURL('image/png')
-              console.log('favicon', favicon)
               this.setState({
                 faviconEl: favicon
               })
             }
           }
         }
-        console.log('loop ' + new Date())
+        // console.log('loop ' + new Date())
         this.setState({
           unread: display
         })

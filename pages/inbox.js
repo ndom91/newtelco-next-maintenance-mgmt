@@ -72,8 +72,10 @@ export default class Inbox extends React.Component {
       windowInnerHeight: 0,
       windowInnerWidth: 0
     }
+
     this.toggle = this.toggle.bind(this)
     this.toggleTooltip = this.toggleTooltip.bind(this)
+    this.fetchCompanyLogo = this.fetchCompanyLogo.bind(this)
   }
 
   componentDidMount () {
@@ -82,6 +84,23 @@ export default class Inbox extends React.Component {
       windowInnerHeight: window.innerHeight,
       windowInnerWidth: window.innerWidth
     })
+  }
+
+  fetchCompanyLogo = (domain) => {
+    fetch(`https://realfavicongenerator.p.rapidapi.com/favicon/icon?platform=android_chrome&site=https%3A%2F%2F${domain}`, {
+      method: 'GET',
+      headers: {
+        'x-rapidapi-host': 'realfavicongenerator.p.rapidapi.com',
+        'x-rapidapi-key': '55fb2c8df5msh893e7c177736a1ap158653jsn61bb889ce0dd'
+      }
+    })
+      .then(response => {
+        console.log('apiresponse', response.body)
+        return response.url
+      })
+      .catch(err => {
+        console.log(err)
+      })
   }
 
   toggle (mailId) {
@@ -220,8 +239,7 @@ export default class Inbox extends React.Component {
                               {this.state.windowInnerWidth > 500
                                 ? (
                                   <Badge outline theme='light' className='mail-badge'>
-                                    {/* https://github.com/mat/besticon */}
-                                    <img className='mail-icon' src={`https://besticon-demo.herokuapp.com/icon?size=40..100..360&url=${mail.domain}`} />
+                                    <img className='mail-icon' src={`https://api.statvoo.com/favicon/?url=${mail.domain}`} />
                                     <FontAwesomeIcon onClick={() => this.toggle(mail.id)} width='1.325em' className='mail-open-icon' icon={faEnvelopeOpenText} />
                                   </Badge>
                                 ) : (
@@ -240,8 +258,7 @@ export default class Inbox extends React.Component {
                                 {this.state.windowInnerWidth < 500
                                   ? (
                                     <Badge outline theme='light' className='mail-badge'>
-                                      {/* https://github.com/mat/besticon */}
-                                      <img className='mail-icon' src={`https://besticon-demo.herokuapp.com/icon?size=40..100..360&url=${mail.domain}`} />
+                                      <img className='mail-icon' src={`https://api.statvoo.com/favicon/?url=${mail.domain}`} />
                                       <FontAwesomeIcon onClick={() => this.toggle(mail.id)} width='1.525em' className='mail-open-icon' icon={faEnvelopeOpenText} />
                                     </Badge>
                                   ) : (

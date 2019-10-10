@@ -1468,7 +1468,7 @@ export default class Maintenance extends React.Component {
                         borderRadius: '0px'
                       }}
                       >
-                        <img className='mail-icon' src={`https://besticon-demo.herokuapp.com/icon?size=40..100..360&url=${this.state.maintenance.incomingDomain}`} />
+                        <img className='mail-icon' src={`https://api.statvoo.com/favicon/?url=${this.state.maintenance.incomingDomain}`} />
                         <div className='modal-incoming-header-text'>
                           <h5 className='modal-incoming-from'>{this.state.maintenance.incomingFrom}</h5>
                           <small className='modal-incoming-subject'>{this.state.maintenance.incomingSubject}</small><br />
