@@ -9,9 +9,7 @@ module.exports = async (req, res) => {
   const updatedAt = req.query.updatedAt
 
   const insertQuery = await db.query(escape`INSERT INTO maintenancedb (bearbeitetvon, receivedmail, lieferant, updatedAt) VALUES (${bearbeitetvon}, ${mailId}, ${lieferant}, ${updatedAt});`)
-  console.log(insertQuery)
   const getLastInsertedID = await db.query('SELECT LAST_INSERT_ID();')
-  console.log(getLastInsertedID[0])
   const newId = getLastInsertedID[0]
 
   if (insertQuery.affectedRows >= 1) {

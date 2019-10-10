@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react'
+import React from 'react'
 import Layout from '../src/components/layout'
 import fetch from 'isomorphic-unfetch'
 import { AgGridReact } from 'ag-grid-react'
@@ -17,8 +17,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Editor as TinyEditor } from '@tinymce/tinymce-react'
 import { format, isValid } from 'date-fns'
 import DateFnsUtils from '@date-io/date-fns'
-import { zonedTimeToUtc, utcToZonedTime, format as formatTz } from 'date-fns-tz'
-import ReactModal from 'react-modal-resizable-draggable'
+import { zonedTimeToUtc, format as formatTz } from 'date-fns-tz'
 import { Rnd } from 'react-rnd'
 import SelectTimezone, { getTimezoneProps } from '@capaj/react-select-timezone'
 import { KeyboardDateTimePicker, MuiPickersUtilsProvider } from '@material-ui/pickers'
@@ -328,6 +327,7 @@ export default class Maintenance extends React.Component {
       }
     }
 
+
     if (this.props.jsonData.profile.id === 'NEW') {
       const {
         email
@@ -336,7 +336,7 @@ export default class Maintenance extends React.Component {
       const maintenance = {
         ...this.props.jsonData.profile,
         bearbeitetvon: username,
-        incomingBody: this.props.jsonData.profile.body,
+        incomingBody: mailBody,
         incomingSubject: this.props.jsonData.profile.subject,
         incomingFrom: this.props.jsonData.profile.from,
         incomingDate: this.props.jsonData.profile.maileingang,
@@ -484,11 +484,32 @@ export default class Maintenance extends React.Component {
       })
         .then(resp => resp.json())
         .then(data => {
+
+          let mailBody
+          const htmlRegex = new RegExp(/<(?:"[^"]*"[`"]*|'[^']*'['"]*|[^'">])+>/, 'gi')
+          // const htmlRegex2 = new RegExp('<([a-z]+)[^>]*(?<!/)>', 'gi')
+          // const htmlRegex3 = new RegExp('<meta .*>', 'gi')
+
+          console.log(htmlRegex.test(data.body))
+
+          if (htmlRegex.test(data.body)) {
+            console.log('html true')
+            mailBody = data.body
+            this.setState({
+              incomingMailIsHtml: true
+            })
+          } else {
+            console.log('html false')
+            mailBody = `<pre>${data.body}</pre>`
+            this.setState({
+              incomingMailIsHtml: false
+            })
+          }
           // console.log(data)
           this.setState({
             openReadModal: !this.state.openReadModal,
             maintenance: {
-              incomingBody: data.body,
+              incomingBody: mailBody,
               incomingFrom: data.from,
               incomingSubject: data.subject,
               incomingDate: data.date,
@@ -556,10 +577,12 @@ export default class Maintenance extends React.Component {
       return
     }
 
+    console.log()
+
     const rescheduleText = ''
     const timeZone = incomingTimezone || 'Europe/Berlin'
-    const startDateTimeDE = formatTz(utcToZonedTime(new Date(startDateTime), timeZone), 'dd.MM.yyyy HH:mm')
-    const endDateTimeDE = formatTz(utcToZonedTime(new Date(endDateTime), timeZone), 'dd.MM.yyyy HH:mm')
+    const startDateTimeDE = formatTz(zonedTimeToUtc(new Date(startDateTime), timeZone), 'dd.MM.yyyy HH:mm')
+    const endDateTimeDE = formatTz(zonedTimeToUtc(new Date(endDateTime), timeZone), 'dd.MM.yyyy HH:mm')
     const tzSuffixRAW = 'CET / GMT+2:00'
 
     let body = `<body style="color:#666666;">${rescheduleText} Dear Colleagues,​​<p><span>We would like to inform you about planned work on the following CID(s):<br><br> <b>${customerCID}</b> <br><br>The maintenance work is with the following details:</span></p><table border="0" cellspacing="2" cellpadding="2" width="775px"><tr><td style='width: 205px;'>Maintenance ID:</td><td><b>NT-${id}</b></td></tr><tr><td>Start date and time:</td><td><b>${startDateTimeDE} (${tzSuffixRAW})</b></td></tr><tr><td>Finish date and time:</td><td><b>${endDateTimeDE} (${tzSuffixRAW})</b></td></tr>`
@@ -1406,27 +1429,29 @@ export default class Maintenance extends React.Component {
                   <Rnd
                     default={{
                       x: 900,
-                      y: 5,
+                      y: 25,
                       width: 800,
                       height: 600
                     }}
                     style={{
                       visibility: openReadModal ? 'visible' : 'hidden',
                       background: 'var(--light)',
-                      overflowY: 'hidden',
-                      border: '5px solid #007bff',
-                      borderRadius: '15px',
+                      overflow: 'hidden',
+                      border: '2px solid #007bff',
                       height: 'auto',
                       zIndex: '3'
                     }}
                     minWidth={500}
                     minHeight={590}
-                    bounds="window"
-                    >
+                    bounds='window'
+                    dragHandleClassName='modal-incoming-header-text'
+                  >
                     <div style={{ position: 'relative' }}>
                       <ModalHeader style={{
-                        background: '#5a6169'
-                      }}>
+                        background: '#5a6169',
+                        borderRadius: '0px'
+                      }}
+                      >
                         <img className='mail-icon' src={`https://besticon-demo.herokuapp.com/icon?size=40..100..360&url=${this.state.maintenance.incomingDomain}`} />
                         <div className='modal-incoming-header-text'>
                           <h5 className='modal-incoming-from'>{this.state.maintenance.incomingFrom}</h5>
@@ -1435,10 +1460,10 @@ export default class Maintenance extends React.Component {
                         </div>
                         <ButtonGroup style={{ display: 'flex', flexDirection: 'column' }}>
                           <Button outline theme='light' style={{ borderRadius: '5px 5px 0 0', padding: '0.7em 0.9em' }} onClick={this.toggleReadModal}>
-                            <FontAwesomeIcon width='1.5em' style={{ fontSize: '20px' }}className='translate-icon' icon={faTimesCircle} />
+                            <FontAwesomeIcon width='1.5em' style={{ fontSize: '20px' }} className='translate-icon' icon={faTimesCircle} />
                           </Button>
                           <Button theme='light' style={{ borderRadius: '0 0 5px 5px', padding: '0.7em 0.9em' }} onClick={this.handleTranslate.bind(this)}>
-                            <FontAwesomeIcon width='1.5em' style={{ fontSize: '20px' }}className='translate-icon' icon={faLanguage} />
+                            <FontAwesomeIcon width='1.5em' style={{ fontSize: '20px' }} className='translate-icon' icon={faLanguage} />
                           </Button>
                         </ButtonGroup>
                       </ModalHeader>
@@ -1633,7 +1658,17 @@ export default class Maintenance extends React.Component {
               }
               :global(.mail-body) {
                 font-family: Poppins, Helvetica;
-                overflow-y: scroll;
+                height: 460px;
+                overflow-y: ${this.state.incomingMailIsHtml ? 'scroll' : 'hidden'};
+              }
+              :global(.mail-body > :first-child) {
+                position: absolute;
+                top: 0;
+                left: 0;
+                height: 100%;
+                width: 100%;
+                padding: 40px;
+                overflow-y: ${this.state.incomingMailIsHtml ? 'hidden' : 'scroll'};
               }
               :global(.modal-backdrop) {
                 background-color: #000;
@@ -1685,6 +1720,12 @@ export default class Maintenance extends React.Component {
                 right:0;
                 top:0;
                 cursor:move;
+              }
+              .modal-incoming-header-text {
+                cursor: pointer;
+              }
+              .modal-incoming-header-text > * {
+                color: #fff;
               }
               @media only screen and (max-width: 500px) {
                 :global(div.btn-toolbar > .btn-group-md) {
