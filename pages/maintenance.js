@@ -17,7 +17,7 @@ import Router from 'next/router'
 import { Helmet } from 'react-helmet'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Editor as TinyEditor } from '@tinymce/tinymce-react'
-import { format, isValid, formatDistance } from 'date-fns'
+import { format, isValid, formatDistance, parseISO } from 'date-fns'
 import DateFnsUtils from '@date-io/date-fns'
 import { zonedTimeToUtc, format as formatTz } from 'date-fns-tz'
 import { Rnd } from 'react-rnd'
@@ -25,6 +25,9 @@ import { Timezones } from '../src/components/timezone/timezones.js'
 import { KeyboardDateTimePicker, MuiPickersUtilsProvider } from '@material-ui/pickers'
 import { createMuiTheme } from '@material-ui/core/styles'
 import UnreadCount from '../src/components/unreadcount'
+import Flatpickr from 'react-flatpickr'
+import 'flatpickr/dist/themes/material_blue.css'
+
 import {
   faPlusCircle,
   faCalendarAlt,
@@ -585,7 +588,7 @@ export default class Maintenance extends React.Component {
     const timeZone = incomingTimezone || 'Europe/Berlin'
     const startDateTimeDE = formatTz(zonedTimeToUtc(new Date(startDateTime), timeZone), 'dd.MM.yyyy HH:mm')
     const endDateTimeDE = formatTz(zonedTimeToUtc(new Date(endDateTime), timeZone), 'dd.MM.yyyy HH:mm')
-    const tzSuffixRAW = 'CET / GMT+2:00'
+    const tzSuffixRAW = 'CET / GMT+1:00'
 
     let body = `<body style="color:#666666;">${rescheduleText} Dear Colleagues,​​<p><span>We would like to inform you about planned work on the following CID(s):<br><br> <b>${customerCID}</b> <br><br>The maintenance work is with the following details:</span></p><table border="0" cellspacing="2" cellpadding="2" width="775px"><tr><td style='width: 205px;'>Maintenance ID:</td><td><b>NT-${id}</b></td></tr><tr><td>Start date and time:</td><td><b>${startDateTimeDE} (${tzSuffixRAW})</b></td></tr><tr><td>Finish date and time:</td><td><b>${endDateTimeDE} (${tzSuffixRAW})</b></td></tr>`
 
@@ -772,14 +775,14 @@ export default class Maintenance extends React.Component {
     this.setState({
       maintenance: {
         ...this.state.maintenance,
-        startDateTime: date
+        startDateTime: new Date(date[0]).toISOString()
       }
     })
     const startDateTime = this.state.maintenance.startDateTime
     const endDateTime = this.state.maintenance.endDateTime
 
-    if (startDateTime && endDateTime && isValid(startDateTime) && isValid(endDateTime)) {
-      const impactCalculation = formatDistance(endDateTime, startDateTime)
+    if (startDateTime && endDateTime && isValid(parseISO(startDateTime)) && isValid(parseISO(endDateTime))) {
+      const impactCalculation = formatDistance(parseISO(endDateTime), parseISO(startDateTime))
       this.setState({
         impactPlaceholder: impactCalculation
       })
@@ -790,14 +793,14 @@ export default class Maintenance extends React.Component {
     this.setState({
       maintenance: {
         ...this.state.maintenance,
-        endDateTime: date
+        endDateTime: new Date(date[0]).toISOString()
       }
     })
     const startDateTime = this.state.maintenance.startDateTime
     const endDateTime = this.state.maintenance.endDateTime
 
-    if (startDateTime && endDateTime && isValid(startDateTime) && isValid(endDateTime)) {
-      const impactCalculation = formatDistance(endDateTime, startDateTime)
+    if (startDateTime && endDateTime && isValid(parseISO(startDateTime)) && isValid(parseISO(endDateTime))) {
+      const impactCalculation = formatDistance(parseISO(endDateTime), parseISO(startDateTime))
       this.setState({
         impactPlaceholder: impactCalculation
       })
@@ -808,30 +811,38 @@ export default class Maintenance extends React.Component {
     let newValue
     const maintId = this.state.maintenance.id
     const host = window.location.host
+    // console.log(element)
     if (element === 'start') {
-      if (isValid(this.state.maintenance.startDateTime)) {
+      // console.log(isValid(this.state.maintenance.startDateTime))
+      // console.log(this.state.maintenance.startDateTime)
+      // console.log(isValid(parseISO(this.state.maintenance.startDateTime)))
+      // console.log(parseISO(this.state.maintenance.startDateTime))
+      console.log(this.state.maintenance.startDateTime, this.props.jsonData.profile.endDateTime)
+      if (isValid(parseISO(this.state.maintenance.startDateTime))) {
         newValue = this.state.maintenance.startDateTime
-        const newCompareValue = new Date(newValue).toISOString()
-        if (newCompareValue === this.props.jsonData.profile.startDateTime) {
-          return
-        }
+        // if (newValue === this.props.jsonData.profile.startDateTime) {
+        //   return
+        // }
       }
     } else if (element === 'end') {
-      if (isValid(this.state.maintenance.endDateTime)) {
+      // console.log(isValid(this.state.maintenance.endDateTime))
+      // console.log(isValid(new Date(this.state.maintenance.endDateTime)))
+      // console.log(new Date(this.state.maintenance.endDateTime))
+      console.log(this.state.maintenance.endDateTime, this.props.jsonData.profile.endDateTime)
+      if (isValid(new Date(this.state.maintenance.endDateTime))) {
         newValue = this.state.maintenance.endDateTime
-        const newCompareValue = new Date(newValue).toISOString()
-        if (newCompareValue === this.props.jsonData.profile.endDateTime) {
-          return
-        }
+        // if (newValue === this.props.jsonData.profile.endDateTime) {
+        //   // console.log('return if same as old')
+        //   return
+        // }
       }
     }
-    const sendMail = (host, maintId, element, newValue) => {
-      let newISOTime = new Date(newValue)
+    const saveDateTime = (host, maintId, element, newValue) => {
+      let newISOTime = parseISO(newValue)
       const selectedTimezone = this.state.maintenance.incomingTimezone
-      if (selectedTimezone !== 'Europe/Berlin' && isValid(newISOTime)) {
+      if (selectedTimezone && isValid(newISOTime)) {
         newISOTime = zonedTimeToUtc(newISOTime, selectedTimezone)
       }
-      let newISOTimeString
       if (isValid(newISOTime)) {
         const maintId = this.state.maintenance.id
         if (maintId === 'NEW') {
@@ -840,9 +851,9 @@ export default class Maintenance extends React.Component {
           })
           return
         }
-        console.log(newISOTime)
-        console.log(newISOTimeString)
-        fetch(`https://${host}/api/maintenances/save/dateTime?maintId=${maintId}&element=${element}&value=${newISOTimeString}`, {
+        const saveDateFormat = format(newISOTime, 'yyyy-MM-dd HH:mm:ss')
+        console.log(format(newISOTime, 'yyyy-MM-dd HH:mm:ss'))
+        fetch(`https://${host}/api/maintenances/save/dateTime?maintId=${maintId}&element=${element}&value=${saveDateFormat}`, {
           method: 'get',
           headers: {
             'Access-Control-Allow-Origin': '*',
@@ -864,7 +875,7 @@ export default class Maintenance extends React.Component {
           .catch(err => console.error(err))
       }
     }
-    sendMail(host, maintId, element, newValue)
+    saveDateTime(host, maintId, element, newValue)
   }
 
   handleToggleChange (element, event) {
@@ -1226,7 +1237,7 @@ export default class Maintenance extends React.Component {
                                 </FormGroup>
                                 <FormGroup>
                                   <label htmlFor='start-datetime'>Start Date/Time</label>
-                                  <KeyboardDateTimePicker
+                                  {/* <KeyboardDateTimePicker
                                     value={maintenance.startDateTime || null}
                                     onChange={date => this.handleStartDate(date)}
                                     animateYearScrolling
@@ -1237,28 +1248,23 @@ export default class Maintenance extends React.Component {
                                     variant='inline'
                                     disableToolbar
                                     inputVariant='outlined'
+                                  /> */}
+                                  <Flatpickr
+                                    data-enable-time
+                                    options={{ time_24hr: 'true', allow_input: 'true' }}
+                                    className='flatpickr end-date-time'
+                                    value={maintenance.startDateTime || null}
+                                    onChange={date => this.handleStartDate(date)}
+                                    onClose={() => this.handleDateTimeSave('start')}
                                   />
                                 </FormGroup>
                                 <FormGroup>
                                   <label htmlFor='supplier'>Timezone</label>
-                                  {/* <AsyncSelect
-                                    // value={maintenance.incomingTimezone}
-                                    // onChange={(val) => this.handleTimezoneChange(val)}
-                                    // loadOptions={Timezones}
-                                    cacheOptions
-                                    defaultOptions
-                                  /> */}
                                   <Select
                                     value={this.state.incomingTimezone}
                                     onChange={this.handleTimezoneChange}
                                     options={Timezones}
                                   />
-                                  {/* <SelectTimezone
-                                    value={maintenance.incomingTimezone} // the default, so you can omit if you don't need other value
-                                    isClearable // allows user to have null value in this select
-                                    guess // this will fill the input with user's timezone guessed by moment. A "value" prop has always bigger priority than guessed TZ
-                                    onChange={(val) => { this.handleTimezoneChange(val) }}
-                                  /> */}
                                 </FormGroup>
                                 <FormGroup>
                                   <label htmlFor='supplier'>Supplier</label>
@@ -1276,7 +1282,15 @@ export default class Maintenance extends React.Component {
                                 </FormGroup>
                                 <FormGroup>
                                   <label htmlFor='end-datetime'>End Date/Time</label>
-                                  <KeyboardDateTimePicker
+                                  <Flatpickr
+                                    data-enable-time
+                                    options={{ time_24hr: 'true', allow_input: 'true' }}
+                                    className='flatpickr end-date-time'
+                                    value={maintenance.endDateTime || null}
+                                    onChange={date => this.handleEndDate(date)}
+                                    onClose={() => this.handleDateTimeSave('end')}
+                                  />
+                                  {/* <KeyboardDateTimePicker
                                     value={maintenance.endDateTime || null}
                                     onChange={date => this.handleEndDate(date)}
                                     animateYearScrolling
@@ -1294,7 +1308,7 @@ export default class Maintenance extends React.Component {
                                         }
                                       }
                                     }}
-                                  />
+                                  /> */}
                                 </FormGroup>
                                 <FormGroup>
                                   <label htmlFor='their-cid'>{maintenance.name} CID</label>
@@ -1747,6 +1761,40 @@ export default class Maintenance extends React.Component {
               }
               :global(.close-read-modal-btn:hover > .close-read-modal-icon) {
                 color: var(--dark) !important;
+              }
+              :global(.flatpickr) {
+                height: auto;
+                width: 100%;
+                padding: .5rem 1rem;
+                font-size: .95rem;
+                line-height: 1.5;
+                color: #495057;
+                background-color: #fff;
+                border: 1px solid #becad6;
+                font-weight: 300;
+                will-change: border-color,box-shadow;
+                border-radius: .375rem;
+                box-shadow: none;
+                transition: box-shadow 250ms cubic-bezier(.27,.01,.38,1.06),border 250ms cubic-bezier(.27,.01,.38,1.06);
+              }
+              :global(.flatpickr-months) {
+                background: #007bff !important;
+              }
+              :global(.flatpickr-month) {
+                background: #007bff !important;
+              }
+              :global(.flatpickr-monthDropdown-months) {
+                background: #007bff !important;
+              }
+              :global(.flatpickr-weekdays) {
+                background: #007bff !important;
+              }
+              :global(.flatpickr-weekday) {
+                background: #007bff !important;
+              }
+              :global(.flatpickr-day.selected) {
+                background: #007bff !important;
+                border-color: #007bff !important;
               }
               @media only screen and (max-width: 500px) {
                 :global(div.btn-toolbar > .btn-group-md) {
