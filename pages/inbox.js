@@ -8,6 +8,7 @@ import { NextAuth } from 'next-auth/client'
 import cogoToast from 'cogo-toast'
 import { CSSTransition, TransitionGroup } from 'react-transition-group'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import UnreadCount from '../src/components/unreadcount'
 import {
   faPencilAlt,
   faEnvelopeOpenText,
@@ -220,6 +221,7 @@ export default class Inbox extends React.Component {
       // console.log(inboxMails)
       return (
         <Layout unread={this.props.unread} session={this.props.session}>
+          {UnreadCount()}
           <Card style={{ maxWidth: '100%' }}>
             <CardHeader><h2>Inbox</h2></CardHeader>
             <CardBody>
@@ -239,7 +241,7 @@ export default class Inbox extends React.Component {
                               {this.state.windowInnerWidth > 500
                                 ? (
                                   <Badge outline theme='light' className='mail-badge'>
-                                    <img className='mail-icon' src={`https://api.statvoo.com/favicon/?url=${mail.domain}`} />
+                                    <img className='mail-icon' src={`https://cdn.statically.io/favicons/${mail.domain}`} />
                                     <FontAwesomeIcon onClick={() => this.toggle(mail.id)} width='1.325em' className='mail-open-icon' icon={faEnvelopeOpenText} />
                                   </Badge>
                                 ) : (
@@ -258,7 +260,7 @@ export default class Inbox extends React.Component {
                                 {this.state.windowInnerWidth < 500
                                   ? (
                                     <Badge outline theme='light' className='mail-badge'>
-                                      <img className='mail-icon' src={`https://api.statvoo.com/favicon/?url=${mail.domain}`} />
+                                      <img className='mail-icon' src={`https://cdn.statically.io/favicons/${mail.domain}`} />
                                       <FontAwesomeIcon onClick={() => this.toggle(mail.id)} width='1.525em' className='mail-open-icon' icon={faEnvelopeOpenText} />
                                     </Badge>
                                   ) : (

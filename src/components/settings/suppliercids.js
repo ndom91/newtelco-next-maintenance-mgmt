@@ -2,6 +2,10 @@ import React from 'react'
 import fetch from 'isomorphic-unfetch'
 import { AgGridReact } from 'ag-grid-react'
 import { CardTitle, Button } from 'shards-react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import {
+  faPlusCircle
+} from '@fortawesome/free-solid-svg-icons'
 import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-material.css'
 
@@ -103,7 +107,10 @@ export default class SupplierCIDs extends React.Component {
       <>
         <CardTitle>
           <span className='section-title'>Newtelco CIDs</span>
-          <Button outline theme='primary'>Add</Button>
+          <Button outline theme='primary'>
+            <FontAwesomeIcon width='1.125em' style={{ marginRight: '10px' }} icon={faPlusCircle} />
+            Add
+          </Button>
         </CardTitle>
         <div className='table-wrapper'>
           <div

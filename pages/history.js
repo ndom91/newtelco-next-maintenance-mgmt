@@ -17,6 +17,7 @@ import MailArrived from '../src/components/ag-grid/mailarrived'
 import UpdatedAt from '../src/components/ag-grid/updatedat'
 import Supplier from '../src/components/ag-grid/supplier'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import UnreadCount from '../src/components/unreadcount'
 import UseAnimations from 'react-useanimations'
 import {
   Card,
@@ -228,6 +229,7 @@ export default class History extends React.Component {
     if (this.props.session.user) {
       return (
         <Layout unread={this.props.unread} session={this.props.session}>
+          {UnreadCount()}
           <Card style={{ maxWidth: '100%' }}>
             <CardHeader>
               <ButtonToolbar style={{ justifyContent: 'space-between' }}>

@@ -8,6 +8,7 @@ import Layout from '../src/components/layout'
 import Companies from '../src/components/settings/companies'
 import CustomerCIDs from '../src/components/settings/customercids'
 import SupplierCIDs from '../src/components/settings/suppliercids'
+import UnreadCount from '../src/components/unreadcount'
 import Footer from '../src/components/footer'
 import {
   Nav,
@@ -41,10 +42,10 @@ class Settings extends React.Component {
     // todo: clean up active tab stuff - this is ugly!
     this.state = {
       active: {
-        companies: props.router.query.tab === 'companies' ? true : false,
-        customercids: props.router.query.tab === 'customercids' ? true : false,
-        suppliercids: props.router.query.tab === 'ourcids' ? true : false,
-        templates: props.router.query.tab === 'templates' ? true : false
+        companies: props.router.query.tab === 'companies',
+        customercids: props.router.query.tab === 'customercids',
+        suppliercids: props.router.query.tab === 'ourcids',
+        templates: props.router.query.tab === 'templates'
       }
     }
   }
@@ -56,10 +57,10 @@ class Settings extends React.Component {
 
     console.log(tab)
     const active = {
-      companies: tab === 'companies' ? true : false,
-      customercids: tab === 'customercids' ? true : false,
-      suppliercids: tab === 'suppliercids' ? true : false,
-      templates: tab === 'templates' ? true : false
+      companies: tab === 'companies',
+      customercids: tab === 'customercids',
+      suppliercids: tab === 'suppliercids',
+      templates: tab === 'templates'
     }
 
     if (prevState.active.companies !== active.companies ||
@@ -89,6 +90,7 @@ class Settings extends React.Component {
     if (this.props.session.user) {
       return (
         <Layout unread={this.props.unread} session={this.props.session}>
+          {UnreadCount()}
           <Card style={{ maxWidth: '100%' }}>
             <CardHeader>
               <h2>Settings</h2>

@@ -24,6 +24,7 @@ import { Rnd } from 'react-rnd'
 import { Timezones } from '../src/components/timezone/timezones.js'
 import { KeyboardDateTimePicker, MuiPickersUtilsProvider } from '@material-ui/pickers'
 import { createMuiTheme } from '@material-ui/core/styles'
+import UnreadCount from '../src/components/unreadcount'
 import {
   faPlusCircle,
   faCalendarAlt,
@@ -1167,6 +1168,7 @@ export default class Maintenance extends React.Component {
           <Helmet>
             <title>{`Newtelco Maintenance - NT-${maintenance.id}`}</title>
           </Helmet>
+          {UnreadCount()}
           <Layout unread={this.props.unread} session={this.props.session}>
             <Card style={{ maxWidth: '100%' }}>
               <CardHeader>
@@ -1486,7 +1488,7 @@ export default class Maintenance extends React.Component {
                         borderRadius: '0px'
                       }}
                       >
-                        <img className='mail-icon' src={`https://api.statvoo.com/favicon/?url=${this.state.maintenance.incomingDomain}`} />
+                        <img className='mail-icon' src={`https://cdn.statically.io/favicons/${this.state.maintenance.incomingDomain}`} />
                         <div className='modal-incoming-header-text'>
                           <h5 className='modal-incoming-from'>{this.state.maintenance.incomingFrom}</h5>
                           <small className='modal-incoming-subject'>{this.state.maintenance.incomingSubject}</small><br />
