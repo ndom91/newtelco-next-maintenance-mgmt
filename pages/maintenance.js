@@ -490,7 +490,13 @@ export default class Maintenance extends React.Component {
   toggleReadModal () {
     if (!this.state.maintenance.incomingBody) {
       const host = window.location.host
-      fetch(`https://api.${host}/mail/${this.state.maintenance.mailId}`, {
+      let mailId
+      if (this.state.maintenance.id === 'NEW') {
+        mailId = this.state.maintenance.mailId
+      } else {
+        mailId = this.state.maintenance.receivedMail
+      }
+      fetch(`https://api.${host}/mail/${mailId}`, {
         method: 'get'
       })
         .then(resp => resp.json())
@@ -543,7 +549,7 @@ export default class Maintenance extends React.Component {
         openPreviewModal: !this.state.openPreviewModal,
         mailBodyText: HtmlBody,
         mailPreviewHeaderText: recipient || this.state.mailPreviewHeaderText,
-        mailPreviewSubjectText: `Planned Work Notification - ${this.state.maintenance.id}`
+        mailPreviewSubjectText: `Planned Work Notification - NT-${this.state.maintenance.id}`
       })
     } else {
       this.setState({
@@ -756,7 +762,7 @@ export default class Maintenance extends React.Component {
   prepareDirectSend (recipient, customerCID) {
     if (!this.state.mailBodyText) {
       const HtmlBody = this.generateMail(customerCID)
-      const subject = `Planned Work Notification - ${this.state.maintenance.id}`
+      const subject = `Planned Work Notification - NT-${this.state.maintenance.id}`
       this.setState({
         mailBodyText: HtmlBody,
         mailPreviewHeaderText: recipient,
@@ -1040,7 +1046,28 @@ export default class Maintenance extends React.Component {
   }
 
   handleTimezoneBlur (ev) {
-    // console.log(ev)
+    const incomingTimezone = this.state.maintenance.incomingTimezone || 'Europe/Berlin'
+    const host = window.location.host
+    fetch(`https://${host}/api/maintenances/save/timezone?maintId=${this.state.maintenance.id}&timezone=${incomingTimezone}`, {
+      method: 'get',
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        _csrf: this.props.session.csrfToken
+      }
+    })
+      .then(resp => resp.json())
+      .then(data => {
+        if (data.status === 200 && data.statusText === 'OK') {
+          cogoToast.success('Save Success', {
+            position: 'top-right'
+          })
+        } else {
+          cogoToast.warn(`Error - ${data.err}`, {
+            position: 'top-right'
+          })
+        }
+      })
+      .catch(err => console.error(err))
   }
 
   handleTextInputBlur (element) {
@@ -1092,7 +1119,7 @@ export default class Maintenance extends React.Component {
 
     // console.log(Date.parse(incomingDate))
     // const incomingFormatted = format(incomingDate, 'YYYY-MM-DD HH:mm:ss')
-    const incomingFormatted = format(new Date(maileingang), 'YYYY-MM-DD HH:mm:ss')
+    const incomingFormatted = format(new Date(maileingang), 'yyyy-MM-dd HH:mm:ss')
     const updatedAtFormatted = format(new Date(updatedAt), 'yyyy-MM-dd HH:mm:ss')
 
     const host = window.location.host
@@ -1212,7 +1239,7 @@ export default class Maintenance extends React.Component {
                           <FontAwesomeIcon icon={faCalendarAlt} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
                         Calendar
                         </Button>
-                        <Button onClick={this.handleSaveOnClick}>
+                        <Button className='create-btn' onClick={this.handleSaveOnClick}>
                           <FontAwesomeIcon icon={faPlusCircle} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
                         Create
                         </Button>
@@ -1269,6 +1296,7 @@ export default class Maintenance extends React.Component {
                                     value={this.state.incomingTimezone}
                                     onChange={this.handleTimezoneChange}
                                     options={Timezones}
+                                    onBlur={this.handleTimezoneBlur}
                                   />
                                 </FormGroup>
                                 <FormGroup>
@@ -1541,7 +1569,7 @@ export default class Maintenance extends React.Component {
                       Cc: service@newtelco.de
                     </div>
                     <div className='modal-preview-Subject-text'>
-                      Subject: NT-{this.state.mailPreviewSubjectText}
+                      Subject: {this.state.mailPreviewSubjectText}
                     </div>
                   </div>
                   <Button id='send-mail-btn' style={{ padding: '0.9em 1.1em' }} onClick={this.sendMail}>
@@ -1800,6 +1828,17 @@ export default class Maintenance extends React.Component {
               :global(.flatpickr-day.selected) {
                 background: #007bff !important;
                 border-color: #007bff !important;
+              }
+              :global(.create-btn) {
+                box-shadow: ${this.state.maintenance.id === 'NEW' ? '0 0 0 100vmax rgba(0,0,0,.8)' : 'none'};
+                pointer-events: ${this.state.maintenance.id === 'NEW' ? 'auto' : 'none'};
+                z-index: 100;
+              }
+              :global(*) {
+                pointer-events: ${this.state.maintenance.id === 'NEW' ? 'none' : 'auto'};
+              }
+              :global(.create-btn:before) {
+                
               }
               @media only screen and (max-width: 500px) {
                 :global(div.btn-toolbar > .btn-group-md) {
