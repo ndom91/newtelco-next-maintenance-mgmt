@@ -40,7 +40,6 @@ const UnreadCount = () => {
 
             // Replace favicon
             favicon.href = canvas.toDataURL('image/png')
-            console.log('Helmet')
             return (
               <>
                 <Head>
@@ -54,7 +53,6 @@ const UnreadCount = () => {
       })
       .catch(err => console.error(`Error - ${err}`))
   } else {
-    console.log('No Helmet')
     return null
   }
 }
