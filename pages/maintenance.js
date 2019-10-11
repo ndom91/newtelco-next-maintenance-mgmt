@@ -379,7 +379,12 @@ export default class Maintenance extends React.Component {
 
       this.fetchLieferantCIDs(lieferantId)
     } else {
-      const lieferantDomain = this.props.jsonData.profile.mailDomain
+      let lieferantDomain
+      if (this.props.jsonData.profile.id === 'NEW') {
+        lieferantDomain = this.props.jsonData.profile.name
+      } else {
+        lieferantDomain = this.props.jsonData.profile.mailDomain
+      }
       fetch(`https://${host}/api/companies/domain?id=${lieferantDomain}`, {
         method: 'get'
       })
@@ -485,7 +490,7 @@ export default class Maintenance extends React.Component {
   toggleReadModal () {
     if (!this.state.maintenance.incomingBody) {
       const host = window.location.host
-      fetch(`https://api.${host}/mail/${this.state.maintenance.receivedmail}`, {
+      fetch(`https://api.${host}/mail/${this.state.maintenance.mailId}`, {
         method: 'get'
       })
         .then(resp => resp.json())
@@ -514,12 +519,12 @@ export default class Maintenance extends React.Component {
           this.setState({
             openReadModal: !this.state.openReadModal,
             maintenance: {
+              ...this.state.maintenance,
               incomingBody: mailBody,
               incomingFrom: data.from,
               incomingSubject: data.subject,
               incomingDate: data.date,
-              incomingDomain: this.props.jsonData.profile.mailDomain,
-              ...this.state.maintenance
+              incomingDomain: this.props.jsonData.profile.mailDomain
             }
           })
         })
@@ -1498,7 +1503,7 @@ export default class Maintenance extends React.Component {
                   >
                     <div style={{ position: 'relative' }}>
                       <ModalHeader style={{
-                        background: 'var(--dark)',
+                        background: 'var(--secondary)',
                         borderRadius: '0px'
                       }}
                       >
@@ -1582,7 +1587,7 @@ export default class Maintenance extends React.Component {
                 padding: 15px;
               }
               .mail-icon {
-                width: 96px;
+                min-width: 96px;
                 height: 96px;
                 border: 2px solid var(--primary);
                 padding: 10px;

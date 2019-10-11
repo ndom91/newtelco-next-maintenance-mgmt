@@ -1,5 +1,4 @@
 import fetch from 'isomorphic-unfetch'
-// import Helmet from 'react-helmet'
 import Head from 'next/head'
 
 const UnreadCount = () => {
