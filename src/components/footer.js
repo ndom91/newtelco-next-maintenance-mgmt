@@ -18,7 +18,7 @@ export default class Footer extends React.Component {
             style={{
               marginRight: '10px',
               color: 'secondary',
-              opacity: '0.2'
+              opacity: '0.6'
             }}
           />
         ndomino
@@ -30,6 +30,7 @@ export default class Footer extends React.Component {
             font-family: Poppins, Helvetica;
             font-size: 1em;
             font-weight: 100;
+            color: #cfd0d2;
           } 
         `}
         </style>

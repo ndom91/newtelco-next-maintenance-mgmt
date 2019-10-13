@@ -575,81 +575,20 @@ export default class Maintenance extends React.Component {
     }
 
     const timezone = incomingTimezone || 'Europe/Dublin'
-    console.log(startDateTime)
-    // startDateTime = Tue Oct 22 2019 15:00:00 GMT+0200 (Central European Summer Time)
+    const rawStart = moment(startDateTime).format('YYYY-MM-DD HH:mm:ss')
+    const rawEnd = moment(endDateTime).format('YYYY-MM-DD HH:mm:ss')
+    const incomingTzStart = moment.tz(rawStart, incomingTimezone)
+    const incomingTzEnd = moment.tz(rawEnd, incomingTimezone)
+    const utcStart = incomingTzStart.tz('UTC').format('YYYY-MM-DD HH:mm:ss')
+    const utcEnd = incomingTzEnd.tz('UTC').format('YYYY-MM-DD HH:mm:ss')
 
-    const momentTz = moment(startDateTime).tz(timezone).add(2, 'h').utc().toString()
-
-    console.log(momentTz)
-    // momentTz = Tue Oct 22 2019 13:00:00 GMT+0000
-
-    // const momentStartUserTz = moment.tz(momentTz, timezone)
-    // console.log(momentStartUserTz.add(2, 'h').toString())
-    // momentStartUserTz = Tue Oct 22 2019 17:00:00 GMT+0400
-
-    // moment.tz.setDefault('Europe/London')
-    // const timeZone = incomingTimezone || 'Europe/Dublin'
-    // console.log(timeZone)
-    // const isoStartTime = new Date(startDateTime).toISOString()
-    // const isoEndTime = new Date(endDateTime).toISOString()
-    // console.log(isoStartTime, isoEndTime)
-
-    // const momentStart = moment(isoStartTime)
-    // console.log(momentStart)
-    // const momentStartA = momentStart.tz(timeZone)
-    // console.log(momentStartA)
-    // const momentStartF = moment.tz(startDateTime, timeZone).utc().toString()
-    // console.log(momentStartF)
-
-    ////////////////////////////////////////
-    // Export Object ob available Timezone data
-    // var timeZones = moment.tz.names()
-    // var offsetTmz = []
-
-    // for (var i in timeZones) {
-    //   offsetTmz.push({ label: '(GMT'+moment.tz(timeZones[i]).format('Z')+") " + timeZones[i], value: timeZones[i]});
-    // }
-    // console.log(offsetTmz)
-    ////////////////////////////////////////
-
-
-    // const newStartDateTime = new Date(startDateTime)
-    // console.log(new Date(startDateTime))
-    // console.log(new Date(startDateTime).toLocaleString('de-DE', {timeZone: 'Europe/London'}))
-    // const convertedTime = new Date(startDateTime).toLocaleString('de-DE', {timeZone: 'Europe/London'})
-    // const timezoneOffset = new Date(startDateTime).getTimezoneOffset()
-    // console.log(timezoneOffset)
-
-    // const newStartDateTime = new Date(startDateTime)
-    // const y = getYear(newStartDateTime)
-    // const mo = getMonth(newStartDateTime)
-    // const d = getDay(newStartDateTime)
-    // const h = getHours(newStartDateTime)
-    // const mi = getMinutes(newStartDateTime)
-    // console.log(y, mo, d, h, mi)
-    // console.log(new Date(y, mo, d, h, mi))
-    // const result = addMinutes(new Date(y, mo, d, h, mi), timezoneOffset)
-    // console.log(result)
-
-    // console.log(new Date(startDateTime).toString().substr(0, newStartDateTime.toString().indexOf('GMT') - 1))
-    // console.log(zonedTimeToUtc(new Date(startDateTime)))
-    // console.log(this.state.maintenance.incomingTimezoneLabel.match(/GMT(\+|-)\d{2}:\d{2}/))
-    // const selectedTimezone = this.state.maintenance.incomingTimezoneLabel.match(/(\+|-)\d{2}:\d{2}/)[0]
-    // console.log(format(new Date(startDateTime), "yyyy-MM-dd'T'HH:mm:ss"), selectedTimezone)
-    // console.log(`${format(new Date(startDateTime), "yyyy-MM-dd'T'HH:mm:ss")}${selectedTimezone}`)
-    // const hackedTimeString = `${format(new Date(startDateTime), "yyyy-MM-dd'T'HH:mm:ss")}${selectedTimezone}`
-    // // console.log(zonedTimeToUtc(format(new Date(hackedTimeString), 'dd.MM.yyyy HH:mm'), 'Europe/London'))
-    // const printDate = toDate(parseISO(hackedTimeString))
-    // const printDate2 = format(printDate, 'dd-MM-yyyy HH:mm', { timeZone: 'Europe/London' })
-    // console.log(printDate)
-    // console.log(printDate2)
+    console.log("\x1b[1m", `Start\n${incomingTimezone}\n${rawStart}\n${startDateTime}\n${incomingTzStart}\n${utcStart}`)
+    console.log("\x1b[1m", `End\n${incomingTimezone}\n${rawEnd}\n${endDateTime}\n${incomingTzEnd}\n${utcEnd}`, 'font-weight: bold')
 
     const rescheduleText = ''
-    // const startDateTimeDE = addMinutes(formatTz(zonedTimeToUtc(new Date(startDateTime), timeZone), 'dd.MM.yyyy HH:mm'), 120)
-    // const endDateTimeDE = addMinutes(formatTz(zonedTimeToUtc(new Date(endDateTime), timeZone), 'dd.MM.yyyy HH:mm'), 120)
     const tzSuffixRAW = 'UTC / GMT+0:00'
 
-    let body = `<body style="color:#666666;">${rescheduleText} Dear Colleagues,​​<p><span>We would like to inform you about planned work on the following CID(s):<br><br> <b>${customerCID}</b> <br><br>The maintenance work is with the following details:</span></p><table border="0" cellspacing="2" cellpadding="2" width="775px"><tr><td style='width: 205px;'>Maintenance ID:</td><td><b>NT-${id}</b></td></tr><tr><td>Start date and time:</td><td><b>${startDateTime} (${tzSuffixRAW})</b></td></tr><tr><td>Finish date and time:</td><td><b>${endDateTime} (${tzSuffixRAW})</b></td></tr>`
+    let body = `<body style="color:#666666;">${rescheduleText} Dear Colleagues,​​<p><span>We would like to inform you about planned work on the following CID(s):<br><br> <b>${customerCID}</b> <br><br>The maintenance work is with the following details:</span></p><table border="0" cellspacing="2" cellpadding="2" width="775px"><tr><td style='width: 205px;'>Maintenance ID:</td><td><b>NT-${id}</b></td></tr><tr><td>Start date and time:</td><td><b>${utcStart} (${tzSuffixRAW})</b></td></tr><tr><td>Finish date and time:</td><td><b>${utcEnd} (${tzSuffixRAW})</b></td></tr>`
 
     if (impact) {
       body = body + '<tr><td>Impact:</td><td>' + impact + '</td></tr>'
@@ -830,39 +769,14 @@ export default class Maintenance extends React.Component {
     }
   }
 
-  // parseDate (dateString, format) {
-  //   return parseISO(dateString)
-  //   // console.log(dateString, format)
-  //   // let timezonedDate = timeZone ? new moment.tz(dateString, format, timeZone)
-  //   //                               : new moment(dateString, format);
-  //   // const timezonedDate = format(dateString, format)
-  //   // return timezonedDate
-  // }
-
-  // formatDate (date, formatIn) {
-  //   console.log(date, formatIn)
-  //   console.log(new Date(date).getTimezoneOffset())
-  //   const timezoneOffset = new Date(date).getTimezoneOffset()
-  //   const UTCDateTime = subMinutes(new Date(date), timezoneOffset)
-  //   console.log(UTCDateTime)
-  //   console.log(zonedTimeToUtc(date, 'Europe/Berlin'))
-
-
-  //   // var dt = moment(date);
-  //   // if(timeZone)
-  //   //     dt = dt.tz(timeZone);
-
-  //   return format(date, 'yyyy-MM-dd HH:mm:ss')
-  // }
-
   handleStartDate (date) {
+
+    const startDate = moment(date[0]).format('YYYY-MM-DD HH:mm:ss')
 
     this.setState({
       maintenance: {
         ...this.state.maintenance,
-        startDateTime: date[0]
-        // Tue Oct 22 2019 15:00:00 GMT+0200 (Central European Summer Time)
-        // startDateTime: new Date(date[0]).toISOString()
+        startDateTime: startDate
       }
     })
     const startDateTime = this.state.maintenance.startDateTime
@@ -879,11 +793,13 @@ export default class Maintenance extends React.Component {
 
 
   handleEndDate (date) {
-    // console.log(date[0])
+
+    const endDate = moment(date[0]).format('YYYY-MM-DD HH:mm:ss')
+
     this.setState({
       maintenance: {
         ...this.state.maintenance,
-        endDateTime: new Date(date[0]).toISOString()
+        endDateTime: endDate
       }
     })
     const startDateTime = this.state.maintenance.startDateTime
