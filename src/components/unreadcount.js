@@ -45,7 +45,6 @@ const UnreadCount = () => {
                 <Head>
                   <title>{`${favicon}`}</title>
                 </Head>
-                <div>test</div>
               </>
             )
           }

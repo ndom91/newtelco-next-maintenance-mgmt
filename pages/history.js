@@ -108,13 +108,11 @@ export default class History extends React.Component {
           }, {
             headerName: 'Start',
             field: 'startDateTime',
-            cellRenderer: 'startdateTime',
-            tooltipField: 'startDateTime'
+            cellRenderer: 'startdateTime'
           }, {
             headerName: 'End',
             field: 'endDateTime',
-            cellRenderer: 'enddateTime',
-            tooltipField: 'endDateTime'
+            cellRenderer: 'enddateTime'
           }, {
             headerName: 'Newtelco CIDs',
             field: 'betroffeneCIDs',
@@ -145,8 +143,8 @@ export default class History extends React.Component {
         rowClass: 'row-class',
         rowClassRules: {
           'row-completed': function (params) {
-            const completed = params.data.completed
-            if (completed === 'true' || completed === '1') {
+            const done = params.data.done
+            if (done === 'true' || done === '1') {
               return true
             }
             return false
@@ -306,7 +304,7 @@ export default class History extends React.Component {
                       pathname: '/maintenance',
                       query: {
                         id: 'NEW',
-                        mailId: null,
+                        mailId: 'NT',
                         name: this.state.newCompMailDomain
                       }
                     }}

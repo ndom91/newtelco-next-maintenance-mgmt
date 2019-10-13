@@ -17,14 +17,14 @@ import Router from 'next/router'
 import { Helmet } from 'react-helmet'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Editor as TinyEditor } from '@tinymce/tinymce-react'
-import { format, isValid, formatDistance, parseISO, addMinutes, parse, subMinutes, toDate, getYear, getMonth, getDay, getHours, getMinutes, getSeconds } from 'date-fns'
+import { format, isValid, formatDistance, parseISO } from 'date-fns'
 import moment from 'moment-timezone'
-import { zonedTimeToUtc, format as formatTz } from 'date-fns-tz'
+import { zonedTimeToUtc } from 'date-fns-tz'
 import { Rnd } from 'react-rnd'
-import { Timezones } from '../src/components/timezone/timezones.js'
 import UnreadCount from '../src/components/unreadcount'
 import Flatpickr from 'react-flatpickr'
 import 'flatpickr/dist/themes/material_blue.css'
+import TimezoneSelector from '../src/components/timezone'
 
 import {
   faPlusCircle,
@@ -35,7 +35,8 @@ import {
   faFirstAid,
   faSearch,
   faPaperPlane,
-  faTimesCircle
+  faTimesCircle,
+  faRandom
 } from '@fortawesome/free-solid-svg-icons'
 import {
   Container,
@@ -95,7 +96,17 @@ export default class Maintenance extends React.Component {
       width: 0,
       maintenance: {
         incomingBody: this.props.jsonData.profile.body,
-        incomingTimezone: this.props.jsonData.profile.timezone
+        timezone: this.props.jsonData.profile.timezone,
+        timezoneLabel: this.props.jsonData.profile.timezoneLabel,
+        bearbeitetvon: '',
+        maileingang: '',
+        updatedAt: '',
+        updatedBy: '',
+        name: '',
+        impact: '',
+        location: '',
+        reason: '',
+        mailId: 'NT'
       },
       openReadModal: false,
       openPreviewModal: false,
@@ -107,6 +118,7 @@ export default class Maintenance extends React.Component {
       lieferantcids: {},
       kundencids: [],
       windowInnerHeight: 0,
+      unreadCount: '',
       gridOptions: {
         defaultColDef: {
           resizable: true,
@@ -189,6 +201,110 @@ export default class Maintenance extends React.Component {
     this.handleNotesBlur = this.handleNotesBlur.bind(this)
     this.handleTimezoneChange = this.handleTimezoneChange.bind(this)
     this.handleTimezoneBlur = this.handleTimezoneBlur.bind(this)
+    this.handleProtectionSwitch = this.handleProtectionSwitch.bind(this)
+    this.handleUpdatedByChange = this.handleUpdatedByChange.bind(this)
+    this.handleUpdatedAtChange = this.handleUpdatedAtChange.bind(this)
+  }
+
+  componentDidMount () {
+    const convertBool = (input) => {
+      if (input === '1' || input === '0') {
+        if (input === '1') {
+          return true
+        } else if (input === '0') {
+          return false
+        }
+      } else if (input === 'true' || input === 'false') {
+        if (input === 'true') {
+          return true
+        } else if (input === 'false') {
+          return false
+        }
+      } else {
+        return input
+      }
+    }
+
+    if (this.props.jsonData.profile.id === 'NEW') {
+      const {
+        email
+      } = this.props.session.user
+      const username = email.substr(0, email.indexOf('@'))
+      const maintenance = {
+        ...this.props.jsonData.profile,
+        startDateTime: moment(this.props.jsonData.profile.startDateTime).format('YYYY-MM-DD HH:mm:ss'),
+        endDateTime: moment(this.props.jsonData.profile.endDateTime).format('YYYY-MM-DD HH:mm:ss'),
+        bearbeitetvon: username,
+        incomingBody: '',
+        incomingSubject: this.props.jsonData.profile.subject,
+        incomingFrom: this.props.jsonData.profile.from,
+        incomingDate: this.props.jsonData.profile.maileingang,
+        incomingDomain: this.props.jsonData.profile.name,
+        updatedAt: format(new Date(), 'MM.dd.yyyy HH:mm') //, { locale: de })
+      }
+      this.setState({
+        maintenance: maintenance,
+        width: window.innerWidth
+      })
+    } else {
+      const {
+        cancelled,
+        emergency,
+        done
+      } = this.props.jsonData.profile
+
+      const newMaintenance = {
+        ...this.props.jsonData.profile,
+        cancelled: convertBool(cancelled),
+        emergency: convertBool(emergency),
+        done: convertBool(done)
+      }
+
+      this.setState({
+        maintenance: newMaintenance,
+        width: window.innerWidth
+      })
+    }
+
+    const host = window.location.host
+    if (this.props.jsonData.profile.lieferant) {
+      const lieferantId = this.props.jsonData.profile.lieferant
+
+      this.fetchLieferantCIDs(lieferantId)
+    } else {
+      let lieferantDomain
+      if (this.props.jsonData.profile.id === 'NEW') {
+        lieferantDomain = this.props.jsonData.profile.name
+      } else {
+        lieferantDomain = this.props.jsonData.profile.mailDomain
+      }
+      fetch(`https://${host}/api/companies/domain?id=${lieferantDomain}`, {
+        method: 'get'
+      })
+        .then(resp => resp.json())
+        .then(data => {
+          if (!data.companyResults[0]) {
+            this.fetchLieferantCIDs()
+            return
+          }
+          const companyId = data.companyResults[0].id
+          const companyName = data.companyResults[0].name
+          // const selectedLieferantCIDid = parseInt(this.props.jsonData.profile.derenCIDid) || null
+          // const selectedLieferantCIDvalue = this.props.jsonData.profile.derenCID || null
+          this.setState({
+            maintenance: {
+              ...this.state.maintenance,
+              name: companyName,
+              lieferant: companyId
+            }
+          })
+          this.fetchLieferantCIDs(companyId)
+        })
+        .catch(err => console.error(`Error - ${err}`))
+    }
+    this.setState({
+      windowInnerHeight: window.innerHeight
+    })
   }
 
   sendMailBtns = (row) => {
@@ -299,99 +415,6 @@ export default class Maintenance extends React.Component {
         }
       })
       .catch(err => console.error(`Error - ${err}`))
-  }
-
-  componentDidMount () {
-    const convertBool = (input) => {
-      if (input === '1' || input === '0') {
-        if (input === '1') {
-          return true
-        } else if (input === '0') {
-          return false
-        }
-      } else {
-        return input
-      }
-    }
-
-    if (this.props.jsonData.profile.id === 'NEW') {
-      const {
-        email
-      } = this.props.session.user
-      const username = email.substr(0, email.indexOf('@'))
-      const maintenance = {
-        ...this.props.jsonData.profile,
-        bearbeitetvon: username,
-        incomingBody: '',
-        incomingSubject: this.props.jsonData.profile.subject,
-        incomingFrom: this.props.jsonData.profile.from,
-        incomingDate: this.props.jsonData.profile.maileingang,
-        incomingDomain: this.props.jsonData.profile.name,
-        updatedAt: format(new Date(), 'MM.dd.yyyy HH:mm') //, { locale: de })
-      }
-      this.setState({
-        maintenance: maintenance,
-        width: window.innerWidth
-      })
-    } else {
-      const {
-        cancelled,
-        emergency,
-        done
-      } = this.props.jsonData.profile
-
-      const newMaintenance = {
-        ...this.props.jsonData.profile,
-        cancelled: convertBool(cancelled),
-        emergency: convertBool(emergency),
-        done: convertBool(done)
-      }
-
-      this.setState({
-        maintenance: newMaintenance,
-        width: window.innerWidth
-      })
-    }
-
-    const host = window.location.host
-    if (this.props.jsonData.profile.lieferant) {
-      const lieferantId = this.props.jsonData.profile.lieferant
-
-      this.fetchLieferantCIDs(lieferantId)
-    } else {
-      let lieferantDomain
-      if (this.props.jsonData.profile.id === 'NEW') {
-        lieferantDomain = this.props.jsonData.profile.name
-      } else {
-        lieferantDomain = this.props.jsonData.profile.mailDomain
-      }
-      fetch(`https://${host}/api/companies/domain?id=${lieferantDomain}`, {
-        method: 'get'
-      })
-        .then(resp => resp.json())
-        .then(data => {
-          if (!data.companyResults[0]) {
-            this.fetchLieferantCIDs()
-            return
-          }
-          const companyId = data.companyResults[0].id
-          const companyName = data.companyResults[0].name
-          // const selectedLieferantCIDid = parseInt(this.props.jsonData.profile.derenCIDid) || null
-          // const selectedLieferantCIDvalue = this.props.jsonData.profile.derenCID || null
-          this.setState({
-            maintenance: {
-              ...this.state.maintenance,
-              name: companyName,
-              lieferant: companyId
-            }
-          })
-          this.fetchLieferantCIDs(companyId)
-        })
-        .catch(err => console.error(`Error - ${err}`))
-    }
-    this.setState({
-      windowInnerHeight: window.innerHeight
-    })
   }
 
   getUnique (arr, comp) {
@@ -564,7 +587,8 @@ export default class Maintenance extends React.Component {
       impact,
       reason,
       location,
-      incomingTimezone
+      timezone,
+      timezoneLabel
     } = this.state.maintenance
 
     if (!id || !startDateTime || !endDateTime) {
@@ -574,16 +598,16 @@ export default class Maintenance extends React.Component {
       return
     }
 
-    const timezone = incomingTimezone || 'Europe/Dublin'
+    const timezoneValue = timezone || 'Europe/Dublin'
     const rawStart = moment(startDateTime).format('YYYY-MM-DD HH:mm:ss')
     const rawEnd = moment(endDateTime).format('YYYY-MM-DD HH:mm:ss')
-    const incomingTzStart = moment.tz(rawStart, incomingTimezone)
-    const incomingTzEnd = moment.tz(rawEnd, incomingTimezone)
+    const incomingTzStart = moment.tz(rawStart, timezoneValue)
+    const incomingTzEnd = moment.tz(rawEnd, timezoneValue)
     const utcStart = incomingTzStart.tz('UTC').format('YYYY-MM-DD HH:mm:ss')
     const utcEnd = incomingTzEnd.tz('UTC').format('YYYY-MM-DD HH:mm:ss')
 
-    console.log("\x1b[1m", `Start\n${incomingTimezone}\n${rawStart}\n${startDateTime}\n${incomingTzStart}\n${utcStart}`)
-    console.log("\x1b[1m", `End\n${incomingTimezone}\n${rawEnd}\n${endDateTime}\n${incomingTzEnd}\n${utcEnd}`, 'font-weight: bold')
+    console.log(`%cStart\n${timezoneValue} - ${timezoneLabel}\nsDT: ${startDateTime}\nrS: ${rawStart}\niTS: ${incomingTzStart}\nuS: ${utcStart}`, 'font-weight: bold')
+    console.log(`%cEnd\n${timezoneValue} - ${timezoneLabel}\neDT: ${endDateTime}\nrE: ${rawEnd}\niTE: ${incomingTzEnd}\nuE: ${utcEnd}`, 'font-weight: bold')
 
     const rescheduleText = ''
     const tzSuffixRAW = 'UTC / GMT+0:00'
@@ -712,6 +736,11 @@ export default class Maintenance extends React.Component {
     const startDateTime = this.state.maintenance.startDateTime
     const endDateTime = this.state.maintenance.endDateTime
 
+    const startMoment = moment.tz(startDateTime, this.state.maintenance.timezone)
+    const startDE = startMoment.tz('Europe/Berlin').format()
+    const endMoment = moment.tz(endDateTime, this.state.maintenance.timezone)
+    const endDE = endMoment.tz('Europe/Berlin').format()
+
     fetch(`https://api.${host}/calendar/create`, {
       method: 'post',
       body: JSON.stringify({
@@ -719,8 +748,8 @@ export default class Maintenance extends React.Component {
         cids: cids,
         supplierCID: supplierCID,
         maintId: maintId,
-        startDateTime: startDateTime,
-        endDateTime: endDateTime
+        startDateTime: startDE,
+        endDateTime: endDE
       }),
       mode: 'cors',
       headers: {
@@ -738,7 +767,7 @@ export default class Maintenance extends React.Component {
             position: 'top-right'
           })
         } else if (statusText === 'failed') {
-          cogoToast.warn(`Error creating Calendar Entry - ${data.error}`, {
+          cogoToast.warn(`Error creating Calendar Entry - ${data.statusText}`, {
             position: 'top-right'
           })
         }
@@ -770,7 +799,7 @@ export default class Maintenance extends React.Component {
   }
 
   handleStartDate (date) {
-
+    console.log(`changeStart\n${date[0]}\n${moment(date[0]).format('YYYY-MM-DD HH:mm:ss')}`)
     const startDate = moment(date[0]).format('YYYY-MM-DD HH:mm:ss')
 
     this.setState({
@@ -790,10 +819,8 @@ export default class Maintenance extends React.Component {
     }
   }
 
-
-
   handleEndDate (date) {
-
+    console.log(`changeEnd\n${date[0]}\n${moment(date[0]).format('YYYY-MM-DD HH:mm:ss')}`)
     const endDate = moment(date[0]).format('YYYY-MM-DD HH:mm:ss')
 
     this.setState({
@@ -817,35 +844,18 @@ export default class Maintenance extends React.Component {
     let newValue
     const maintId = this.state.maintenance.id
     const host = window.location.host
-    // console.log(element)
     if (element === 'start') {
-      // console.log(isValid(this.state.maintenance.startDateTime))
-      // console.log(this.state.maintenance.startDateTime)
-      // console.log(isValid(parseISO(this.state.maintenance.startDateTime)))
-      // console.log(parseISO(this.state.maintenance.startDateTime))
-      // console.log(this.state.maintenance.startDateTime, this.props.jsonData.profile.endDateTime)
       if (isValid(parseISO(this.state.maintenance.startDateTime))) {
         newValue = this.state.maintenance.startDateTime
-        // if (newValue === this.props.jsonData.profile.startDateTime) {
-        //   return
-        // }
       }
     } else if (element === 'end') {
-      // console.log(isValid(this.state.maintenance.endDateTime))
-      // console.log(isValid(new Date(this.state.maintenance.endDateTime)))
-      // console.log(new Date(this.state.maintenance.endDateTime))
-      // console.log(this.state.maintenance.endDateTime, this.props.jsonData.profile.endDateTime)
       if (isValid(new Date(this.state.maintenance.endDateTime))) {
         newValue = this.state.maintenance.endDateTime
-        // if (newValue === this.props.jsonData.profile.endDateTime) {
-        //   // console.log('return if same as old')
-        //   return
-        // }
       }
     }
     const saveDateTime = (host, maintId, element, newValue) => {
       let newISOTime = parseISO(newValue)
-      const selectedTimezone = this.state.maintenance.incomingTimezone
+      const selectedTimezone = this.state.maintenance.timezone
       if (selectedTimezone && isValid(newISOTime)) {
         newISOTime = zonedTimeToUtc(newISOTime, selectedTimezone)
       }
@@ -858,7 +868,6 @@ export default class Maintenance extends React.Component {
           return
         }
         const saveDateFormat = format(newISOTime, 'yyyy-MM-dd HH:mm:ss')
-        // console.log(format(newISOTime, 'yyyy-MM-dd HH:mm:ss'))
         fetch(`https://${host}/api/maintenances/save/dateTime?maintId=${maintId}&element=${element}&value=${saveDateFormat}`, {
           method: 'get',
           headers: {
@@ -887,7 +896,15 @@ export default class Maintenance extends React.Component {
   handleToggleChange (element, event) {
     const host = window.location.host
     const maintId = this.state.maintenance.id
-    const newValue = !eval(`this.state.maintenance.${element}`)
+    let newValue = !eval(`this.state.maintenance.${element}`)
+    if (typeof newValue === 'string') {
+      if (newValue === 'false') {
+        newValue = false
+      } else if (newValue === 'true') {
+        newValue = true
+      }
+    }
+
     this.setState({
       maintenance: {
         ...this.state.maintenance,
@@ -897,9 +914,10 @@ export default class Maintenance extends React.Component {
 
     if (element === 'done') {
       // mark mail as unread as well
+      const mailId = this.state.maintenance.mailId || this.state.maintenance.receivedmail
       fetch(`https://api.${host}/inbox/delete`, {
         method: 'post',
-        body: JSON.stringify({ m: this.state.maintenance.mailId }),
+        body: JSON.stringify({ m: mailId }),
         mode: 'cors',
         headers: {
           'Access-Control-Allow-Origin': '*',
@@ -908,17 +926,59 @@ export default class Maintenance extends React.Component {
       })
         .then(resp => resp.json())
         .then(data => {
-          if (data.status === 'complete') {
+          if (data.status === 'complete' && newValue === 'true') {
             cogoToast.success('Message Marked Complete', {
               position: 'top-right'
             })
-          } else {
+          } else if (data.id === 500) {
             cogoToast.warn('Error marking as complete', {
               position: 'top-right'
             })
           }
         })
         .catch(err => console.error(`Error - ${err}`))
+
+      // save 'betroffeneCIDs'
+      let impactedCIDs = ''
+      this.state.kundencids.forEach(cid => {
+        impactedCIDs = impactedCIDs + cid.kundenCID + ' '
+      })
+
+      impactedCIDs = impactedCIDs.trim()
+
+      this.setState({
+        maintenance: {
+          ...this.state.maintenance,
+          betroffeneCIDs: impactedCIDs,
+          [element]: newValue
+        }
+      })
+
+      fetch(`https://${host}/api/maintenances/save/impactedcids?cids=${impactedCIDs}&maintId=${this.state.maintenance.id}`, {
+        method: 'get',
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          _csrf: this.props.session.csrfToken
+        }
+      })
+        .then(resp => resp.json())
+        .then(data => {
+          if (data.status === 200) {
+            cogoToast.success('Impacted CIDs Saved', {
+              position: 'top-right'
+            })
+          } else {
+            cogoToast.warn('Impacted CIDs Not Saved', {
+              position: 'top-right'
+            })
+          }
+        })
+        .catch(err => console.error(`Error - ${err}`))
+
+      // update Algolia Index
+      fetch(`https://api.${host}/search/update`, {
+        method: 'get'
+      })
     }
 
     if (maintId === 'NEW') {
@@ -1030,22 +1090,34 @@ export default class Maintenance extends React.Component {
     })
   }
 
-  handleTimezoneChange (selection) {
-    const zoneLabel = selection.value
-    const zoneGMTValue = selection.label
+  handleProtectionSwitch () {
     this.setState({
       maintenance: {
         ...this.state.maintenance,
-        incomingTimezone: zoneLabel,
-        incomingTimezoneLabel: zoneGMTValue
+        impact: '50ms protection switch'
+      }
+    })
+    this.handleTextInputBlur('impact')
+  }
+
+  handleTimezoneChange (selection) {
+    const timezoneLabel = selection.label
+    const timezoneValue = selection.value
+
+    this.setState({
+      maintenance: {
+        ...this.state.maintenance,
+        timezone: timezoneValue,
+        timezoneLabel: timezoneLabel
       }
     })
   }
 
   handleTimezoneBlur (ev) {
-    const incomingTimezone = this.state.maintenance.incomingTimezone || 'Europe/Berlin'
+    const incomingTimezone = this.state.maintenance.timezone || 'Europe/Berlin'
+    const incomingTimezoneLabel = this.state.maintenance.timezoneLabel || '(GMT+01:00) Berlin'
     const host = window.location.host
-    fetch(`https://${host}/api/maintenances/save/timezone?maintId=${this.state.maintenance.id}&timezone=${incomingTimezone}`, {
+    fetch(`https://${host}/api/maintenances/save/timezone?maintId=${this.state.maintenance.id}&timezone=${incomingTimezone}&timezoneLabel=${incomingTimezoneLabel}`, {
       method: 'get',
       headers: {
         'Access-Control-Allow-Origin': '*',
@@ -1114,9 +1186,12 @@ export default class Maintenance extends React.Component {
       updatedAt
     } = this.state.maintenance
 
-    // console.log(Date.parse(incomingDate))
-    // const incomingFormatted = format(incomingDate, 'YYYY-MM-DD HH:mm:ss')
-    const incomingFormatted = format(new Date(maileingang), 'yyyy-MM-dd HH:mm:ss')
+    let incomingFormatted
+    if (mailId === 'NT') {
+      incomingFormatted = format(new Date(updatedAt), 'yyyy-MM-dd HH:mm:ss')
+    } else {
+      incomingFormatted = format(new Date(maileingang), 'yyyy-MM-dd HH:mm:ss')
+    }
     const updatedAtFormatted = format(new Date(updatedAt), 'yyyy-MM-dd HH:mm:ss')
 
     const host = window.location.host
@@ -1182,9 +1257,23 @@ export default class Maintenance extends React.Component {
       .catch(err => console.error(err))
   }
 
-  handleLoadTimezones = input => {
-    new Promise(resolve => {
-      resolve(Timezones)
+  handleUpdatedByChange () {
+    const value = this.state.maintenance.updatedBy
+    this.setState({
+      maintenance: {
+        ...this.state.maintenance,
+        updatedBy: value
+      }
+    })
+  }
+
+  handleUpdatedAtChange () {
+    const value = this.state.maintenance.updatedAt
+    this.setState({
+      maintenance: {
+        ...this.state.maintenance,
+        updatedAt: value
+      }
     })
   }
 
@@ -1204,7 +1293,7 @@ export default class Maintenance extends React.Component {
 
     if (this.props.session.user) {
       return (
-        <Layout unread={this.props.unread} session={this.props.session}>
+        <Layout unread={this.state.unreadCount} session={this.props.session}>
           <Helmet>
             <title>{`Newtelco Maintenance - NT-${maintenance.id}`}</title>
           </Helmet>
@@ -1261,14 +1350,13 @@ export default class Maintenance extends React.Component {
                               </FormGroup>
                               <FormGroup>
                                 <label htmlFor='updated-by'>Last Updated By</label>
-                                <FormInput readOnly id='updated-by' name='updated-by' type='text' value={maintenance.updatedBy} />
+                                <FormInput readOnly id='updated-by' name='updated-by' type='text' value={maintenance.updatedBy} onChange={this.handleUpdatedByChange} />
                               </FormGroup>
                               <FormGroup>
                                 <label htmlFor='supplier'>Timezone</label>
-                                <Select
-                                  value={this.state.incomingTimezone}
+                                <TimezoneSelector
+                                  value={{ value: this.state.maintenance.timezone, label: this.state.maintenance.timezoneLabel }}
                                   onChange={this.handleTimezoneChange}
-                                  options={Timezones}
                                   onBlur={this.handleTimezoneBlur}
                                 />
                               </FormGroup>
@@ -1295,7 +1383,7 @@ export default class Maintenance extends React.Component {
                               </FormGroup>
                               <FormGroup>
                                 <label htmlFor='updated-at'>Updated At</label>
-                                <FormInput tabIndex='-1' readOnly id='updated-at' name='updated-at' type='text' value={this.convertDateTime(maintenance.updatedAt)} />
+                                <FormInput tabIndex='-1' readOnly id='updated-at' name='updated-at' type='text' value={this.convertDateTime(maintenance.updatedAt)} onChange={this.handleUpdatedAtChange} />
                               </FormGroup>
                               <FormGroup>
                                 <label htmlFor='their-cid'>{maintenance.name} CID</label>
@@ -1331,6 +1419,9 @@ export default class Maintenance extends React.Component {
                                 <Col>
                                   <FormGroup>
                                     <label htmlFor='impact'>Impact</label>
+                                    <Button style={{ padding: '0.35em', float: 'right', marginTop: '10px' }} onClick={this.handleProtectionSwitch} outline theme='secondary'>
+                                      <FontAwesomeIcon width={'16px'} icon={faRandom} />
+                                    </Button>
                                     <FormInput onBlur={() => this.handleTextInputBlur('impact')} id='impact' name='impact' type='text' onChange={this.handleImpactChange} placeholder={this.state.impactPlaceholder} value={maintenance.impact} />
                                   </FormGroup>
                                 </Col>
@@ -1365,7 +1456,7 @@ export default class Maintenance extends React.Component {
                                   <label>
                                     <Toggle
                                       icons={{
-                                        checked: <FontAwesomeIcon icon={faFirstAid} width='0.5em' style={{ color: '#fff' }} />,
+                                        checked: <FontAwesomeIcon icon={faFirstAid} width='1em' style={{ color: '#fff' }} />,
                                         unchecked: null
                                       }}
                                       checked={maintenance.emergency === 'false' ? false : !!maintenance.emergency}

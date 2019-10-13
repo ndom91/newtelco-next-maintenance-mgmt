@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
   faLock,
   faQuestion,
-  faBan
+  faLockOpen
 } from '@fortawesome/free-solid-svg-icons'
 
 export default class ProtectedIcon extends Component {
@@ -14,7 +14,7 @@ export default class ProtectedIcon extends Component {
       )
     } else if (this.props.node.data.protected === '0' || this.props.node.data.protected === 'false') {
       return (
-        <FontAwesomeIcon style={{ fontSize: '12px' }} width='1.5em' icon={faBan} />
+        <FontAwesomeIcon style={{ fontSize: '12px' }} width='1.5em' icon={faLockOpen} />
       )
     } else {
       return (

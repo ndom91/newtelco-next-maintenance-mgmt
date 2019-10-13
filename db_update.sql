@@ -21,3 +21,5 @@ ALTER TABLE `maintenancedb` CHANGE `location` `location` VARCHAR(256) CHARACTER 
 ALTER TABLE `maintenancedb` CHANGE `notes` `notes` LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL;
 ALTER TABLE `maintenancedb` CHANGE `betroffeneKunden` `betroffeneKunden` VARCHAR(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL;
 ALTER TABLE `maintenancedb` CHANGE `betroffeneCIDs` `betroffeneCIDs` VARCHAR(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL;
+
+ALTER TABLE `maintenancedb` ADD `timezoneLabel` VARCHAR(128) NULL AFTER `timezone`;
