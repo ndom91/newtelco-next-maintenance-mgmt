@@ -86,6 +86,14 @@ class EmailTable extends React.Component {
     }
   }
 
+  componentDidMount () {
+    this.props.onRef(this)
+  }
+
+  componentWillUnmount () {
+    this.props.onRef(undefined)
+  }
+
   sendMailBtns = (row) => {
     return (
       <ButtonGroup>
@@ -100,9 +108,13 @@ class EmailTable extends React.Component {
   }
 
   handleGridReady = params => {
-    // this.gridApi = params.gridApi
-    // this.gridColumnApi = params.gridColumnApi
+    this.gridApi = params.gridApi
+    this.gridColumnApi = params.gridColumnApi
     // params.columnApi.autoSizeColumns()
+  }
+
+  refreshCells () {
+    this.gridApi.refreshCells()
   }
 
   onFirstDataRendered (params) {

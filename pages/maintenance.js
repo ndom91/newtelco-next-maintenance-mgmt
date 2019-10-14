@@ -174,14 +174,12 @@ export default class Maintenance extends React.Component {
       const username = email.substr(0, email.indexOf('@'))
       const maintenance = {
         ...this.props.jsonData.profile,
-        startDateTime: moment(this.props.jsonData.profile.startDateTime).format('YYYY-MM-DD HH:mm:ss'),
-        endDateTime: moment(this.props.jsonData.profile.endDateTime).format('YYYY-MM-DD HH:mm:ss'),
         bearbeitetvon: username,
-        incomingBody: '',
-        incomingSubject: this.props.jsonData.profile.subject,
-        incomingFrom: this.props.jsonData.profile.from,
-        incomingDate: this.props.jsonData.profile.maileingang,
-        incomingDomain: this.props.jsonData.profile.name,
+        // incomingBody: '',
+        // incomingSubject: this.props.jsonData.profile.subject,
+        // incomingFrom: this.props.jsonData.profile.from,
+        // incomingDate: this.props.jsonData.profile.maileingang,
+        // incomingDomain: this.props.jsonData.profile.name,
         updatedAt: format(new Date(), 'MM.dd.yyyy HH:mm')
       }
       this.setState({
@@ -368,7 +366,6 @@ export default class Maintenance extends React.Component {
       return
     }
     // @param1 - int -1 single LIeferantCID ID
-    console.log(lieferantCidId)
     fetch(`https://${host}/api/customercids/${lieferantCidId}`, {
       method: 'get'
     })
@@ -396,14 +393,11 @@ export default class Maintenance extends React.Component {
             } else {
               data.kundenCIDsResult[0].sent = '0'
             }
-            console.log(data.kundenCIDsResult)
             const existingKundenCids = [
               ...this.state.kundencids,
               data.kundenCIDsResult[0]
             ]
-            console.log(existingKundenCids)
             const uniqueKundenCids = getUnique(existingKundenCids, 'kundenCID')
-            console.log(uniqueKundenCids)
             this.setState({
               kundencids: uniqueKundenCids
             })
@@ -437,11 +431,16 @@ export default class Maintenance extends React.Component {
     if (!this.state.maintenance.incomingBody) {
       const host = window.location.host
       let mailId
-      console.log(this.state.maintenance.id, this.state.maintenance.receivedmail, this.state.maintenance.mailId)
       if (this.state.maintenance.id === 'NEW') {
         mailId = this.state.maintenance.mailId
       } else {
         mailId = this.state.maintenance.receivedmail
+      }
+      if (mailId === 'NT') {
+        cogoToast.warn('No mail available', {
+          position: 'top-right'
+        })
+        return
       }
       fetch(`https://api.${host}/mail/${mailId}`, {
         method: 'get'
@@ -576,6 +575,10 @@ export default class Maintenance extends React.Component {
     })
   }
 
+  refreshCells (gridApi) {
+    gridApi.refreshCells()
+  }
+
   // send out the created mail
   sendMail (recipient, customerCid, subj, htmlBody) {
     const host = window.location.host
@@ -612,20 +615,22 @@ export default class Maintenance extends React.Component {
         if (status === 200 && statusText === 'OK') {
           if (customerCid) {
             const activeRowIndex = this.state.kundencids.findIndex(el => el.kundenCID === customerCid)
+            console.log(activeRowIndex)
             const kundenCidRow = this.state.kundencids[activeRowIndex]
-            kundenCidRow.sent = 1
+            kundenCidRow.sent = '1'
             const updatedKundenCids = [
-              kundenCidRow,
-              ...this.state.kundencids
+              ...this.state.kundencids,
+              kundenCidRow
             ]
             const deduplicatedKundenCids = getUnique(updatedKundenCids, 'kundenCID')
             this.setState({
               kundencids: deduplicatedKundenCids
             })
-            this.gridApi.refreshCells()
             cogoToast.success('Mail Sent', {
               position: 'top-right'
             })
+            // this.refreshCells()
+            this.MailTable.refreshCells()
           } else {
             this.setState({
               openPreviewModal: !this.state.openPreviewModal
@@ -635,16 +640,12 @@ export default class Maintenance extends React.Component {
             })
           }
         } else {
-          if (customerCid) {
-            cogoToast.warn('Error Sending Mail', {
-              position: 'top-right'
-            })
-          } else {
+          cogoToast.warn('Error Sending Mail', {
+            position: 'top-right'
+          })
+          if (!customerCid) {
             this.setState({
               openPreviewModal: !this.state.openPreviewModal
-            })
-            cogoToast.warn('Error Sending Mail', {
-              position: 'top-right'
             })
           }
         }
@@ -706,18 +707,14 @@ export default class Maintenance extends React.Component {
 
   // prepare mail from direct-send button
   prepareDirectSend (recipient, customerCID) {
-    if (!this.state.mailBodyText) {
-      const HtmlBody = this.generateMail(customerCID)
-      const subject = `Planned Work Notification - NT-${this.state.maintenance.id}`
-      this.setState({
-        mailBodyText: HtmlBody,
-        mailPreviewHeaderText: recipient,
-        mailPreviewSubjectText: subject
-      })
-      this.sendMail(recipient, customerCID, subject, HtmlBody)
-    } else {
-      this.sendMail(recipient, customerCID)
-    }
+    const HtmlBody = this.generateMail(customerCID)
+    const subject = `Planned Work Notification - NT-${this.state.maintenance.id}`
+    this.setState({
+      mailBodyText: HtmlBody,
+      mailPreviewHeaderText: recipient,
+      mailPreviewSubjectText: subject
+    })
+    this.sendMail(recipient, customerCID, subject, HtmlBody)
   }
 
   handleStartDateChange (date) {
@@ -1151,6 +1148,8 @@ export default class Maintenance extends React.Component {
         this.setState({
           maintenance: newMaint
         })
+        const newLocation = `/maintenance?id=${newId}`
+        Router.push(newLocation, newLocation, { shallow: true })
         if (data.status === 200 && data.statusText === 'OK') {
           cogoToast.success('Create Success', {
             position: 'top-right'
@@ -1508,6 +1507,7 @@ export default class Maintenance extends React.Component {
                                 prepareDirectSend={this.prepareDirectSend}
                                 togglePreviewModal={this.togglePreviewModal}
                                 kundencids={this.state.kundencids}
+                                onRef={ref => (this.MailTable = ref)}
                               />
                             </Col>
                           </Row>
