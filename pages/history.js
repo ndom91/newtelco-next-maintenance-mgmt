@@ -16,6 +16,8 @@ import EndDateTime from '../src/components/ag-grid/enddatetime'
 import MailArrived from '../src/components/ag-grid/mailarrived'
 import UpdatedAt from '../src/components/ag-grid/updatedat'
 import Supplier from '../src/components/ag-grid/supplier'
+import CompleteIcon from '../src/components/ag-grid/complete'
+import EdittedBy from '../src/components/ag-grid/edittedby'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import UnreadCount from '../src/components/unreadcount'
 import UseAnimations from 'react-useanimations'
@@ -89,12 +91,13 @@ export default class History extends React.Component {
           {
             headerName: 'ID',
             field: 'id',
-            width: 80,
+            width: 100,
             pinned: 'left',
             sort: { direction: 'asc', priority: 0 }
           }, {
-            headerName: 'Edited By',
+            headerName: 'By',
             field: 'bearbeitetvon',
+            cellRenderer: 'edittedby',
             width: 100
           }, {
             headerName: 'Supplier',
@@ -108,10 +111,12 @@ export default class History extends React.Component {
           }, {
             headerName: 'Start',
             field: 'startDateTime',
+            width: 160,
             cellRenderer: 'startdateTime'
           }, {
             headerName: 'End',
             field: 'endDateTime',
+            width: 160,
             cellRenderer: 'enddateTime'
           }, {
             headerName: 'Newtelco CIDs',
@@ -127,6 +132,12 @@ export default class History extends React.Component {
             headerName: 'Updated',
             field: 'updatedAt',
             cellRenderer: 'updatedAt'
+          }, {
+            headerName: 'Complete',
+            field: 'done',
+            width: 140,
+            pinned: 'right',
+            cellRenderer: 'complete'
           }
         ],
         context: { componentParent: this },
@@ -136,7 +147,9 @@ export default class History extends React.Component {
           enddateTime: EndDateTime,
           mailArrived: MailArrived,
           updatedAt: UpdatedAt,
-          supplier: Supplier
+          supplier: Supplier,
+          complete: CompleteIcon,
+          edittedby: EdittedBy
         },
         rowSelection: 'multiple',
         paginationPageSize: 10,
@@ -181,7 +194,7 @@ export default class History extends React.Component {
   }
 
   onFirstDataRendered (params) {
-    // params.columnApi.autoSizeColumns()
+    params.columnApi.autoSizeColumns()
     // params.columnApi.sizeColumnsToFit()
   }
 
@@ -233,7 +246,7 @@ export default class History extends React.Component {
               <ButtonToolbar style={{ justifyContent: 'space-between' }}>
                 <h2 style={{ marginBottom: '0px' }}>History</h2>
                 <ButtonGroup size='md'>
-                  <Button disabled outline theme='dark' className='export-btn' onClick={this.handleGridExport}>
+                  <Button style={{ cursor: 'not-allowed' }} disabled outline theme='dark' className='export-btn' onClick={this.handleGridExport}>
                     <UseAnimations animationKey='download' size={22} style={{ display: 'inline-block', fill: 'rgb(0,0,0)' }} />
                     <span style={{ marginLeft: '5px' }}>
                       Export

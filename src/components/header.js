@@ -101,10 +101,10 @@ class Header extends React.Component {
             <InputGroup id='search-group' style={{ width: '100%', alignItems: 'center' }} size='sm' seamless>
               <InputGroupAddon type='prepend'>
                 <InputGroupText className='input-group-search'>
-                  <FontAwesomeIcon icon={faSearch} className='search-icon' width='1em' style={{ color: 'secondary' }} />
+                  <FontAwesomeIcon icon={faSearch} className='search-icon' width='1em' style={{  color: 'secondary' }} />
                 </InputGroupText>
               </InputGroupAddon>
-              <FormInput className='border-0 nav-search' placeholder='Search...' />
+              <FormInput style={{ cursor: 'not-allowed' }} className='border-0 nav-search' placeholder='Coming Soon...' />
               <NavItem>
                 <NavLink>
                   <form id='signout' method='post' action='/auth/signout' onSubmit={this.handleSignOutSubmit}>

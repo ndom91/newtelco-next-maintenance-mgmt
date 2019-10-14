@@ -1,12 +1,7 @@
 import React from 'react'
 import Layout from '../src/components/layout'
 import fetch from 'isomorphic-unfetch'
-import { AgGridReact } from 'ag-grid-react'
-import 'ag-grid-community/dist/styles/ag-grid.css'
-import 'ag-grid-community/dist/styles/ag-theme-material.css'
 import RequireLogin from '../src/components/require-login'
-import ProtectedIcon from '../src/components/ag-grid/protected'
-import SentIcon from '../src/components/ag-grid/sent'
 import { NextAuth } from 'next-auth/client'
 import Toggle from 'react-toggle'
 import './style/maintenance.css'
@@ -25,7 +20,8 @@ import UnreadCount from '../src/components/unreadcount'
 import Flatpickr from 'react-flatpickr'
 import 'flatpickr/dist/themes/material_blue.css'
 import TimezoneSelector from '../src/components/timezone'
-
+import EmailTable from '../src/components/maintenance/table'
+import { getUnique, convertDateTime } from '../src/components/maintenance/helper'
 import {
   faPlusCircle,
   faCalendarAlt,
@@ -33,10 +29,10 @@ import {
   faEnvelopeOpenText,
   faLanguage,
   faFirstAid,
-  faSearch,
   faPaperPlane,
   faTimesCircle,
-  faRandom
+  faRandom,
+  faHistory
 } from '@fortawesome/free-solid-svg-icons'
 import {
   Container,
@@ -55,7 +51,8 @@ import {
   FormInput,
   Modal,
   ModalHeader,
-  ModalBody
+  ModalBody,
+  Tooltip
 } from 'shards-react'
 
 const animatedComponents = makeAnimated()
@@ -108,6 +105,8 @@ export default class Maintenance extends React.Component {
         reason: '',
         mailId: 'NT'
       },
+      openProtectionSwitchToggle: false,
+      openUseImpactPlaceholderToggle: false,
       openReadModal: false,
       openPreviewModal: false,
       translateTooltipOpen: false,
@@ -118,94 +117,33 @@ export default class Maintenance extends React.Component {
       lieferantcids: {},
       kundencids: [],
       windowInnerHeight: 0,
-      unreadCount: '',
-      gridOptions: {
-        defaultColDef: {
-          resizable: true,
-          sortable: true,
-          filter: true,
-          selectable: true
-        },
-        columnDefs: [
-          {
-            headerName: 'Mail',
-            width: 80,
-            sortable: false,
-            filter: false,
-            resizable: false,
-            cellRenderer: 'sendMailBtn',
-            cellStyle: { 'padding-right': '0px', 'padding-left': '10px' }
-          }, {
-            headerName: 'CID',
-            field: 'kundenCID',
-            width: 100,
-            sort: { direction: 'asc', priority: 0 }
-          }, {
-            headerName: 'Customer',
-            field: 'name',
-            width: 170
-          }, {
-            headerName: 'Protection',
-            field: 'protected',
-            filter: false,
-            cellRenderer: 'protectedIcon',
-            width: 120,
-            cellStyle: {
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              height: '100%'
-            }
-          }, {
-            headerName: 'Recipient',
-            field: 'maintenanceRecipient',
-            width: 150
-          }, {
-            headerName: 'Sent',
-            field: 'sent',
-            cellRenderer: 'sentIcon',
-            width: 100,
-            cellStyle: {
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              height: '100%'
-            }
-          }
-        ],
-        context: { componentParent: this },
-        frameworkComponents: {
-          sendMailBtn: this.sendMailBtns,
-          protectedIcon: ProtectedIcon,
-          sentIcon: SentIcon
-        },
-        paginationPageSize: 10,
-        rowClass: 'row-class'
-      }
+      unreadCount: ''
     }
     this.toggleReadModal = this.toggleReadModal.bind(this)
     this.togglePreviewModal = this.togglePreviewModal.bind(this)
-    this.toggleTooltip = this.toggleTooltip.bind(this)
     this.handleNotesChange = this.handleNotesChange.bind(this)
     this.handleMailPreviewChange = this.handleMailPreviewChange.bind(this)
     this.sendMail = this.sendMail.bind(this)
     this.handleEditorChange = this.handleEditorChange.bind(this)
     this.handleCalendarCreate = this.handleCalendarCreate.bind(this)
     this.handleCIDBlur = this.handleCIDBlur.bind(this)
-    this.handleDateTimeSave = this.handleDateTimeSave.bind(this)
+    this.handleDateTimeBlur = this.handleDateTimeBlur.bind(this)
     this.handleTextInputBlur = this.handleTextInputBlur.bind(this)
     this.handleImpactChange = this.handleImpactChange.bind(this)
     this.handleReasonChange = this.handleReasonChange.bind(this)
     this.handleLocationChange = this.handleLocationChange.bind(this)
-    this.handleSaveOnClick = this.handleSaveOnClick.bind(this)
+    this.handleCreateOnClick = this.handleCreateOnClick.bind(this)
     this.handleNotesBlur = this.handleNotesBlur.bind(this)
     this.handleTimezoneChange = this.handleTimezoneChange.bind(this)
     this.handleTimezoneBlur = this.handleTimezoneBlur.bind(this)
     this.handleProtectionSwitch = this.handleProtectionSwitch.bind(this)
+    this.useImpactPlaceholder = this.useImpactPlaceholder.bind(this)
     this.handleUpdatedByChange = this.handleUpdatedByChange.bind(this)
     this.handleUpdatedAtChange = this.handleUpdatedAtChange.bind(this)
     this.handleSupplierBlur = this.handleSupplierBlur.bind(this)
     this.handleSupplierChange = this.handleSupplierChange.bind(this)
+    this.toggleProtectionSwitchTooltip = this.toggleProtectionSwitchTooltip.bind(this)
+    this.toggleUseImpactPlaceholderTooltip = this.toggleUseImpactPlaceholderTooltip.bind(this)
   }
 
   componentDidMount () {
@@ -227,6 +165,7 @@ export default class Maintenance extends React.Component {
       }
     }
 
+    // preapre NEW maintenance
     if (this.props.jsonData.profile.id === 'NEW') {
       const {
         email
@@ -249,6 +188,7 @@ export default class Maintenance extends React.Component {
         width: window.innerWidth
       })
     } else {
+      // prepare page for existing maintenance
       const {
         cancelled,
         emergency,
@@ -270,6 +210,7 @@ export default class Maintenance extends React.Component {
       })
     }
 
+    // prepare to get available supplier CIDs for selected supplier
     const host = window.location.host
     if (this.props.jsonData.profile.lieferant) {
       const lieferantId = this.props.jsonData.profile.lieferant
@@ -293,8 +234,6 @@ export default class Maintenance extends React.Component {
           }
           const companyId = data.companyResults[0].id
           const companyName = data.companyResults[0].name
-          // const selectedLieferantCIDid = parseInt(this.props.jsonData.profile.derenCIDid) || null
-          // const selectedLieferantCIDvalue = this.props.jsonData.profile.derenCID || null
           this.setState({
             maintenance: {
               ...this.state.maintenance,
@@ -306,16 +245,15 @@ export default class Maintenance extends React.Component {
         })
         .catch(err => console.error(`Error - ${err}`))
     }
+    // get choices for company select
     fetch(`https://${host}/api/companies/selectmaint`, {
       method: 'get'
     })
       .then(resp => resp.json())
       .then(data => {
-        console.log(data)
         this.setState({
-          suppliers: data.companies,
+          suppliers: data.companies
         })
-        // this.fetchLieferantCIDs(companyId)
       })
       .catch(err => console.error(`Error - ${err}`))
     this.setState({
@@ -323,19 +261,7 @@ export default class Maintenance extends React.Component {
     })
   }
 
-  sendMailBtns = (row) => {
-    return (
-      <ButtonGroup>
-        <Button onClick={() => this.prepareDirectSend(row.data.maintenanceRecipient, row.data.kundenCID)} style={{ padding: '0.7em' }} size='sm' outline>
-          <FontAwesomeIcon width='1.325em' icon={faPaperPlane} />
-        </Button>
-        <Button onClick={() => this.togglePreviewModal(row.data.maintenanceRecipient, row.data.kundenCID)} style={{ padding: '0.7em' }} size='sm' outline>
-          <FontAwesomeIcon width='1.325em' icon={faSearch} />
-        </Button>
-      </ButtonGroup>
-    )
-  }
-
+  // handle Google Translate API calls
   handleTranslate () {
     const {
       body
@@ -372,6 +298,7 @@ export default class Maintenance extends React.Component {
     }
   }
 
+  // fetch supplier CIDs
   fetchLieferantCIDs (lieferantId) {
     if (!lieferantId) {
       this.setState({
@@ -433,14 +360,16 @@ export default class Maintenance extends React.Component {
       .catch(err => console.error(`Error - ${err}`))
   }
 
-  getUnique (arr, comp) {
-    const unique = arr
-      .map(e => e[comp])
-      .map((e, i, final) => final.indexOf(e) === i && i)
-      .filter(e => arr[e]).map(e => arr[e])
-    return unique
-  }
+  // // deduplicate array of objects
+  // getUnique (arr, comp) {
+  //   const unique = arr
+  //     .map(e => e[comp])
+  //     .map((e, i, final) => final.indexOf(e) === i && i)
+  //     .filter(e => arr[e]).map(e => arr[e])
+  //   return unique
+  // }
 
+  // fetch customer CIDs based on selected Supplier CID
   fetchMailCIDs (lieferantCidId) {
     const host = window.location.host
     if (!lieferantCidId) {
@@ -466,7 +395,7 @@ export default class Maintenance extends React.Component {
             ...this.state.kundencids,
             data.kundenCIDsResult[0]
           ]
-          const uniqueKundenCids = this.getUnique(existingKundenCids, 'kundenCID')
+          const uniqueKundenCids = getUnique(existingKundenCids, 'kundenCID')
           this.setState({
             kundencids: uniqueKundenCids
           })
@@ -475,18 +404,16 @@ export default class Maintenance extends React.Component {
       .catch(err => console.error(`Error - ${err}`))
   }
 
-  componentDidUpdate () {
-  }
-
-  convertDateTime = (datetime) => {
-    let newDateTime
-    if (isValid(new Date(datetime))) {
-      newDateTime = format(new Date(datetime), 'dd.MM.yyyy HH:mm')
-    } else {
-      newDateTime = datetime
-    }
-    return newDateTime
-  }
+  // // convert datetime 
+  // convertDateTime = (datetime) => {
+  //   let newDateTime
+  //   if (isValid(new Date(datetime))) {
+  //     newDateTime = format(new Date(datetime), 'dd.MM.yyyy HH:mm')
+  //   } else {
+  //     newDateTime = datetime
+  //   }
+  //   return newDateTime
+  // }
 
   handleMailPreviewChange (content, delta, source, editor) {
     this.setState({ mailBodyText: editor.getContents() })
@@ -506,6 +433,7 @@ export default class Maintenance extends React.Component {
     }
   }
 
+  // open / close Read Modal
   toggleReadModal () {
     if (!this.state.maintenance.incomingBody) {
       const host = window.location.host
@@ -562,6 +490,7 @@ export default class Maintenance extends React.Component {
     }
   }
 
+  // open / close send preview modal
   togglePreviewModal = (recipient, customerCID) => {
     if (recipient && customerCID) {
       const HtmlBody = this.generateMail(customerCID)
@@ -578,23 +507,7 @@ export default class Maintenance extends React.Component {
     }
   }
 
-  toggleTooltip () {
-    this.setState({
-      translateTooltipOpen: !this.state.translateTooltipOpen
-    })
-  }
-
-  handleGridReady = params => {
-    // this.gridApi = params.gridApi
-    // this.gridColumnApi = params.gridColumnApi
-    // params.columnApi.autoSizeColumns()
-  }
-
-  onFirstDataRendered (params) {
-    // params.columnApi.autoSizeColumns()
-    // params.columnApi.sizeColumnsToFit()
-  }
-
+  // generate Mail contents
   generateMail = (customerCID) => {
     const {
       id,
@@ -664,6 +577,7 @@ export default class Maintenance extends React.Component {
     })
   }
 
+  // send out the created mail
   sendMail (recipient, customerCid, subj, htmlBody) {
     const host = window.location.host
     const body = this.state.mailBodyText || htmlBody
@@ -740,7 +654,7 @@ export default class Maintenance extends React.Component {
   }
 
   handleCreatedByChange (data) {
-    // console.log(data.nativeEvent)
+    // dummy
   }
 
   handleCalendarCreate () {
@@ -791,6 +705,7 @@ export default class Maintenance extends React.Component {
       .catch(err => console.error(`Error - ${err}`))
   }
 
+  // prepare mail from direct-send button
   prepareDirectSend (recipient, customerCID) {
     if (!this.state.mailBodyText) {
       const HtmlBody = this.generateMail(customerCID)
@@ -806,15 +721,7 @@ export default class Maintenance extends React.Component {
     }
   }
 
-  renderDateTimeLabel = (date) => {
-    if (isValid(date)) {
-      return format(new Date(date), 'dd.MM.yyyy HH:mm')
-    } else {
-      return ''
-    }
-  }
-
-  handleStartDate (date) {
+  handleStartDateChange (date) {
     console.log(`changeStart\n${date[0]}\n${moment(date[0]).format('YYYY-MM-DD HH:mm:ss')}`)
     const startDate = moment(date[0]).format('YYYY-MM-DD HH:mm:ss')
 
@@ -835,7 +742,7 @@ export default class Maintenance extends React.Component {
     }
   }
 
-  handleEndDate (date) {
+  handleEndDateChange (date) {
     console.log(`changeEnd\n${date[0]}\n${moment(date[0]).format('YYYY-MM-DD HH:mm:ss')}`)
     const endDate = moment(date[0]).format('YYYY-MM-DD HH:mm:ss')
 
@@ -856,7 +763,7 @@ export default class Maintenance extends React.Component {
     }
   }
 
-  handleDateTimeSave (element) {
+  handleDateTimeBlur (element) {
     let newValue
     const maintId = this.state.maintenance.id
     const host = window.location.host
@@ -1116,6 +1023,27 @@ export default class Maintenance extends React.Component {
     this.handleTextInputBlur('impact')
   }
 
+  useImpactPlaceholder () {
+    this.setState({
+      maintenance: {
+        ...this.state.maintenance,
+        impact: this.state.impactPlaceholder
+      }
+    })
+  }
+
+  toggleProtectionSwitchTooltip () {
+    this.setState({
+      openUseImpactPlaceholderToggle: !this.state.openUseImpactPlaceholderToggle
+    })
+  }
+
+  toggleUseImpactPlaceholderTooltip () {
+    this.setState({
+      openProtectionSwitchToggle: !this.state.openProtectionSwitchToggle
+    })
+  }
+
   handleTimezoneChange (selection) {
     const timezoneLabel = selection.label // 'Europe/Amsterdam'
     const timezoneValue = selection.value // '(GMT+02:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna'
@@ -1193,7 +1121,7 @@ export default class Maintenance extends React.Component {
       .catch(err => console.error(err))
   }
 
-  handleSaveOnClick (event) {
+  handleCreateOnClick (event) {
     const {
       bearbeitetvon,
       maileingang,
@@ -1304,7 +1232,6 @@ export default class Maintenance extends React.Component {
       kundencids: []
     })
     this.fetchLieferantCIDs(selectedOption.value)
-
   }
 
   handleSupplierBlur () {
@@ -1317,7 +1244,7 @@ export default class Maintenance extends React.Component {
       openReadModal,
       openPreviewModal
     } = this.state
-    // console.log(maintenance)
+
     let maintenanceIdDisplay
     if (maintenance.id === 'NEW') {
       maintenanceIdDisplay = maintenance.id
@@ -1358,7 +1285,7 @@ export default class Maintenance extends React.Component {
                         <FontAwesomeIcon icon={faCalendarAlt} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
                       Calendar
                       </Button>
-                      <Button disabled={maintenance.id !== 'NEW'} className='create-btn' onClick={this.handleSaveOnClick}>
+                      <Button disabled={maintenance.id !== 'NEW'} className='create-btn' onClick={this.handleCreateOnClick}>
                         <FontAwesomeIcon icon={faPlusCircle} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
                       Create
                       </Button>
@@ -1401,23 +1328,22 @@ export default class Maintenance extends React.Component {
                                   options={{ time_24hr: 'true', allow_input: 'true' }}
                                   className='flatpickr end-date-time'
                                   value={maintenance.startDateTime || null}
-                                  onChange={date => this.handleStartDate(date)}
-                                  onClose={() => this.handleDateTimeSave('start')}
+                                  onChange={date => this.handleStartDateChange(date)}
+                                  onClose={() => this.handleDateTimeBlur('start')}
                                 />
                               </FormGroup>
                             </Col>
                             <Col style={{ width: '30vw' }}>
                               <FormGroup>
                                 <label htmlFor='maileingang'>Mail Arrived</label>
-                                <FormInput tabIndex='-1' readOnly id='maileingang-input' name='maileingang' type='text' value={this.convertDateTime(maintenance.maileingang)} />
+                                <FormInput tabIndex='-1' readOnly id='maileingang-input' name='maileingang' type='text' value={convertDateTime(maintenance.maileingang)} />
                               </FormGroup>
                               <FormGroup>
                                 <label htmlFor='updated-at'>Updated At</label>
-                                <FormInput tabIndex='-1' readOnly id='updated-at' name='updated-at' type='text' value={this.convertDateTime(maintenance.updatedAt)} onChange={this.handleUpdatedAtChange} />
+                                <FormInput tabIndex='-1' readOnly id='updated-at' name='updated-at' type='text' value={convertDateTime(maintenance.updatedAt)} onChange={this.handleUpdatedAtChange} />
                               </FormGroup>
                               <FormGroup>
                                 <label htmlFor='supplier'>Supplier</label>
-                                {/* <FormInput id='supplier-input' name='supplier' type='text' value={maintenance.name} /> */}
                                 <Select
                                   value={{ label: this.state.maintenance.name, value: this.state.maintenance.lieferant }}
                                   onChange={this.handleSupplierChange}
@@ -1434,8 +1360,8 @@ export default class Maintenance extends React.Component {
                                   options={{ time_24hr: 'true', allow_input: 'true' }}
                                   className='flatpickr end-date-time'
                                   value={maintenance.endDateTime || null}
-                                  onChange={date => this.handleEndDate(date)}
-                                  onClose={() => this.handleDateTimeSave('end')}
+                                  onChange={date => this.handleEndDateChange(date)}
+                                  onClose={() => this.handleDateTimeBlur('end')}
                                 />
                               </FormGroup>
                             </Col>
@@ -1465,9 +1391,26 @@ export default class Maintenance extends React.Component {
                                 <Col>
                                   <FormGroup>
                                     <label htmlFor='impact'>Impact</label>
-                                    <Button style={{ padding: '0.35em', float: 'right', marginTop: '10px' }} onClick={this.handleProtectionSwitch} outline theme='secondary'>
+                                    <Button id='protectionswitchtext' style={{ float: 'right', padding: '0.35em', marginTop: '10px' }} onClick={this.handleProtectionSwitch} outline theme='secondary'>
                                       <FontAwesomeIcon width='16px' icon={faRandom} />
                                     </Button>
+                                    {/* <Tooltip
+                                      open={this.state.openUseImpactPlaceholderToggle}
+                                      target='#impactplaceholdertext'
+                                      toggle={this.toggleUseImpactPlaceholderTooltip}
+                                    >
+                                      Use Impact Placeholder Text
+                                    </Tooltip> */}
+                                    <Button id='impactplaceholdertext' style={{ float: 'right', padding: '0.35em', marginRight: '10px', marginTop: '10px' }} onClick={this.useImpactPlaceholder} outline theme='secondary'>
+                                      <FontAwesomeIcon width='16px' icon={faHistory} />
+                                    </Button>
+                                    {/* <Tooltip
+                                      open={this.state.openProtectionSwitchToggle}
+                                      target='#protectionswitchtext'
+                                      toggle={this.toggleProtectionSwitchTooltip}
+                                    >
+                                      Insert Protection Switch Text
+                                    </Tooltip> */}
                                     <FormInput onBlur={() => this.handleTextInputBlur('impact')} id='impact' name='impact' type='text' onChange={this.handleImpactChange} placeholder={this.state.impactPlaceholder} value={maintenance.impact} />
                                   </FormGroup>
                                 </Col>
@@ -1562,23 +1505,11 @@ export default class Maintenance extends React.Component {
                         <Container style={{ padding: '20px' }} className='maintenance-subcontainer'>
                           <Row>
                             <Col style={{ width: '100%', height: '600px' }}>
-                              <div
-                                className='ag-theme-material'
-                                style={{
-                                  height: '100%',
-                                  width: '100%'
-                                }}
-                              >
-                                <AgGridReact
-                                  gridOptions={this.state.gridOptions}
-                                  rowData={this.state.kundencids}
-                                  // onGridReady={this.handleGridReady}
-                                  onGridReady={params => this.gridApi = params.api}
-                                  animateRows
-                                  pagination
-                                  onFirstDataRendered={this.onFirstDataRendered.bind(this)}
-                                />
-                              </div>
+                              <EmailTable
+                                prepareDirectSend={this.prepareDirectSend}
+                                togglePreviewModal={this.togglePreviewModal}
+                                kundencids={this.state.kundencids}
+                              />
                             </Col>
                           </Row>
                         </Container>
@@ -1600,7 +1531,7 @@ export default class Maintenance extends React.Component {
                       <FontAwesomeIcon icon={faCalendarAlt} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
                     Calendar
                     </Button>
-                    <Button disabled={maintenance.id !== 'NEW'} className='create-btn' onClick={this.handleSaveOnClick}>
+                    <Button disabled={maintenance.id !== 'NEW'} className='create-btn' onClick={this.handleCreateOnClick}>
                       <FontAwesomeIcon icon={faPlusCircle} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
                     Create
                     </Button>

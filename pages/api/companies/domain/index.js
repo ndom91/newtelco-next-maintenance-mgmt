@@ -11,12 +11,5 @@ module.exports = async (req, res) => {
     WHERE companies.mailDomain 
     LIKE ${mailDomain}
   `)
-  // const count = await db.query(escape`
-  //     SELECT COUNT(*)
-  //     AS companyCount
-  //     FROM lieferantCID
-  //     WHERE lieferantCID.lieferant LIKE ${mailDomain}
-  //   `)
-  // const { companyCount } = count[0]
   res.status(200).json({ companyResults })
 }

@@ -1,0 +1,38 @@
+import React, { Component } from 'react'
+
+export default class EdittedBy extends Component {
+  render () {
+    if (this.props.node.data.bearbeitetvon === 'fwaleska') {
+      return (
+        <span>
+          <img style={{ border: '2px solid #007bff', borderRadius: '50%' }} src='/static/images/avatars/FWA.png' width='32px' height='32px' />
+        </span>
+      )
+    } else if (this.props.node.data.bearbeitetvon === 'alissitsin') {
+      return (
+        <span>
+          <img style={{ border: '2px solid #007bff', borderRadius: '50%' }} src='/static/images/avatars/ALI.png' width='32px' height='32px' />
+        </span>
+      )
+    } else if (this.props.node.data.bearbeitetvon === 'ndomino') {
+      return (
+        <span>
+          <img style={{ border: '2px solid #007bff', borderRadius: '50%' }} src='/static/images/avatars/NDO.png' width='32px' height='32px' />
+        </span>
+      )
+    } else if (this.props.node.data.bearbeitetvon === 'sstergiou') {
+      return (
+        <span>
+          <img style={{ border: '2px solid #007bff', borderRadius: '50%' }} src='/static/images/avatars/SST.png' width='32px' height='32px' />
+        </span>
+      )
+    } else {
+      const r = Math.floor(Math.random() * 6) + 1
+      return (
+        <span>
+          <img src={`/static/images/avatars/avatar${r}.svg`} width='32px' height='32px' />
+        </span>
+      )
+    }
+  }
+};
