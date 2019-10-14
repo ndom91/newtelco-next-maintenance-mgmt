@@ -360,15 +360,6 @@ export default class Maintenance extends React.Component {
       .catch(err => console.error(`Error - ${err}`))
   }
 
-  // // deduplicate array of objects
-  // getUnique (arr, comp) {
-  //   const unique = arr
-  //     .map(e => e[comp])
-  //     .map((e, i, final) => final.indexOf(e) === i && i)
-  //     .filter(e => arr[e]).map(e => arr[e])
-  //   return unique
-  // }
-
   // fetch customer CIDs based on selected Supplier CID
   fetchMailCIDs (lieferantCidId) {
     const host = window.location.host
@@ -376,6 +367,7 @@ export default class Maintenance extends React.Component {
       return
     }
     // @param1 - int -1 single LIeferantCID ID
+    console.log(lieferantCidId)
     fetch(`https://${host}/api/customercids/${lieferantCidId}`, {
       method: 'get'
     })
@@ -384,36 +376,42 @@ export default class Maintenance extends React.Component {
         const {
           done
         } = this.state.maintenance
-        if (data.kundenCIDsResult[0]) {
+        if (data.kundenCIDsResult.length > 1) {
+          let currentSentStatus = '0'
           if (done === 1 || done === true || done === '1') {
-            data.kundenCIDsResult[0].sent = '1'
-          } else {
-            data.kundenCIDsResult[0].sent = '0'
+            currentSentStatus = '1'
           }
-
-          const existingKundenCids = [
-            ...this.state.kundencids,
-            data.kundenCIDsResult[0]
-          ]
-          const uniqueKundenCids = getUnique(existingKundenCids, 'kundenCID')
-          this.setState({
-            kundencids: uniqueKundenCids
+          const kundencids = data.kundenCIDsResult
+          kundencids.forEach(cid => {
+            cid.sent = currentSentStatus
           })
+          this.setState({
+            kundencids: kundencids
+          })
+        } else {
+          if (data.kundenCIDsResult[0]) {
+            if (done === 1 || done === true || done === '1') {
+              data.kundenCIDsResult[0].sent = '1'
+            } else {
+              data.kundenCIDsResult[0].sent = '0'
+            }
+            console.log(data.kundenCIDsResult)
+            const existingKundenCids = [
+              ...this.state.kundencids,
+              data.kundenCIDsResult[0]
+            ]
+            console.log(existingKundenCids)
+            const uniqueKundenCids = getUnique(existingKundenCids, 'kundenCID')
+            console.log(uniqueKundenCids)
+            this.setState({
+              kundencids: uniqueKundenCids
+            })
+            console.log(this.state.kundencids)
+          }
         }
       })
       .catch(err => console.error(`Error - ${err}`))
   }
-
-  // // convert datetime 
-  // convertDateTime = (datetime) => {
-  //   let newDateTime
-  //   if (isValid(new Date(datetime))) {
-  //     newDateTime = format(new Date(datetime), 'dd.MM.yyyy HH:mm')
-  //   } else {
-  //     newDateTime = datetime
-  //   }
-  //   return newDateTime
-  // }
 
   handleMailPreviewChange (content, delta, source, editor) {
     this.setState({ mailBodyText: editor.getContents() })
