@@ -1,13 +1,27 @@
 import React from 'react'
 import fetch from 'isomorphic-unfetch'
+import Link from 'next/link'
 import { AgGridReact } from 'ag-grid-react'
-import { CardTitle, Button } from 'shards-react'
 import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-material.css'
+import Select from 'react-select'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
   faPlusCircle
 } from '@fortawesome/free-solid-svg-icons'
+import {
+  CardTitle,
+  Badge,
+  Button,
+  Container,
+  Col,
+  Row,
+  Modal,
+  ModalHeader,
+  ModalBody,
+  FormGroup,
+  FormInput
+} from 'shards-react'
 
 export default class CustomerCIDs extends React.Component {
   static async getInitialProps ({ req, query }) {
@@ -70,6 +84,10 @@ export default class CustomerCIDs extends React.Component {
         maxBlocksInCache: 10
       }
     }
+    this.toggleCompanyAdd = this.toggleCompanyAdd.bind(this)
+    this.handleCustomerCidChange = this.handleCustomerCidChange.bind(this)
+    this.handleNameChange = this.handleNameChange.bind(this)
+    this.handleRecipientChange = this.handleRecipientChange.bind(this)
   }
 
   handleGridReady = params => {
@@ -113,6 +131,23 @@ export default class CustomerCIDs extends React.Component {
     // params.columnApi.sizeColumnsToFit()
   }
 
+  toggleCompanyAdd () {
+    this.setState({
+      openCompanyModal: !this.state.openCompanyModal
+    })
+  }
+
+  handleCustomerCidChange (ev) {
+    console.log(ev)
+    // this.setState({
+    //   newDomain: value
+    // })
+  }
+
+  handleSaveOnClick () {
+    fetch(`https://${host}/api/settings/add/customercid`)
+  }
+
   render () {
     return (
       <>
@@ -140,6 +175,54 @@ export default class CustomerCIDs extends React.Component {
             />
           </div>
         </div>
+        <Modal className='modal-body' animation backdrop open={this.state.openCompanyModal} size='md' toggle={this.toggleCompanyAdd}>
+          <ModalHeader>
+            New Customer CID
+          </ModalHeader>
+          <ModalBody className='modal-body'>
+            <Container className='container-border'>
+              <Row>
+                <Col>
+                  <FormGroup>
+                    <label>
+                      Customer
+                    </label>
+                    {/* SELECT FOR COMPANY NAMES */}
+                    <FormInput id='updated-by' name='updated-by' />
+                  </FormGroup>
+                  <FormGroup>
+                    <label style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      Newtelco CID<Badge outline theme='primary'>for Customer</Badge>
+                    </label>
+                    <FormInput id='updated-by' name='updated-by' type='text' value={newDomain} onChange={this.handleCustomerCidChange} />
+                  </FormGroup>
+                  <FormGroup>
+                    <label>
+                      Supplier CID
+                    </label>
+                    {/* SELECT FOR SUPPLIER CIDs */}
+                    <FormInput id='updated-by' name='updated-by' type='text'/>
+                  </FormGroup>
+                  <FormGroup>
+                    <label>
+                      Protection 
+                    </label>
+                    {/* TOGGLE FOR PROTECTION */}
+                    <FormInput id='updated-by' name='updated-by' type='text' />
+                  </FormGroup>
+                </Col>
+              </Row>
+              <Row style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <Col>
+                  <Button onClick={this.handleSaveOnClick} style={{ width: '100%', marginTop: '15px' }} theme='primary'>
+                    Add
+                  </Button>
+                </Col>
+              </Row>
+
+            </Container>
+          </ModalBody>
+        </Modal>
         <style jsx>{`
             :global(.card-title) {
               display: flex;
