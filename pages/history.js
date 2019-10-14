@@ -34,8 +34,7 @@ import {
   Container,
   FormGroup,
   Col,
-  Row,
-  FormInput
+  Row
 } from 'shards-react'
 import {
   faPlusCircle

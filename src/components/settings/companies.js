@@ -1,13 +1,26 @@
 import React from 'react'
 import fetch from 'isomorphic-unfetch'
+import Link from 'next/link'
 import { AgGridReact } from 'ag-grid-react'
-import { CardTitle, Button } from 'shards-react'
 import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-material.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
   faPlusCircle
 } from '@fortawesome/free-solid-svg-icons'
+import {
+  CardTitle,
+  Badge,
+  Button,
+  Container,
+  Col,
+  Row,
+  Modal,
+  ModalHeader,
+  ModalBody,
+  FormGroup,
+  FormInput
+} from 'shards-react'
 
 export default class Companies extends React.Component {
   static async getInitialProps ({ req, query }) {
@@ -63,8 +76,16 @@ export default class Companies extends React.Component {
         maxConcurrentDatasourceRequests: 1,
         infiniteInitialRowCount: 144,
         maxBlocksInCache: 10
-      }
+      },
+      newName: '',
+      newDomain: '',
+      newRecipient: '',
+      openCompanyModal: false
     }
+    this.toggleCompanyAdd = this.toggleCompanyAdd.bind(this)
+    this.handleDomainChange = this.handleDomainChange.bind(this)
+    this.handleNameChange = this.handleNameChange.bind(this)
+    this.handleRecipientChange = this.handleRecipientChange.bind(this)
   }
 
   handleGridReady = params => {
@@ -108,12 +129,39 @@ export default class Companies extends React.Component {
     // params.columnApi.sizeColumnsToFit()
   }
 
+  toggleCompanyAdd () {
+    this.setState({
+      openCompanyModal: !this.state.openCompanyModal
+    })
+  }
+
+  handleDomainChange (ev) {
+    console.log(ev)
+    // this.setState({
+    //   newDomain: value
+    // })
+  }
+
+  handleNameChange () {
+
+  }
+
+  handleRecipientChange () {
+
+  }
+
   render () {
+    const {
+      newDomain,
+      newName,
+      newRecipient
+    } = this.state
+
     return (
       <>
         <CardTitle>
           <span className='section-title'>Companies</span>
-          <Button outline theme='primary'>
+          <Button onClick={this.toggleCompanyAdd} outline theme='primary'>
             <FontAwesomeIcon width='1.125em' style={{ marginRight: '10px' }} icon={faPlusCircle} />
             Add
           </Button>
@@ -135,7 +183,76 @@ export default class Companies extends React.Component {
             />
           </div>
         </div>
+        <Modal className='modal-body' animation backdrop open={this.state.openCompanyModal} size='md' toggle={this.toggleCompanyAdd}>
+          <ModalHeader>
+            New Company
+          </ModalHeader>
+          <ModalBody className='modal-body'>
+            <Container className='container-border'>
+              <Row>
+                <Col>
+                  <FormGroup>
+                    <label htmlFor='selectCompany'>
+                      Name
+                    </label>
+                    <FormInput id='updated-by' name='updated-by' type='text' value={newName} onChange={this.handleNameChange} />
+                  </FormGroup>
+                  <FormGroup>
+                    <label htmlFor='selectCompany'>
+                      Domain
+                    </label>
+                    <FormInput id='updated-by' name='updated-by' type='text' value={newDomain} onChange={this.handleDomainChange} />
+                  </FormGroup>
+                  <FormGroup>
+                    <label style={{ display: 'flex', justifyContent: 'space-between' }} htmlFor='selectCompany'>
+                      Recipient <Badge outline theme='primary'>separate multiple via semicolon <code>(;)</code></Badge>
+                    </label>
+                    <FormInput id='updated-by' name='updated-by' type='text' value={newRecipient} onChange={this.handleRecipientChange} />
+                  </FormGroup>
+                </Col>
+              </Row>
+              <Row style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <Col>
+                  <Link
+                    href={{
+                      pathname: '/maintenance',
+                      query: {
+                        id: 'NEW',
+                        mailId: 'NT',
+                        name: this.state.newCompMailDomain
+                      }
+                    }}
+                    as='/maintenance/new'
+                  >
+                    <Button style={{ width: '100%', marginTop: '15px' }} theme='primary'>
+                      Add
+                    </Button>
+                  </Link>
+                </Col>
+              </Row>
+
+            </Container>
+          </ModalBody>
+        </Modal>
         <style jsx>{`
+            :global(.modal-title) {
+              font-size: 42px;
+            }
+            :global(.modal-body) {
+              padding: 1rem;
+            }
+            :global(.container-border) {
+              border: 1px solid var(--light);
+              border-radius: 0.325rem;
+              margin: 10px 0;
+              padding: 1.5rem;
+            }
+            :global(.modal-header) {
+              background: var(--light);
+              display: flex;
+              justify-content: flex-start;
+              align-content: center;
+            }
             :global(.card-title) {
               display: flex;
               justify-content: space-between;
