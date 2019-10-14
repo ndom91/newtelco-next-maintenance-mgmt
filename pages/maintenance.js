@@ -144,6 +144,7 @@ export default class Maintenance extends React.Component {
     this.handleSupplierChange = this.handleSupplierChange.bind(this)
     this.toggleProtectionSwitchTooltip = this.toggleProtectionSwitchTooltip.bind(this)
     this.toggleUseImpactPlaceholderTooltip = this.toggleUseImpactPlaceholderTooltip.bind(this)
+    this.prepareDirectSend = this.prepareDirectSend.bind(this)
   }
 
   componentDidMount () {
