@@ -204,6 +204,8 @@ export default class Maintenance extends React.Component {
     this.handleProtectionSwitch = this.handleProtectionSwitch.bind(this)
     this.handleUpdatedByChange = this.handleUpdatedByChange.bind(this)
     this.handleUpdatedAtChange = this.handleUpdatedAtChange.bind(this)
+    this.handleSupplierBlur = this.handleSupplierBlur.bind(this)
+    this.handleSupplierChange = this.handleSupplierChange.bind(this)
   }
 
   componentDidMount () {
@@ -304,6 +306,18 @@ export default class Maintenance extends React.Component {
         })
         .catch(err => console.error(`Error - ${err}`))
     }
+    fetch(`https://${host}/api/companies/selectmaint`, {
+      method: 'get'
+    })
+      .then(resp => resp.json())
+      .then(data => {
+        console.log(data)
+        this.setState({
+          suppliers: data.companies,
+        })
+        // this.fetchLieferantCIDs(companyId)
+      })
+      .catch(err => console.error(`Error - ${err}`))
     this.setState({
       windowInnerHeight: window.innerHeight
     })
@@ -1279,6 +1293,24 @@ export default class Maintenance extends React.Component {
     })
   }
 
+  handleSupplierChange (selectedOption) {
+    this.setState({
+      maintenance: {
+        ...this.state.maintenance,
+        lieferant: selectedOption.value,
+        name: selectedOption.label
+      },
+      selectedLieferant: [],
+      kundencids: []
+    })
+    this.fetchLieferantCIDs(selectedOption.value)
+
+  }
+
+  handleSupplierBlur () {
+
+  }
+
   render () {
     const {
       maintenance,
@@ -1326,7 +1358,7 @@ export default class Maintenance extends React.Component {
                         <FontAwesomeIcon icon={faCalendarAlt} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
                       Calendar
                       </Button>
-                      <Button disabled={maintenance.id !== 'NEW' ? 'true' : 'false'} className='create-btn' onClick={this.handleSaveOnClick}>
+                      <Button disabled={maintenance.id !== 'NEW'} className='create-btn' onClick={this.handleSaveOnClick}>
                         <FontAwesomeIcon icon={faPlusCircle} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
                       Create
                       </Button>
@@ -1385,7 +1417,15 @@ export default class Maintenance extends React.Component {
                               </FormGroup>
                               <FormGroup>
                                 <label htmlFor='supplier'>Supplier</label>
-                                <FormInput id='supplier-input' name='supplier' type='text' value={maintenance.name} />
+                                {/* <FormInput id='supplier-input' name='supplier' type='text' value={maintenance.name} /> */}
+                                <Select
+                                  value={{ label: this.state.maintenance.name, value: this.state.maintenance.lieferant }}
+                                  onChange={this.handleSupplierChange}
+                                  options={this.state.suppliers}
+                                  noOptionsMessage={() => 'No Suppliers'}
+                                  placeholder='Please select a Supplier'
+                                  onBlur={this.handleSupplierBlur}
+                                />
                               </FormGroup>
                               <FormGroup>
                                 <label htmlFor='end-datetime'>End Date/Time</label>
@@ -1552,17 +1592,17 @@ export default class Maintenance extends React.Component {
               {this.state.width < 500
                 ? (
                   <ButtonGroup className='btn-group-2' size='md'>
-                    <Button onClick={this.toggle} outline>
+                    <Button onClick={this.toggleReadModal} outline>
                       <FontAwesomeIcon icon={faEnvelopeOpenText} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
-                      Read
+                    Read
                     </Button>
-                    <Button outline>
+                    <Button onClick={this.handleCalendarCreate} outline>
                       <FontAwesomeIcon icon={faCalendarAlt} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
-                      Calendar
+                    Calendar
                     </Button>
-                    <Button>
+                    <Button disabled={maintenance.id !== 'NEW'} className='create-btn' onClick={this.handleSaveOnClick}>
                       <FontAwesomeIcon icon={faPlusCircle} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
-                      Create
+                    Create
                     </Button>
                   </ButtonGroup>
                 ) : (
@@ -1625,13 +1665,13 @@ export default class Maintenance extends React.Component {
               <ModalHeader>
                 <div className='modal-preview-text-wrapper'>
                   <div className='modal-preview-to-text'>
-                    <b>To:</b> {this.state.mailPreviewHeaderText}
+                    <b style={{ fontWeight: '900' }}>To:</b> {this.state.mailPreviewHeaderText}
                   </div>
                   <div className='modal-preview-to-text'>
-                    <b>CC:</b> service@newtelco.de
+                    <b style={{ fontWeight: '900' }}>Cc:</b> service@newtelco.de
                   </div>
                   <div className='modal-preview-Subject-text'>
-                    <b>Subject: </b>{this.state.mailPreviewSubjectText}
+                    <b style={{ fontWeight: '900' }}>Subject: </b>{this.state.mailPreviewSubjectText}
                   </div>
                 </div>
                 <Button id='send-mail-btn' style={{ padding: '0.9em 1.1em' }} onClick={this.sendMail}>
