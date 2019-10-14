@@ -96,8 +96,8 @@ export default class Maintenance extends React.Component {
       width: 0,
       maintenance: {
         incomingBody: this.props.jsonData.profile.body,
-        timezone: this.props.jsonData.profile.timezone,
-        timezoneLabel: this.props.jsonData.profile.timezoneLabel,
+        timezone: 'Europe/Amsterdam',
+        timezoneLabel: '(GMT+02:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna',
         bearbeitetvon: '',
         maileingang: '',
         updatedAt: '',
@@ -240,7 +240,7 @@ export default class Maintenance extends React.Component {
         incomingFrom: this.props.jsonData.profile.from,
         incomingDate: this.props.jsonData.profile.maileingang,
         incomingDomain: this.props.jsonData.profile.name,
-        updatedAt: format(new Date(), 'MM.dd.yyyy HH:mm') //, { locale: de })
+        updatedAt: format(new Date(), 'MM.dd.yyyy HH:mm')
       }
       this.setState({
         maintenance: maintenance,
@@ -257,7 +257,9 @@ export default class Maintenance extends React.Component {
         ...this.props.jsonData.profile,
         cancelled: convertBool(cancelled),
         emergency: convertBool(emergency),
-        done: convertBool(done)
+        done: convertBool(done),
+        timezone: 'Europe/Amsterdam',
+        timezoneLabel: '(GMT+02:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna'
       }
 
       this.setState({
@@ -1101,8 +1103,8 @@ export default class Maintenance extends React.Component {
   }
 
   handleTimezoneChange (selection) {
-    const timezoneLabel = selection.label
-    const timezoneValue = selection.value
+    const timezoneLabel = selection.label // 'Europe/Amsterdam'
+    const timezoneValue = selection.value // '(GMT+02:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna'
 
     this.setState({
       maintenance: {
@@ -1114,8 +1116,8 @@ export default class Maintenance extends React.Component {
   }
 
   handleTimezoneBlur (ev) {
-    const incomingTimezone = this.state.maintenance.timezone || 'Europe/Berlin'
-    const incomingTimezoneLabel = this.state.maintenance.timezoneLabel || '(GMT+01:00) Berlin'
+    const incomingTimezone = this.state.maintenance.timezone || 'Europe/Amsterdam'
+    const incomingTimezoneLabel = this.state.maintenance.timezoneLabel || '(GMT+02:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna'
     const host = window.location.host
     fetch(`https://${host}/api/maintenances/save/timezone?maintId=${this.state.maintenance.id}&timezone=${incomingTimezone}&timezoneLabel=${incomingTimezoneLabel}`, {
       method: 'get',
@@ -1324,7 +1326,7 @@ export default class Maintenance extends React.Component {
                         <FontAwesomeIcon icon={faCalendarAlt} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
                       Calendar
                       </Button>
-                      <Button className='create-btn' onClick={this.handleSaveOnClick}>
+                      <Button disabled={maintenance.id !== 'NEW' ? 'true' : 'false'} className='create-btn' onClick={this.handleSaveOnClick}>
                         <FontAwesomeIcon icon={faPlusCircle} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
                       Create
                       </Button>
@@ -1371,10 +1373,6 @@ export default class Maintenance extends React.Component {
                                   onClose={() => this.handleDateTimeSave('start')}
                                 />
                               </FormGroup>
-                              <FormGroup>
-                                <label htmlFor='supplier'>Supplier</label>
-                                <FormInput id='supplier-input' name='supplier' type='text' value={maintenance.name} />
-                              </FormGroup>
                             </Col>
                             <Col style={{ width: '30vw' }}>
                               <FormGroup>
@@ -1386,17 +1384,8 @@ export default class Maintenance extends React.Component {
                                 <FormInput tabIndex='-1' readOnly id='updated-at' name='updated-at' type='text' value={this.convertDateTime(maintenance.updatedAt)} onChange={this.handleUpdatedAtChange} />
                               </FormGroup>
                               <FormGroup>
-                                <label htmlFor='their-cid'>{maintenance.name} CID</label>
-                                <Select
-                                  value={this.state.selectedLieferant || undefined}
-                                  onChange={this.handleSelectLieferantChange}
-                                  options={this.state.lieferantcids}
-                                  components={animatedComponents}
-                                  isMulti
-                                  noOptionsMessage={() => 'No CIDs for this Supplier'}
-                                  placeholder='Please select a CID'
-                                  onBlur={this.handleCIDBlur}
-                                />
+                                <label htmlFor='supplier'>Supplier</label>
+                                <FormInput id='supplier-input' name='supplier' type='text' value={maintenance.name} />
                               </FormGroup>
                               <FormGroup>
                                 <label htmlFor='end-datetime'>End Date/Time</label>
@@ -1411,6 +1400,23 @@ export default class Maintenance extends React.Component {
                               </FormGroup>
                             </Col>
                           </Row>
+                          <Row>
+                            <Col>
+                              <FormGroup>
+                                <label htmlFor='their-cid'>{maintenance.name} CID</label>
+                                <Select
+                                  value={this.state.selectedLieferant || undefined}
+                                  onChange={this.handleSelectLieferantChange}
+                                  options={this.state.lieferantcids}
+                                  components={animatedComponents}
+                                  isMulti
+                                  noOptionsMessage={() => 'No CIDs for this Supplier'}
+                                  placeholder='Please select a CID'
+                                  onBlur={this.handleCIDBlur}
+                                />
+                              </FormGroup>
+                            </Col>
+                          </Row>
                         </Container>
                         <Container className='maintenance-subcontainer'>
                           <Row>
@@ -1420,7 +1426,7 @@ export default class Maintenance extends React.Component {
                                   <FormGroup>
                                     <label htmlFor='impact'>Impact</label>
                                     <Button style={{ padding: '0.35em', float: 'right', marginTop: '10px' }} onClick={this.handleProtectionSwitch} outline theme='secondary'>
-                                      <FontAwesomeIcon width={'16px'} icon={faRandom} />
+                                      <FontAwesomeIcon width='16px' icon={faRandom} />
                                     </Button>
                                     <FormInput onBlur={() => this.handleTextInputBlur('impact')} id='impact' name='impact' type='text' onChange={this.handleImpactChange} placeholder={this.state.impactPlaceholder} value={maintenance.impact} />
                                   </FormGroup>
@@ -1619,13 +1625,13 @@ export default class Maintenance extends React.Component {
               <ModalHeader>
                 <div className='modal-preview-text-wrapper'>
                   <div className='modal-preview-to-text'>
-                    To: {this.state.mailPreviewHeaderText}
+                    <b>To:</b> {this.state.mailPreviewHeaderText}
                   </div>
                   <div className='modal-preview-to-text'>
-                    Cc: service@newtelco.de
+                    <b>CC:</b> service@newtelco.de
                   </div>
                   <div className='modal-preview-Subject-text'>
-                    Subject: {this.state.mailPreviewSubjectText}
+                    <b>Subject: </b>{this.state.mailPreviewSubjectText}
                   </div>
                 </div>
                 <Button id='send-mail-btn' style={{ padding: '0.9em 1.1em' }} onClick={this.sendMail}>
