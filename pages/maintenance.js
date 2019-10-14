@@ -260,6 +260,12 @@ export default class Maintenance extends React.Component {
     })
   }
 
+  ////////////////////////////////////////////////////////////
+  // 
+  //                ACTIONS: API CALLS
+  // 
+  ////////////////////////////////////////////////////////////
+
   // handle Google Translate API calls
   handleTranslate () {
     const {
@@ -408,103 +414,6 @@ export default class Maintenance extends React.Component {
       .catch(err => console.error(`Error - ${err}`))
   }
 
-  handleMailPreviewChange (content, delta, source, editor) {
-    this.setState({ mailBodyText: editor.getContents() })
-  }
-
-  handleSelectLieferantChange = selectedOption => {
-    if (selectedOption) {
-      this.setState({
-        kundencids: []
-      })
-      selectedOption.forEach(option => {
-        this.fetchMailCIDs(option.value)
-      })
-      this.setState({
-        selectedLieferant: selectedOption
-      })
-    }
-  }
-
-  // open / close Read Modal
-  toggleReadModal () {
-    if (!this.state.maintenance.incomingBody) {
-      const host = window.location.host
-      let mailId
-      if (this.state.maintenance.id === 'NEW') {
-        mailId = this.state.maintenance.mailId
-      } else {
-        mailId = this.state.maintenance.receivedmail
-      }
-      if (mailId === 'NT') {
-        cogoToast.warn('No mail available', {
-          position: 'top-right'
-        })
-        return
-      }
-      fetch(`https://api.${host}/mail/${mailId}`, {
-        method: 'get'
-      })
-        .then(resp => resp.json())
-        .then(data => {
-          let mailBody
-          const htmlRegex = new RegExp(/<(?:"[^"]*"[`"]*|'[^']*'['"]*|[^'">])+>/, 'gi')
-          // const htmlRegex2 = new RegExp('<([a-z]+)[^>]*(?<!/)>', 'gi')
-          // const htmlRegex3 = new RegExp('<meta .*>', 'gi')
-
-          console.log(htmlRegex.test(data.body))
-
-          if (htmlRegex.test(data.body)) {
-            console.log('html true')
-            mailBody = data.body
-            this.setState({
-              incomingMailIsHtml: true
-            })
-          } else {
-            console.log('html false')
-            mailBody = `<pre>${data.body}</pre>`
-            this.setState({
-              incomingMailIsHtml: false
-            })
-          }
-          // console.log(data)
-          this.setState({
-            openReadModal: !this.state.openReadModal,
-            maintenance: {
-              ...this.state.maintenance,
-              incomingBody: mailBody,
-              incomingFrom: data.from,
-              incomingSubject: data.subject,
-              incomingDate: data.date,
-              incomingDomain: this.props.jsonData.profile.mailDomain
-            }
-          })
-        })
-        .catch(err => console.error(`Error - ${err}`))
-    } else {
-      this.setState({
-        openReadModal: !this.state.openReadModal
-      })
-    }
-  }
-
-  // open / close send preview modal
-  togglePreviewModal = (recipient, customerCID) => {
-    if (recipient && customerCID) {
-      const HtmlBody = this.generateMail(customerCID)
-      HtmlBody && this.setState({
-        openPreviewModal: !this.state.openPreviewModal,
-        mailBodyText: HtmlBody,
-        mailPreviewHeaderText: recipient || this.state.mailPreviewHeaderText,
-        mailPreviewSubjectText: `Planned Work Notification - NT-${this.state.maintenance.id}`
-      })
-    } else {
-      this.setState({
-        openPreviewModal: !this.state.openPreviewModal
-      })
-    }
-  }
-
   // generate Mail contents
   generateMail = (customerCID) => {
     const {
@@ -556,27 +465,6 @@ export default class Maintenance extends React.Component {
     body = body + '</table><p>We sincerely regret any inconvenience that may be caused by this and hope for further mutually advantageous cooperation.</p><p>If you have any questions feel free to contact us at maintenance@newtelco.de.</p></div>​​</body>​​<footer>​<style>.sig{font-family:Century Gothic, sans-serif;font-size:9pt;color:#636266!important;}b.i{color:#4ca702;}.gray{color:#636266 !important;}a{text-decoration:none;color:#636266 !important;}</style><div class="sig"><div>Best regards <b class="i">|</b> Mit freundlichen Grüßen</div><br><div><b>Newtelco Maintenance Team</b></div><br><div>NewTelco GmbH <b class="i">|</b> Moenchhofsstr. 24 <b class="i">|</b> 60326 Frankfurt a.M. <b class="i">|</b> DE <br>www.newtelco.com <b class="i">|</b> 24/7 NOC  49 69 75 00 27 30 ​​<b class="i">|</b> <a style="color:#" href="mailto:service@newtelco.de">service@newtelco.de</a><br><br><div><img src="https://home.newtelco.de/sig.png" height="29" width="516"></div></div>​</footer>'
 
     return body
-  }
-
-  handleEditorChange (data) {
-    this.setState({
-      mailBodyText: data.level.content
-    })
-  }
-
-  handleNotesChange (data) {
-    const newMaint = {
-      ...this.state.maintenance,
-      notes: data.level.content
-    }
-
-    this.setState({
-      maintenance: newMaint
-    })
-  }
-
-  refreshCells (gridApi) {
-    gridApi.refreshCells()
   }
 
   // send out the created mail
@@ -653,10 +541,6 @@ export default class Maintenance extends React.Component {
       .catch(err => console.error(`Error - ${err}`))
   }
 
-  handleCreatedByChange (data) {
-    // dummy
-  }
-
   handleCalendarCreate () {
     const host = window.location.host
     const company = this.state.maintenance.name
@@ -717,6 +601,58 @@ export default class Maintenance extends React.Component {
     this.sendMail(recipient, customerCID, subject, HtmlBody)
   }
 
+  ////////////////////////////////////////////////////////////
+  // 
+  //                INPUTS: ONCHANGE
+  // 
+  ////////////////////////////////////////////////////////////
+
+  // mail preview modal change
+  handleMailPreviewChange (content, delta, source, editor) {
+    this.setState({ mailBodyText: editor.getContents() })
+  }
+
+  // react-select change cmoponent for supplier CIDs - change
+  handleSelectLieferantChange = selectedOption => {
+    if (selectedOption) {
+      this.setState({
+        kundencids: []
+      })
+      selectedOption.forEach(option => {
+        this.fetchMailCIDs(option.value)
+      })
+      this.setState({
+        selectedLieferant: selectedOption
+      })
+    }
+  }
+
+  handleEditorChange (data) {
+    this.setState({
+      mailBodyText: data.level.content
+    })
+  }
+
+  handleNotesChange (data) {
+    const newMaint = {
+      ...this.state.maintenance,
+      notes: data.level.content
+    }
+
+    this.setState({
+      maintenance: newMaint
+    })
+  }
+
+  refreshCells (gridApi) {
+    gridApi.refreshCells()
+  }
+
+
+  handleCreatedByChange (data) {
+    // dummy
+  }
+
   handleStartDateChange (date) {
     console.log(`changeStart\n${date[0]}\n${moment(date[0]).format('YYYY-MM-DD HH:mm:ss')}`)
     const startDate = moment(date[0]).format('YYYY-MM-DD HH:mm:ss')
@@ -757,59 +693,6 @@ export default class Maintenance extends React.Component {
         impactPlaceholder: impactCalculation
       })
     }
-  }
-
-  handleDateTimeBlur (element) {
-    let newValue
-    const maintId = this.state.maintenance.id
-    const host = window.location.host
-    if (element === 'start') {
-      if (isValid(parseISO(this.state.maintenance.startDateTime))) {
-        newValue = this.state.maintenance.startDateTime
-      }
-    } else if (element === 'end') {
-      if (isValid(new Date(this.state.maintenance.endDateTime))) {
-        newValue = this.state.maintenance.endDateTime
-      }
-    }
-    const saveDateTime = (host, maintId, element, newValue) => {
-      let newISOTime = parseISO(newValue)
-      const selectedTimezone = this.state.maintenance.timezone
-      if (selectedTimezone && isValid(newISOTime)) {
-        newISOTime = zonedTimeToUtc(newISOTime, selectedTimezone)
-      }
-      if (isValid(newISOTime)) {
-        const maintId = this.state.maintenance.id
-        if (maintId === 'NEW') {
-          cogoToast.warn('No CID assigned - Cannot Save', {
-            position: 'top-right'
-          })
-          return
-        }
-        const saveDateFormat = format(newISOTime, 'yyyy-MM-dd HH:mm:ss')
-        fetch(`https://${host}/api/maintenances/save/dateTime?maintId=${maintId}&element=${element}&value=${saveDateFormat}`, {
-          method: 'get',
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            _csrf: this.props.session.csrfToken
-          }
-        })
-          .then(resp => resp.json())
-          .then(data => {
-            if (data.status === 200 && data.statusText === 'OK') {
-              cogoToast.success('Save Success', {
-                position: 'top-right'
-              })
-            } else {
-              cogoToast.warn(`Error - ${data.err}`, {
-                position: 'top-right'
-              })
-            }
-          })
-          .catch(err => console.error(err))
-      }
-    }
-    saveDateTime(host, maintId, element, newValue)
   }
 
   handleToggleChange (element, event) {
@@ -928,6 +811,138 @@ export default class Maintenance extends React.Component {
       .catch(err => console.error(err))
   }
 
+  handleReasonChange (event) {
+    this.setState({
+      maintenance: {
+        ...this.state.maintenance,
+        reason: event.target.value
+      }
+    })
+  }
+
+  handleLocationChange (event) {
+    this.setState({
+      maintenance: {
+        ...this.state.maintenance,
+        location: event.target.value
+      }
+    })
+  }
+
+  handleImpactChange (event) {
+    this.setState({
+      maintenance: {
+        ...this.state.maintenance,
+        impact: event.target.value
+      }
+    })
+  }
+
+  handleTimezoneChange (selection) {
+    const timezoneLabel = selection.label // 'Europe/Amsterdam'
+    const timezoneValue = selection.value // '(GMT+02:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna'
+
+    this.setState({
+      maintenance: {
+        ...this.state.maintenance,
+        timezone: timezoneValue,
+        timezoneLabel: timezoneLabel
+      }
+    })
+  }
+
+  handleUpdatedByChange () {
+    const value = this.state.maintenance.updatedBy
+    this.setState({
+      maintenance: {
+        ...this.state.maintenance,
+        updatedBy: value
+      }
+    })
+  }
+
+  handleUpdatedAtChange () {
+    const value = this.state.maintenance.updatedAt
+    this.setState({
+      maintenance: {
+        ...this.state.maintenance,
+        updatedAt: value
+      }
+    })
+  }
+
+  handleSupplierChange (selectedOption) {
+    this.setState({
+      maintenance: {
+        ...this.state.maintenance,
+        lieferant: selectedOption.value,
+        name: selectedOption.label
+      },
+      selectedLieferant: [],
+      kundencids: []
+    })
+    this.fetchLieferantCIDs(selectedOption.value)
+  }
+
+  ////////////////////////////////////////////////////////////
+  // 
+  //                INPUTS: ONBLUR
+  // 
+  ////////////////////////////////////////////////////////////
+
+  handleDateTimeBlur (element) {
+    let newValue
+    const maintId = this.state.maintenance.id
+    const host = window.location.host
+    if (element === 'start') {
+      if (isValid(parseISO(this.state.maintenance.startDateTime))) {
+        newValue = this.state.maintenance.startDateTime
+      }
+    } else if (element === 'end') {
+      if (isValid(new Date(this.state.maintenance.endDateTime))) {
+        newValue = this.state.maintenance.endDateTime
+      }
+    }
+    const saveDateTime = (host, maintId, element, newValue) => {
+      let newISOTime = parseISO(newValue)
+      const selectedTimezone = this.state.maintenance.timezone
+      if (selectedTimezone && isValid(newISOTime)) {
+        newISOTime = zonedTimeToUtc(newISOTime, selectedTimezone)
+      }
+      if (isValid(newISOTime)) {
+        const maintId = this.state.maintenance.id
+        if (maintId === 'NEW') {
+          cogoToast.warn('No CID assigned - Cannot Save', {
+            position: 'top-right'
+          })
+          return
+        }
+        const saveDateFormat = format(newISOTime, 'yyyy-MM-dd HH:mm:ss')
+        fetch(`https://${host}/api/maintenances/save/dateTime?maintId=${maintId}&element=${element}&value=${saveDateFormat}`, {
+          method: 'get',
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            _csrf: this.props.session.csrfToken
+          }
+        })
+          .then(resp => resp.json())
+          .then(data => {
+            if (data.status === 200 && data.statusText === 'OK') {
+              cogoToast.success('Save Success', {
+                position: 'top-right'
+              })
+            } else {
+              cogoToast.warn(`Error - ${data.err}`, {
+                position: 'top-right'
+              })
+            }
+          })
+          .catch(err => console.error(err))
+      }
+    }
+    saveDateTime(host, maintId, element, newValue)
+  }
+
   handleCIDBlur (ev) {
     const postSelection = (id) => {
       const host = window.location.host
@@ -980,77 +995,6 @@ export default class Maintenance extends React.Component {
       const selectedId = selectedSupplierCids.value
       postSelection(selectedId)
     }
-  }
-
-  handleReasonChange (event) {
-    this.setState({
-      maintenance: {
-        ...this.state.maintenance,
-        reason: event.target.value
-      }
-    })
-  }
-
-  handleLocationChange (event) {
-    this.setState({
-      maintenance: {
-        ...this.state.maintenance,
-        location: event.target.value
-      }
-    })
-  }
-
-  handleImpactChange (event) {
-    this.setState({
-      maintenance: {
-        ...this.state.maintenance,
-        impact: event.target.value
-      }
-    })
-  }
-
-  handleProtectionSwitch () {
-    this.setState({
-      maintenance: {
-        ...this.state.maintenance,
-        impact: '50ms protection switch'
-      }
-    })
-    this.handleTextInputBlur('impact')
-  }
-
-  useImpactPlaceholder () {
-    this.setState({
-      maintenance: {
-        ...this.state.maintenance,
-        impact: this.state.impactPlaceholder
-      }
-    })
-  }
-
-  toggleProtectionSwitchTooltip () {
-    this.setState({
-      openUseImpactPlaceholderToggle: !this.state.openUseImpactPlaceholderToggle
-    })
-  }
-
-  toggleUseImpactPlaceholderTooltip () {
-    this.setState({
-      openProtectionSwitchToggle: !this.state.openProtectionSwitchToggle
-    })
-  }
-
-  handleTimezoneChange (selection) {
-    const timezoneLabel = selection.label // 'Europe/Amsterdam'
-    const timezoneValue = selection.value // '(GMT+02:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna'
-
-    this.setState({
-      maintenance: {
-        ...this.state.maintenance,
-        timezone: timezoneValue,
-        timezoneLabel: timezoneLabel
-      }
-    })
   }
 
   handleTimezoneBlur (ev) {
@@ -1117,6 +1061,170 @@ export default class Maintenance extends React.Component {
       .catch(err => console.error(err))
   }
 
+  handleNotesBlur (event) {
+    const host = window.location.host
+    const newValue = this.state.maintenance.notes
+    const originalValue = this.props.jsonData.profile.notes
+    if (newValue === originalValue) {
+      return
+    }
+    const maintId = this.state.maintenance.id
+    if (maintId === 'NEW') {
+      cogoToast.warn('No CID assigned - Cannot Save', {
+        position: 'top-right'
+      })
+      return
+    }
+    fetch(`https://${host}/api/maintenances/save/notes?maintId=${maintId}&value=${newValue}`, {
+      method: 'get',
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        _csrf: this.props.session.csrfToken
+      }
+    })
+      .then(resp => resp.json())
+      .then(data => {
+        if (data.status === 200 && data.statusText === 'OK') {
+          cogoToast.success('Save Success', {
+            position: 'top-right'
+          })
+        } else {
+          cogoToast.warn(`Error - ${data.err}`, {
+            position: 'top-right'
+          })
+        }
+      })
+      .catch(err => console.error(err))
+  }
+
+  handleSupplierBlur () {
+    // dummy
+  }
+
+  ////////////////////////////////////////////////////////////
+  // 
+  //                MODAL: TOGGLE
+  // 
+  ////////////////////////////////////////////////////////////
+
+  // open / close Read Modal
+  toggleReadModal () {
+    if (!this.state.maintenance.incomingBody) {
+      const host = window.location.host
+      let mailId
+      if (this.state.maintenance.id === 'NEW') {
+        mailId = this.state.maintenance.mailId
+      } else {
+        mailId = this.state.maintenance.receivedmail
+      }
+      if (mailId === 'NT') {
+        cogoToast.warn('No mail available', {
+          position: 'top-right'
+        })
+        return
+      }
+      fetch(`https://api.${host}/mail/${mailId}`, {
+        method: 'get'
+      })
+        .then(resp => resp.json())
+        .then(data => {
+          let mailBody
+          const htmlRegex = new RegExp(/<(?:"[^"]*"[`"]*|'[^']*'['"]*|[^'">])+>/, 'gi')
+          // const htmlRegex2 = new RegExp('<([a-z]+)[^>]*(?<!/)>', 'gi')
+          // const htmlRegex3 = new RegExp('<meta .*>', 'gi')
+
+          console.log(htmlRegex.test(data.body))
+
+          if (htmlRegex.test(data.body)) {
+            console.log('html true')
+            mailBody = data.body
+            this.setState({
+              incomingMailIsHtml: true
+            })
+          } else {
+            console.log('html false')
+            mailBody = `<pre>${data.body}</pre>`
+            this.setState({
+              incomingMailIsHtml: false
+            })
+          }
+          // console.log(data)
+          this.setState({
+            openReadModal: !this.state.openReadModal,
+            maintenance: {
+              ...this.state.maintenance,
+              incomingBody: mailBody,
+              incomingFrom: data.from,
+              incomingSubject: data.subject,
+              incomingDate: data.date,
+              incomingDomain: this.props.jsonData.profile.mailDomain
+            }
+          })
+        })
+        .catch(err => console.error(`Error - ${err}`))
+    } else {
+      this.setState({
+        openReadModal: !this.state.openReadModal
+      })
+    }
+  }
+
+  // open / close send preview modal
+  togglePreviewModal = (recipient, customerCID) => {
+    if (recipient && customerCID) {
+      const HtmlBody = this.generateMail(customerCID)
+      HtmlBody && this.setState({
+        openPreviewModal: !this.state.openPreviewModal,
+        mailBodyText: HtmlBody,
+        mailPreviewHeaderText: recipient || this.state.mailPreviewHeaderText,
+        mailPreviewSubjectText: `Planned Work Notification - NT-${this.state.maintenance.id}`
+      })
+    } else {
+      this.setState({
+        openPreviewModal: !this.state.openPreviewModal
+      })
+    }
+  }
+
+  // toggleProtectionSwitchTooltip () {
+  //   this.setState({
+  //     openUseImpactPlaceholderToggle: !this.state.openUseImpactPlaceholderToggle
+  //   })
+  // }
+
+  // toggleUseImpactPlaceholderTooltip () {
+  //   this.setState({
+  //     openProtectionSwitchToggle: !this.state.openProtectionSwitchToggle
+  //   })
+  // }
+
+
+
+  ////////////////////////////////////////////////////////////
+  // 
+  //                    OTHER ACTIONS
+  // 
+  ////////////////////////////////////////////////////////////
+
+  handleProtectionSwitch () {
+    this.setState({
+      maintenance: {
+        ...this.state.maintenance,
+        impact: '50ms protection switch'
+      }
+    })
+    this.handleTextInputBlur('impact')
+  }
+
+  useImpactPlaceholder () {
+    this.setState({
+      maintenance: {
+        ...this.state.maintenance,
+        impact: this.state.impactPlaceholder
+      }
+    })
+  }
+
   handleCreateOnClick (event) {
     const {
       bearbeitetvon,
@@ -1163,78 +1271,11 @@ export default class Maintenance extends React.Component {
       .catch(err => console.error(err))
   }
 
-  handleNotesBlur (event) {
-    const host = window.location.host
-    const newValue = this.state.maintenance.notes
-    const originalValue = this.props.jsonData.profile.notes
-    if (newValue === originalValue) {
-      return
-    }
-    const maintId = this.state.maintenance.id
-    if (maintId === 'NEW') {
-      cogoToast.warn('No CID assigned - Cannot Save', {
-        position: 'top-right'
-      })
-      return
-    }
-    fetch(`https://${host}/api/maintenances/save/notes?maintId=${maintId}&value=${newValue}`, {
-      method: 'get',
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        _csrf: this.props.session.csrfToken
-      }
-    })
-      .then(resp => resp.json())
-      .then(data => {
-        if (data.status === 200 && data.statusText === 'OK') {
-          cogoToast.success('Save Success', {
-            position: 'top-right'
-          })
-        } else {
-          cogoToast.warn(`Error - ${data.err}`, {
-            position: 'top-right'
-          })
-        }
-      })
-      .catch(err => console.error(err))
-  }
-
-  handleUpdatedByChange () {
-    const value = this.state.maintenance.updatedBy
-    this.setState({
-      maintenance: {
-        ...this.state.maintenance,
-        updatedBy: value
-      }
-    })
-  }
-
-  handleUpdatedAtChange () {
-    const value = this.state.maintenance.updatedAt
-    this.setState({
-      maintenance: {
-        ...this.state.maintenance,
-        updatedAt: value
-      }
-    })
-  }
-
-  handleSupplierChange (selectedOption) {
-    this.setState({
-      maintenance: {
-        ...this.state.maintenance,
-        lieferant: selectedOption.value,
-        name: selectedOption.label
-      },
-      selectedLieferant: [],
-      kundencids: []
-    })
-    this.fetchLieferantCIDs(selectedOption.value)
-  }
-
-  handleSupplierBlur () {
-
-  }
+  ////////////////////////////////////////////////////////////
+  // 
+  //                      RENDER
+  // 
+  ////////////////////////////////////////////////////////////
 
   render () {
     const {
