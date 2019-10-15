@@ -66,15 +66,15 @@ class Header extends React.Component {
 
           <Nav navbar>
             <NavItem>
-              <Link href='/'>
-                <NavLink href='/'>
+              <Link href='/' passHref>
+                <NavLink>
                   <span className='menu-label'>Home</span>
                 </NavLink>
               </Link>
             </NavItem>
             <NavItem style={{ position: 'relative' }}>
-              <Link href='/inbox'>
-                <NavLink href='/inbox'>
+              <Link href='/inbox' passHref>
+                <NavLink>
                   <Badge className='unread-badge' pill theme='dark'>
                     {this.props.unread}
                   </Badge>
@@ -83,15 +83,23 @@ class Header extends React.Component {
               </Link>
             </NavItem>
             <NavItem>
-              <Link href='/history'>
-                <NavLink href='/history'>
+              <Link href='/history' passHref>
+                <NavLink>
                   <span className='menu-label'>History</span>
                 </NavLink>
               </Link>
             </NavItem>
             <NavItem>
-              <Link href='/settings'>
-                <NavLink href='/settings'>
+              <Link
+                href={{
+                  pathname: '/settings',
+                  query: {
+                    tab: 'companies'
+                  }
+                }}
+                passHref
+              >
+                <NavLink>
                   <span className='menu-label'>Settings</span>
                 </NavLink>
               </Link>

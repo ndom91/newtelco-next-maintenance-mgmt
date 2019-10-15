@@ -97,7 +97,8 @@ export default class History extends React.Component {
             headerName: 'By',
             field: 'bearbeitetvon',
             cellRenderer: 'edittedby',
-            width: 100
+            width: 100,
+            tooltipField: 'bearbeitetvon'
           }, {
             headerName: 'Supplier',
             field: 'name',
@@ -125,8 +126,7 @@ export default class History extends React.Component {
           }, {
             headerName: 'Mail Arrived',
             field: 'maileingang',
-            cellRenderer: 'mailArrived',
-            tooltipField: 'maileingang'
+            cellRenderer: 'mailArrived'
           }, {
             headerName: 'Updated',
             field: 'updatedAt',

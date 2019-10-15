@@ -2,12 +2,25 @@ import React from 'react'
 import Header from './header'
 import Router from 'next/router'
 import { NextAuth } from 'next-auth/client'
-import { Container, Row, Col } from 'shards-react'
+import { HotKeys } from 'react-hotkeys'
+import {
+  Container,
+  Row,
+  Col,
+  Modal,
+  ModalHeader,
+  ModalBody,
+  Badge
+} from 'shards-react'
 
 export default class Layout extends React.Component {
   constructor (props) {
     super(props)
+    this.state = {
+      openHelpModal: false
+    }
     this.handleSignOutSubmit = this.handleSignOutSubmit.bind(this)
+    this.toggleHelpModal = this.toggleHelpModal.bind(this)
   }
 
   handleSignOutSubmit (event) {
@@ -22,36 +35,145 @@ export default class Layout extends React.Component {
       })
   }
 
+  toggleHelpModal () {
+    this.setState({
+      openHelpModal: !this.state.openHelpModal
+    })
+  }
+
   render () {
+    const {
+      openHelpModal
+    } = this.state
+
+    const keyMap = {
+      TOGGLE_HELP: 'shift+?',
+      NAV_HOME: 'alt+h',
+      NAV_INBOX: 'alt+i',
+      NAV_HISTORY: 'alt+y',
+      NAV_SETTINGS: 'alt+s'
+    }
+
+    const handlers = {
+      TOGGLE_HELP: this.toggleHelpModal,
+      NAV_HOME: () => Router.push('/'),
+      NAV_INBOX: () => Router.push('/inbox'),
+      NAV_HISTORY: () => Router.push('/history'),
+      NAV_SETTINGS: () => Router.push('/settings')
+    }
+
     return (
       <div>
-        <Header unread={this.props.unread} session={this.props.session} />
-        <Container fluid>
-          <Row style={{ height: '20px' }} />
-          <Row>
-            <Col className='toplevel-col' sm='12' lg='12'>
-              {this.props.children}
-            </Col>
-          </Row>
-          <style jsx>{`
-            :global(.toplevel-col) {
-              margin-bottom: 50px !important;
-            }
-            @media only screen and (min-width: 1024px) {
-              :global(div.toplevel-col) {
-                flex: 1;
-                margin: 0 30px;
+        <HotKeys keyMap={keyMap} handlers={handlers}>
+          <Header unread={this.props.unread} session={this.props.session} />
+          <Container fluid>
+            <Row style={{ height: '20px' }} />
+            <Row>
+              <Col className='toplevel-col' sm='12' lg='12'>
+                {this.props.children}
+              </Col>
+            </Row>
+            <Modal backdropClassName='modal-backdrop' animation backdrop size='md' open={openHelpModal} toggle={this.toggleHelpModal} style={{ marginTop: '75px' }}>
+              <ModalHeader className='keyboard-shortcut-header'>
+                Keyboard Shortcuts
+              </ModalHeader>
+              <ModalBody className='keyboard-shortcut-body'>
+                <Container className='keyboard-shortcut-container'>
+                  {typeof window !== 'undefined' && window.location.pathname === '/maintenance'
+                    ? (
+                      <Row className='keyboard-row'>
+                        <Col>
+                          <Badge outline theme='primary'>CTRL + ALT + R</Badge>
+                        </Col>
+                        <Col>
+                          Toggle Read Mail
+                        </Col>
+                      </Row>
+                    ) : (
+                      null
+                    )}
+                  <Row className='keyboard-row'>
+                    <Col>
+                      <Badge outline theme='primary'>ALT + H</Badge>
+                    </Col>
+                    <Col>
+                      Home
+                    </Col>
+                  </Row>
+                  <Row className='keyboard-row'>
+                    <Col>
+                      <Badge outline theme='primary'>ALT + I</Badge>
+                    </Col>
+                    <Col>
+                      Inbox
+                    </Col>
+                  </Row>
+                  <Row className='keyboard-row'>
+                    <Col>
+                      <Badge outline theme='primary'>ALT + Y</Badge>
+                    </Col>
+                    <Col>
+                      History
+                    </Col>
+                  </Row>
+                  <Row className='keyboard-row'>
+                    <Col>
+                      <Badge outline theme='primary'>ALT + S</Badge>
+                    </Col>
+                    <Col>
+                      Settings
+                    </Col>
+                  </Row>
+                </Container>
+              </ModalBody>
+            </Modal>
+            <style jsx>{`
+              :global(.badge) {
+                font-size: 90%;
               }
-            }
-            @media only screen and (max-width: 1024px) {
-              :global(div.toplevel-col) {
-                flex: 1;
-                margin: 0;
+              :global(.keyboard-row > .col:last-child) {
+                font-size: 18px;
               }
-            }
-          `}
-          </style>
-        </Container>
+              :global(.modal-title) {
+                justify-content: center !important;
+              }
+              :global(.keyboard-shortcut-header) {
+                background: var(--light);
+              }
+              :global(.keyboard-shortcut-body) {
+                padding: 1rem;
+              }
+              :global(.keyboard-row > .col) {
+                display: flex;
+                justify-content: center;
+              }
+              :global(.keyboard-row) {
+                border-top: 1px solid var(--light);
+                padding-top: 15px;
+                padding-bottom: 15px;
+              }
+              :global(.keyboard-row:first-child) {
+                border-top: none;
+              }
+              :global(.toplevel-col) {
+                margin-bottom: 50px !important;
+              }
+              @media only screen and (min-width: 1024px) {
+                :global(div.toplevel-col) {
+                  flex: 1;
+                  margin: 0 30px;
+                }
+              }
+              @media only screen and (max-width: 1024px) {
+                :global(div.toplevel-col) {
+                  flex: 1;
+                  margin: 0;
+                }
+              }
+            `}
+            </style>
+          </Container>
+        </HotKeys>
         {/* <Footer /> */}
       </div>
     )

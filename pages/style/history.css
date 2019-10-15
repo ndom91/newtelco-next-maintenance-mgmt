@@ -11,9 +11,9 @@ h5 {
   vertical-align: center;
 }
 
-.row-completed {
+/* .row-completed {
   background-color: rgba(184, 246, 155, 0.1);
-}
+} */
 
 .row-cancelled {
   color: rgba(0, 0, 0, 0.3);
@@ -77,8 +77,9 @@ div.ag-row-selected {
 
 .user-pic:hover {
   filter: grayscale(0%);
+  box-shadow: 0 0 20px 1px rgba(0,0,0,0.3);
 }
 .user-pic {
   filter: grayscale(100%);
-  transition: all 150ms ease-in-out;
+  transition: all 750ms ease-in-out;
 }

@@ -180,10 +180,8 @@ export default class Blog extends React.Component {
             <CardBody>
               <Container className='card-container'>
                 <Card className='card-inboxUnread'>
-                  <Link href='/inbox'>
-                    <a href='/inbox'>
-                      <Badge className='card-badge'>{this.props.unread}</Badge>
-                    </a>
+                  <Link href='/inbox' passHref>
+                    <Badge className='card-badge'>{this.props.unread}</Badge>
                   </Link>
                   <Link href='/inbox'>
                     <a href='/inbox'>

@@ -2,7 +2,7 @@ import React from 'react'
 import { NextAuth } from 'next-auth/client'
 import Link from 'next/link'
 import fetch from 'isomorphic-unfetch'
-import { withRouter } from 'next/router'
+import { Router, withRouter } from 'next/router'
 import RequireLogin from '../src/components/require-login'
 import Layout from '../src/components/layout'
 import Companies from '../src/components/settings/companies'
@@ -49,6 +49,21 @@ class Settings extends React.Component {
       }
     }
   }
+
+  // componentDidMount () {
+  //   if (typeof window !== 'undefined' && window.location.pathname === '/settings') {
+  //     this.setState({
+  //       active: {
+  //         ...this.state.active,
+  //         companies: true
+  //       }
+  //     })
+  //     Router.push({
+  //       pathname: '/settings',
+  //       query: { tab: 'companies' }
+  //     })
+  //   }
+  // }
 
   componentDidUpdate (prevProps, prevState) {
     const {

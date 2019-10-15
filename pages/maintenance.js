@@ -22,6 +22,7 @@ import 'flatpickr/dist/themes/material_blue.css'
 import TimezoneSelector from '../src/components/timezone'
 import EmailTable from '../src/components/maintenance/table'
 import { getUnique, convertDateTime } from '../src/components/maintenance/helper'
+import { HotKeys } from 'react-hotkeys'
 import {
   faPlusCircle,
   faCalendarAlt,
@@ -51,8 +52,7 @@ import {
   FormInput,
   Modal,
   ModalHeader,
-  ModalBody,
-  Tooltip
+  ModalBody
 } from 'shards-react'
 
 const animatedComponents = makeAnimated()
@@ -109,6 +109,7 @@ export default class Maintenance extends React.Component {
       openUseImpactPlaceholderToggle: false,
       openReadModal: false,
       openPreviewModal: false,
+      openHelpModal: false,
       translateTooltipOpen: false,
       translated: false,
       translatedBody: '',
@@ -142,9 +143,10 @@ export default class Maintenance extends React.Component {
     this.handleUpdatedAtChange = this.handleUpdatedAtChange.bind(this)
     this.handleSupplierBlur = this.handleSupplierBlur.bind(this)
     this.handleSupplierChange = this.handleSupplierChange.bind(this)
-    this.toggleProtectionSwitchTooltip = this.toggleProtectionSwitchTooltip.bind(this)
-    this.toggleUseImpactPlaceholderTooltip = this.toggleUseImpactPlaceholderTooltip.bind(this)
     this.prepareDirectSend = this.prepareDirectSend.bind(this)
+    this.toggleHelpModal = this.toggleHelpModal.bind(this)
+    // this.toggleProtectionSwitchTooltip = this.toggleProtectionSwitchTooltip.bind(this)
+    // this.toggleUseImpactPlaceholderTooltip = this.toggleUseImpactPlaceholderTooltip.bind(this)
   }
 
   componentDidMount () {
@@ -260,11 +262,11 @@ export default class Maintenance extends React.Component {
     })
   }
 
-  ////////////////////////////////////////////////////////////
-  // 
+  /// /////////////////////////////////////////////////////////
+  //
   //                ACTIONS: API CALLS
-  // 
-  ////////////////////////////////////////////////////////////
+  //
+  /// /////////////////////////////////////////////////////////
 
   // handle Google Translate API calls
   handleTranslate () {
@@ -601,11 +603,11 @@ export default class Maintenance extends React.Component {
     this.sendMail(recipient, customerCID, subject, HtmlBody)
   }
 
-  ////////////////////////////////////////////////////////////
-  // 
+  /// /////////////////////////////////////////////////////////
+  //
   //                INPUTS: ONCHANGE
-  // 
-  ////////////////////////////////////////////////////////////
+  //
+  /// /////////////////////////////////////////////////////////
 
   // mail preview modal change
   handleMailPreviewChange (content, delta, source, editor) {
@@ -647,7 +649,6 @@ export default class Maintenance extends React.Component {
   refreshCells (gridApi) {
     gridApi.refreshCells()
   }
-
 
   handleCreatedByChange (data) {
     // dummy
@@ -884,11 +885,11 @@ export default class Maintenance extends React.Component {
     this.fetchLieferantCIDs(selectedOption.value)
   }
 
-  ////////////////////////////////////////////////////////////
-  // 
+  /// /////////////////////////////////////////////////////////
+  //
   //                INPUTS: ONBLUR
-  // 
-  ////////////////////////////////////////////////////////////
+  //
+  /// /////////////////////////////////////////////////////////
 
   handleDateTimeBlur (element) {
     let newValue
@@ -1101,11 +1102,11 @@ export default class Maintenance extends React.Component {
     // dummy
   }
 
-  ////////////////////////////////////////////////////////////
-  // 
+  /// /////////////////////////////////////////////////////////
+  //
   //                MODAL: TOGGLE
-  // 
-  ////////////////////////////////////////////////////////////
+  //
+  /// /////////////////////////////////////////////////////////
 
   // open / close Read Modal
   toggleReadModal () {
@@ -1186,6 +1187,12 @@ export default class Maintenance extends React.Component {
     }
   }
 
+  toggleHelpModal () {
+    this.setState({
+      openHelpModal: !this.state.openHelpModal
+    })
+  }
+
   // toggleProtectionSwitchTooltip () {
   //   this.setState({
   //     openUseImpactPlaceholderToggle: !this.state.openUseImpactPlaceholderToggle
@@ -1198,13 +1205,11 @@ export default class Maintenance extends React.Component {
   //   })
   // }
 
-
-
-  ////////////////////////////////////////////////////////////
-  // 
+  /// /////////////////////////////////////////////////////////
+  //
   //                    OTHER ACTIONS
-  // 
-  ////////////////////////////////////////////////////////////
+  //
+  /// /////////////////////////////////////////////////////////
 
   handleProtectionSwitch () {
     this.setState({
@@ -1271,11 +1276,11 @@ export default class Maintenance extends React.Component {
       .catch(err => console.error(err))
   }
 
-  ////////////////////////////////////////////////////////////
-  // 
+  /// /////////////////////////////////////////////////////////
+  //
   //                      RENDER
-  // 
-  ////////////////////////////////////////////////////////////
+  //
+  /// /////////////////////////////////////////////////////////
 
   render () {
     const {
@@ -1291,29 +1296,287 @@ export default class Maintenance extends React.Component {
       maintenanceIdDisplay = `NT-${maintenance.id}`
     }
 
+    const keyMap = {
+      TOGGLE_READ: 'alt+r',
+      TOGGLE_HELP: 'shift+?'
+    }
+
+    const handlers = {
+      TOGGLE_READ: this.toggleReadModal,
+      TOGGLE_HELP: this.toggleHelpModal
+    }
+
     if (this.props.session.user) {
       return (
-        <Layout unread={this.state.unreadCount} session={this.props.session}>
-          <Helmet>
-            <title>{`Newtelco Maintenance - NT-${maintenance.id}`}</title>
-          </Helmet>
-          {UnreadCount()}
-          <Card style={{ maxWidth: '100%' }}>
-            <CardHeader>
-              <ButtonToolbar style={{ justifyContent: 'space-between' }}>
-                <ButtonGroup size='md'>
-                  <Button onClick={() => Router.back()} outline>
-                    <FontAwesomeIcon icon={faArrowLeft} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
-                    Back
-                  </Button>
-                </ButtonGroup>
-                <span>
-                  <Badge theme='secondary' style={{ fontSize: '2rem', marginRight: '20px' }} outline>
-                    {maintenanceIdDisplay}
-                  </Badge>
-                  <h2 style={{ display: 'inline-block', marginBottom: '0px' }}>{maintenance.name}</h2>
-                </span>
-                {this.state.width > 500
+        <HotKeys keyMap={keyMap} handlers={handlers}>
+          <Layout unread={this.state.unreadCount} session={this.props.session}>
+            <Helmet>
+              <title>{`Newtelco Maintenance - NT-${maintenance.id}`}</title>
+            </Helmet>
+            {UnreadCount()}
+            <Card style={{ maxWidth: '100%' }}>
+              <CardHeader>
+                <ButtonToolbar style={{ justifyContent: 'space-between' }}>
+                  <ButtonGroup size='md'>
+                    <Button onClick={() => Router.back()} outline>
+                      <FontAwesomeIcon icon={faArrowLeft} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
+                      Back
+                    </Button>
+                  </ButtonGroup>
+                  <span>
+                    <Badge theme='secondary' style={{ fontSize: '2rem', marginRight: '20px' }} outline>
+                      {maintenanceIdDisplay}
+                    </Badge>
+                    <h2 style={{ display: 'inline-block', marginBottom: '0px' }}>{maintenance.name}</h2>
+                  </span>
+                  {this.state.width > 500
+                    ? (
+                      <ButtonGroup className='btn-group-2' size='md'>
+                        <Button onClick={this.toggleReadModal} outline>
+                          <FontAwesomeIcon icon={faEnvelopeOpenText} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
+                        Read
+                        </Button>
+                        <Button onClick={this.handleCalendarCreate} outline>
+                          <FontAwesomeIcon icon={faCalendarAlt} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
+                        Calendar
+                        </Button>
+                        <Button disabled={maintenance.id !== 'NEW'} className='create-btn' onClick={this.handleCreateOnClick}>
+                          <FontAwesomeIcon icon={faPlusCircle} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
+                        Create
+                        </Button>
+                      </ButtonGroup>
+                    ) : (
+                      <></>
+                    )}
+                </ButtonToolbar>
+              </CardHeader>
+              <CardBody>
+                <Container fluid>
+                  <Row style={{ height: '20px' }} />
+                  <Row>
+                    <Col sm='12' lg='6'>
+                      <Row>
+                        <Col>
+                          <Container className='maintenance-subcontainer'>
+                            <Row>
+                              <Col style={{ width: '30vw' }}>
+                                <FormGroup>
+                                  <label htmlFor='edited-by'>Created By</label>
+                                  <FormInput tabIndex='-1' readOnly id='edited-by-input' name='edited-by' type='text' value={maintenance.bearbeitetvon} onChange={this.handleCreatedByChange} />
+                                </FormGroup>
+                                <FormGroup>
+                                  <label htmlFor='updated-by'>Last Updated By</label>
+                                  <FormInput readOnly id='updated-by' name='updated-by' type='text' value={maintenance.updatedBy} onChange={this.handleUpdatedByChange} />
+                                </FormGroup>
+                                <FormGroup>
+                                  <label htmlFor='supplier'>Timezone</label>
+                                  <TimezoneSelector
+                                    value={{ value: this.state.maintenance.timezone, label: this.state.maintenance.timezoneLabel }}
+                                    onChange={this.handleTimezoneChange}
+                                    onBlur={this.handleTimezoneBlur}
+                                  />
+                                </FormGroup>
+                                <FormGroup>
+                                  <label htmlFor='start-datetime'>Start Date/Time</label>
+                                  <Flatpickr
+                                    data-enable-time
+                                    options={{ time_24hr: 'true', allow_input: 'true' }}
+                                    className='flatpickr end-date-time'
+                                    value={maintenance.startDateTime || null}
+                                    onChange={date => this.handleStartDateChange(date)}
+                                    onClose={() => this.handleDateTimeBlur('start')}
+                                  />
+                                </FormGroup>
+                              </Col>
+                              <Col style={{ width: '30vw' }}>
+                                <FormGroup>
+                                  <label htmlFor='maileingang'>Mail Arrived</label>
+                                  <FormInput tabIndex='-1' readOnly id='maileingang-input' name='maileingang' type='text' value={convertDateTime(maintenance.maileingang)} />
+                                </FormGroup>
+                                <FormGroup>
+                                  <label htmlFor='updated-at'>Updated At</label>
+                                  <FormInput tabIndex='-1' readOnly id='updated-at' name='updated-at' type='text' value={convertDateTime(maintenance.updatedAt)} onChange={this.handleUpdatedAtChange} />
+                                </FormGroup>
+                                <FormGroup>
+                                  <label htmlFor='supplier'>Supplier</label>
+                                  <Select
+                                    value={{ label: this.state.maintenance.name, value: this.state.maintenance.lieferant }}
+                                    onChange={this.handleSupplierChange}
+                                    options={this.state.suppliers}
+                                    noOptionsMessage={() => 'No Suppliers'}
+                                    placeholder='Please select a Supplier'
+                                    onBlur={this.handleSupplierBlur}
+                                  />
+                                </FormGroup>
+                                <FormGroup>
+                                  <label htmlFor='end-datetime'>End Date/Time</label>
+                                  <Flatpickr
+                                    data-enable-time
+                                    options={{ time_24hr: 'true', allow_input: 'true' }}
+                                    className='flatpickr end-date-time'
+                                    value={maintenance.endDateTime || null}
+                                    onChange={date => this.handleEndDateChange(date)}
+                                    onClose={() => this.handleDateTimeBlur('end')}
+                                  />
+                                </FormGroup>
+                              </Col>
+                            </Row>
+                            <Row>
+                              <Col>
+                                <FormGroup>
+                                  <label htmlFor='their-cid'>{maintenance.name} CID</label>
+                                  <Select
+                                    value={this.state.selectedLieferant || undefined}
+                                    onChange={this.handleSelectLieferantChange}
+                                    options={this.state.lieferantcids}
+                                    components={animatedComponents}
+                                    isMulti
+                                    noOptionsMessage={() => 'No CIDs for this Supplier'}
+                                    placeholder='Please select a CID'
+                                    onBlur={this.handleCIDBlur}
+                                  />
+                                </FormGroup>
+                              </Col>
+                            </Row>
+                          </Container>
+                          <Container className='maintenance-subcontainer'>
+                            <Row>
+                              <Col>
+                                <Row>
+                                  <Col>
+                                    <FormGroup>
+                                      <label htmlFor='impact'>Impact</label>
+                                      <Button id='protectionswitchtext' style={{ float: 'right', padding: '0.35em', marginTop: '10px' }} onClick={this.handleProtectionSwitch} outline theme='secondary'>
+                                        <FontAwesomeIcon width='16px' icon={faRandom} />
+                                      </Button>
+                                      {/* <Tooltip
+                                        open={this.state.openUseImpactPlaceholderToggle}
+                                        target='#impactplaceholdertext'
+                                        toggle={this.toggleUseImpactPlaceholderTooltip}
+                                      >
+                                        Use Impact Placeholder Text
+                                      </Tooltip> */}
+                                      <Button id='impactplaceholdertext' style={{ float: 'right', padding: '0.35em', marginRight: '10px', marginTop: '10px' }} onClick={this.useImpactPlaceholder} outline theme='secondary'>
+                                        <FontAwesomeIcon width='16px' icon={faHistory} />
+                                      </Button>
+                                      {/* <Tooltip
+                                        open={this.state.openProtectionSwitchToggle}
+                                        target='#protectionswitchtext'
+                                        toggle={this.toggleProtectionSwitchTooltip}
+                                      >
+                                        Insert Protection Switch Text
+                                      </Tooltip> */}
+                                      <FormInput onBlur={() => this.handleTextInputBlur('impact')} id='impact' name='impact' type='text' onChange={this.handleImpactChange} placeholder={this.state.impactPlaceholder} value={maintenance.impact} />
+                                    </FormGroup>
+                                  </Col>
+                                  <Col>
+                                    <FormGroup>
+                                      <label htmlFor='location'>Location</label>
+                                      <FormInput onBlur={() => this.handleTextInputBlur('location')} id='location' name='location' type='text' onChange={this.handleLocationChange} value={maintenance.location} />
+                                    </FormGroup>
+                                  </Col>
+                                </Row>
+                                <FormGroup>
+                                  <label htmlFor='reason'>Reason</label>
+                                  <FormTextarea id='reason' name='reason' onBlur={() => this.handleTextInputBlur('reason')} onChange={this.handleReasonChange} type='text' value={maintenance.reason} />
+                                </FormGroup>
+                              </Col>
+                            </Row>
+                          </Container>
+                          <Container style={{ paddingTop: '20px' }} className='maintenance-subcontainer'>
+                            <Row>
+                              <Col>
+                                <FormGroup className='form-group-toggle'>
+                                  <Badge theme='light' outline>
+                                    <label>
+                                      <Toggle
+                                        checked={maintenance.cancelled === 'false' ? false : !!maintenance.cancelled}
+                                        onChange={(event) => this.handleToggleChange('cancelled', event)}
+                                      />
+                                      <div style={{ marginTop: '10px' }}>Cancelled</div>
+                                    </label>
+                                  </Badge>
+                                  <Badge theme='light' outline>
+                                    <label>
+                                      <Toggle
+                                        icons={{
+                                          checked: <FontAwesomeIcon icon={faFirstAid} width='1em' style={{ color: '#fff' }} />,
+                                          unchecked: null
+                                        }}
+                                        checked={maintenance.emergency === 'false' ? false : !!maintenance.emergency}
+                                        onChange={(event) => this.handleToggleChange('emergency', event)}
+                                      />
+                                      <div style={{ marginTop: '10px' }}>Emergency</div>
+                                    </label>
+                                  </Badge>
+                                  <Badge theme='secondary' outline>
+                                    <label>
+                                      <Toggle
+                                        checked={maintenance.done === 'false' ? false : !!maintenance.done}
+                                        onChange={(event) => this.handleToggleChange('done', event)}
+                                      />
+                                      <div style={{ marginTop: '10px' }}>Done</div>
+                                    </label>
+                                  </Badge>
+                                </FormGroup>
+                              </Col>
+                            </Row>
+                          </Container>
+                          <Container className='maintenance-subcontainer'>
+                            <Row>
+                              <Col>
+                                <FormGroup>
+                                  <label htmlFor='notes'>Notes</label>
+                                  <TinyEditor
+                                    initialValue={this.state.notesText}
+                                    apiKey='ttv2x1is9joc0fi7v6f6rzi0u98w2mpehx53mnc1277omr7s'
+                                    onBlur={this.handleNotesBlur}
+                                    init={{
+                                      height: 300,
+                                      menubar: false,
+                                      statusbar: false,
+                                      plugins: [
+                                        'advlist autolink lists link image print preview anchor',
+                                        'searchreplace code',
+                                        'insertdatetime table paste code help wordcount'
+                                      ],
+                                      toolbar:
+                                        `undo redo | formatselect | bold italic backcolor | 
+                                        alignleft aligncenter alignright alignjustify | 
+                                        bullist numlist outdent indent | removeformat | help`
+                                    }}
+                                    onChange={this.handleNotesChange}
+                                  />
+                                </FormGroup>
+                              </Col>
+                            </Row>
+                          </Container>
+                        </Col>
+                      </Row>
+                    </Col>
+                    <Col sm='12' lg='6'>
+                      <Row>
+                        <Col>
+                          <Container style={{ padding: '20px' }} className='maintenance-subcontainer'>
+                            <Row>
+                              <Col style={{ width: '100%', height: '600px' }}>
+                                <EmailTable
+                                  prepareDirectSend={this.prepareDirectSend}
+                                  togglePreviewModal={this.togglePreviewModal}
+                                  kundencids={this.state.kundencids}
+                                  onRef={ref => (this.MailTable = ref)}
+                                />
+                              </Col>
+                            </Row>
+                          </Container>
+                        </Col>
+                      </Row>
+                    </Col>
+                  </Row>
+                </Container>
+              </CardBody>
+              <CardFooter className='card-footer'>
+                {this.state.width < 500
                   ? (
                     <ButtonGroup className='btn-group-2' size='md'>
                       <Button onClick={this.toggleReadModal} outline>
@@ -1330,614 +1593,368 @@ export default class Maintenance extends React.Component {
                       </Button>
                     </ButtonGroup>
                   ) : (
-                    <></>
+                    <span />
                   )}
-              </ButtonToolbar>
-            </CardHeader>
-            <CardBody>
-              <Container fluid>
-                <Row style={{ height: '20px' }} />
-                <Row>
-                  <Col sm='12' lg='6'>
-                    <Row>
-                      <Col>
-                        <Container className='maintenance-subcontainer'>
-                          <Row>
-                            <Col style={{ width: '30vw' }}>
-                              <FormGroup>
-                                <label htmlFor='edited-by'>Created By</label>
-                                <FormInput tabIndex='-1' readOnly id='edited-by-input' name='edited-by' type='text' value={maintenance.bearbeitetvon} onChange={this.handleCreatedByChange} />
-                              </FormGroup>
-                              <FormGroup>
-                                <label htmlFor='updated-by'>Last Updated By</label>
-                                <FormInput readOnly id='updated-by' name='updated-by' type='text' value={maintenance.updatedBy} onChange={this.handleUpdatedByChange} />
-                              </FormGroup>
-                              <FormGroup>
-                                <label htmlFor='supplier'>Timezone</label>
-                                <TimezoneSelector
-                                  value={{ value: this.state.maintenance.timezone, label: this.state.maintenance.timezoneLabel }}
-                                  onChange={this.handleTimezoneChange}
-                                  onBlur={this.handleTimezoneBlur}
-                                />
-                              </FormGroup>
-                              <FormGroup>
-                                <label htmlFor='start-datetime'>Start Date/Time</label>
-                                <Flatpickr
-                                  data-enable-time
-                                  options={{ time_24hr: 'true', allow_input: 'true' }}
-                                  className='flatpickr end-date-time'
-                                  value={maintenance.startDateTime || null}
-                                  onChange={date => this.handleStartDateChange(date)}
-                                  onClose={() => this.handleDateTimeBlur('start')}
-                                />
-                              </FormGroup>
-                            </Col>
-                            <Col style={{ width: '30vw' }}>
-                              <FormGroup>
-                                <label htmlFor='maileingang'>Mail Arrived</label>
-                                <FormInput tabIndex='-1' readOnly id='maileingang-input' name='maileingang' type='text' value={convertDateTime(maintenance.maileingang)} />
-                              </FormGroup>
-                              <FormGroup>
-                                <label htmlFor='updated-at'>Updated At</label>
-                                <FormInput tabIndex='-1' readOnly id='updated-at' name='updated-at' type='text' value={convertDateTime(maintenance.updatedAt)} onChange={this.handleUpdatedAtChange} />
-                              </FormGroup>
-                              <FormGroup>
-                                <label htmlFor='supplier'>Supplier</label>
-                                <Select
-                                  value={{ label: this.state.maintenance.name, value: this.state.maintenance.lieferant }}
-                                  onChange={this.handleSupplierChange}
-                                  options={this.state.suppliers}
-                                  noOptionsMessage={() => 'No Suppliers'}
-                                  placeholder='Please select a Supplier'
-                                  onBlur={this.handleSupplierBlur}
-                                />
-                              </FormGroup>
-                              <FormGroup>
-                                <label htmlFor='end-datetime'>End Date/Time</label>
-                                <Flatpickr
-                                  data-enable-time
-                                  options={{ time_24hr: 'true', allow_input: 'true' }}
-                                  className='flatpickr end-date-time'
-                                  value={maintenance.endDateTime || null}
-                                  onChange={date => this.handleEndDateChange(date)}
-                                  onClose={() => this.handleDateTimeBlur('end')}
-                                />
-                              </FormGroup>
-                            </Col>
-                          </Row>
-                          <Row>
-                            <Col>
-                              <FormGroup>
-                                <label htmlFor='their-cid'>{maintenance.name} CID</label>
-                                <Select
-                                  value={this.state.selectedLieferant || undefined}
-                                  onChange={this.handleSelectLieferantChange}
-                                  options={this.state.lieferantcids}
-                                  components={animatedComponents}
-                                  isMulti
-                                  noOptionsMessage={() => 'No CIDs for this Supplier'}
-                                  placeholder='Please select a CID'
-                                  onBlur={this.handleCIDBlur}
-                                />
-                              </FormGroup>
-                            </Col>
-                          </Row>
-                        </Container>
-                        <Container className='maintenance-subcontainer'>
-                          <Row>
-                            <Col>
-                              <Row>
-                                <Col>
-                                  <FormGroup>
-                                    <label htmlFor='impact'>Impact</label>
-                                    <Button id='protectionswitchtext' style={{ float: 'right', padding: '0.35em', marginTop: '10px' }} onClick={this.handleProtectionSwitch} outline theme='secondary'>
-                                      <FontAwesomeIcon width='16px' icon={faRandom} />
-                                    </Button>
-                                    {/* <Tooltip
-                                      open={this.state.openUseImpactPlaceholderToggle}
-                                      target='#impactplaceholdertext'
-                                      toggle={this.toggleUseImpactPlaceholderTooltip}
-                                    >
-                                      Use Impact Placeholder Text
-                                    </Tooltip> */}
-                                    <Button id='impactplaceholdertext' style={{ float: 'right', padding: '0.35em', marginRight: '10px', marginTop: '10px' }} onClick={this.useImpactPlaceholder} outline theme='secondary'>
-                                      <FontAwesomeIcon width='16px' icon={faHistory} />
-                                    </Button>
-                                    {/* <Tooltip
-                                      open={this.state.openProtectionSwitchToggle}
-                                      target='#protectionswitchtext'
-                                      toggle={this.toggleProtectionSwitchTooltip}
-                                    >
-                                      Insert Protection Switch Text
-                                    </Tooltip> */}
-                                    <FormInput onBlur={() => this.handleTextInputBlur('impact')} id='impact' name='impact' type='text' onChange={this.handleImpactChange} placeholder={this.state.impactPlaceholder} value={maintenance.impact} />
-                                  </FormGroup>
-                                </Col>
-                                <Col>
-                                  <FormGroup>
-                                    <label htmlFor='location'>Location</label>
-                                    <FormInput onBlur={() => this.handleTextInputBlur('location')} id='location' name='location' type='text' onChange={this.handleLocationChange} value={maintenance.location} />
-                                  </FormGroup>
-                                </Col>
-                              </Row>
-                              <FormGroup>
-                                <label htmlFor='reason'>Reason</label>
-                                <FormTextarea id='reason' name='reason' onBlur={() => this.handleTextInputBlur('reason')} onChange={this.handleReasonChange} type='text' value={maintenance.reason} />
-                              </FormGroup>
-                            </Col>
-                          </Row>
-                        </Container>
-                        <Container style={{ paddingTop: '20px' }} className='maintenance-subcontainer'>
-                          <Row>
-                            <Col>
-                              <FormGroup className='form-group-toggle'>
-                                <Badge theme='light' outline>
-                                  <label>
-                                    <Toggle
-                                      checked={maintenance.cancelled === 'false' ? false : !!maintenance.cancelled}
-                                      onChange={(event) => this.handleToggleChange('cancelled', event)}
-                                    />
-                                    <div style={{ marginTop: '10px' }}>Cancelled</div>
-                                  </label>
-                                </Badge>
-                                <Badge theme='light' outline>
-                                  <label>
-                                    <Toggle
-                                      icons={{
-                                        checked: <FontAwesomeIcon icon={faFirstAid} width='1em' style={{ color: '#fff' }} />,
-                                        unchecked: null
-                                      }}
-                                      checked={maintenance.emergency === 'false' ? false : !!maintenance.emergency}
-                                      onChange={(event) => this.handleToggleChange('emergency', event)}
-                                    />
-                                    <div style={{ marginTop: '10px' }}>Emergency</div>
-                                  </label>
-                                </Badge>
-                                <Badge theme='secondary' outline>
-                                  <label>
-                                    <Toggle
-                                      checked={maintenance.done === 'false' ? false : !!maintenance.done}
-                                      onChange={(event) => this.handleToggleChange('done', event)}
-                                    />
-                                    <div style={{ marginTop: '10px' }}>Done</div>
-                                  </label>
-                                </Badge>
-                              </FormGroup>
-                            </Col>
-                          </Row>
-                        </Container>
-                        <Container className='maintenance-subcontainer'>
-                          <Row>
-                            <Col>
-                              <FormGroup>
-                                <label htmlFor='notes'>Notes</label>
-                                <TinyEditor
-                                  initialValue={this.state.notesText}
-                                  apiKey='ttv2x1is9joc0fi7v6f6rzi0u98w2mpehx53mnc1277omr7s'
-                                  onBlur={this.handleNotesBlur}
-                                  init={{
-                                    height: 300,
-                                    menubar: false,
-                                    statusbar: false,
-                                    plugins: [
-                                      'advlist autolink lists link image print preview anchor',
-                                      'searchreplace code',
-                                      'insertdatetime table paste code help wordcount'
-                                    ],
-                                    toolbar:
-                                      `undo redo | formatselect | bold italic backcolor | 
-                                      alignleft aligncenter alignright alignjustify | 
-                                      bullist numlist outdent indent | removeformat | help`
-                                  }}
-                                  onChange={this.handleNotesChange}
-                                />
-                              </FormGroup>
-                            </Col>
-                          </Row>
-                        </Container>
-                      </Col>
-                    </Row>
-                  </Col>
-                  <Col sm='12' lg='6'>
-                    <Row>
-                      <Col>
-                        <Container style={{ padding: '20px' }} className='maintenance-subcontainer'>
-                          <Row>
-                            <Col style={{ width: '100%', height: '600px' }}>
-                              <EmailTable
-                                prepareDirectSend={this.prepareDirectSend}
-                                togglePreviewModal={this.togglePreviewModal}
-                                kundencids={this.state.kundencids}
-                                onRef={ref => (this.MailTable = ref)}
-                              />
-                            </Col>
-                          </Row>
-                        </Container>
-                      </Col>
-                    </Row>
-                  </Col>
-                </Row>
-              </Container>
-            </CardBody>
-            <CardFooter className='card-footer'>
-              {this.state.width < 500
+              </CardFooter>
+              {typeof window !== 'undefined'
                 ? (
-                  <ButtonGroup className='btn-group-2' size='md'>
-                    <Button onClick={this.toggleReadModal} outline>
-                      <FontAwesomeIcon icon={faEnvelopeOpenText} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
-                    Read
-                    </Button>
-                    <Button onClick={this.handleCalendarCreate} outline>
-                      <FontAwesomeIcon icon={faCalendarAlt} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
-                    Calendar
-                    </Button>
-                    <Button disabled={maintenance.id !== 'NEW'} className='create-btn' onClick={this.handleCreateOnClick}>
-                      <FontAwesomeIcon icon={faPlusCircle} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
-                    Create
-                    </Button>
-                  </ButtonGroup>
-                ) : (
-                  <span />
-                )}
-            </CardFooter>
-            {typeof window !== 'undefined'
-              ? (
-                <Rnd
-                  default={{
-                    x: 900,
-                    y: 25,
-                    width: 800,
-                    height: 600
-                  }}
-                  style={{
-                    visibility: openReadModal ? 'visible' : 'hidden',
-                    background: 'var(--light)',
-                    overflow: 'hidden',
-                    border: '2px solid #007bff',
-                    height: 'auto',
-                    zIndex: '101'
-                  }}
-                  minWidth={500}
-                  minHeight={590}
-                  bounds='window'
-                  dragHandleClassName='modal-incoming-header-text'
-                >
-                  <div style={{ position: 'relative' }}>
-                    <ModalHeader style={{
-                      background: 'var(--secondary)',
-                      borderRadius: '0px'
+                  <Rnd
+                    default={{
+                      x: 900,
+                      y: 25,
+                      width: 800,
+                      height: 600
                     }}
-                    >
-                      <img className='mail-icon' src={`https://cdn.statically.io/favicons/${this.state.maintenance.incomingDomain}`} />
-                      <div className='modal-incoming-header-text'>
-                        <h5 className='modal-incoming-from'>{this.state.maintenance.incomingFrom}</h5>
-                        <small className='modal-incoming-subject'>{this.state.maintenance.incomingSubject}</small><br />
-                        <small className='modal-incoming-datetime'>{this.state.maintenance.incomingDate}</small>
-                      </div>
-                      <ButtonGroup style={{ display: 'flex', flexDirection: 'column' }}>
-                        <Button outline className='close-read-modal-btn' theme='light' style={{ borderRadius: '5px 5px 0 0', padding: '0.7em 0.9em' }} onClick={this.toggleReadModal}>
-                          <FontAwesomeIcon
-                            className='close-read-modal-icon' width='1.5em' style={{ color: 'var(--light)', fontSize: '12px' }}
-                            icon={faTimesCircle}
-                          />
-                        </Button>
-                        <Button theme='light' style={{ borderRadius: '0 0 5px 5px', padding: '0.7em 0.9em' }} onClick={this.handleTranslate.bind(this)}>
-                          <FontAwesomeIcon width='1.5em' style={{ fontSize: '12px' }} className='translate-icon' icon={faLanguage} />
-                        </Button>
-                      </ButtonGroup>
-                    </ModalHeader>
-                    <ModalBody className='mail-body' dangerouslySetInnerHTML={{ __html: this.state.translated ? this.state.translatedBody : this.state.maintenance.incomingBody }} />
+                    style={{
+                      visibility: openReadModal ? 'visible' : 'hidden',
+                      background: 'var(--light)',
+                      overflow: 'hidden',
+                      border: '2px solid #007bff',
+                      height: 'auto',
+                      zIndex: '101'
+                    }}
+                    minWidth={500}
+                    minHeight={590}
+                    bounds='window'
+                    dragHandleClassName='modal-incoming-header-text'
+                  >
+                    <div style={{ position: 'relative' }}>
+                      <ModalHeader style={{
+                        background: 'var(--secondary)',
+                        borderRadius: '0px'
+                      }}
+                      >
+                        <img className='mail-icon' src={`https://cdn.statically.io/favicons/${this.state.maintenance.incomingDomain}`} />
+                        <div className='modal-incoming-header-text'>
+                          <h5 className='modal-incoming-from'>{this.state.maintenance.incomingFrom}</h5>
+                          <small className='modal-incoming-subject'>{this.state.maintenance.incomingSubject}</small><br />
+                          <small className='modal-incoming-datetime'>{this.state.maintenance.incomingDate}</small>
+                        </div>
+                        <ButtonGroup style={{ display: 'flex', flexDirection: 'column' }}>
+                          <Button outline className='close-read-modal-btn' theme='light' style={{ borderRadius: '5px 5px 0 0', padding: '0.7em 0.9em' }} onClick={this.toggleReadModal}>
+                            <FontAwesomeIcon
+                              className='close-read-modal-icon' width='1.5em' style={{ color: 'var(--light)', fontSize: '12px' }}
+                              icon={faTimesCircle}
+                            />
+                          </Button>
+                          <Button theme='light' style={{ borderRadius: '0 0 5px 5px', padding: '0.7em 0.9em' }} onClick={this.handleTranslate.bind(this)}>
+                            <FontAwesomeIcon width='1.5em' style={{ fontSize: '12px' }} className='translate-icon' icon={faLanguage} />
+                          </Button>
+                        </ButtonGroup>
+                      </ModalHeader>
+                      <ModalBody className='mail-body' dangerouslySetInnerHTML={{ __html: this.state.translated ? this.state.translatedBody : this.state.maintenance.incomingBody }} />
+                    </div>
+                  </Rnd>
+                ) : (
+                  <></>
+                )}
+              <Modal backdropClassName='modal-backdrop' animation backdrop size='lg' open={openPreviewModal} toggle={this.togglePreviewModal}>
+                <ModalHeader>
+                  <div className='modal-preview-text-wrapper'>
+                    <div className='modal-preview-to-text'>
+                      <b style={{ fontWeight: '900' }}>To:</b> {this.state.mailPreviewHeaderText}
+                    </div>
+                    <div className='modal-preview-to-text'>
+                      <b style={{ fontWeight: '900' }}>Cc:</b> service@newtelco.de
+                    </div>
+                    <div className='modal-preview-Subject-text'>
+                      <b style={{ fontWeight: '900' }}>Subject: </b>{this.state.mailPreviewSubjectText}
+                    </div>
                   </div>
-                </Rnd>
-              ) : (
-                <></>
-              )}
-            <Modal backdropClassName='modal-backdrop' animation backdrop size='lg' open={openPreviewModal} toggle={this.togglePreviewModal}>
-              <ModalHeader>
-                <div className='modal-preview-text-wrapper'>
-                  <div className='modal-preview-to-text'>
-                    <b style={{ fontWeight: '900' }}>To:</b> {this.state.mailPreviewHeaderText}
-                  </div>
-                  <div className='modal-preview-to-text'>
-                    <b style={{ fontWeight: '900' }}>Cc:</b> service@newtelco.de
-                  </div>
-                  <div className='modal-preview-Subject-text'>
-                    <b style={{ fontWeight: '900' }}>Subject: </b>{this.state.mailPreviewSubjectText}
-                  </div>
-                </div>
-                <Button id='send-mail-btn' style={{ padding: '0.9em 1.1em' }} onClick={this.sendMail}>
-                  <FontAwesomeIcon width='1.5em' style={{ fontSize: '12px' }} className='modal-preview-send-icon' icon={faPaperPlane} />
-                </Button>
-              </ModalHeader>
-              <ModalBody>
-                <TinyEditor
-                  initialValue={this.state.mailBodyText}
-                  apiKey='ttv2x1is9joc0fi7v6f6rzi0u98w2mpehx53mnc1277omr7s'
-                  init={{
-                    height: 500,
-                    menubar: false,
-                    statusbar: false,
-                    plugins: [
-                      'advlist autolink lists link image print preview anchor',
-                      'searchreplace code',
-                      'insertdatetime table paste code help wordcount'
-                    ],
-                    toolbar:
-                      `undo redo | formatselect | bold italic backcolor | 
-                      alignleft aligncenter alignright alignjustify | 
-                      bullist numlist outdent indent | removeformat | help`
-                  }}
-                  onChange={this.handleEditorChange}
-                />
+                  <Button id='send-mail-btn' style={{ padding: '0.9em 1.1em' }} onClick={this.sendMail}>
+                    <FontAwesomeIcon width='1.5em' style={{ fontSize: '12px' }} className='modal-preview-send-icon' icon={faPaperPlane} />
+                  </Button>
+                </ModalHeader>
+                <ModalBody>
+                  <TinyEditor
+                    initialValue={this.state.mailBodyText}
+                    apiKey='ttv2x1is9joc0fi7v6f6rzi0u98w2mpehx53mnc1277omr7s'
+                    init={{
+                      height: 500,
+                      menubar: false,
+                      statusbar: false,
+                      plugins: [
+                        'advlist autolink lists link image print preview anchor',
+                        'searchreplace code',
+                        'insertdatetime table paste code help wordcount'
+                      ],
+                      toolbar:
+                        `undo redo | formatselect | bold italic backcolor | 
+                        alignleft aligncenter alignright alignjustify | 
+                        bullist numlist outdent indent | removeformat | help`
+                    }}
+                    onChange={this.handleEditorChange}
+                  />
 
-              </ModalBody>
-            </Modal>
-          </Card>
-          <style jsx>{`
-            :global(div[class$="-singleValue"]) {
-              font-size: 0.95rem;
-              color: #495057;
-            }
-            :global(.form-group > label) {
-              margin: 10px !important;
-            }
-            :global(.form-group) {
-              margin-bottom: 0px !important;
-            }
-            :global(.container) {
-              padding: 15px;
-            }
-            .mail-icon {
-              min-width: 96px;
-              height: 96px;
-              border: 2px solid var(--primary);
-              padding: 10px;
-              border-radius: 5px;
-              margin-right: 10px;
-            }
-            :global(.MuiFormControl-root) {
-              width: 100%;
-            }
-            :global(.MuiInputBase-root) {
-              color: #495057;
-            }
-            :global(.MuiInputBase-root:hover) {
-              border-color: #8fa4b8 !important;
-            }
-            :global(.MuiOutlinedInput-input) {
-              padding: 10.5px 14px;
-              transition: box-shadow 250ms cubic-bezier(.27,.01,.38,1.06),border 250ms cubic-bezier(.27,.01,.38,1.06);
-            }
-            :global(.Mui-focused) {
-              border: none !important;
-            }
-            :global(.MuiInputBase-root:focus-within) {
-              color: #495057;
-              background-color: #fff;
-              border: 1px solid #007bff !important;
-              border-radius: 0.325rem;
-              box-shadow: 0 0.313rem 0.719rem rgba(0,123,255,.1), 0 0.156rem 0.125rem rgba(0,0,0,.06);
-            }
-            :global(.MuiIconButton-root:hover) {
-              background-color: none !important;
-            }
-            :global(.fa-language) {
-              font-size: 20px;
-            }
-            :global(.modal-lg) {
-              max-width: 1000px !important;
-            }
-            :global(.tox-toolbar__group) {
-              border-right: none !important;
-            }
-            :global(.tox-tinymce) {
-              border-radius: 5px !important;
-            }
-            :global(.tox-toolbar) {
-              background: none !important;
-            }
-            :global(.maintenance-subcontainer) {
-              border: 1px solid var(--light);
-              border-radius: 0.325rem;
-              margin: 10px 0;
-            }
-            :global(.form-group-toggle > label) {
-              display: flex;
-              flex-direction: column;
-              align-items: center;
-            }
-            :global(.form-group-toggle) {
-              display: flex;
-              justify-content: space-around;
-              align-items: center;
-            }
-            .toggle-done {
-              border: 1px solid var(--secondary);
-              border-radius: 0.325rem;
-              padding: 20px;
-            }
-            :global(.rdw-option-active) {
-              box-shadow: none;
-              border: 2px solid var(--primary);
-              border-radius: 5px;
-            }
-            :global(.editor-toolbar) {
-              transition: all 150ms ease-in-out;
-            }
-            :global(.editor-dropdown) {
-              position: relative;
-              font-family: inherit;
-              background-color: transparent;
-              padding: 2px 2px 2px 0;
-              font-size: 10px;
-              border-radius: 0;
-              border: none;
-              border-bottom: 1px solid rgba(0,0,0, 0.12);
-              transition: all 150ms ease-in-out;
-            }
-            :global(.editor-wrapper) {
-              border: 1px solid var(--light);
-              border-radius: 5px;
-            }
-            :global(.editor-wrapper) {
-              padding: 5px;
-            }
-            :global(button.btn-primary) {
-              max-height: 45px;
-            }
-            input {
-              display: block;
-            }
-            label {
-              margin: 15px;
-            }
-            :global(.modal-content) {
-              max-height: calc(${this.state.windowInnerHeight}px - 50px);
-            }
-            :global(.mail-body) {
-              font-family: Poppins, Helvetica;
-              height: 460px;
-              overflow-y: ${this.state.incomingMailIsHtml ? 'scroll' : 'hidden'};
-            }
-            :global(.mail-body > :first-child) {
-              position: absolute;
-              top: 0;
-              left: 0;
-              height: 100%;
-              width: 100%;
-              padding: 40px;
-              overflow-y: ${this.state.incomingMailIsHtml ? 'hidden' : 'scroll'};
-            }
-            :global(.modal-backdrop) {
-              background-color: #000;
-              transition: all 150ms ease-in-out;
-            }
-            :global(.modal-backdrop.show) {
-              opacity: 0.5;
-            }
-            .modal-incoming-header-text {
-              flex-grow: 1;
-            }
-            :global(.modal-title) {
-              display: flex;
-              justify-content: space-between;
-              width: 100%;
-              align-items: center;
-            }
-            :global(.modal-content) {
-              max-height: calc(${this.state.windowInnerHeight}px - 50px);
-            }
-            :global(.flexible-modal) {
-              position: absolute;
-              z-index: 1;
-              border: 1px solid #ccc;
-              background: white;
-            }
-            :global(.flexible-modal-mask) {
-              position: fixed;
-              height: 100%;
-              background: rgba(55, 55, 55, 0.6);
-              top:0;
-              left:0;
-              right:0;
-              bottom:0;
-            }
-            :global(.flexible-modal-resizer) {
-              position:absolute;
-              right:0;
-              bottom:0;
-              cursor:se-resize;
-              margin:5px;
-              border-bottom: solid 2px #333;
-              border-right: solid 2px #333;
-            }
-            :global(.flexible-modal-drag-area) {
-              background: #007bff;
-              height: 50px;
-              position:absolute;
-              right:0;
-              top:0;
-              cursor:move;
-            }
-            .modal-incoming-header-text {
-              cursor: pointer;
-            }
-            .modal-incoming-header-text > * {
-              color: #fff;
-            }
-            :global(.close-read-modal-btn:hover > .close-read-modal-icon) {
-              color: var(--dark) !important;
-            }
-            :global(.flatpickr) {
-              height: auto;
-              width: 100%;
-              padding: .5rem 1rem;
-              font-size: .95rem;
-              line-height: 1.5;
-              color: #495057;
-              background-color: #fff;
-              border: 1px solid #becad6;
-              font-weight: 300;
-              will-change: border-color,box-shadow;
-              border-radius: .375rem;
-              box-shadow: none;
-              transition: box-shadow 250ms cubic-bezier(.27,.01,.38,1.06),border 250ms cubic-bezier(.27,.01,.38,1.06);
-            }
-            :global(.flatpickr-months) {
-              background: #007bff !important;
-            }
-            :global(.flatpickr-month) {
-              background: #007bff !important;
-            }
-            :global(.flatpickr-monthDropdown-months) {
-              background: #007bff !important;
-            }
-            :global(.flatpickr-weekdays) {
-              background: #007bff !important;
-            }
-            :global(.flatpickr-weekday) {
-              background: #007bff !important;
-            }
-            :global(.flatpickr-day.selected) {
-              background: #007bff !important;
-              border-color: #007bff !important;
-            }
-            :global(.create-btn) {
-              box-shadow: ${this.state.maintenance.id === 'NEW' ? '0 0 0 100vmax rgba(0,0,0,.8)' : 'none'};
-              pointer-events: ${this.state.maintenance.id === 'NEW' ? 'auto' : 'none'};
-              z-index: 100;
-            }
-            :global(*) {
-              pointer-events: ${this.state.maintenance.id === 'NEW' ? 'none' : 'auto'};
-            }
-            :global(.create-btn:before) {
-              
-            }
-            @media only screen and (max-width: 500px) {
-              :global(div.btn-toolbar > .btn-group-md) {
-                margin-right: 20px;
+                </ModalBody>
+              </Modal>
+            </Card>
+            <style jsx>{`
+              :global(div[class$="-singleValue"]) {
+                font-size: 0.95rem;
+                color: #495057;
               }
-              :global(div.btn-toolbar) {
-                flex-wrap: no-wrap;
+              :global(.form-group > label) {
+                margin: 10px !important;
               }
-              :global(div.btn-toolbar > span) {
+              :global(.form-group) {
+                margin-bottom: 0px !important;
+              }
+              :global(.container) {
+                padding: 15px;
+              }
+              .mail-icon {
+                min-width: 96px;
+                height: 96px;
+                border: 2px solid var(--primary);
+                padding: 10px;
+                border-radius: 5px;
+                margin-right: 10px;
+              }
+              :global(.MuiFormControl-root) {
+                width: 100%;
+              }
+              :global(.MuiInputBase-root) {
+                color: #495057;
+              }
+              :global(.MuiInputBase-root:hover) {
+                border-color: #8fa4b8 !important;
+              }
+              :global(.MuiOutlinedInput-input) {
+                padding: 10.5px 14px;
+                transition: box-shadow 250ms cubic-bezier(.27,.01,.38,1.06),border 250ms cubic-bezier(.27,.01,.38,1.06);
+              }
+              :global(.Mui-focused) {
+                border: none !important;
+              }
+              :global(.MuiInputBase-root:focus-within) {
+                color: #495057;
+                background-color: #fff;
+                border: 1px solid #007bff !important;
+                border-radius: 0.325rem;
+                box-shadow: 0 0.313rem 0.719rem rgba(0,123,255,.1), 0 0.156rem 0.125rem rgba(0,0,0,.06);
+              }
+              :global(.MuiIconButton-root:hover) {
+                background-color: none !important;
+              }
+              :global(.fa-language) {
+                font-size: 20px;
+              }
+              :global(.modal-lg) {
+                max-width: 1000px !important;
+              }
+              :global(.tox-toolbar__group) {
+                border-right: none !important;
+              }
+              :global(.tox-tinymce) {
+                border-radius: 5px !important;
+              }
+              :global(.tox-toolbar) {
+                background: none !important;
+              }
+              :global(.maintenance-subcontainer) {
+                border: 1px solid var(--light);
+                border-radius: 0.325rem;
+                margin: 10px 0;
+              }
+              :global(.form-group-toggle > label) {
                 display: flex;
-                justify-content: center;
-                flex-wrap: wrap;
                 flex-direction: column;
+                align-items: center;
+              }
+              :global(.form-group-toggle) {
+                display: flex;
+                justify-content: space-around;
+                align-items: center;
+              }
+              .toggle-done {
+                border: 1px solid var(--secondary);
+                border-radius: 0.325rem;
+                padding: 20px;
+              }
+              :global(.rdw-option-active) {
+                box-shadow: none;
+                border: 2px solid var(--primary);
+                border-radius: 5px;
+              }
+              :global(.editor-toolbar) {
+                transition: all 150ms ease-in-out;
+              }
+              :global(.editor-dropdown) {
+                position: relative;
+                font-family: inherit;
+                background-color: transparent;
+                padding: 2px 2px 2px 0;
+                font-size: 10px;
+                border-radius: 0;
+                border: none;
+                border-bottom: 1px solid rgba(0,0,0, 0.12);
+                transition: all 150ms ease-in-out;
+              }
+              :global(.editor-wrapper) {
+                border: 1px solid var(--light);
+                border-radius: 5px;
+              }
+              :global(.editor-wrapper) {
+                padding: 5px;
+              }
+              :global(button.btn-primary) {
+                max-height: 45px;
+              }
+              input {
+                display: block;
+              }
+              label {
+                margin: 15px;
+              }
+              :global(.modal-content) {
+                max-height: calc(${this.state.windowInnerHeight}px - 50px);
+              }
+              :global(.mail-body) {
+                font-family: Poppins, Helvetica;
+                height: 460px;
+                overflow-y: ${this.state.incomingMailIsHtml ? 'scroll' : 'hidden'};
+              }
+              :global(.mail-body > :first-child) {
+                position: absolute;
+                top: 0;
+                left: 0;
+                height: 100%;
+                width: 100%;
+                padding: 40px;
+                overflow-y: ${this.state.incomingMailIsHtml ? 'hidden' : 'scroll'};
+              }
+              :global(.modal-backdrop) {
+                background-color: #000;
+                transition: all 150ms ease-in-out;
+              }
+              :global(.modal-backdrop.show) {
+                opacity: 0.5;
+              }
+              .modal-incoming-header-text {
                 flex-grow: 1;
               }
-              :global(div.btn-toolbar > span > h2) {
-                margin: 0 auto;
-                padding-right: 20px;
+              :global(.modal-title) {
+                display: flex;
+                justify-content: space-between;
+                width: 100%;
+                align-items: center;
               }
-              :global(.card-body) {
-                padding: 0px;
+              :global(.modal-content) {
+                max-height: calc(${this.state.windowInnerHeight}px - 50px);
               }
-            }
-          `}
-          </style>
-        </Layout>
+              :global(.flexible-modal) {
+                position: absolute;
+                z-index: 1;
+                border: 1px solid #ccc;
+                background: white;
+              }
+              :global(.flexible-modal-mask) {
+                position: fixed;
+                height: 100%;
+                background: rgba(55, 55, 55, 0.6);
+                top:0;
+                left:0;
+                right:0;
+                bottom:0;
+              }
+              :global(.flexible-modal-resizer) {
+                position:absolute;
+                right:0;
+                bottom:0;
+                cursor:se-resize;
+                margin:5px;
+                border-bottom: solid 2px #333;
+                border-right: solid 2px #333;
+              }
+              :global(.flexible-modal-drag-area) {
+                background: #007bff;
+                height: 50px;
+                position:absolute;
+                right:0;
+                top:0;
+                cursor:move;
+              }
+              .modal-incoming-header-text {
+                cursor: pointer;
+              }
+              .modal-incoming-header-text > * {
+                color: #fff;
+              }
+              :global(.close-read-modal-btn:hover > .close-read-modal-icon) {
+                color: var(--dark) !important;
+              }
+              :global(.flatpickr) {
+                height: auto;
+                width: 100%;
+                padding: .5rem 1rem;
+                font-size: .95rem;
+                line-height: 1.5;
+                color: #495057;
+                background-color: #fff;
+                border: 1px solid #becad6;
+                font-weight: 300;
+                will-change: border-color,box-shadow;
+                border-radius: .375rem;
+                box-shadow: none;
+                transition: box-shadow 250ms cubic-bezier(.27,.01,.38,1.06),border 250ms cubic-bezier(.27,.01,.38,1.06);
+              }
+              :global(.flatpickr-months) {
+                background: #007bff !important;
+              }
+              :global(.flatpickr-month) {
+                background: #007bff !important;
+              }
+              :global(.flatpickr-monthDropdown-months) {
+                background: #007bff !important;
+              }
+              :global(.flatpickr-weekdays) {
+                background: #007bff !important;
+              }
+              :global(.flatpickr-weekday) {
+                background: #007bff !important;
+              }
+              :global(.flatpickr-day.selected) {
+                background: #007bff !important;
+                border-color: #007bff !important;
+              }
+              :global(.create-btn) {
+                box-shadow: ${this.state.maintenance.id === 'NEW' ? '0 0 0 100vmax rgba(0,0,0,.8)' : 'none'};
+                pointer-events: ${this.state.maintenance.id === 'NEW' ? 'auto' : 'none'};
+                z-index: 100;
+              }
+              :global(*) {
+                pointer-events: ${this.state.maintenance.id === 'NEW' ? 'none' : 'auto'};
+              }
+              :global(.create-btn:before) {
+                
+              }
+              @media only screen and (max-width: 500px) {
+                :global(div.btn-toolbar > .btn-group-md) {
+                  margin-right: 20px;
+                }
+                :global(div.btn-toolbar) {
+                  flex-wrap: no-wrap;
+                }
+                :global(div.btn-toolbar > span) {
+                  display: flex;
+                  justify-content: center;
+                  flex-wrap: wrap;
+                  flex-direction: column;
+                  flex-grow: 1;
+                }
+                :global(div.btn-toolbar > span > h2) {
+                  margin: 0 auto;
+                  padding-right: 20px;
+                }
+                :global(.card-body) {
+                  padding: 0px;
+                }
+              }
+            `}
+            </style>
+          </Layout>
+        </HotKeys>
       )
     } else {
       return <RequireLogin />

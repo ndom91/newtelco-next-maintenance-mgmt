@@ -225,7 +225,7 @@ export default class Companies extends React.Component {
                     as='/maintenance/new'
                   >
                     <Button style={{ width: '100%', marginTop: '15px' }} theme='primary'>
-                      Add
+                      Save
                     </Button>
                   </Link>
                 </Col>
