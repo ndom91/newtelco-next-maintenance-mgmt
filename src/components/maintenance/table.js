@@ -19,7 +19,7 @@ class EmailTable extends React.Component {
     super(props)
 
     this.state = {
-      kundencids: this.props.kundencids,
+      kundencids: [],
       gridOptions: {
         defaultColDef: {
           resizable: true,
@@ -122,7 +122,26 @@ class EmailTable extends React.Component {
     // params.columnApi.sizeColumnsToFit()
   }
 
+  onGridReady (params) {
+    params.api.setRowData(this.state.kundencids)
+  }
+
+  // componentDidUpdate (prevProps) {
+  //   console.log('pP', prevProps.kundencids.length, this.state.kundencids.length)
+  //   if (prevProps.kundencids.length !== this.state.kundencids.length) {
+  //     this.setState({
+  //       kundencids: this.props.kundencids
+  //     })
+  //     console.log('rerender')
+  //   }
+  //   // this.gridApi.setRowData(this.state.kundencids)
+  //   if (this.gridApi) {
+  //     this.gridApi.redrawRows()
+  //   }
+  // }
+
   static getDerivedStateFromProps (props, state) {
+    console.log(props.kundencids.length, state.kundencids.length)
     if (props.kundencids.length !== state.kundencids.length) {
       return {
         kundencids: props.kundencids
@@ -143,10 +162,11 @@ class EmailTable extends React.Component {
         <AgGridReact
           gridOptions={this.state.gridOptions}
           rowData={this.state.kundencids}
-          // onGridReady={this.handleGridReady}
           onGridReady={params => this.gridApi = params.api}
-          animateRows
+          // animateRows
+          debug
           pagination
+          // batchUpdateWaitMillis={50}
           onFirstDataRendered={this.onFirstDataRendered.bind(this)}
         />
       </div>

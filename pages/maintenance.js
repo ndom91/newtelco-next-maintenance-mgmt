@@ -382,36 +382,43 @@ export default class Maintenance extends React.Component {
         const {
           done
         } = this.state.maintenance
-        if (data.kundenCIDsResult.length > 1) {
-          let currentSentStatus = '0'
-          if (done === 1 || done === true || done === '1') {
-            currentSentStatus = '1'
-          }
-          const kundencids = data.kundenCIDsResult
-          kundencids.forEach(cid => {
-            cid.sent = currentSentStatus
-          })
-          this.setState({
-            kundencids: kundencids
-          })
-        } else {
-          if (data.kundenCIDsResult[0]) {
-            if (done === 1 || done === true || done === '1') {
-              data.kundenCIDsResult[0].sent = '1'
-            } else {
-              data.kundenCIDsResult[0].sent = '0'
-            }
-            const existingKundenCids = [
-              ...this.state.kundencids,
-              data.kundenCIDsResult[0]
-            ]
-            const uniqueKundenCids = getUnique(existingKundenCids, 'kundenCID')
-            this.setState({
-              kundencids: uniqueKundenCids
-            })
-            console.log(this.state.kundencids)
-          }
+        // if (data.kundenCIDsResult.length > 1) {
+        let currentSentStatus = '0'
+        if (done === 1 || done === true || done === '1') {
+          currentSentStatus = '1'
         }
+        const kundencids = data.kundenCIDsResult
+        kundencids.forEach(cid => {
+          cid.sent = currentSentStatus
+        })
+        const newKundenCids = this.state.kundencids
+        kundencids.forEach(cid => {
+          newKundenCids.push(cid)
+        })
+        const uniqueKundenCids = getUnique(newKundenCids, 'kundenCID')
+        console.log(newKundenCids)
+        console.log(uniqueKundenCids)
+        this.setState({
+          kundencids: uniqueKundenCids
+        })
+        // } else {
+        //   if (data.kundenCIDsResult[0]) {
+        //     if (done === 1 || done === true || done === '1') {
+        //       data.kundenCIDsResult[0].sent = '1'
+        //     } else {
+        //       data.kundenCIDsResult[0].sent = '0'
+        //     }
+        //     const existingKundenCids = [
+        //       ...this.state.kundencids,
+        //       data.kundenCIDsResult[0]
+        //     ]
+        //     const uniqueKundenCids = getUnique(existingKundenCids, 'kundenCID')
+        //     this.setState({
+        //       kundencids: uniqueKundenCids
+        //     })
+        //     console.log(this.state.kundencids)
+        //   }
+        // }
       })
       .catch(err => console.error(`Error - ${err}`))
   }
@@ -1112,12 +1119,7 @@ export default class Maintenance extends React.Component {
   toggleReadModal () {
     if (!this.state.maintenance.incomingBody) {
       const host = window.location.host
-      let mailId
-      if (this.state.maintenance.id === 'NEW') {
-        mailId = this.state.maintenance.mailId
-      } else {
-        mailId = this.state.maintenance.receivedmail
-      }
+      const mailId = this.state.maintenance.mailId || this.state.maintenance.receivedmail
       if (mailId === 'NT') {
         cogoToast.warn('No mail available', {
           position: 'top-right'
@@ -1134,22 +1136,17 @@ export default class Maintenance extends React.Component {
           // const htmlRegex2 = new RegExp('<([a-z]+)[^>]*(?<!/)>', 'gi')
           // const htmlRegex3 = new RegExp('<meta .*>', 'gi')
 
-          console.log(htmlRegex.test(data.body))
-
           if (htmlRegex.test(data.body)) {
-            console.log('html true')
             mailBody = data.body
             this.setState({
               incomingMailIsHtml: true
             })
           } else {
-            console.log('html false')
             mailBody = `<pre>${data.body}</pre>`
             this.setState({
               incomingMailIsHtml: false
             })
           }
-          // console.log(data)
           this.setState({
             openReadModal: !this.state.openReadModal,
             maintenance: {
@@ -1478,19 +1475,19 @@ export default class Maintenance extends React.Component {
                                       >
                                         Insert Protection Switch Text
                                       </Tooltip> */}
-                                      <FormInput onBlur={() => this.handleTextInputBlur('impact')} id='impact' name='impact' type='text' onChange={this.handleImpactChange} placeholder={this.state.impactPlaceholder} value={maintenance.impact} />
+                                      <FormInput onBlur={() => this.handleTextInputBlur('impact')} id='impact' name='impact' type='text' onChange={this.handleImpactChange} placeholder={this.state.impactPlaceholder} value={maintenance.impact || ''} />
                                     </FormGroup>
                                   </Col>
                                   <Col>
                                     <FormGroup>
                                       <label htmlFor='location'>Location</label>
-                                      <FormInput onBlur={() => this.handleTextInputBlur('location')} id='location' name='location' type='text' onChange={this.handleLocationChange} value={maintenance.location} />
+                                      <FormInput onBlur={() => this.handleTextInputBlur('location')} id='location' name='location' type='text' onChange={this.handleLocationChange} value={maintenance.location || ''} />
                                     </FormGroup>
                                   </Col>
                                 </Row>
                                 <FormGroup>
                                   <label htmlFor='reason'>Reason</label>
-                                  <FormTextarea id='reason' name='reason' onBlur={() => this.handleTextInputBlur('reason')} onChange={this.handleReasonChange} type='text' value={maintenance.reason} />
+                                  <FormTextarea id='reason' name='reason' onBlur={() => this.handleTextInputBlur('reason')} onChange={this.handleReasonChange} type='text' value={maintenance.reason || ''} />
                                 </FormGroup>
                               </Col>
                             </Row>
@@ -1619,7 +1616,7 @@ export default class Maintenance extends React.Component {
                     }}
                     style={{
                       visibility: openReadModal ? 'visible' : 'hidden',
-                      background: 'var(--light)',
+                      background: '#fff',
                       overflow: 'hidden',
                       border: '2px solid #b1b3b5',
                       borderRadius: '15px',
@@ -1828,6 +1825,7 @@ export default class Maintenance extends React.Component {
               :global(.mail-body) {
                 font-family: Poppins, Helvetica;
                 height: 460px;
+                background: #fff;
                 overflow-y: ${this.state.incomingMailIsHtml ? 'scroll' : 'hidden'};
               }
               :global(.mail-body > :first-child) {
