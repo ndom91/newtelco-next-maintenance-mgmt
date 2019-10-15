@@ -22,6 +22,8 @@ export default class ProtectedIcon extends Component {
           <FontAwesomeIcon style={{ fontSize: '12px' }} width='1.5em' icon={faQuestion} />
         )
       }
+    } else {
+      return null
     }
   }
 };
