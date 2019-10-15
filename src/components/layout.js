@@ -83,7 +83,7 @@ export default class Layout extends React.Component {
                     ? (
                       <Row className='keyboard-row'>
                         <Col>
-                          <Badge outline theme='primary'>CTRL + ALT + R</Badge>
+                          <Badge className='key-badge' outline theme='primary'>CTRL + ALT + R</Badge>
                         </Col>
                         <Col>
                           Toggle Read Mail
@@ -94,7 +94,7 @@ export default class Layout extends React.Component {
                     )}
                   <Row className='keyboard-row'>
                     <Col>
-                      <Badge outline theme='primary'>ALT + H</Badge>
+                      <Badge className='key-badge' outline theme='primary'>ALT + H</Badge>
                     </Col>
                     <Col>
                       Home
@@ -102,7 +102,7 @@ export default class Layout extends React.Component {
                   </Row>
                   <Row className='keyboard-row'>
                     <Col>
-                      <Badge outline theme='primary'>ALT + I</Badge>
+                      <Badge className='key-badge' outline theme='primary'>ALT + I</Badge>
                     </Col>
                     <Col>
                       Inbox
@@ -110,7 +110,7 @@ export default class Layout extends React.Component {
                   </Row>
                   <Row className='keyboard-row'>
                     <Col>
-                      <Badge outline theme='primary'>ALT + Y</Badge>
+                      <Badge className='key-badge' outline theme='primary'>ALT + Y</Badge>
                     </Col>
                     <Col>
                       History
@@ -118,7 +118,7 @@ export default class Layout extends React.Component {
                   </Row>
                   <Row className='keyboard-row'>
                     <Col>
-                      <Badge outline theme='primary'>ALT + S</Badge>
+                      <Badge className='key-badge' outline theme='primary'>ALT + S</Badge>
                     </Col>
                     <Col>
                       Settings
@@ -128,7 +128,7 @@ export default class Layout extends React.Component {
               </ModalBody>
             </Modal>
             <style jsx>{`
-              :global(.badge) {
+              :global(.key-badge) {
                 font-size: 90%;
               }
               :global(.keyboard-row > .col:last-child) {

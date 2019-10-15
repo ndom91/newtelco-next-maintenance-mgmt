@@ -1168,6 +1168,18 @@ export default class Maintenance extends React.Component {
         openReadModal: !this.state.openReadModal
       })
     }
+    if (!this.state.readIconUrl) {
+      const host = window.location.host
+      fetch(`https://api.${host}/favicon?d=${this.props.jsonData.profile.mailDomain}`, {
+        method: 'get'
+      })
+        .then(resp => resp.json())
+        .then(data => {
+          this.setState({
+            readIconUrl: data.icons
+          })
+        })
+    }
   }
 
   // open / close send preview modal
@@ -1609,22 +1621,24 @@ export default class Maintenance extends React.Component {
                       visibility: openReadModal ? 'visible' : 'hidden',
                       background: 'var(--light)',
                       overflow: 'hidden',
-                      border: '2px solid #007bff',
+                      border: '2px solid #b1b3b5',
+                      borderRadius: '15px',
                       height: 'auto',
-                      zIndex: '101'
+                      zIndex: '101',
+                      boxShadow: '0px 0px 20px 1px'
                     }}
                     minWidth={500}
                     minHeight={590}
                     bounds='window'
                     dragHandleClassName='modal-incoming-header-text'
                   >
-                    <div style={{ position: 'relative' }}>
+                    <div style={{ borderRadius: '15px', position: 'relative' }}>
                       <ModalHeader style={{
                         background: 'var(--secondary)',
                         borderRadius: '0px'
                       }}
                       >
-                        <img className='mail-icon' src={`https://cdn.statically.io/favicons/${this.state.maintenance.incomingDomain}`} />
+                        <img className='mail-icon' src={this.state.readIconUrl} />
                         <div className='modal-incoming-header-text'>
                           <h5 className='modal-incoming-from'>{this.state.maintenance.incomingFrom}</h5>
                           <small className='modal-incoming-subject'>{this.state.maintenance.incomingSubject}</small><br />
@@ -1706,7 +1720,8 @@ export default class Maintenance extends React.Component {
               .mail-icon {
                 min-width: 96px;
                 height: 96px;
-                border: 2px solid var(--primary);
+                border: 2px solid var(--light);
+                background: #fff;
                 padding: 10px;
                 border-radius: 5px;
                 margin-right: 10px;
