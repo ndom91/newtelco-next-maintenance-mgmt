@@ -201,10 +201,9 @@ export default class CustomerCIDs extends React.Component {
   }
 
   handleNewtelcoCidChange (ev) {
-    console.log(ev)
-    // this.setState({
-    //   newDomain: value
-    // })
+    this.setState({
+      newNewtelcoCid: ev.target.value
+    })
   }
 
   handleSaveOnClick () {
@@ -257,7 +256,7 @@ export default class CustomerCIDs extends React.Component {
                     <label style={{ display: 'flex', justifyContent: 'space-between' }}>
                       Newtelco CID<Badge outline theme='primary'>for Customer</Badge>
                     </label>
-                    <FormInput id='updated-by' name='updated-by' type='text' value={newNewtelcoCid} onChange={this.handleCustomerCidChange} />
+                    <FormInput id='updated-by' name='updated-by' type='text' value={newNewtelcoCid} onChange={this.handleNewtelcoCidChange} />
                   </FormGroup>
                   <FormGroup>
                     <label>
@@ -294,6 +293,7 @@ export default class CustomerCIDs extends React.Component {
                       }}
                       checked={newProtection}
                       onChange={(event) => this.handleProtectionChange(event)}
+                      className='add-protection-toggle'
                     />
                   </FormGroup>
                 </Col>
@@ -305,11 +305,13 @@ export default class CustomerCIDs extends React.Component {
                   </Button>
                 </Col>
               </Row>
-
             </Container>
           </ModalBody>
         </Modal>
         <style jsx>{`
+            :global(.add-protection-toggle > .react-toggle-track > div) {
+              top: -12px; 
+            }
             :global(.protection-group) {
               display: flex;
               justify-content: space-between;

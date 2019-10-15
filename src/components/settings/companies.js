@@ -136,18 +136,21 @@ export default class Companies extends React.Component {
   }
 
   handleDomainChange (ev) {
-    console.log(ev)
-    // this.setState({
-    //   newDomain: value
-    // })
+    this.setState({
+      newDomain: ev.target.value
+    })
   }
 
-  handleNameChange () {
-
+  handleNameChange (ev) {
+    this.setState({
+      newName: ev.target.value
+    })
   }
 
-  handleRecipientChange () {
-
+  handleRecipientChange (ev) {
+    this.setState({
+      newRecipient: ev.target.value
+    })
   }
 
   render () {
@@ -205,7 +208,7 @@ export default class Companies extends React.Component {
                   </FormGroup>
                   <FormGroup>
                     <label style={{ display: 'flex', justifyContent: 'space-between' }} htmlFor='selectCompany'>
-                      Recipient <Badge outline theme='primary'>separate multiple via semicolon <code>(;)</code></Badge>
+                      Recipient <Badge outline theme='primary'>separate multiple via semicolon `;`</Badge>
                     </label>
                     <FormInput id='updated-by' name='updated-by' type='text' value={newRecipient} onChange={this.handleRecipientChange} />
                   </FormGroup>

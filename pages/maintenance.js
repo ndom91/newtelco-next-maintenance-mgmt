@@ -1750,6 +1750,7 @@ export default class Maintenance extends React.Component {
                     }}
                     style={{
                       visibility: openReadModal ? 'visible' : 'hidden',
+                      opacity: openReadModal ? 1 : 0,
                       background: '#fff',
                       overflow: 'hidden',
                       border: '2px solid #2075ca',
@@ -1762,6 +1763,12 @@ export default class Maintenance extends React.Component {
                     minHeight={590}
                     bounds='window'
                     dragHandleClassName='modal-incoming-header-text'
+                    onResize={(e, direction, ref, delta, position) => {
+                      this.setState({
+                        readHeight: ref.style.height,
+                        readWidth: ref.style.width
+                      })
+                    }}
                   >
                     <div style={{ borderRadius: '15px', position: 'relative' }}>
                       <ModalHeader style={{
@@ -1771,9 +1778,16 @@ export default class Maintenance extends React.Component {
                       >
                         <img className='mail-icon' src={this.state.readIconUrl} />
                         <div className='modal-incoming-header-text'>
-                          <h5 className='modal-incoming-from'>{this.state.maintenance.incomingFrom}</h5>
-                          <small className='modal-incoming-subject'>{this.state.maintenance.incomingSubject}</small><br />
-                          <small className='modal-incoming-datetime'>{this.state.maintenance.incomingDate}</small>
+                          <h5 className='modal-incoming-from' style={{ marginBottom: '0px' }}>
+                            {this.state.maintenance.incomingFrom}
+                          </h5>
+                          <small className='modal-incoming-subject'>
+                            {this.state.maintenance.incomingSubject}
+                          </small>
+                          <br />
+                          <small className='modal-incoming-datetime'>
+                            {this.state.maintenance.incomingDate}
+                          </small>
                         </div>
                         <ButtonGroup style={{ display: 'flex', flexDirection: 'column' }}>
                           <Button outline className='close-read-modal-btn' theme='light' style={{ borderRadius: '5px 5px 0 0', padding: '0.7em 0.9em' }} onClick={this.toggleReadModal}>
@@ -1835,6 +1849,9 @@ export default class Maintenance extends React.Component {
               </Modal>
             </Card>
             <style jsx>{`
+              :global(.react-draggable) {
+                transition: visibility 200ms linear, opacity 200ms linear;
+              }
               :global(div[class$="-singleValue"]) {
                 font-size: 0.95rem;
                 color: #495057;
@@ -1958,7 +1975,7 @@ export default class Maintenance extends React.Component {
               }
               :global(.mail-body) {
                 font-family: Poppins, Helvetica;
-                height: 460px;
+                height: ${this.state.readHeight ? `calc(${this.state.readHeight} - 127px)` : '460px' };
                 background: #fff;
                 overflow-y: ${this.state.incomingMailIsHtml ? 'scroll' : 'hidden'};
               }
@@ -1966,7 +1983,7 @@ export default class Maintenance extends React.Component {
                 position: absolute;
                 top: 0;
                 left: 0;
-                height: 100%;
+                height: 100vh;
                 width: 100%;
                 padding: 40px;
                 overflow-y: ${this.state.incomingMailIsHtml ? 'hidden' : 'scroll'};

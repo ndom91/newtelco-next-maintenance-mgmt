@@ -2,12 +2,13 @@ import React from 'react'
 import { NextAuth } from 'next-auth/client'
 import Link from 'next/link'
 import fetch from 'isomorphic-unfetch'
-import { Router, withRouter } from 'next/router'
+import { withRouter } from 'next/router'
 import RequireLogin from '../src/components/require-login'
 import Layout from '../src/components/layout'
 import Companies from '../src/components/settings/companies'
 import CustomerCIDs from '../src/components/settings/customercids'
 import SupplierCIDs from '../src/components/settings/suppliercids'
+import Templates from '../src/components/settings/templates'
 import UnreadCount from '../src/components/unreadcount'
 import Footer from '../src/components/footer'
 import {
@@ -44,26 +45,26 @@ class Settings extends React.Component {
       active: {
         companies: props.router.query.tab === 'companies',
         customercids: props.router.query.tab === 'customercids',
-        suppliercids: props.router.query.tab === 'ourcids',
+        suppliercids: props.router.query.tab === 'suppliercids',
         templates: props.router.query.tab === 'templates'
       }
     }
   }
 
-  // componentDidMount () {
-  //   if (typeof window !== 'undefined' && window.location.pathname === '/settings') {
-  //     this.setState({
-  //       active: {
-  //         ...this.state.active,
-  //         companies: true
-  //       }
-  //     })
-  //     Router.push({
-  //       pathname: '/settings',
-  //       query: { tab: 'companies' }
-  //     })
-  //   }
-  // }
+  componentDidMount () {
+    if (this.props.router.asPath) {
+      const pathname = this.props.router.asPath
+      const pathMatch = pathname.match(/^\/(.*)\/(.*)/)
+      if (pathMatch && pathMatch[2]) {
+        this.setState({
+          active: {
+            ...this.state.active,
+            [pathMatch[2]]: true
+          }
+        })
+      }
+    }
+  }
 
   componentDidUpdate (prevProps, prevState) {
     const {
@@ -136,6 +137,7 @@ class Settings extends React.Component {
               {tab === 'companies' && <Companies />}
               {tab === 'customercids' && <CustomerCIDs />}
               {tab === 'suppliercids' && <SupplierCIDs />}
+              {tab === 'templates' && <Templates />}
             </CardBody>
             <Footer />
           </Card>
