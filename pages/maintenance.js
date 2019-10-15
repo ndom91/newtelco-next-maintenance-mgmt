@@ -42,7 +42,8 @@ import {
   faTimesCircle,
   faRandom,
   faSearch,
-  faHistory
+  faHistory,
+  faFileExcel
 } from '@fortawesome/free-solid-svg-icons'
 import {
   Container,
@@ -101,6 +102,7 @@ export default class Maintenance extends React.Component {
     this.state = {
       width: 0,
       maintenance: {
+        incomingAttachments: [],
         incomingBody: this.props.jsonData.profile.body,
         timezone: 'Europe/Amsterdam',
         timezoneLabel: '(GMT+02:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna',
@@ -218,6 +220,7 @@ export default class Maintenance extends React.Component {
     this.prepareDirectSend = this.prepareDirectSend.bind(this)
     this.toggleHelpModal = this.toggleHelpModal.bind(this)
     this.onGridReady = this.onGridReady.bind(this)
+    this.showAttachments = this.showAttachments.bind(this)
     // this.toggleProtectionSwitchTooltip = this.toggleProtectionSwitchTooltip.bind(this)
     // this.toggleUseImpactPlaceholderTooltip = this.toggleUseImpactPlaceholderTooltip.bind(this)
   }
@@ -1254,15 +1257,16 @@ export default class Maintenance extends React.Component {
             })
           }
           this.setState({
-            openReadModal: !this.state.openReadModal,
             maintenance: {
               ...this.state.maintenance,
               incomingBody: mailBody,
               incomingFrom: data.from,
               incomingSubject: data.subject,
               incomingDate: data.date,
+              incomingAttachments: data.attachments,
               incomingDomain: this.props.jsonData.profile.mailDomain
-            }
+            },
+            openReadModal: !this.state.openReadModal
           })
         })
         .catch(err => console.error(`Error - ${err}`))
@@ -1309,23 +1313,17 @@ export default class Maintenance extends React.Component {
     })
   }
 
-  // toggleProtectionSwitchTooltip () {
-  //   this.setState({
-  //     openUseImpactPlaceholderToggle: !this.state.openUseImpactPlaceholderToggle
-  //   })
-  // }
-
-  // toggleUseImpactPlaceholderTooltip () {
-  //   this.setState({
-  //     openProtectionSwitchToggle: !this.state.openProtectionSwitchToggle
-  //   })
-  // }
-
   /// /////////////////////////////////////////////////////////
   //
   //                    OTHER ACTIONS
   //
   /// /////////////////////////////////////////////////////////
+
+  showAttachments () {
+    this.setState({
+      openAttachmentModal: !this.state.openAttachmentModal
+    })
+  }
 
   handleProtectionSwitch () {
     this.setState({
@@ -1402,7 +1400,8 @@ export default class Maintenance extends React.Component {
     const {
       maintenance,
       openReadModal,
-      openPreviewModal
+      openPreviewModal,
+      openAttachmentModal
     } = this.state
 
     let maintenanceIdDisplay
@@ -1748,11 +1747,10 @@ export default class Maintenance extends React.Component {
                       opacity: openReadModal ? 1 : 0,
                       background: '#fff',
                       overflow: 'hidden',
-                      border: '2px solid #2075ca',
                       borderRadius: '15px',
                       height: 'auto',
                       zIndex: '101',
-                      boxShadow: '0px 0px 20px 1px #2075ca'
+                      boxShadow: '0px 0px 20px 1px var(--dark)'
                     }}
                     minWidth={500}
                     minHeight={590}
@@ -1783,6 +1781,17 @@ export default class Maintenance extends React.Component {
                           <small className='modal-incoming-datetime'>
                             {this.state.maintenance.incomingDate}
                           </small>
+                          {Array.isArray(this.state.maintenance.incomingAttachments) && this.state.maintenance.incomingAttachments.length !== 0
+                            ? this.state.maintenance.incomingAttachments.map((attachment, index) => {
+                              return (
+                                <Button pill size='sm' theme='primary' style={{ marginLeft: '10px' }} key={index} onClick={this.showAttachments} >
+                                  {attachment.name}
+                                </Button>
+                              )
+                            })
+                            : (
+                              <span>N/A</span>
+                            )}
                         </div>
                         <ButtonGroup style={{ display: 'flex', flexDirection: 'column' }}>
                           <Button outline className='close-read-modal-btn' theme='light' style={{ borderRadius: '5px 5px 0 0', padding: '0.7em 0.9em' }} onClick={this.toggleReadModal}>
@@ -1791,8 +1800,11 @@ export default class Maintenance extends React.Component {
                               icon={faTimesCircle}
                             />
                           </Button>
+                          {/* <Button theme='light' style={{ borderRadius: '0', padding: '0.7em 0.9em' }} onClick={this.showAttachments}>
+                            <FontAwesomeIcon width='1.2em' style={{ fontSize: '12px' }} className='translate-icon' icon={faFileExcel} />
+                          </Button> */}
                           <Button theme='light' style={{ borderRadius: '0 0 5px 5px', padding: '0.7em 0.9em' }} onClick={this.handleTranslate.bind(this)}>
-                            <FontAwesomeIcon width='1.5em' style={{ fontSize: '12px' }} className='translate-icon' icon={faLanguage} />
+                            <FontAwesomeIcon width='1.8em' style={{ fontSize: '12px' }} className='translate-icon' icon={faLanguage} />
                           </Button>
                         </ButtonGroup>
                       </ModalHeader>
@@ -1802,6 +1814,61 @@ export default class Maintenance extends React.Component {
                 ) : (
                   <></>
                 )}
+              {/* {typeof window !== 'undefined'
+                ? (
+                  <Rnd
+                    default={{
+                      x: 1200,
+                      y: 25,
+                      width: 400,
+                      height: 300
+                    }}
+                    style={{
+                      visibility: openAttachmentModal ? 'visible' : 'hidden',
+                      opacity: openAttachmentModal ? 1 : 0,
+                      background: '#fff',
+                      overflow: 'hidden',
+                      borderRadius: '15px',
+                      height: 'auto',
+                      zIndex: '101',
+                      boxShadow: '0px 0px 20px 1px var(--dark)'
+                    }}
+                    minWidth={500}
+                    minHeight={590}
+                    bounds='window'
+                    dragHandleClassName='modal-attachment-header-text'
+                  >
+                    <div style={{ borderRadius: '15px', position: 'relative' }}>
+                      <ModalHeader 
+                        className='modal-attachment-header-text'
+                        style={{
+                          background: 'var(--secondary)',
+                          borderRadius: '0px',
+                          color: '#fff',
+                          display: 'flex',
+                          justifyContent: 'space-between'
+                        }}
+                      >
+                        Attachments
+                        <Button outline className='close-attachment-modal-btn' theme='light' style={{ borderRadius: '5px', padding: '0.7em 0.9em' }} onClick={this.showAttachments}>
+                          <FontAwesomeIcon
+                            className='close-attachment-modal-icon' width='1.5em' style={{ color: 'var(--light)', fontSize: '12px' }}
+                            icon={faTimesCircle}
+                          />
+                        </Button>
+                      </ModalHeader>
+                      {Array.isArray(incomingAttachments) && incomingAttachments.length !== 0
+                        ? incomingAttachments.map((attachment, index) => {
+                          return <Badge key={index} theme='primary'>{attachment.name}</Badge>
+                        })
+                        : (
+                          <span>N/A</span>
+                        )}
+                    </div>
+                  </Rnd>
+                ) : (
+                  <></>
+                )} */}
               <Modal backdropClassName='modal-backdrop' animation backdrop size='lg' open={openPreviewModal} toggle={this.togglePreviewModal}>
                 <ModalHeader>
                   <div className='modal-preview-text-wrapper'>
@@ -1970,7 +2037,7 @@ export default class Maintenance extends React.Component {
               }
               :global(.mail-body) {
                 font-family: Poppins, Helvetica;
-                height: ${this.state.readHeight ? `calc(${this.state.readHeight} - 127px)` : '460px' };
+                height: ${this.state.readHeight ? `calc(${this.state.readHeight} - 127px)` : '460px'};
                 background: #fff;
                 overflow-y: ${this.state.incomingMailIsHtml ? 'scroll' : 'hidden'};
               }
@@ -2034,11 +2101,20 @@ export default class Maintenance extends React.Component {
                 top:0;
                 cursor:move;
               }
-              .modal-incoming-header-text {
-                cursor: pointer;
+              .modal-incoming-header-text:hover {
+                cursor: move;
               }
               .modal-incoming-header-text > * {
                 color: #fff;
+              }
+              :global(.modal-attachment-header-text:hover) {
+                cursor: move;
+              }
+              :global(.modal-attachment-header-text > h5) {
+                color: #fff;
+              }
+              :global(.close-attachment-modal-btn:hover > .close-attachment-modal-icon) {
+                color: var(--dark) !important;
               }
               :global(.close-read-modal-btn:hover > .close-read-modal-icon) {
                 color: var(--dark) !important;
