@@ -28,7 +28,8 @@ import { AgGridReact } from 'ag-grid-react'
 import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-material.css'
 
-import { Manager, Reference, Popper } from 'react-popper'
+import 'react-tippy/dist/tippy.css'
+import { Tooltip } from 'react-tippy'
 
 import {
   faPlusCircle,
@@ -1560,41 +1561,35 @@ export default class Maintenance extends React.Component {
                                 <Row>
                                   <Col>
                                     <FormGroup>
-                                      <label htmlFor='impact'>Impact</label>
-                                      <Manager>
-                                        <Reference>
-                                          {({ btn1 }) => (
-                                            <Button ref={btn1} id='protectionswitchtext' style={{ float: 'right', padding: '0.35em', marginTop: '10px' }} onClick={this.handleProtectionSwitch} outline theme='secondary'>
-                                              <FontAwesomeIcon width='16px' icon={faRandom} />
-                                            </Button>
-                                          )}
-                                        </Reference>
-                                        <Popper placement='right'>
-                                          {({ btn1, style, placement, arrowProps }) => (
-                                            <div ref={btn1} style={style} data-placement={placement}>
-                                                Popper element
-                                              <div ref={arrowProps.ref} style={arrowProps.style} />
-                                            </div>
-                                          )}
-                                        </Popper>
-                                      </Manager>
-                                      {/* <Tooltip
-                                        open={this.state.openUseImpactPlaceholderToggle}
-                                        target='#impactplaceholdertext'
-                                        toggle={this.toggleUseImpactPlaceholderTooltip}
-                                      >
-                                        Use Impact Placeholder Text
-                                      </Tooltip> */}
-                                      <Button id='impactplaceholdertext' style={{ float: 'right', padding: '0.35em', marginRight: '10px', marginTop: '10px' }} onClick={this.useImpactPlaceholder} outline theme='secondary'>
-                                        <FontAwesomeIcon width='16px' icon={faHistory} />
-                                      </Button>
-                                      {/* <Tooltip
-                                        open={this.state.openProtectionSwitchToggle}
-                                        target='#protectionswitchtext'
-                                        toggle={this.toggleProtectionSwitchTooltip}
-                                      >
-                                        Insert Protection Switch Text
-                                      </Tooltip> */}
+                                      <div className='impact-title-group'>
+                                        <label style={{ flexGrow: '1', margin: '10px' }} htmlFor='impact'>Impact</label>
+                                        <Tooltip
+                                          title='Use Protection Switch Text'
+                                          position='top'
+                                          theme='dark'
+                                          trigger='mouseenter'
+                                          delay='150'
+                                          arrow
+                                          animation='shift'
+                                        >
+                                          <Button id='protectionswitchtext' style={{ padding: '0.35em', marginRight: '10px', marginTop: '10px' }} onClick={this.handleProtectionSwitch} outline theme='secondary'>
+                                            <FontAwesomeIcon width='16px' icon={faRandom} />
+                                          </Button>
+                                        </Tooltip>
+                                        <Tooltip
+                                          title='Use Time Difference Text'
+                                          position='top'
+                                          theme='dark'
+                                          trigger='mouseenter'
+                                          delay='150'
+                                          arrow
+                                          animation='shift'
+                                        >
+                                          <Button id='impactplaceholdertext' style={{ padding: '0.35em', marginTop: '10px' }} onClick={this.useImpactPlaceholder} outline theme='secondary'>
+                                            <FontAwesomeIcon width='16px' icon={faHistory} />
+                                          </Button>
+                                        </Tooltip>
+                                      </div>
                                       <FormInput onBlur={() => this.handleTextInputBlur('impact')} id='impact' name='impact' type='text' onChange={this.handleImpactChange} placeholder={this.state.impactPlaceholder} value={maintenance.impact || ''} />
                                     </FormGroup>
                                   </Col>
@@ -2092,6 +2087,9 @@ export default class Maintenance extends React.Component {
               }
               :global(.create-btn:before) {
                 
+              }
+              .impact-title-group {
+                display: flex;
               }
               @media only screen and (max-width: 500px) {
                 :global(div.btn-toolbar > .btn-group-md) {
