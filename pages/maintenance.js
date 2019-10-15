@@ -14,15 +14,22 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Editor as TinyEditor } from '@tinymce/tinymce-react'
 import { format, isValid, formatDistance, parseISO } from 'date-fns'
 import moment from 'moment-timezone'
-import { zonedTimeToUtc } from 'date-fns-tz'
 import { Rnd } from 'react-rnd'
 import UnreadCount from '../src/components/unreadcount'
 import Flatpickr from 'react-flatpickr'
 import 'flatpickr/dist/themes/material_blue.css'
 import TimezoneSelector from '../src/components/timezone'
-import EmailTable from '../src/components/maintenance/table'
 import { getUnique, convertDateTime } from '../src/components/maintenance/helper'
 import { HotKeys } from 'react-hotkeys'
+
+import ProtectedIcon from '../src/components/ag-grid/protected'
+import SentIcon from '../src/components/ag-grid/sent'
+import { AgGridReact } from 'ag-grid-react'
+import 'ag-grid-community/dist/styles/ag-grid.css'
+import 'ag-grid-community/dist/styles/ag-theme-material.css'
+
+import { Manager, Reference, Popper } from 'react-popper'
+
 import {
   faPlusCircle,
   faCalendarAlt,
@@ -33,6 +40,7 @@ import {
   faPaperPlane,
   faTimesCircle,
   faRandom,
+  faSearch,
   faHistory
 } from '@fortawesome/free-solid-svg-icons'
 import {
@@ -118,7 +126,70 @@ export default class Maintenance extends React.Component {
       lieferantcids: {},
       kundencids: [],
       windowInnerHeight: 0,
-      unreadCount: ''
+      unreadCount: '',
+      gridOptions: {
+        defaultColDef: {
+          resizable: true,
+          sortable: true,
+          filter: true,
+          selectable: true
+        },
+        columnDefs: [
+          {
+            headerName: 'Mail',
+            width: 80,
+            sortable: false,
+            filter: false,
+            resizable: false,
+            cellRenderer: 'sendMailBtn',
+            cellStyle: { 'padding-right': '0px', 'padding-left': '10px' }
+          }, {
+            headerName: 'CID',
+            field: 'kundenCID',
+            width: 100,
+            sort: { direction: 'asc', priority: 0 }
+          }, {
+            headerName: 'Customer',
+            field: 'name',
+            width: 170
+          }, {
+            headerName: 'Protection',
+            field: 'protected',
+            filter: false,
+            cellRenderer: 'protectedIcon',
+            width: 120,
+            cellStyle: {
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              height: '100%'
+            }
+          }, {
+            headerName: 'Recipient',
+            field: 'maintenanceRecipient',
+            width: 150
+          }, {
+            headerName: 'Sent',
+            field: 'sent',
+            cellRenderer: 'sentIcon',
+            width: 100,
+            cellStyle: {
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              height: '100%'
+            }
+          }
+        ],
+        // context: { componentParent: this },
+        frameworkComponents: {
+          sendMailBtn: this.sendMailBtns,
+          protectedIcon: ProtectedIcon,
+          sentIcon: SentIcon
+        },
+        paginationPageSize: 10,
+        rowClass: 'row-class'
+      }
     }
     this.toggleReadModal = this.toggleReadModal.bind(this)
     this.togglePreviewModal = this.togglePreviewModal.bind(this)
@@ -145,6 +216,7 @@ export default class Maintenance extends React.Component {
     this.handleSupplierChange = this.handleSupplierChange.bind(this)
     this.prepareDirectSend = this.prepareDirectSend.bind(this)
     this.toggleHelpModal = this.toggleHelpModal.bind(this)
+    this.onGridReady = this.onGridReady.bind(this)
     // this.toggleProtectionSwitchTooltip = this.toggleProtectionSwitchTooltip.bind(this)
     // this.toggleUseImpactPlaceholderTooltip = this.toggleUseImpactPlaceholderTooltip.bind(this)
   }
@@ -177,11 +249,6 @@ export default class Maintenance extends React.Component {
       const maintenance = {
         ...this.props.jsonData.profile,
         bearbeitetvon: username,
-        // incomingBody: '',
-        // incomingSubject: this.props.jsonData.profile.subject,
-        // incomingFrom: this.props.jsonData.profile.from,
-        // incomingDate: this.props.jsonData.profile.maileingang,
-        // incomingDomain: this.props.jsonData.profile.name,
         updatedAt: format(new Date(), 'MM.dd.yyyy HH:mm')
       }
       this.setState({
@@ -262,6 +329,56 @@ export default class Maintenance extends React.Component {
     this.setState({
       windowInnerHeight: window.innerHeight
     })
+
+    const startDateTime = this.props.jsonData.profile.startDateTime
+    const endDateTime = this.props.jsonData.profile.endDateTime
+
+    if (startDateTime && endDateTime && isValid(parseISO(startDateTime)) && isValid(parseISO(endDateTime))) {
+      const impactCalculation = formatDistance(parseISO(endDateTime), parseISO(startDateTime))
+      this.setState({
+        impactPlaceholder: impactCalculation
+      })
+    }
+  }
+
+  /// /////////////////////////////////////////////////////////
+  //
+  //                AG-GRID TABLE
+  //
+  /// /////////////////////////////////////////////////////////
+
+  handleGridReady = params => {
+    this.gridApi = params.gridApi
+    this.gridColumnApi = params.gridColumnApi
+    // params.columnApi.autoSizeColumns()
+  }
+
+  refreshCells () {
+    this.gridApi.refreshCells()
+  }
+
+  sendMailBtns = (row) => {
+    return (
+      <ButtonGroup>
+        <Button onClick={() => this.prepareDirectSend(row.data.maintenanceRecipient, row.data.kundenCID)} style={{ padding: '0.7em' }} size='sm' outline>
+          <FontAwesomeIcon width='1.325em' icon={faPaperPlane} />
+        </Button>
+        <Button onClick={() => this.togglePreviewModal(row.data.maintenanceRecipient, row.data.kundenCID)} style={{ padding: '0.7em' }} size='sm' outline>
+          <FontAwesomeIcon width='1.325em' icon={faSearch} />
+        </Button>
+      </ButtonGroup>
+    )
+  }
+
+  onGridReady (params) {
+    this.gridApi = params.gridApi
+    // this.gridOptions.api.setColumnDefs(yourColumnDefs);
+    params.api.setRowData(this.state.kundencids)
+  }
+
+  onFirstDataRendered (params) {
+    // params.columnApi.autoSizeColumns()
+    // params.columnApi.sizeColumnsToFit()
   }
 
   /// /////////////////////////////////////////////////////////
@@ -311,7 +428,7 @@ export default class Maintenance extends React.Component {
   fetchLieferantCIDs (lieferantId) {
     if (!lieferantId) {
       this.setState({
-        lieferantcids: [{ label: 'No CIDs available for this Supplier', value: '1' }]
+        lieferantcids: [{ label: 'Invalid Supplier ID', value: '1' }]
       })
       return
     }
@@ -398,31 +515,30 @@ export default class Maintenance extends React.Component {
           newKundenCids.push(cid)
         })
         const uniqueKundenCids = getUnique(newKundenCids, 'kundenCID')
-        // console.log(newKundenCids)
-        // console.log(uniqueKundenCids)
         this.setState({
           kundencids: uniqueKundenCids
         })
-        // } else {
-        //   if (data.kundenCIDsResult[0]) {
-        //     if (done === 1 || done === true || done === '1') {
-        //       data.kundenCIDsResult[0].sent = '1'
-        //     } else {
-        //       data.kundenCIDsResult[0].sent = '0'
-        //     }
-        //     const existingKundenCids = [
-        //       ...this.state.kundencids,
-        //       data.kundenCIDsResult[0]
-        //     ]
-        //     const uniqueKundenCids = getUnique(existingKundenCids, 'kundenCID')
-        //     this.setState({
-        //       kundencids: uniqueKundenCids
-        //     })
-        //     console.log(this.state.kundencids)
-        //   }
-        // }
+        if (this.gridApi) {
+          this.gridApi.refreshCells()
+        }
       })
       .catch(err => console.error(`Error - ${err}`))
+  }
+
+  /// /////////////////////////////////////////////////////////
+  //                    SEND MAILS
+  /// /////////////////////////////////////////////////////////
+
+  // prepare mail from direct-send button
+  prepareDirectSend (recipient, customerCID) {
+    const HtmlBody = this.generateMail(customerCID)
+    const subject = `Planned Work Notification - NT-${this.state.maintenance.id}`
+    // this.setState({
+    //   mailBodyText: HtmlBody,
+    //   mailPreviewHeaderText: recipient,
+    //   mailPreviewSubjectText: subject
+    // })
+    this.sendMail(recipient, customerCID, subject, HtmlBody, false)
   }
 
   // generate Mail contents
@@ -434,8 +550,7 @@ export default class Maintenance extends React.Component {
       impact,
       reason,
       location,
-      timezone,
-      timezoneLabel
+      timezone
     } = this.state.maintenance
 
     if (!id || !startDateTime || !endDateTime) {
@@ -452,9 +567,6 @@ export default class Maintenance extends React.Component {
     const incomingTzEnd = moment.tz(rawEnd, timezoneValue)
     const utcStart = incomingTzStart.tz('UTC').format('YYYY-MM-DD HH:mm:ss')
     const utcEnd = incomingTzEnd.tz('UTC').format('YYYY-MM-DD HH:mm:ss')
-
-    console.log(`%cStart\n${timezoneValue} - ${timezoneLabel}\nsDT: ${startDateTime}\nrS: ${rawStart}\niTS: ${incomingTzStart}\nuS: ${utcStart}`, 'font-weight: bold')
-    console.log(`%cEnd\n${timezoneValue} - ${timezoneLabel}\neDT: ${endDateTime}\nrE: ${rawEnd}\niTE: ${incomingTzEnd}\nuE: ${utcEnd}`, 'font-weight: bold')
 
     const rescheduleText = ''
     const tzSuffixRAW = 'UTC / GMT+0:00'
@@ -479,11 +591,11 @@ export default class Maintenance extends React.Component {
   }
 
   // send out the created mail
-  sendMail (recipient, customerCid, subj, htmlBody) {
+  sendMail (recipient, customerCid, subj, htmlBody, isFromPreview) {
     const host = window.location.host
-    const body = this.state.mailBodyText || htmlBody
-    let subject = this.state.mailPreviewSubjectText || subj
-    const to = this.state.mailPreviewHeaderText || recipient
+    const body = htmlBody || this.state.mailBodyText
+    let subject = subj || this.state.mailPreviewSubjectText
+    const to = recipient || this.state.mailPreviewHeaderText
 
     const emergency = this.state.maintenance.emergency
     if (emergency === 'true' || emergency === true || emergency === '1' || emergency === 1) {
@@ -508,46 +620,34 @@ export default class Maintenance extends React.Component {
         const status = data.response.status
         const statusText = data.response.statusText
 
-        const getUnique = (arr, comp) => {
-          const unique = arr
-            .map(e => e[comp])
-            .map((e, i, final) => final.indexOf(e) === i && i)
-            .filter(e => arr[e]).map(e => arr[e])
-          return unique
-        }
-
         if (status === 200 && statusText === 'OK') {
-          if (customerCid) {
-            const activeRowIndex = this.state.kundencids.findIndex(el => el.kundenCID === customerCid)
-            console.log(activeRowIndex)
-            const kundenCidRow = this.state.kundencids[activeRowIndex]
-            kundenCidRow.sent = '1'
-            const updatedKundenCids = [
-              ...this.state.kundencids,
-              kundenCidRow
-            ]
-            const deduplicatedKundenCids = getUnique(updatedKundenCids, 'kundenCID')
-            this.setState({
-              kundencids: deduplicatedKundenCids
-            })
-            cogoToast.success('Mail Sent', {
-              position: 'top-right'
-            })
-            // this.refreshCells()
-            this.MailTable.refreshCells()
-          } else {
+          const activeRowIndex = this.state.kundencids.findIndex(el => el.kundenCID === customerCid)
+          const kundenCidRow = this.state.kundencids[activeRowIndex]
+          kundenCidRow.sent = '1'
+          const updatedKundenCids = [
+            ...this.state.kundencids,
+            kundenCidRow
+          ]
+          const deduplicatedKundenCids = getUnique(updatedKundenCids, 'kundenCID')
+          this.setState({
+            kundencids: deduplicatedKundenCids
+          })
+          cogoToast.success('Mail Sent', {
+            position: 'top-right'
+          })
+          if (isFromPreview) {
             this.setState({
               openPreviewModal: !this.state.openPreviewModal
             })
-            cogoToast.success('Mail Sent', {
-              position: 'top-right'
-            })
+          }
+          if (this.gridApi) {
+            this.gridApi.refreshCells()
           }
         } else {
           cogoToast.warn('Error Sending Mail', {
             position: 'top-right'
           })
-          if (!customerCid) {
+          if (isFromPreview) {
             this.setState({
               openPreviewModal: !this.state.openPreviewModal
             })
@@ -605,18 +705,6 @@ export default class Maintenance extends React.Component {
       .catch(err => console.error(`Error - ${err}`))
   }
 
-  // prepare mail from direct-send button
-  prepareDirectSend (recipient, customerCID) {
-    const HtmlBody = this.generateMail(customerCID)
-    const subject = `Planned Work Notification - NT-${this.state.maintenance.id}`
-    this.setState({
-      mailBodyText: HtmlBody,
-      mailPreviewHeaderText: recipient,
-      mailPreviewSubjectText: subject
-    })
-    this.sendMail(recipient, customerCID, subject, HtmlBody)
-  }
-
   /// /////////////////////////////////////////////////////////
   //
   //                INPUTS: ONCHANGE
@@ -660,9 +748,9 @@ export default class Maintenance extends React.Component {
     })
   }
 
-  refreshCells (gridApi) {
-    gridApi.refreshCells()
-  }
+  // refreshCells (gridApi) {
+  //   gridApi.refreshCells()
+  // }
 
   handleCreatedByChange (data) {
     // dummy
@@ -737,29 +825,30 @@ export default class Maintenance extends React.Component {
     if (element === 'done') {
       // mark mail as unread as well
       const mailId = this.state.maintenance.mailId || this.state.maintenance.receivedmail
-      fetch(`https://api.${host}/inbox/delete`, {
-        method: 'post',
-        body: JSON.stringify({ m: mailId }),
-        mode: 'cors',
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Content-Type': 'application/json'
-        }
-      })
-        .then(resp => resp.json())
-        .then(data => {
-          if (data.status === 'complete' && newValue === 'true') {
-            cogoToast.success('Message Marked Complete', {
-              position: 'top-right'
-            })
-          } else if (data.id === 500) {
-            cogoToast.warn('Error marking as complete', {
-              position: 'top-right'
-            })
+      if (mailId !== 'NT') {
+        fetch(`https://api.${host}/inbox/delete`, {
+          method: 'post',
+          body: JSON.stringify({ m: mailId }),
+          mode: 'cors',
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Content-Type': 'application/json'
           }
         })
-        .catch(err => console.error(`Error - ${err}`))
-
+          .then(resp => resp.json())
+          .then(data => {
+            if (data.status === 'complete' && newValue === 'true') {
+              cogoToast.success('Message Marked Complete', {
+                position: 'top-right'
+              })
+            } else if (data.id === 500) {
+              cogoToast.warn('Error marking as complete', {
+                position: 'top-right'
+              })
+            }
+          })
+          .catch(err => console.error(`Error - ${err}`))
+      }
       // save 'betroffeneCIDs'
       let impactedCIDs = ''
       this.state.kundencids.forEach(cid => {
@@ -1023,7 +1112,7 @@ export default class Maintenance extends React.Component {
 
   handleTimezoneBlur (ev) {
     const incomingTimezone = this.state.maintenance.timezone || 'Europe/Amsterdam'
-    const incomingTimezoneLabel = this.state.maintenance.timezoneLabel || '(GMT+02:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna'
+    const incomingTimezoneLabel = encodeURIComponent(this.state.maintenance.timezoneLabel || '(GMT+02:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna')
     const host = window.location.host
     fetch(`https://${host}/api/maintenances/save/timezone?maintId=${this.state.maintenance.id}&timezone=${incomingTimezone}&timezoneLabel=${incomingTimezoneLabel}`, {
       method: 'get',
@@ -1137,7 +1226,7 @@ export default class Maintenance extends React.Component {
       const host = window.location.host
       const mailId = this.state.maintenance.mailId || this.state.maintenance.receivedmail
       if (mailId === 'NT') {
-        cogoToast.warn('No mail available', {
+        cogoToast.warn('Self created Maintenance - No mail available', {
           position: 'top-right'
         })
         return
@@ -1197,20 +1286,14 @@ export default class Maintenance extends React.Component {
 
   // open / close send preview modal
   togglePreviewModal = (recipient, customerCID) => {
-
-    let subject = `Planned Work Notification - NT-${this.state.maintenance.id}`
-    const emergency = this.state.maintenance.emergency
-    if (emergency === 'true' || emergency === true || emergency === '1' || emergency === 1) {
-      subject = `[EMERGENCY] ${subject}`
-    }
-
     if (recipient && customerCID) {
       const HtmlBody = this.generateMail(customerCID)
       HtmlBody && this.setState({
         openPreviewModal: !this.state.openPreviewModal,
         mailBodyText: HtmlBody,
         mailPreviewHeaderText: recipient || this.state.mailPreviewHeaderText,
-        mailPreviewSubjectText: subject
+        mailPreviewSubjectText: `Planned Work Notification - NT-${this.state.maintenance.id}`,
+        mailPreviewCustomerCid: customerCID
       })
     } else {
       this.setState({
@@ -1478,9 +1561,23 @@ export default class Maintenance extends React.Component {
                                   <Col>
                                     <FormGroup>
                                       <label htmlFor='impact'>Impact</label>
-                                      <Button id='protectionswitchtext' style={{ float: 'right', padding: '0.35em', marginTop: '10px' }} onClick={this.handleProtectionSwitch} outline theme='secondary'>
-                                        <FontAwesomeIcon width='16px' icon={faRandom} />
-                                      </Button>
+                                      <Manager>
+                                        <Reference>
+                                          {({ btn1 }) => (
+                                            <Button ref={btn1} id='protectionswitchtext' style={{ float: 'right', padding: '0.35em', marginTop: '10px' }} onClick={this.handleProtectionSwitch} outline theme='secondary'>
+                                              <FontAwesomeIcon width='16px' icon={faRandom} />
+                                            </Button>
+                                          )}
+                                        </Reference>
+                                        <Popper placement='right'>
+                                          {({ btn1, style, placement, arrowProps }) => (
+                                            <div ref={btn1} style={style} data-placement={placement}>
+                                                Popper element
+                                              <div ref={arrowProps.ref} style={arrowProps.style} />
+                                            </div>
+                                          )}
+                                        </Popper>
+                                      </Manager>
                                       {/* <Tooltip
                                         open={this.state.openUseImpactPlaceholderToggle}
                                         target='#impactplaceholdertext'
@@ -1592,12 +1689,26 @@ export default class Maintenance extends React.Component {
                           <Container style={{ padding: '20px' }} className='maintenance-subcontainer'>
                             <Row>
                               <Col style={{ width: '100%', height: '600px' }}>
-                                <EmailTable
-                                  prepareDirectSend={this.prepareDirectSend}
-                                  togglePreviewModal={this.togglePreviewModal}
-                                  kundencids={this.state.kundencids}
-                                  onRef={ref => (this.MailTable = ref)}
-                                />
+                                <div
+                                  className='ag-theme-material'
+                                  style={{
+                                    height: '100%',
+                                    width: '100%'
+                                  }}
+                                >
+                                  <AgGridReact
+                                    gridOptions={this.state.gridOptions}
+                                    rowData={this.state.kundencids}
+                                    onGridReady={params => this.gridApi = params.api}
+                                    pagination
+                                    // batchUpdateWaitMillis={50}
+                                    deltaRowDataMode
+                                    getRowNodeId={(data) => {
+                                      return data.kundenCID
+                                    }}
+                                    onFirstDataRendered={this.onFirstDataRendered.bind(this)}
+                                  />
+                                </div>
                               </Col>
                             </Row>
                           </Container>
@@ -1641,11 +1752,11 @@ export default class Maintenance extends React.Component {
                       visibility: openReadModal ? 'visible' : 'hidden',
                       background: '#fff',
                       overflow: 'hidden',
-                      border: '2px solid #b1b3b5',
+                      border: '2px solid #2075ca',
                       borderRadius: '15px',
                       height: 'auto',
                       zIndex: '101',
-                      boxShadow: '0px 0px 20px 1px'
+                      boxShadow: '0px 0px 20px 1px #2075ca'
                     }}
                     minWidth={500}
                     minHeight={590}
@@ -1692,10 +1803,10 @@ export default class Maintenance extends React.Component {
                       <b style={{ fontWeight: '900' }}>Cc:</b> service@newtelco.de
                     </div>
                     <div className='modal-preview-Subject-text'>
-                      <b style={{ fontWeight: '900' }}>Subject: </b>{this.state.mailPreviewSubjectText}
+                      <b style={{ fontWeight: '900' }}>Subject: </b>{this.state.maintenance.emergency ? `[EMERGENCY] ${this.state.mailPreviewSubjectText}` : `${this.state.mailPreviewSubjectText}`}
                     </div>
                   </div>
-                  <Button id='send-mail-btn' style={{ padding: '0.9em 1.1em' }} onClick={this.sendMail}>
+                  <Button id='send-mail-btn' style={{ padding: '0.9em 1.1em' }} onClick={() => this.sendMail(this.state.mailPreviewHeaderText, this.state.mailPreviewCustomerCid, this.state.mailPreviewSubjectText, this.state.mailBodyText, true)}>
                     <FontAwesomeIcon width='1.5em' style={{ fontSize: '12px' }} className='modal-preview-send-icon' icon={faPaperPlane} />
                   </Button>
                 </ModalHeader>
