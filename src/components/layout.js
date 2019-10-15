@@ -134,7 +134,7 @@ export default class Layout extends React.Component {
               :global(.keyboard-row > .col:last-child) {
                 font-size: 18px;
               }
-              :global(.modal-title) {
+              :global(.keyboard-shortcut-header > .modal-title) {
                 justify-content: center !important;
               }
               :global(.keyboard-shortcut-header) {

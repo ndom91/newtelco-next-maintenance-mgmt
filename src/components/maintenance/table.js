@@ -141,7 +141,7 @@ class EmailTable extends React.Component {
   // }
 
   static getDerivedStateFromProps (props, state) {
-    console.log(props.kundencids.length, state.kundencids.length)
+    // console.log(props.kundencids.length, state.kundencids.length)
     if (props.kundencids.length !== state.kundencids.length) {
       return {
         kundencids: props.kundencids
@@ -164,7 +164,7 @@ class EmailTable extends React.Component {
           rowData={this.state.kundencids}
           onGridReady={params => this.gridApi = params.api}
           // animateRows
-          debug
+          // debug
           pagination
           // batchUpdateWaitMillis={50}
           onFirstDataRendered={this.onFirstDataRendered.bind(this)}

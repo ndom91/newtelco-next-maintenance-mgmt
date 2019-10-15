@@ -202,7 +202,9 @@ export default class Maintenance extends React.Component {
         emergency: convertBool(emergency),
         done: convertBool(done),
         timezone: 'Europe/Amsterdam',
-        timezoneLabel: '(GMT+02:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna'
+        timezoneLabel: '(GMT+02:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna',
+        startDateTime: moment.tz(this.props.jsonData.profile.startDateTime, 'Etc/UTC').tz('Europe/Amsterdam').format('YYYY-MM-DD HH:mm:ss'),
+        endDateTime: moment.tz(this.props.jsonData.profile.endDateTime, 'Etc/UTC').tz('Europe/Amsterdam').format('YYYY-MM-DD HH:mm:ss')
       }
 
       this.setState({
@@ -396,8 +398,8 @@ export default class Maintenance extends React.Component {
           newKundenCids.push(cid)
         })
         const uniqueKundenCids = getUnique(newKundenCids, 'kundenCID')
-        console.log(newKundenCids)
-        console.log(uniqueKundenCids)
+        // console.log(newKundenCids)
+        // console.log(uniqueKundenCids)
         this.setState({
           kundencids: uniqueKundenCids
         })
@@ -480,8 +482,13 @@ export default class Maintenance extends React.Component {
   sendMail (recipient, customerCid, subj, htmlBody) {
     const host = window.location.host
     const body = this.state.mailBodyText || htmlBody
-    const subject = this.state.mailPreviewSubjectText || subj
+    let subject = this.state.mailPreviewSubjectText || subj
     const to = this.state.mailPreviewHeaderText || recipient
+
+    const emergency = this.state.maintenance.emergency
+    if (emergency === 'true' || emergency === true || emergency === '1' || emergency === 1) {
+      subject = `[EMERGENCY] ${subject}`
+    }
 
     fetch(`https://api.${host}/mail/send`, {
       method: 'post',
@@ -662,8 +669,11 @@ export default class Maintenance extends React.Component {
   }
 
   handleStartDateChange (date) {
-    console.log(`changeStart\n${date[0]}\n${moment(date[0]).format('YYYY-MM-DD HH:mm:ss')}`)
-    const startDate = moment(date[0]).format('YYYY-MM-DD HH:mm:ss')
+    // console.log(`changeStart\n${date[0]}\n${moment(date[0]).format('YYYY-MM-DD HH:mm:ss')}`)
+    // console.log(date)
+    // const startDate = moment(date[0]).format('YYYY-MM-DD HH:mm:ss')
+    const startDate = moment.tz(date[0], this.state.maintenance.timezone).format('YYYY-MM-DD HH:mm:ss')
+    // console.log('sD: ', startDate)
 
     this.setState({
       maintenance: {
@@ -683,8 +693,10 @@ export default class Maintenance extends React.Component {
   }
 
   handleEndDateChange (date) {
-    console.log(`changeEnd\n${date[0]}\n${moment(date[0]).format('YYYY-MM-DD HH:mm:ss')}`)
-    const endDate = moment(date[0]).format('YYYY-MM-DD HH:mm:ss')
+    // console.log(date)
+    // console.log(`changeEnd\n${date[0]}\n${moment(date[0]).format('YYYY-MM-DD HH:mm:ss')}`)
+    const endDate = moment.tz(date[0], this.state.maintenance.timezone).format('YYYY-MM-DD HH:mm:ss')
+    // console.log('sD: ', endDate)
 
     this.setState({
       maintenance: {
@@ -912,41 +924,45 @@ export default class Maintenance extends React.Component {
       }
     }
     const saveDateTime = (host, maintId, element, newValue) => {
-      let newISOTime = parseISO(newValue)
-      const selectedTimezone = this.state.maintenance.timezone
-      if (selectedTimezone && isValid(newISOTime)) {
-        newISOTime = zonedTimeToUtc(newISOTime, selectedTimezone)
+      console.log('presaveTime: ', newValue, this.state.maintenance.timezone)
+      let newISOTime = moment.tz(newValue, this.state.maintenance.timezone)
+      console.log('saveTime: ', newISOTime.toString())
+      // const selectedTimezone = this.state.maintenance.timezone
+      // if (selectedTimezone && isValid(newISOTime)) {
+      //   newISOTime = zonedTimeToUtc(newISOTime, selectedTimezone)
+      // }
+      // if (isValid(parseISO(newISOTime))) {
+      // const maintId = this.state.maintenance.id
+      if (maintId === 'NEW') {
+        cogoToast.warn('No CID assigned - Cannot Save', {
+          position: 'top-right'
+        })
+        return
       }
-      if (isValid(newISOTime)) {
-        const maintId = this.state.maintenance.id
-        if (maintId === 'NEW') {
-          cogoToast.warn('No CID assigned - Cannot Save', {
-            position: 'top-right'
-          })
-          return
+      // const saveDateFormat = format(newISOTime, 'yyyy-MM-dd HH:mm:ss')
+      newISOTime = newISOTime.utc().format('YYYY-MM-DD HH:mm:ss')
+      console.log('preSave1: ', newISOTime)
+      fetch(`https://${host}/api/maintenances/save/dateTime?maintId=${maintId}&element=${element}&value=${newISOTime}`, {
+        method: 'get',
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          _csrf: this.props.session.csrfToken
         }
-        const saveDateFormat = format(newISOTime, 'yyyy-MM-dd HH:mm:ss')
-        fetch(`https://${host}/api/maintenances/save/dateTime?maintId=${maintId}&element=${element}&value=${saveDateFormat}`, {
-          method: 'get',
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            _csrf: this.props.session.csrfToken
+      })
+        .then(resp => resp.json())
+        .then(data => {
+          if (data.status === 200 && data.statusText === 'OK') {
+            cogoToast.success('Save Success', {
+              position: 'top-right'
+            })
+          } else {
+            cogoToast.warn(`Error - ${data.err}`, {
+              position: 'top-right'
+            })
           }
         })
-          .then(resp => resp.json())
-          .then(data => {
-            if (data.status === 200 && data.statusText === 'OK') {
-              cogoToast.success('Save Success', {
-                position: 'top-right'
-              })
-            } else {
-              cogoToast.warn(`Error - ${data.err}`, {
-                position: 'top-right'
-              })
-            }
-          })
-          .catch(err => console.error(err))
-      }
+        .catch(err => console.error(err))
+      // }
     }
     saveDateTime(host, maintId, element, newValue)
   }
@@ -1181,13 +1197,20 @@ export default class Maintenance extends React.Component {
 
   // open / close send preview modal
   togglePreviewModal = (recipient, customerCID) => {
+
+    let subject = `Planned Work Notification - NT-${this.state.maintenance.id}`
+    const emergency = this.state.maintenance.emergency
+    if (emergency === 'true' || emergency === true || emergency === '1' || emergency === 1) {
+      subject = `[EMERGENCY] ${subject}`
+    }
+
     if (recipient && customerCID) {
       const HtmlBody = this.generateMail(customerCID)
       HtmlBody && this.setState({
         openPreviewModal: !this.state.openPreviewModal,
         mailBodyText: HtmlBody,
         mailPreviewHeaderText: recipient || this.state.mailPreviewHeaderText,
-        mailPreviewSubjectText: `Planned Work Notification - NT-${this.state.maintenance.id}`
+        mailPreviewSubjectText: subject
       })
     } else {
       this.setState({
