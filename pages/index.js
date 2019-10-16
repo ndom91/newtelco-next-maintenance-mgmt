@@ -4,9 +4,9 @@ import Link from 'next/link'
 import RequireLogin from '../src/components/require-login'
 import { NextAuth } from 'next-auth/client'
 import Router from 'next/router'
-import Helmet from 'react-helmet'
 import fetch from 'isomorphic-unfetch'
 import Fonts from '../src/components/fonts'
+import UnreadCount from '../src/components/unreadcount'
 import Footer from '../src/components/footer'
 import { Sparklines, SparklinesLine } from 'react-sparklines'
 import UseAnimations from 'react-useanimations'
@@ -20,7 +20,7 @@ import {
 
 const people = ['fwaleska', 'alissitsin', 'sstergiou']
 
-export default class Blog extends React.Component {
+export default class Index extends React.Component {
   static async getInitialProps ({ res, req }) {
     const host = req ? req.headers['x-forwarded-host'] : location.host
     const pageRequest = `https://api.${host}/inbox/count` // ?page=${query.page || 1}&limit=${query.limit || 41}`
@@ -72,67 +72,68 @@ export default class Blog extends React.Component {
       sstergiou: {
         total: 0,
         weeks: []
-      }
+      },
+      logRocketLoaded: false
     }
-    this.checkUnreadCount = this.checkUnreadCount.bind(this)
+    // this.checkUnreadCount = this.checkUnreadCount.bind(this)
   }
 
-  checkUnreadCount () {
-    const host = window.location.host
-    fetch(`https://api.${host}/inbox/count`, {
-      method: 'get'
-    })
-      .then(resp => resp.json())
-      .then(data => {
-        let display
-        if (data === 'No unread emails') {
-          display = 0
-        } else {
-          display = data.count
-          if (document !== undefined) {
-            const favicon = document.getElementById('favicon')
-            const faviconSize = 16
+  // checkUnreadCount () {
+  //   const host = window.location.host
+  //   fetch(`https://api.${host}/inbox/count`, {
+  //     method: 'get'
+  //   })
+  //     .then(resp => resp.json())
+  //     .then(data => {
+  //       let display
+  //       if (data === 'No unread emails') {
+  //         display = 0
+  //       } else {
+  //         display = data.count
+  //         if (document !== undefined) {
+  //           const favicon = document.getElementById('favicon')
+  //           const faviconSize = 16
 
-            const canvas = document.createElement('canvas')
-            canvas.width = faviconSize
-            canvas.height = faviconSize
+  //           const canvas = document.createElement('canvas')
+  //           canvas.width = faviconSize
+  //           canvas.height = faviconSize
 
-            const context = canvas.getContext('2d')
-            const img = document.createElement('img')
-            img.src = favicon.href
+  //           const context = canvas.getContext('2d')
+  //           const img = document.createElement('img')
+  //           img.src = favicon.href
 
-            img.onload = () => {
-              // Draw Original Favicon as Background
-              context.drawImage(img, 0, 0, faviconSize, faviconSize)
+  //           img.onload = () => {
+  //             // Draw Original Favicon as Background
+  //             context.drawImage(img, 0, 0, faviconSize, faviconSize)
 
-              // Draw Notification Circle
-              context.beginPath()
-              context.arc(canvas.width - faviconSize / 4, faviconSize / 4, faviconSize / 4, 0, 2 * Math.PI)
-              context.fillStyle = '#FF0000'
-              context.fill()
+  //             // Draw Notification Circle
+  //             context.beginPath()
+  //             context.arc(canvas.width - faviconSize / 4, faviconSize / 4, faviconSize / 4, 0, 2 * Math.PI)
+  //             context.fillStyle = '#FF0000'
+  //             context.fill()
 
-              // Draw Notification Number
-              // context.font = '9px "helvetica", sans-serif'
-              // context.textAlign = 'center'
-              // context.textBaseline = 'middle'
-              // context.fillStyle = '#FFFFFF'
-              // context.fillText(display, canvas.width - faviconSize / 3, faviconSize / 3)
+  //             // Draw Notification Number
+  //             // context.font = '9px "helvetica", sans-serif'
+  //             // context.textAlign = 'center'
+  //             // context.textBaseline = 'middle'
+  //             // context.fillStyle = '#FFFFFF'
+  //             // context.fillText(display, canvas.width - faviconSize / 3, faviconSize / 3)
 
-              // Replace favicon
-              favicon.href = canvas.toDataURL('image/png')
-              this.setState({
-                faviconEl: favicon
-              })
-            }
-          }
-        }
-        // console.log('loop ' + new Date())
-        this.setState({
-          unread: display
-        })
-      })
-      .catch(err => console.error(`Error - ${err}`))
-  }
+  //             // Replace favicon
+  //             favicon.href = canvas.toDataURL('image/png')
+  //             this.setState({
+  //               faviconEl: favicon
+  //             })
+  //           }
+  //         }
+  //       }
+  //       // console.log('loop ' + new Date())
+  //       this.setState({
+  //         unread: display
+  //       })
+  //     })
+  //     .catch(err => console.error(`Error - ${err}`))
+  // }
 
   fetchPersonStats (person) {
     const host = window.location.host
@@ -156,8 +157,8 @@ export default class Blog extends React.Component {
     Fonts()
 
     // Keep Inbox Count uptodate
-    this.checkUnreadCount()
-    this.unreadInterval = setTimeout(() => this.checkUnreadCount, 60 * 1000)
+    // this.checkUnreadCount()
+    // this.unreadInterval = setTimeout(() => this.checkUnreadCount, 60 * 1000)
     people.forEach(person => {
       this.fetchPersonStats(person)
     })
@@ -172,9 +173,7 @@ export default class Blog extends React.Component {
     if (this.props.session.user) {
       return (
         <Layout unread={this.props.unread} session={this.props.session}>
-          <Helmet>
-            <head>{`${this.state.faviconEl}`}</head>
-          </Helmet>
+          {UnreadCount()}
           <Card style={{ maxWidth: '100%' }}>
             <CardHeader><h2>Newtelco Maintenance</h2></CardHeader>
             <CardBody>

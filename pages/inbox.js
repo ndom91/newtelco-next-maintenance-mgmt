@@ -87,18 +87,32 @@ export default class Inbox extends React.Component {
     const host = window.location.host
     if (Array.isArray(this.props.jsonData)) {
       this.props.jsonData.forEach((mail, index) => {
-        fetch(`https://api.${host}/favicon?d=${mail.domain}`, {
+        let mailDomain = mail.domain
+        if (mail.domain === 'notify.digitalrealty.com') {
+          mailDomain = 'digitalrealty.com'
+        }
+        if (mail.domain === 'zayo.com') {
+          mailDomain = 'investors.zayo.com'
+        }
+        fetch(`https://api.${host}/favicon?d=${mailDomain}`, {
           method: 'get'
         })
           .then(resp => resp.json())
           .then(data => {
-            console.log(data)
             const iconUrl = data.icons
-            const newInboxMails = this.state.inboxMails
-            newInboxMails[index].faviconUrl = iconUrl
-            this.setState(prevState => ({
-              inboxMails: newInboxMails
-            }))
+            if (data.icons.substr(0, 4) !== 'http') {
+              const newInboxMails = this.state.inboxMails
+              newInboxMails[index].faviconUrl = `https://${iconUrl}`
+              this.setState(prevState => ({
+                inboxMails: newInboxMails
+              }))
+            } else {
+              const newInboxMails = this.state.inboxMails
+              newInboxMails[index].faviconUrl = iconUrl
+              this.setState(prevState => ({
+                inboxMails: newInboxMails
+              }))
+            }
           })
       })
     }

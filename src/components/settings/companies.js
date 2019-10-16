@@ -203,7 +203,7 @@ export default class Companies extends React.Component {
             />
           </div>
         </div>
-        <Modal className='modal-body' animation backdrop open={this.state.openCompanyModal} size='md' toggle={this.toggleCompanyAdd}>
+        <Modal className='modal-body' animation backdrop backdropClassName='modal-backdrop' open={this.state.openCompanyModal} size='md' toggle={this.toggleCompanyAdd}>
           <ModalHeader>
             New Company
           </ModalHeader>

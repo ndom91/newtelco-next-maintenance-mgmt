@@ -153,6 +153,10 @@ class Settings extends React.Component {
                 border: 1px solid var(--primary);
                 border-radius: 5px;
               }
+              :global(.modal-backdrop) {
+                background-color: rgba(0,0,0,0.8);
+                opacity: 0.95;
+              }
             `}
           </style>
         </Layout>

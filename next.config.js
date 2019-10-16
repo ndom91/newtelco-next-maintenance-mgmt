@@ -4,6 +4,9 @@ const withCSS = require('@zeit/next-css')
 require('dotenv').config()
 const path = require('path')
 const Dotenv = require('dotenv-webpack')
+const LogRocket = require('logrocket')
+const setupLogRocketReact = require('logrocket-react')
+const Sentry = require('@sentry/browser')
 
 function HACK_removeMinimizeOptionFromCssLoaders (config) {
   console.warn(
@@ -19,6 +22,19 @@ function HACK_removeMinimizeOptionFromCssLoaders (config) {
     }
   })
 }
+
+LogRocket.init('ui3vht/next-maintenance')
+setupLogRocketReact(LogRocket)
+// LogRocket.identify(this.props.session.user.id, {
+//   name: this.props.session.user.name,
+//   email: this.props.session.user.email
+// })
+Sentry.init({ dsn: 'https://627b5da84c4944f4acc2118b47dad88e@sentry.ndo.dev/3' })
+LogRocket.getSessionURL(sessionURL => {
+  Sentry.configureScope(scope => {
+    scope.setExtra('sessionURL', sessionURL)
+  })
+})
 
 const nextConfig = {
   target: 'server',

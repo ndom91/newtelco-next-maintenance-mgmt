@@ -101,8 +101,8 @@ export default class History extends React.Component {
             headerName: 'By',
             field: 'bearbeitetvon',
             cellRenderer: 'edittedby',
-            width: 100,
-            tooltipField: 'bearbeitetvon'
+            width: 100
+            // tooltipField: 'bearbeitetvon'
           }, {
             headerName: 'Supplier',
             field: 'name',

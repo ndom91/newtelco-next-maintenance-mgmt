@@ -75,11 +75,13 @@ div.ag-row-selected {
   width: 100%;
 }
 
-.user-pic:hover {
-  filter: grayscale(0%);
-  box-shadow: 0 0 20px 1px rgba(0,0,0,0.3);
-}
 .user-pic {
   filter: grayscale(100%);
   transition: all 750ms ease-in-out;
+}
+
+.user-pic:hover {
+  filter: grayscale(0%);
+  box-shadow: 0 0 20px 1px rgba(0,0,0,0.2);
+  transform: translateY(-2px);
 }

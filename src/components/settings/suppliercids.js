@@ -59,7 +59,7 @@ export default class SupplierCIDs extends React.Component {
           {
             headerName: 'Supplier CID',
             field: 'derenCID',
-            width: 200,
+            width: 200
           }
         ],
         rowBuffer: 0,
@@ -192,7 +192,7 @@ export default class SupplierCIDs extends React.Component {
             />
           </div>
         </div>
-        <Modal className='modal-body' animation backdrop open={this.state.openSupplierCidAdd} size='md' toggle={this.toggleSupplierCidAdd}>
+        <Modal className='modal-body' animation backdrop backdropClassName='modal-backdrop' open={this.state.openSupplierCidAdd} size='md' toggle={this.toggleSupplierCidAdd}>
           <ModalHeader>
             New Supplier CID
           </ModalHeader>

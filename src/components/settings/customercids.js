@@ -244,7 +244,7 @@ export default class CustomerCIDs extends React.Component {
             />
           </div>
         </div>
-        <Modal className='modal-body' animation backdrop open={this.state.openCustomerCidAdd} size='md' toggle={this.toggleCustomerCidAdd}>
+        <Modal className='modal-body' animation backdrop backdropClassName='modal-backdrop' open={this.state.openCustomerCidAdd} size='md' toggle={this.toggleCustomerCidAdd}>
           <ModalHeader>
             New Customer CID
           </ModalHeader>
