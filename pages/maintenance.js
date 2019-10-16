@@ -761,10 +761,10 @@ export default class Maintenance extends React.Component {
   }
 
   handleStartDateChange (date) {
-    // console.log(`changeStart\n${date[0]}\n${moment(date[0]).format('YYYY-MM-DD HH:mm:ss')}`)
+    console.log(`changeStart\n${date[0]}\n${moment(date[0]).format('YYYY-MM-DD HH:mm:ss')}`)
     // console.log(date)
     // const startDate = moment(date[0]).format('YYYY-MM-DD HH:mm:ss')
-    const startDate = moment.tz(date[0], this.state.maintenance.timezone).format('YYYY-MM-DD HH:mm:ss')
+    const startDate = moment(date[0]).format('YYYY-MM-DD HH:mm:ss')
     // console.log('sD: ', startDate)
 
     this.setState({
@@ -786,8 +786,8 @@ export default class Maintenance extends React.Component {
 
   handleEndDateChange (date) {
     // console.log(date)
-    // console.log(`changeEnd\n${date[0]}\n${moment(date[0]).format('YYYY-MM-DD HH:mm:ss')}`)
-    const endDate = moment.tz(date[0], this.state.maintenance.timezone).format('YYYY-MM-DD HH:mm:ss')
+    console.log(`changeEnd\n${date[0]}\n${moment(date[0]).format('YYYY-MM-DD HH:mm:ss')}`)
+    const endDate = moment(date[0]).format('YYYY-MM-DD HH:mm:ss')
     // console.log('sD: ', endDate)
 
     this.setState({
@@ -1784,7 +1784,7 @@ export default class Maintenance extends React.Component {
                           {Array.isArray(this.state.maintenance.incomingAttachments) && this.state.maintenance.incomingAttachments.length !== 0
                             ? this.state.maintenance.incomingAttachments.map((attachment, index) => {
                               return (
-                                <Button pill size='sm' theme='primary' style={{ marginLeft: '10px' }} key={index} onClick={this.showAttachments} >
+                                <Button pill size='sm' theme='primary' style={{ marginLeft: '10px' }} key={index} onClick={this.showAttachments}>
                                   {attachment.name}
                                 </Button>
                               )
@@ -1839,7 +1839,7 @@ export default class Maintenance extends React.Component {
                     dragHandleClassName='modal-attachment-header-text'
                   >
                     <div style={{ borderRadius: '15px', position: 'relative' }}>
-                      <ModalHeader 
+                      <ModalHeader
                         className='modal-attachment-header-text'
                         style={{
                           background: 'var(--secondary)',
