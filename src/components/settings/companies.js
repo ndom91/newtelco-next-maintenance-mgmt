@@ -1,6 +1,7 @@
 import React from 'react'
 import fetch from 'isomorphic-unfetch'
 import Link from 'next/link'
+import cogoToast from 'cogo-toast'
 import { AgGridReact } from 'ag-grid-react'
 import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-material.css'
@@ -25,7 +26,7 @@ import {
 export default class Companies extends React.Component {
   static async getInitialProps ({ req, query }) {
     const host = req ? req.headers['x-forwarded-host'] : location.host
-    const pageRequest = `https://${host}/api/settings/companies` // ?page=${query.page || 1}&limit=${query.limit || 41}`
+    const pageRequest = `https://${host}/api/settings/companies`
     const res = await fetch(pageRequest)
     const json = await res.json()
     return {
@@ -49,7 +50,8 @@ export default class Companies extends React.Component {
             headerName: 'ID',
             field: 'id',
             width: 200,
-            editable: false
+            editable: false,
+            sort: { direction: 'desc', priority: 0 }
           },
           {
             headerName: 'Domain',
@@ -67,16 +69,9 @@ export default class Companies extends React.Component {
             field: 'maintenanceRecipient',
             width: 200
           }
-        ],
-        rowBuffer: 0,
-        rowSelection: 'multiple',
-        rowModelType: 'infinite',
-        paginationPageSize: 100,
-        cacheOverflowSize: 2,
-        maxConcurrentDatasourceRequests: 1,
-        infiniteInitialRowCount: 144,
-        maxBlocksInCache: 10
+        ]
       },
+      rowData: [],
       newName: '',
       newDomain: '',
       newRecipient: '',
@@ -86,42 +81,29 @@ export default class Companies extends React.Component {
     this.handleDomainChange = this.handleDomainChange.bind(this)
     this.handleNameChange = this.handleNameChange.bind(this)
     this.handleRecipientChange = this.handleRecipientChange.bind(this)
+    this.handleAddCompany = this.handleAddCompany.bind(this)
+  }
+
+  componentDidMount () {
+    const host = window.location.host
+    fetch(`https://${host}/api/companies`, {
+      method: 'get'
+    })
+      .then(resp => resp.json())
+      .then(data => {
+        console.log(data)
+        this.setState({
+          rowData: data.companies
+        })
+      })
+      .catch(err => console.error(err))
   }
 
   handleGridReady = params => {
     this.gridApi = params.api
+    window.gridApi = params.api
     this.gridColumnApi = params.columnApi
     params.api.sizeColumnsToFit()
-
-    const host = window.location.host
-
-    const httpRequest = new XMLHttpRequest()
-    const updateData = data => {
-      const companies = data.companies
-      var dataSource = {
-        rowCount: null,
-        getRows: function (params) {
-          var rowsThisPage = companies.slice(params.startRow, params.endRow)
-          var lastRow = -1
-          if (companies.length <= params.endRow) {
-            lastRow = companies.length
-          }
-          params.successCallback(rowsThisPage, lastRow)
-        }
-      }
-      params.api.setDatasource(dataSource)
-    }
-
-    httpRequest.open(
-      'GET',
-      `https://${host}/api/companies`
-    )
-    httpRequest.send()
-    httpRequest.onreadystatechange = () => {
-      if (httpRequest.readyState === 4 && httpRequest.status === 200) {
-        updateData(JSON.parse(httpRequest.responseText))
-      }
-    }
   };
 
   onFirstDataRendered (params) {
@@ -153,6 +135,40 @@ export default class Companies extends React.Component {
     })
   }
 
+  handleAddCompany () {
+    const {
+      newName,
+      newDomain,
+      newRecipient
+    } = this.state
+
+    const host = window.location.host
+    fetch(`https://${host}/api/settings/add/companies?name=${encodeURIComponent(newName)}&domain=${encodeURIComponent(newDomain)}&recipient=${encodeURIComponent(newRecipient)}`, {
+      method: 'get'
+    })
+      .then(resp => resp.json())
+      .then(data => {
+        console.log(data)
+        const insertId = data.insertCompanyQuery.insertId
+        if (data.insertCompanyQuery.affectedRows === 1 && data.insertCompanyQuery.warningCount === 0) {
+          cogoToast.success(`Company ${newName} Added`, {
+            position: 'top-right'
+          })
+        } else {
+          cogoToast.warn(`Error - ${data.err}`, {
+            position: 'top-right'
+          })
+        }
+        const newRowData = this.state.rowData
+        newRowData.push({ id: insertId, mailDomain: newDomain, maintenanceRecipient: newRecipient, name: newName })
+        this.setState({
+          rowData: newRowData,
+          openCompanyModal: !this.state.openCompanyModal
+        })
+      })
+      .catch(err => console.error(err))
+  }
+
   render () {
     const {
       newDomain,
@@ -180,6 +196,7 @@ export default class Companies extends React.Component {
             <AgGridReact
               gridOptions={this.state.gridOptions}
               onGridReady={this.handleGridReady}
+              rowData={this.state.rowData}
               animateRows
               stopEditingWhenGridLosesFocus
               onFirstDataRendered={this.onFirstDataRendered.bind(this)}
@@ -216,21 +233,9 @@ export default class Companies extends React.Component {
               </Row>
               <Row style={{ display: 'flex', justifyContent: 'flex-end' }}>
                 <Col>
-                  <Link
-                    href={{
-                      pathname: '/maintenance',
-                      query: {
-                        id: 'NEW',
-                        mailId: 'NT',
-                        name: this.state.newCompMailDomain
-                      }
-                    }}
-                    as='/maintenance/new'
-                  >
-                    <Button style={{ width: '100%', marginTop: '15px' }} theme='primary'>
-                      Save
-                    </Button>
-                  </Link>
+                  <Button onClick={this.handleAddCompany} style={{ width: '100%', marginTop: '15px' }} theme='primary'>
+                    Save
+                  </Button>
                 </Col>
               </Row>
 

@@ -2,11 +2,11 @@ const db = require('../../../../lib/db')
 const escape = require('sql-template-strings')
 
 module.exports = async (req, res) => {
-  const companyName = req.query.name
-  const companyDomain = req.query.domain
-  const companyRecipient = req.query.recipient
-  const lieferantCIDsResult = await db.query(escape`
-    SELECT lieferantCID.id as value, lieferantCID.derenCID as label FROM lieferantCID WHERE lieferantCID.lieferant LIKE ${lieferantId}
+  const companyName = decodeURIComponent(req.query.name)
+  const companyDomain = decodeURIComponent(req.query.domain)
+  const companyRecipient = decodeURIComponent(req.query.recipient)
+  const insertCompanyQuery = await db.query(escape`
+    INSERT INTO companies (name, mailDomain, maintenanceRecipient) VALUES (${companyName}, ${companyDomain}, ${companyRecipient})
   `)
-  res.status(200).json({ lieferantCIDsResult, lieferantCIDsCount })
+  res.status(200).json({ insertCompanyQuery })
 }
