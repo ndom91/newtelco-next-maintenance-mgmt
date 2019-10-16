@@ -76,7 +76,6 @@ export default class Inbox extends React.Component {
 
     this.toggle = this.toggle.bind(this)
     this.toggleTooltip = this.toggleTooltip.bind(this)
-    // this.fetchCompanyLogo = this.fetchCompanyLogo.bind(this)
   }
 
   componentDidMount () {
@@ -93,37 +92,17 @@ export default class Inbox extends React.Component {
         })
           .then(resp => resp.json())
           .then(data => {
-            // this.state.inboxMails[index].faviconUrl = data.icons
+            console.log(data)
+            const iconUrl = data.icons
+            const newInboxMails = this.state.inboxMails
+            newInboxMails[index].faviconUrl = iconUrl
             this.setState(prevState => ({
-              inboxMails: {
-                ...prevState.inboxMails,
-                [prevState.inboxMails[index].faviconUrl]: data.icons
-              }
+              inboxMails: newInboxMails
             }))
-            // this.setState({
-            //   inboxMails[index].faviconUrl: data.icons
-            // })
           })
       })
     }
   }
-
-  // fetchCompanyLogo = (domain) => {
-  //   fetch(`https://realfavicongenerator.p.rapidapi.com/favicon/icon?platform=android_chrome&site=https%3A%2F%2F${domain}`, {
-  //     method: 'GET',
-  //     headers: {
-  //       'x-rapidapi-host': 'realfavicongenerator.p.rapidapi.com',
-  //       'x-rapidapi-key': '55fb2c8df5msh893e7c177736a1ap158653jsn61bb889ce0dd'
-  //     }
-  //   })
-  //     .then(response => {
-  //       console.log('apiresponse', response.body)
-  //       return response.url
-  //     })
-  //     .catch(err => {
-  //       console.log(err)
-  //     })
-  // }
 
   toggle (mailId) {
     const {
@@ -137,8 +116,6 @@ export default class Inbox extends React.Component {
       const htmlRegex = new RegExp(/<(?:"[^"]*"[`"]*|'[^']*'['"]*|[^'">])+>/, 'gi')
       // const htmlRegex2 = new RegExp('<([a-z]+)[^>]*(?<!/)>', 'gi')
       // const htmlRegex3 = new RegExp('<meta .*>', 'gi')
-
-      // console.log(htmlRegex.test(data.body))
 
       if (htmlRegex.test(mailBody)) {
         console.log('html true')
@@ -239,7 +216,7 @@ export default class Inbox extends React.Component {
         inboxMails,
         open
       } = this.state
-      // console.log(inboxMails)
+
       return (
         <Layout unread={this.props.unread} session={this.props.session}>
           {UnreadCount()}
@@ -254,7 +231,6 @@ export default class Inbox extends React.Component {
                         <CSSTransition
                           key={mail.id}
                           timeout={500}
-                          // timeout={200 * index}
                           classNames='item'
                         >
                           <ListGroupItem key={mail.id}>
@@ -262,7 +238,7 @@ export default class Inbox extends React.Component {
                               {this.state.windowInnerWidth > 500
                                 ? (
                                   <Badge outline theme='light' className='mail-badge'>
-                                    <img className='mail-icon' src={`https://cdn.statically.io/favicons/${mail.domain}`} />
+                                    <img className='mail-icon' src={mail.faviconUrl} />
                                     <FontAwesomeIcon onClick={() => this.toggle(mail.id)} width='1.325em' className='mail-open-icon' icon={faEnvelopeOpenText} />
                                   </Badge>
                                 ) : (
@@ -281,7 +257,7 @@ export default class Inbox extends React.Component {
                                 {this.state.windowInnerWidth < 500
                                   ? (
                                     <Badge outline theme='light' className='mail-badge'>
-                                      <img className='mail-icon' src={`https://cdn.statically.io/favicons/${mail.domain}`} />
+                                      <img className='mail-icon' src={mail.faviconUrl} />
                                       <FontAwesomeIcon onClick={() => this.toggle(mail.id)} width='1.525em' className='mail-open-icon' icon={faEnvelopeOpenText} />
                                     </Badge>
                                   ) : (
@@ -314,13 +290,16 @@ export default class Inbox extends React.Component {
                           </ListGroupItem>
                         </CSSTransition>
                       )
-                    })
-                    : (
-                      <div className='inbox0-wrapper'>
-                        <img src='/static/images/inbox0.svg' alt='Inbox 0' style={{ width: '400px' }} />
-                        <h4 className='inbox0-text'>Congrats, you've reached Inbox 0</h4>
-                      </div>
+                    }) : (
+                      null
                     )}
+
+                  {!Array.isArray(inboxMails) && (
+                    <div className='inbox0-wrapper'>
+                      <img src='/static/images/inbox0.svg' alt='Inbox 0' style={{ width: '400px' }} />
+                      <h4 className='inbox0-text'>Congrats, you've reached Inbox 0</h4>
+                    </div>
+                  )}
                 </TransitionGroup>
               </ListGroup>
               <Modal className='mail-modal-body' animation backdrop backdropClassName='modal-backdrop' open={open} size='lg' toggle={this.toggle}>
