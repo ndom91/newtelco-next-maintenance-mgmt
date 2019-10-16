@@ -77,11 +77,12 @@ div.ag-row-selected {
 
 .user-pic {
   filter: grayscale(100%);
-  transition: transform 150ms linear, filter 350ms linear;
+  /* transition: transform 150ms linear, filter 350ms linear, shadow 350ms linear; */
+  transition: all 350ms ease-in-out;
 }
 
 .user-pic:hover {
   filter: grayscale(0%);
-  box-shadow: 0 0 20px 1px rgba(0,0,0,0.2);
-  transform: translateY(-2px);
+  box-shadow: 0 5px 10px 1px rgba(0,0,0,0.4);
+  transform: translateY(-3px);
 }
