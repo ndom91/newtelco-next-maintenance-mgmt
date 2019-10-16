@@ -316,7 +316,10 @@ export default class Inbox extends React.Component {
                       )
                     })
                     : (
-                      <></>
+                      <div className='inbox0-wrapper'>
+                        <img src='/static/images/inbox0.svg' alt='Inbox 0' style={{ width: '400px' }} />
+                        <h4 className='inbox0-text'>Congrats, you've reached Inbox 0</h4>
+                      </div>
                     )}
                 </TransitionGroup>
               </ListGroup>
@@ -385,6 +388,16 @@ export default class Inbox extends React.Component {
               .mail-info {
                 max-width: 80%;
               }
+            }
+            :global(.inbox0-text) {
+              font-family: Poppins, Helvetica;
+              font-weight: 200 !important;
+              margin-top: 20px;
+            }
+            :global(.inbox0-wrapper) {
+              display: flex;
+              align-items: center;
+              flex-direction: column;
             }
             :global(.fa-language) {
               font-size: 20px;
