@@ -274,9 +274,10 @@ export default class Maintenance extends React.Component {
         done: convertBool(done),
         timezone: 'Europe/Amsterdam',
         timezoneLabel: '(GMT+02:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna',
-        startDateTime: moment.tz(this.props.jsonData.profile.startDateTime, 'Etc/UTC').tz('Europe/Amsterdam').format('YYYY-MM-DD HH:mm:ss'),
-        endDateTime: moment.tz(this.props.jsonData.profile.endDateTime, 'Etc/UTC').tz('Europe/Amsterdam').format('YYYY-MM-DD HH:mm:ss')
+        startDateTime: moment.tz(this.props.jsonData.profile.startDateTime, 'GMT').tz('Etc/GMT-2').format('YYYY-MM-DD HH:mm:ss'),
+        endDateTime: moment.tz(this.props.jsonData.profile.endDateTime, 'GMT').tz('Etc/GMT-2').format('YYYY-MM-DD HH:mm:ss')
       }
+      console.log(`Start\n${this.props.jsonData.profile.startDateTime}\n${moment.tz(this.props.jsonData.profile.startDateTime, 'GMT')}\n${newMaintenance.startDateTime}`)
 
       this.setState({
         maintenance: newMaintenance,
@@ -565,12 +566,14 @@ export default class Maintenance extends React.Component {
     }
 
     const timezoneValue = timezone || 'Europe/Dublin'
-    const rawStart = moment(startDateTime).format('YYYY-MM-DD HH:mm:ss')
-    const rawEnd = moment(endDateTime).format('YYYY-MM-DD HH:mm:ss')
-    const incomingTzStart = moment.tz(rawStart, timezoneValue)
-    const incomingTzEnd = moment.tz(rawEnd, timezoneValue)
-    const utcStart = incomingTzStart.tz('UTC').format('YYYY-MM-DD HH:mm:ss')
-    const utcEnd = incomingTzEnd.tz('UTC').format('YYYY-MM-DD HH:mm:ss')
+    const rawStart = moment.tz(startDateTime, timezoneValue)
+    const rawEnd = moment.tz(endDateTime, timezoneValue)
+    // const incomingTzStart = moment.tz(rawStart, timezoneValue)
+    // const incomingTzEnd = moment.tz(rawEnd, timezoneValue)
+    const utcStart1 = rawStart.tz('GMT').format('YYYY-MM-DD HH:mm:ss')
+    const utcEnd1 = rawEnd.tz('GMT').format('YYYY-MM-DD HH:mm:ss')
+    const utcStart = this.props.jsonData.profile.startDateTime || utcStart1
+    const utcEnd = this.props.jsonData.profile.endDateTime || utcEnd1
 
     const rescheduleText = ''
     const tzSuffixRAW = 'UTC / GMT+0:00'
@@ -1851,7 +1854,7 @@ export default class Maintenance extends React.Component {
                               )
                             })
                             : (
-                              <span>N/A</span>
+                              null
                             )}
                         </div>
                         <ButtonGroup style={{ display: 'flex', flexDirection: 'column' }}>
