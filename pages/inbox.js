@@ -76,7 +76,7 @@ export default class Inbox extends React.Component {
 
     this.toggle = this.toggle.bind(this)
     this.toggleTooltip = this.toggleTooltip.bind(this)
-    this.fetchCompanyLogo = this.fetchCompanyLogo.bind(this)
+    // this.fetchCompanyLogo = this.fetchCompanyLogo.bind(this)
   }
 
   componentDidMount () {
@@ -86,42 +86,44 @@ export default class Inbox extends React.Component {
       windowInnerWidth: window.innerWidth
     })
     const host = window.location.host
-    this.props.jsonData.forEach((mail, index) => {
-      fetch(`https://api.${host}/favicon?d=${mail.domain}`, {
-        method: 'get'
-      })
-        .then(resp => resp.json())
-        .then(data => {
-          // this.state.inboxMails[index].faviconUrl = data.icons
-          this.setState(prevState => ({
-            inboxMails: {
-              ...prevState.inboxMails,
-              [prevState.inboxMails[index].faviconUrl]: data.icons
-            }
-          }))
-          // this.setState({
-          //   inboxMails[index].faviconUrl: data.icons
-          // })
+    if (Array.isArray(this.props.jsonData)) {
+      this.props.jsonData.forEach((mail, index) => {
+        fetch(`https://api.${host}/favicon?d=${mail.domain}`, {
+          method: 'get'
         })
-    })
+          .then(resp => resp.json())
+          .then(data => {
+            // this.state.inboxMails[index].faviconUrl = data.icons
+            this.setState(prevState => ({
+              inboxMails: {
+                ...prevState.inboxMails,
+                [prevState.inboxMails[index].faviconUrl]: data.icons
+              }
+            }))
+            // this.setState({
+            //   inboxMails[index].faviconUrl: data.icons
+            // })
+          })
+      })
+    }
   }
 
-  fetchCompanyLogo = (domain) => {
-    fetch(`https://realfavicongenerator.p.rapidapi.com/favicon/icon?platform=android_chrome&site=https%3A%2F%2F${domain}`, {
-      method: 'GET',
-      headers: {
-        'x-rapidapi-host': 'realfavicongenerator.p.rapidapi.com',
-        'x-rapidapi-key': '55fb2c8df5msh893e7c177736a1ap158653jsn61bb889ce0dd'
-      }
-    })
-      .then(response => {
-        console.log('apiresponse', response.body)
-        return response.url
-      })
-      .catch(err => {
-        console.log(err)
-      })
-  }
+  // fetchCompanyLogo = (domain) => {
+  //   fetch(`https://realfavicongenerator.p.rapidapi.com/favicon/icon?platform=android_chrome&site=https%3A%2F%2F${domain}`, {
+  //     method: 'GET',
+  //     headers: {
+  //       'x-rapidapi-host': 'realfavicongenerator.p.rapidapi.com',
+  //       'x-rapidapi-key': '55fb2c8df5msh893e7c177736a1ap158653jsn61bb889ce0dd'
+  //     }
+  //   })
+  //     .then(response => {
+  //       console.log('apiresponse', response.body)
+  //       return response.url
+  //     })
+  //     .catch(err => {
+  //       console.log(err)
+  //     })
+  // }
 
   toggle (mailId) {
     const {
@@ -503,7 +505,7 @@ export default class Inbox extends React.Component {
               position: absolute;
               top: 0;
               left: 0;
-              height: 100%;
+              height: 100vh;
               width: 100%;
               padding: 40px;
               overflow-y: ${this.state.incomingMailIsHtml ? 'hidden' : 'scroll'};

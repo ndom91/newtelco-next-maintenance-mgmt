@@ -6,7 +6,9 @@ import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-material.css'
 import fetch from 'isomorphic-unfetch'
 import Select from 'react-select'
+import cogoToast from 'cogo-toast'
 import Link from 'next/link'
+import moment from 'moment-timezone'
 import { NextAuth } from 'next-auth/client'
 import RequireLogin from '../src/components/require-login'
 import Footer from '../src/components/footer'
@@ -21,6 +23,7 @@ import EdittedBy from '../src/components/ag-grid/edittedby'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import UnreadCount from '../src/components/unreadcount'
 import UseAnimations from 'react-useanimations'
+import { HotKeys } from 'react-hotkeys'
 import {
   Card,
   CardHeader,
@@ -67,6 +70,7 @@ export default class History extends React.Component {
     super(props)
     this.state = {
       openNewModal: false,
+      openConfirmDeleteModal: false,
       newMaintenanceCompany: '',
       newCompMailDomain: '',
       newMaintCompanies: [],
@@ -102,8 +106,8 @@ export default class History extends React.Component {
           }, {
             headerName: 'Supplier',
             field: 'name',
-            cellRenderer: 'supplier',
-            width: 120
+            cellRenderer: 'supplier'
+            // width: 120
           }, {
             headerName: 'Their CID',
             field: 'derenCID',
@@ -121,7 +125,7 @@ export default class History extends React.Component {
           }, {
             headerName: 'Newtelco CIDs',
             field: 'betroffeneCIDs',
-            width: 0,
+            // width: 0,
             tooltipField: 'betroffeneCIDs'
           }, {
             headerName: 'Mail Arrived',
@@ -179,7 +183,11 @@ export default class History extends React.Component {
       }
     }
     this.toggleNewModal = this.toggleNewModal.bind(this)
+    this.toggleConfirmDeleteModal = this.toggleConfirmDeleteModal.bind(this)
     this.handleNewCompanySelect = this.handleNewCompanySelect.bind(this)
+    this.handleGridReady = this.handleGridReady.bind(this)
+    this.handleDelete = this.handleDelete.bind(this)
+    this.deleteMaint = this.deleteMaint.bind(this)
   }
 
   componentDidMount () {
@@ -187,8 +195,8 @@ export default class History extends React.Component {
   }
 
   handleGridReady = params => {
-    this.gridApi = params.gridApi
-    this.gridColumnApi = params.gridColumnApi
+    window.gridApi = params.api
+    this.gridColumnApi = params.columnApi
     // params.columnApi.sizeColumnsToFit()
   }
 
@@ -197,13 +205,15 @@ export default class History extends React.Component {
     // params.columnApi.sizeColumnsToFit()
   }
 
-  handleGridExport (data) {
-    console.log(data)
-    const params = {
-      allColumns: true,
-      fileName: `maintenance${new Date()}`,
-      columnSeparator: ',',
-      onlySelected: true
+  handleGridExport () {
+    // console.log(data)
+    if (window.gridApi) {
+      const params = {
+        allColumns: true,
+        fileName: `maintenanceExport_${moment(new Date()).format('YYYYMMDD')}`,
+        columnSeparator: ','
+      }
+      window.gridApi.exportDataAsCsv(params)
     }
 
     // this.state.gridOptions.api.exportDataAsCsv(params)
@@ -211,6 +221,10 @@ export default class History extends React.Component {
 
   handleRowDoubleClick (event) {
     // this.gridApi.getDisplayedRowAtIndex(event.rowIndex).setSelected(true)
+  }
+
+  toggleConfirmDeleteModal () {
+
   }
 
   toggleNewModal () {
@@ -235,103 +249,194 @@ export default class History extends React.Component {
     })
   }
 
+  handleDelete () {
+    const host = window.location.host
+    const maintId = this.state.maintIdtoDelete
+    fetch(`https://${host}/api/maintenances/delete?maintId=${maintId}`, {
+      method: 'get'
+    })
+      .then(resp => resp.json())
+      .then(data => {
+        if (data.status === 200 && data.statusText === 'OK') {
+          cogoToast.success('Delete Success', {
+            position: 'top-right'
+          })
+        } else {
+          cogoToast.warn(`Error - ${data.err}`, {
+            position: 'top-right'
+          })
+        }
+      })
+      .catch(err => console.error(err))
+
+    const newRowData = this.state.rowData.filter(el => el.id !== maintId)
+    this.setState({
+      rowData: newRowData,
+      openConfirmDeleteModal: !this.state.openConfirmDeleteModal
+    })
+  }
+
+  deleteMaint () {
+    if (window.gridApi) {
+      const row = window.gridApi.getSelectedRows()
+      const maintId = row[0].id
+      this.setState({
+        openConfirmDeleteModal: !this.state.openConfirmDeleteModal,
+        maintIdtoDelete: maintId
+      })
+    }
+  }
+
   render () {
+    const keyMap = {
+      DELETE_MAINT: 'alt+l'
+    }
+
+    const handlers = {
+      DELETE_MAINT: this.deleteMaint
+    }
     if (this.props.session.user) {
       return (
-        <Layout unread={this.props.unread} session={this.props.session}>
-          {UnreadCount()}
-          <Card style={{ maxWidth: '100%' }}>
-            <CardHeader>
-              <ButtonToolbar style={{ justifyContent: 'space-between' }}>
-                <h2 style={{ marginBottom: '0px' }}>History</h2>
-                <ButtonGroup size='md'>
-                  <Button style={{ cursor: 'not-allowed' }} disabled outline theme='dark' className='export-btn' onClick={this.handleGridExport}>
-                    <UseAnimations animationKey='download' size={22} style={{ display: 'inline-block', fill: 'rgb(0,0,0)' }} />
-                    <span style={{ marginLeft: '5px' }}>
-                      Export
-                    </span>
-                  </Button>
-                  <Button onClick={this.toggleNewModal} theme='dark'>
-                    <FontAwesomeIcon icon={faPlusCircle} width='1.5em' style={{ marginRight: '10px', color: 'secondary' }} />
-                    New
-                  </Button>
-                </ButtonGroup>
-              </ButtonToolbar>
-            </CardHeader>
-            <CardBody>
-              <div className='table-wrapper'>
-                <div
-                  className='ag-theme-material'
-                  style={{
-                    height: '700px',
-                    width: '100%'
-                  }}
-                >
-                  <AgGridReact
-                    gridOptions={this.state.gridOptions}
-                    rowData={this.state.rowData}
-                    onGridReady={this.handleGridReady}
-                    animateRows
-                    pagination
-                    // onRowDoubleClicked={this.handleRowDoubleClick}
-                    onFirstDataRendered={this.onFirstDataRendered.bind(this)}
-                  />
+        <HotKeys keyMap={keyMap} handlers={handlers}>
+          <Layout unread={this.props.unread} session={this.props.session}>
+            {UnreadCount()}
+            <Card style={{ maxWidth: '100%' }}>
+              <CardHeader>
+                <ButtonToolbar style={{ justifyContent: 'space-between' }}>
+                  <h2 style={{ marginBottom: '0px' }}>History</h2>
+                  <ButtonGroup size='md'>
+                    <Button outline theme='dark' className='export-btn' onClick={this.handleGridExport}>
+                      <UseAnimations animationKey='download' size={22} style={{ display: 'inline-block', fill: 'rgb(0,0,0)' }} />
+                      <span style={{ marginLeft: '5px' }}>
+                        Export
+                      </span>
+                    </Button>
+                    <Button onClick={this.toggleNewModal} theme='dark'>
+                      <FontAwesomeIcon icon={faPlusCircle} width='1.5em' style={{ marginRight: '10px', color: 'secondary' }} />
+                      New
+                    </Button>
+                  </ButtonGroup>
+                </ButtonToolbar>
+              </CardHeader>
+              <CardBody>
+                <div className='table-wrapper'>
+                  <div
+                    className='ag-theme-material'
+                    style={{
+                      height: '700px',
+                      width: '100%'
+                    }}
+                  >
+                    <AgGridReact
+                      gridOptions={this.state.gridOptions}
+                      rowData={this.state.rowData}
+                      // onGridReady={params => this.gridApi = params.api}
+                      onGridReady={this.handleGridReady}
+                      animateRows
+                      pagination
+                      // onRowDoubleClicked={this.handleRowDoubleClick}
+                      onFirstDataRendered={this.onFirstDataRendered.bind(this)}
+                    />
+                  </div>
                 </div>
-              </div>
-            </CardBody>
-            <Footer />
-          </Card>
-          <style jsx>{`
-            :global(.export-btn) {
-              display: flex;
-              align-items: center;
-            }
-          `}
-          </style>
-          <Modal className='mail-modal-body' animation backdrop backdropClassName='modal-backdrop' open={this.state.openNewModal} size='lg' toggle={this.toggleNewModal}>
-            <ModalHeader />
-            <ModalBody className='mail-body'>
-              <Container>
-                <Row>
-                  <h2>New Maintenance</h2>
-                </Row>
-                <Row>
+              </CardBody>
+              <Footer />
+            </Card>
+            <style jsx>{`
+              :global(.export-btn) {
+                display: flex;
+                align-items: center;
+              }
+            `}
+            </style>
+            <Modal className='mail-modal-body' animation backdrop backdropClassName='modal-backdrop' open={this.state.openNewModal} size='lg' toggle={this.toggleNewModal}>
+              <ModalHeader />
+              <ModalBody className='mail-body'>
+                <Container>
+                  <Row>
+                    <h2>New Maintenance</h2>
+                  </Row>
+                  <Row>
+                    <Col>
+                      <FormGroup>
+                        <label htmlFor='selectCompany'>
+                          Company
+                        </label>
+                        <Select
+                          value={this.state.newMaintenanceCompany || undefined}
+                          onChange={this.handleNewCompanySelect}
+                          options={this.state.newMaintCompanies}
+                          placeholder='Please select a Company'
+                        />
+                      </FormGroup>
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Link
+                      href={{
+                        pathname: '/maintenance',
+                        query: {
+                          id: 'NEW',
+                          mailId: 'NT',
+                          name: this.state.newCompMailDomain
+                        }
+                      }}
+                      as='/maintenance/new'
+                    >
+                      <Button outline theme='primary'>
+                        Go
+                      </Button>
+                    </Link>
+                  </Row>
+
+                </Container>
+              </ModalBody>
+            </Modal>
+            <Modal className='delete-modal' animation backdrop backdropClassName='modal-backdrop' open={this.state.openConfirmDeleteModal} size='md' toggle={this.toggleConfirmDeleteModal}>
+              <ModalHeader className='modal-delete-header'>
+                Confirm Delete
+              </ModalHeader>
+              <ModalBody className='mail-body'>
+                <Container className='container-interior'>
+                  <Row>
+                    <Col>
+                      Are you sure you want to delete maintenance <b style={{ fontWeight: '900' }}> {this.state.maintIdtoDelete}</b>
+                    </Col>
+                  </Row>
+                </Container>
+                <Row style={{ marginTop: '20px' }}>
                   <Col>
-                    <FormGroup>
-                      <label htmlFor='selectCompany'>
-                        Company
-                      </label>
-                      <Select
-                        value={this.state.newMaintenanceCompany || undefined}
-                        onChange={this.handleNewCompanySelect}
-                        options={this.state.newMaintCompanies}
-                        placeholder='Please select a Company'
-                      />
-                    </FormGroup>
+                    <ButtonGroup style={{ width: '100%' }}>
+                      <Button onClick={this.toggleConfirmDeleteModal} outline theme='secondary'>
+                        Cancel
+                      </Button>
+                      <Button onClick={this.handleDelete} theme='danger'>
+                        Confirm
+                      </Button>
+                    </ButtonGroup>
                   </Col>
                 </Row>
-                <Row>
-                  <Link
-                    href={{
-                      pathname: '/maintenance',
-                      query: {
-                        id: 'NEW',
-                        mailId: 'NT',
-                        name: this.state.newCompMailDomain
-                      }
-                    }}
-                    as='/maintenance/new'
-                  >
-                    <Button outline theme='primary'>
-                      Go
-                    </Button>
-                  </Link>
-                </Row>
-
-              </Container>
-            </ModalBody>
-          </Modal>
-        </Layout>
+              </ModalBody>
+            </Modal>
+            <style jsx>{`
+                :global(.delete-modal) {
+                  margin-top: 50px;
+                }
+                :global(.modal-title > h2) {
+                  margin-bottom: 0px;
+                }
+                :global(.modal-delete-header) {
+                  background: var(--light);
+                }
+                :global(.container-interior) {
+                  border: 1px solid var(--light);
+                  border-radius: 0.325em;
+                  padding: 30px;
+                }
+            `} 
+            </style>
+          </Layout>
+        </HotKeys>
       )
     } else {
       return (

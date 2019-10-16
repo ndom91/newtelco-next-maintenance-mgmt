@@ -15,6 +15,7 @@ module.exports = async (req, res) => {
       UPDATE maintenancedb SET endDateTime = ${value} WHERE id = ${maintId}
     `)
   }
+  console.log(value, cidIdsQuery.message)
   if (cidIdsQuery.affectedRows >= 1) {
     res.status(200).json({ statusText: 'OK', status: 200 })
   } else {

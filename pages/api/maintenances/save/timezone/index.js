@@ -8,7 +8,6 @@ module.exports = async (req, res) => {
   const timezoneQuery = await db.query(escape`
     UPDATE maintenancedb SET timezone = ${value}, timezoneLabel = ${label} WHERE id = ${maintId}
   `)
-  console.log(timezoneQuery)
   if (timezoneQuery.affectedRows >= 1) {
     res.status(200).json({ statusText: 'OK', status: 200 })
   } else {

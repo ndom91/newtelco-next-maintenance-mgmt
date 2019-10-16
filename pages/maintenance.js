@@ -220,7 +220,7 @@ export default class Maintenance extends React.Component {
     this.prepareDirectSend = this.prepareDirectSend.bind(this)
     this.toggleHelpModal = this.toggleHelpModal.bind(this)
     this.onGridReady = this.onGridReady.bind(this)
-    this.showAttachments = this.showAttachments.bind(this)
+    // this.showAttachments = this.showAttachments.bind(this)
     // this.toggleProtectionSwitchTooltip = this.toggleProtectionSwitchTooltip.bind(this)
     // this.toggleUseImpactPlaceholderTooltip = this.toggleUseImpactPlaceholderTooltip.bind(this)
   }
@@ -760,8 +760,45 @@ export default class Maintenance extends React.Component {
     // dummy
   }
 
+  saveDateTime = (maintId, element, newValue) => {
+    // console.log('presaveTime: ', newValue, this.state.maintenance.timezone)
+    let newISOTime = moment.tz(newValue, this.state.maintenance.timezone)
+    // console.log('saveTime: ', newISOTime.toString())
+    if (maintId === 'NEW') {
+      cogoToast.warn('No CID assigned - Cannot Save', {
+        position: 'top-right'
+      })
+      return
+    }
+    newISOTime = newISOTime.utc().format('YYYY-MM-DD HH:mm:ss')
+    // console.log('preSave1: ', newISOTime)
+    const host = window.location.host
+    fetch(`https://${host}/api/maintenances/save/dateTime?maintId=${maintId}&element=${element}&value=${newISOTime}`, {
+      method: 'get',
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        _csrf: this.props.session.csrfToken
+      }
+    })
+      .then(resp => resp.json())
+      .then(data => {
+        if (data.status === 200 && data.statusText === 'OK') {
+          // cogoToast.success('Save Success', {
+          //   position: 'top-right'
+          // })
+          console.log(`DateTime Save Success\n${newISOTime}`)
+        } else {
+          console.warn(`DateTime Save Failed\n${element}\n${newValue}\n${newISOTime}`)
+          // cogoToast.warn(`Error - ${data.err}`, {
+          //   position: 'top-right'
+          // })
+        }
+      })
+      .catch(err => console.error(err))
+  }
+
   handleStartDateChange (date) {
-    console.log(`changeStart\n${date[0]}\n${moment(date[0]).format('YYYY-MM-DD HH:mm:ss')}`)
+    // console.log(`changeStart\n${date[0]}\n${moment(date[0]).format('YYYY-MM-DD HH:mm:ss')}`)
     // console.log(date)
     // const startDate = moment(date[0]).format('YYYY-MM-DD HH:mm:ss')
     const startDate = moment(date[0]).format('YYYY-MM-DD HH:mm:ss')
@@ -773,6 +810,7 @@ export default class Maintenance extends React.Component {
         startDateTime: startDate
       }
     })
+    this.saveDateTime(this.state.maintenance.id, 'start', startDate)
     const startDateTime = this.state.maintenance.startDateTime
     const endDateTime = this.state.maintenance.endDateTime
 
@@ -786,7 +824,7 @@ export default class Maintenance extends React.Component {
 
   handleEndDateChange (date) {
     // console.log(date)
-    console.log(`changeEnd\n${date[0]}\n${moment(date[0]).format('YYYY-MM-DD HH:mm:ss')}`)
+    // console.log(`changeEnd\n${date[0]}\n${moment(date[0]).format('YYYY-MM-DD HH:mm:ss')}`)
     const endDate = moment(date[0]).format('YYYY-MM-DD HH:mm:ss')
     // console.log('sD: ', endDate)
 
@@ -796,6 +834,7 @@ export default class Maintenance extends React.Component {
         endDateTime: endDate
       }
     })
+    this.saveDateTime(this.state.maintenance.id, 'end', endDate)
     const startDateTime = this.state.maintenance.startDateTime
     const endDateTime = this.state.maintenance.endDateTime
 
@@ -1004,60 +1043,55 @@ export default class Maintenance extends React.Component {
   /// /////////////////////////////////////////////////////////
 
   handleDateTimeBlur (element) {
-    let newValue
-    const maintId = this.state.maintenance.id
-    const host = window.location.host
-    if (element === 'start') {
-      if (isValid(parseISO(this.state.maintenance.startDateTime))) {
-        newValue = this.state.maintenance.startDateTime
-      }
-    } else if (element === 'end') {
-      if (isValid(new Date(this.state.maintenance.endDateTime))) {
-        newValue = this.state.maintenance.endDateTime
-      }
-    }
-    const saveDateTime = (host, maintId, element, newValue) => {
-      console.log('presaveTime: ', newValue, this.state.maintenance.timezone)
-      let newISOTime = moment.tz(newValue, this.state.maintenance.timezone)
-      console.log('saveTime: ', newISOTime.toString())
-      // const selectedTimezone = this.state.maintenance.timezone
-      // if (selectedTimezone && isValid(newISOTime)) {
-      //   newISOTime = zonedTimeToUtc(newISOTime, selectedTimezone)
-      // }
-      // if (isValid(parseISO(newISOTime))) {
-      // const maintId = this.state.maintenance.id
-      if (maintId === 'NEW') {
-        cogoToast.warn('No CID assigned - Cannot Save', {
-          position: 'top-right'
-        })
-        return
-      }
-      // const saveDateFormat = format(newISOTime, 'yyyy-MM-dd HH:mm:ss')
-      newISOTime = newISOTime.utc().format('YYYY-MM-DD HH:mm:ss')
-      console.log('preSave1: ', newISOTime)
-      fetch(`https://${host}/api/maintenances/save/dateTime?maintId=${maintId}&element=${element}&value=${newISOTime}`, {
-        method: 'get',
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-          _csrf: this.props.session.csrfToken
-        }
-      })
-        .then(resp => resp.json())
-        .then(data => {
-          if (data.status === 200 && data.statusText === 'OK') {
-            cogoToast.success('Save Success', {
-              position: 'top-right'
-            })
-          } else {
-            cogoToast.warn(`Error - ${data.err}`, {
-              position: 'top-right'
-            })
-          }
-        })
-        .catch(err => console.error(err))
-      // }
-    }
-    saveDateTime(host, maintId, element, newValue)
+    // let newValue
+    // const maintId = this.state.maintenance.id
+    // if (element === 'start') {
+    //   if (isValid(parseISO(this.state.maintenance.startDateTime))) {
+    //     newValue = this.state.maintenance.startDateTime
+    //   }
+    // } else if (element === 'end') {
+    //   if (isValid(new Date(this.state.maintenance.endDateTime))) {
+    //     newValue = this.state.maintenance.endDateTime
+    //   }
+    // }
+    // const saveDateTime = (maintId, element, newValue) => {
+    //   const host = window.location.host
+    //   console.log('presaveTime: ', newValue, this.state.maintenance.timezone)
+    //   let newISOTime = moment.tz(newValue, this.state.maintenance.timezone)
+    //   console.log('saveTime: ', newISOTime.toString())
+    //   if (maintId === 'NEW') {
+    //     cogoToast.warn('No CID assigned - Cannot Save', {
+    //       position: 'top-right'
+    //     })
+    //     return
+    //   }
+    //   newISOTime = newISOTime.utc().format('YYYY-MM-DD HH:mm:ss')
+    //   console.log('preSave1: ', newISOTime)
+    //   fetch(`https://${host}/api/maintenances/save/dateTime?maintId=${maintId}&element=${element}&value=${newISOTime}`, {
+    //     method: 'get',
+    //     headers: {
+    //       'Access-Control-Allow-Origin': '*',
+    //       _csrf: this.props.session.csrfToken
+    //     }
+    //   })
+    //     .then(resp => resp.json())
+    //     .then(data => {
+    //       if (data.status === 200 && data.statusText === 'OK') {
+    //         cogoToast.success('Save Success', {
+    //           position: 'top-right'
+    //         })
+    //       } else {
+    //         cogoToast.warn(`Error - ${data.err}`, {
+    //           position: 'top-right'
+    //         })
+    //       }
+    //     })
+    //     .catch(err => console.error(err))
+    // }
+    // saveDateTime(maintId, element, newValue)
+    cogoToast.success('Save Success', {
+      position: 'top-right'
+    })
   }
 
   handleCIDBlur (ev) {
@@ -1215,7 +1249,35 @@ export default class Maintenance extends React.Component {
   }
 
   handleSupplierBlur () {
-    // dummy
+    const host = window.location.host
+    const newValue = this.state.maintenance.lieferant
+    const maintId = this.state.maintenance.id
+    if (maintId === 'NEW') {
+      cogoToast.warn('No CID assigned - Cannot Save', {
+        position: 'top-right'
+      })
+      return
+    }
+    fetch(`https://${host}/api/maintenances/save/supplier?maintId=${maintId}&value=${newValue}`, {
+      method: 'get',
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        _csrf: this.props.session.csrfToken
+      }
+    })
+      .then(resp => resp.json())
+      .then(data => {
+        if (data.status === 200 && data.statusText === 'OK') {
+          cogoToast.success('Save Success', {
+            position: 'top-right'
+          })
+        } else {
+          cogoToast.warn(`Error - ${data.err}`, {
+            position: 'top-right'
+          })
+        }
+      })
+      .catch(err => console.error(err))
   }
 
   /// /////////////////////////////////////////////////////////
@@ -1319,11 +1381,11 @@ export default class Maintenance extends React.Component {
   //
   /// /////////////////////////////////////////////////////////
 
-  showAttachments () {
-    this.setState({
-      openAttachmentModal: !this.state.openAttachmentModal
-    })
-  }
+  // showAttachments () {
+  //   this.setState({
+  //     openAttachmentModal: !this.state.openAttachmentModal
+  //   })
+  // }
 
   handleProtectionSwitch () {
     this.setState({
@@ -1400,8 +1462,7 @@ export default class Maintenance extends React.Component {
     const {
       maintenance,
       openReadModal,
-      openPreviewModal,
-      openAttachmentModal
+      openPreviewModal
     } = this.state
 
     let maintenanceIdDisplay
@@ -1784,7 +1845,7 @@ export default class Maintenance extends React.Component {
                           {Array.isArray(this.state.maintenance.incomingAttachments) && this.state.maintenance.incomingAttachments.length !== 0
                             ? this.state.maintenance.incomingAttachments.map((attachment, index) => {
                               return (
-                                <Button pill size='sm' theme='primary' style={{ marginLeft: '10px' }} key={index} onClick={this.showAttachments}>
+                                <Button pill size='sm' theme='primary' style={{ marginLeft: '10px' }} key={index}>
                                   {attachment.name}
                                 </Button>
                               )
