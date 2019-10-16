@@ -1,5 +1,14 @@
 import React from 'react'
 import Link from 'next/link'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+// import AlgoliaSearch from './autocomplete'
+import { InstantSearch, connectAutoComplete } from 'react-instantsearch-dom'
+import AgAutocomplete from 'react-algoliasearch'
+import algoliasearch from 'algoliasearch/lite'
+import {
+  faPowerOff,
+  faSearch
+} from '@fortawesome/free-solid-svg-icons'
 import {
   Navbar,
   NavbarToggler,
@@ -14,11 +23,17 @@ import {
   FormInput,
   Collapse
 } from 'shards-react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import {
-  faPowerOff,
-  faSearch
-} from '@fortawesome/free-solid-svg-icons'
+import { connectHits } from 'react-instantsearch-dom'
+
+const Hits = ({ hits }) => (
+  <ol>
+    {hits.map(hit => (
+      <li key={hit.objectID}>{hit.name}</li>
+    ))}
+  </ol>
+)
+
+const CustomHits = connectHits(Hits)
 
 class Header extends React.Component {
   constructor (props) {
@@ -49,6 +64,11 @@ class Header extends React.Component {
   }
 
   render () {
+    const searchClient = algoliasearch(
+      'O7K4XJKBHU',
+      '769a2cd0f2b32f30d4dc9ab78a643c0d'
+    )
+
     return (
       <Navbar type='dark' theme='secondary' expand='md'>
         <NavbarBrand href='/'>
@@ -106,6 +126,21 @@ class Header extends React.Component {
             </NavItem>
           </Nav>
           <Nav style={{ justifyContent: 'flex-end' }} navbar className='ml-auto'>
+            {/* <InstantSearch
+              indexName='maintenance'
+              searchClient={searchClient}
+              createURL={searchState => `maintenance/?id=${searchState.query.id}`}
+            >
+              <CustomHits />
+            </InstantSearch> */}
+            {/* <AgAutocomplete
+              apiKey={'769a2cd0f2b32f30d4dc9ab78a643c0d'}
+              appId={'O7K4XJKBHU'}
+              displayKey='id'
+              indices={[{index: 'maintenance'}]}
+              inputId='input-search'
+              placeholder='Search...'
+            /> */}
             <InputGroup id='search-group' style={{ width: '100%', alignItems: 'center' }} size='sm' seamless>
               <InputGroupAddon type='prepend'>
                 <InputGroupText className='input-group-search'>
@@ -137,6 +172,38 @@ class Header extends React.Component {
                 margin-left: 10px;
               }
             }
+          #algolia-autocomplete-listbox-2 {
+            background: #fff;
+            border-radius: 5px 5px 0 0;
+            padding: 5px;
+          }
+          .algolia-autocomplete {
+            width: 100%;
+          }
+          .algolia-autocomplete .aa-input, .algolia-autocomplete .aa-hint {
+            width: 100%;
+          }
+          .algolia-autocomplete .aa-hint {
+            color: #999;
+          }
+          .algolia-autocomplete .aa-dropdown-menu {
+            width: 100%;
+            background-color: #fff;
+            border: 1px solid #999;
+            border-top: none;
+          }
+          .algolia-autocomplete .aa-dropdown-menu .aa-suggestion {
+            cursor: pointer;
+            padding: 5px 4px;
+          }
+          .algolia-autocomplete .aa-dropdown-menu .aa-suggestion.aa-cursor {
+            background-color: #B2D7FF;
+          }
+          .algolia-autocomplete .aa-dropdown-menu .aa-suggestion em {
+            font-weight: bold;
+            font-style: normal;
+          }
+
           :global(.unread-badge) {
             position: absolute;
             top: -2px;

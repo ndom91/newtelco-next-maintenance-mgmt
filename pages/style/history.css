@@ -77,7 +77,7 @@ div.ag-row-selected {
 
 .user-pic {
   filter: grayscale(100%);
-  transition: all 750ms ease-in-out;
+  transition: transform 150ms linear, filter 350ms linear;
 }
 
 .user-pic:hover {
