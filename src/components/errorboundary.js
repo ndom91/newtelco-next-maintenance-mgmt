@@ -32,13 +32,13 @@ export default class ErrorBoundary extends React.Component {
             <Container className='container-border'>
               <img style={{ marginBottom: '50px' }} width='500px' src='/static/images/error.svg' alt='error' />
               <h4>Oops — something's gone wrong.</h4>
-              <p>If you would like to provide more information, please select 'Report' below.</p>
-              <ButtonGroup style={{ width: '100%' }} >
+              <p>If you would like to provide us more information, please select 'Report' below.</p>
+              <ButtonGroup style={{ width: '100%' }}>
                 <Button outline theme='secondary' onClick={() => Sentry.lastEventId() && Sentry.showReportDialog()}>
                   Report
                 </Button>
                 <Button theme='primary' onClick={() => window.history.back()}>
-                  Try Again
+                  Go Back
                 </Button>
               </ButtonGroup>
             </Container>
