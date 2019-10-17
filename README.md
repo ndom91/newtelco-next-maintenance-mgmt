@@ -49,13 +49,11 @@ It is currently setup so that the host is dynamic, you can reverse proxy it out 
 
 ### Screenshots
 
-![screenshot 1](https://imgur.com/Gx5VyDP.png)
+![screenshot 1](https://imgur.com/NN1F2OM.png)
 
 ![screenshot 2](https://imgur.com/5ZNu8Ao.png)
 
-![screenshot 3](https://imgur.com/Rh5y5FL.png)
-
-![screenshot 4](https://imgur.com/ByaLQqv.png)
+![screenshot 3](https://imgur.com/v1E8xo1.png)
 
 
 **Internal Application used by NewTelco GmbH**
