@@ -17,26 +17,9 @@ import {
   CardHeader,
   CardBody
 } from 'shards-react'
-const LogRocket = require('logrocket')
-const setupLogRocketReact = require('logrocket-react')
-const Sentry = require('@sentry/browser')
 
 const people = ['fwaleska', 'alissitsin', 'sstergiou']
 
-if (typeof window !== 'undefined') {
-  LogRocket.init('ui3vht/next-maintenance')
-  setupLogRocketReact(LogRocket)
-  // LogRocket.identify(this.props.session.user.id, {
-  //   name: this.props.session.user.name,
-  //   email: this.props.session.user.email
-  // })
-  Sentry.init({ dsn: 'https://627b5da84c4944f4acc2118b47dad88e@sentry.ndo.dev/3' })
-  LogRocket.getSessionURL(sessionURL => {
-    Sentry.configureScope(scope => {
-      scope.setExtra('sessionURL', sessionURL)
-    })
-  })
-}
 export default class Index extends React.Component {
   static async getInitialProps ({ res, req }) {
     const host = req ? req.headers['x-forwarded-host'] : location.host
