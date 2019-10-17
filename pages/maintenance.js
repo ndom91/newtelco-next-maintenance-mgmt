@@ -12,7 +12,7 @@ import Router from 'next/router'
 import { Helmet } from 'react-helmet'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Editor as TinyEditor } from '@tinymce/tinymce-react'
-import { format, isValid, formatDistance, parseISO } from 'date-fns'
+import { format, isValid, formatDistance, parseISO, compareAsc } from 'date-fns'
 import moment from 'moment-timezone'
 import { Rnd } from 'react-rnd'
 import UnreadCount from '../src/components/unreadcount'
@@ -42,8 +42,7 @@ import {
   faTimesCircle,
   faRandom,
   faSearch,
-  faHistory,
-  faFileExcel
+  faHistory
 } from '@fortawesome/free-solid-svg-icons'
 import {
   Container,
@@ -116,6 +115,7 @@ export default class Maintenance extends React.Component {
         reason: '',
         mailId: 'NT'
       },
+      dateTimeWarning: false,
       openProtectionSwitchToggle: false,
       openUseImpactPlaceholderToggle: false,
       openReadModal: false,
@@ -667,11 +667,21 @@ export default class Maintenance extends React.Component {
   handleCalendarCreate () {
     const host = window.location.host
     const company = this.state.maintenance.name
-    const cids = this.state.maintenance.betroffeneCIDs || ''
-    const supplierCID = this.state.maintenance.derenCID
     const maintId = this.state.maintenance.id
     const startDateTime = this.state.maintenance.startDateTime
     const endDateTime = this.state.maintenance.endDateTime
+
+    let derenCid = ''
+    this.state.selectedLieferant.forEach(cid => {
+      derenCid = derenCid + cid.label + ' '
+    })
+    derenCid = derenCid.trim()
+
+    let cids = ''
+    this.state.kundencids.forEach(cid => {
+      cids = cids + cid.kundenCID + ' '
+    })
+    cids = cids.trim()
 
     const startMoment = moment.tz(startDateTime, this.state.maintenance.timezone)
     const startDE = startMoment.tz('Europe/Berlin').format()
@@ -683,7 +693,7 @@ export default class Maintenance extends React.Component {
       body: JSON.stringify({
         company: company,
         cids: cids,
-        supplierCID: supplierCID,
+        supplierCID: derenCid,
         maintId: maintId,
         startDateTime: startDE,
         endDateTime: endDE
@@ -842,6 +852,21 @@ export default class Maintenance extends React.Component {
     const endDateTime = this.state.maintenance.endDateTime
 
     if (startDateTime && endDateTime && isValid(parseISO(startDateTime)) && isValid(parseISO(endDateTime))) {
+      const dateCompare = compareAsc(parseISO(endDateTime), parseISO(startDateTime))
+      if (dateCompare !== 1) {
+        cogoToast.warn('End date is before Start date', {
+          position: 'top-right'
+        })
+        this.setState({
+          dateTimeWarning: true
+        })
+      } else {
+        if (this.state.dateTimeWarning) {
+          this.setState({
+            dateTimeWarning: false
+          })
+        }
+      }
       const impactCalculation = formatDistance(parseISO(endDateTime), parseISO(startDateTime))
       this.setState({
         impactPlaceholder: impactCalculation
@@ -869,32 +894,6 @@ export default class Maintenance extends React.Component {
     })
 
     if (element === 'done') {
-      // mark mail as unread as well
-      const mailId = this.state.maintenance.mailId || this.state.maintenance.receivedmail
-      if (mailId !== 'NT') {
-        fetch(`https://api.${host}/inbox/delete`, {
-          method: 'post',
-          body: JSON.stringify({ m: mailId }),
-          mode: 'cors',
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Content-Type': 'application/json'
-          }
-        })
-          .then(resp => resp.json())
-          .then(data => {
-            if (data.status === 'complete' && newValue === 'true') {
-              cogoToast.success('Message Marked Complete', {
-                position: 'top-right'
-              })
-            } else if (data.id === 500) {
-              cogoToast.warn('Error marking as complete', {
-                position: 'top-right'
-              })
-            }
-          })
-          .catch(err => console.error(`Error - ${err}`))
-      }
       // save 'betroffeneCIDs'
       let impactedCIDs = ''
       this.state.kundencids.forEach(cid => {
@@ -1453,6 +1452,32 @@ export default class Maintenance extends React.Component {
         }
       })
       .catch(err => console.error(err))
+    // mark mail as unread as well
+    const incomingMailId = this.state.maintenance.mailId || this.state.maintenance.receivedmail
+    if (incomingMailId !== 'NT') {
+      fetch(`https://api.${host}/inbox/delete`, {
+        method: 'post',
+        body: JSON.stringify({ m: incomingMailId }),
+        mode: 'cors',
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Content-Type': 'application/json'
+        }
+      })
+        .then(resp => resp.json())
+        .then(data => {
+          if (data.status === 'complete') {
+            cogoToast.success('Message Removed from Inbox', {
+              position: 'top-right'
+            })
+          } else if (data.id === 500) {
+            cogoToast.warn('Error removing from Inbox', {
+              position: 'top-right'
+            })
+          }
+        })
+        .catch(err => console.error(`Error - ${err}`))
+    }
   }
 
   /// /////////////////////////////////////////////////////////
@@ -1593,6 +1618,7 @@ export default class Maintenance extends React.Component {
                                     data-enable-time
                                     options={{ time_24hr: 'true', allow_input: 'true' }}
                                     className='flatpickr end-date-time'
+                                    style={this.state.dateTimeWarning ? { border: '2px solid #dc3545', boxShadow: '0 0 10px 1px #dc3545' } : null}
                                     value={maintenance.endDateTime || null}
                                     onChange={date => this.handleEndDateChange(date)}
                                     onClose={() => this.handleDateTimeBlur('end')}

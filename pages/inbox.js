@@ -87,13 +87,7 @@ export default class Inbox extends React.Component {
     const host = window.location.host
     if (Array.isArray(this.props.jsonData)) {
       this.props.jsonData.forEach((mail, index) => {
-        let mailDomain = mail.domain
-        if (mail.domain === 'notify.digitalrealty.com') {
-          mailDomain = 'digitalrealty.com'
-        }
-        if (mail.domain === 'zayo.com') {
-          mailDomain = 'investors.zayo.com'
-        }
+        const mailDomain = mail.domain
         fetch(`https://api.${host}/favicon?d=${mailDomain}`, {
           method: 'get'
         })
