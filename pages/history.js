@@ -183,7 +183,6 @@ export default class History extends React.Component {
       }
     }
     this.toggleNewModal = this.toggleNewModal.bind(this)
-    this.toggleConfirmDeleteModal = this.toggleConfirmDeleteModal.bind(this)
     this.handleNewCompanySelect = this.handleNewCompanySelect.bind(this)
     this.handleGridReady = this.handleGridReady.bind(this)
     this.handleDelete = this.handleDelete.bind(this)
@@ -221,10 +220,6 @@ export default class History extends React.Component {
 
   handleRowDoubleClick (event) {
     // this.gridApi.getDisplayedRowAtIndex(event.rowIndex).setSelected(true)
-  }
-
-  toggleConfirmDeleteModal () {
-
   }
 
   toggleNewModal () {
