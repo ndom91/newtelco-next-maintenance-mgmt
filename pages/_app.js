@@ -6,29 +6,29 @@ import './style/app.css'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'shards-ui/dist/css/shards.min.css'
 const LogRocket = require('logrocket')
-const setupLogRocketReact = require('logrocket-react')
+// const setupLogRocketReact = require('logrocket-react')
 const Sentry = require('@sentry/browser')
 
-if (typeof window !== 'undefined') {
-  LogRocket.init('ui2vht/next-maintenance')
-  setupLogRocketReact(LogRocket)
-  // LogRocket.identify(this.props.session.user.id, {
-  //   name: this.props.session.user.name,
-  //   email: this.props.session.user.email
-  // })
-  Sentry.init({ dsn: 'https://627b5da84c4944f4acc2118b47dad88e@sentry.ndo.dev/3' })
-  LogRocket.getSessionURL(sessionURL => {
-    Sentry.configureScope(scope => {
-      scope.setExtra('sessionURL', sessionURL)
-    })
-  })
-}
 export default class MyApp extends App {
   static async getInitialProps ({ Component, ctx }) {
     let pageProps = {}
 
     if (Component.getInitialProps) {
       pageProps = await Component.getInitialProps(ctx)
+    }
+    if (typeof window !== 'undefined') {
+      LogRocket.init('ui2vht/next-maintenance')
+      // setupLogRocketReact(LogRocket)
+      LogRocket.identify(pageProps.session.user.id, {
+        name: pageProps.session.user.name,
+        email: pageProps.session.user.email
+      })
+      Sentry.init({ dsn: 'https://627b5da84c4944f4acc2118b47dad88e@sentry.ndo.dev/3' })
+      LogRocket.getSessionURL(sessionURL => {
+        Sentry.configureScope(scope => {
+          scope.setExtra('sessionURL', sessionURL)
+        })
+      })
     }
 
     return { pageProps }

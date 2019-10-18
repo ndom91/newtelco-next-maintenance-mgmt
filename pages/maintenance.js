@@ -1513,7 +1513,7 @@ export default class Maintenance extends React.Component {
     if (this.props.session.user) {
       return (
         <HotKeys keyMap={keyMap} handlers={handlers}>
-          <Layout unread={this.state.unreadCount} session={this.props.session}>
+          <Layout unread={this.props.unread} session={this.props.session}>
             <Helmet>
               <title>{`Newtelco Maintenance - NT-${maintenance.id}`}</title>
             </Helmet>

@@ -83,7 +83,7 @@ export default class Layout extends React.Component {
                     ? (
                       <Row className='keyboard-row'>
                         <Col>
-                          <Badge className='key-badge' outline theme='primary'>ALT + L</Badge>
+                          <Badge className='key-badge' outline theme='primary'>ALT</Badge> <span className='keyboard-plus'>+</span><Badge className='key-badge' outline theme='primary'>L</Badge>
                         </Col>
                         <Col>
                           Delete Selected
@@ -96,7 +96,7 @@ export default class Layout extends React.Component {
                     ? (
                       <Row className='keyboard-row'>
                         <Col>
-                          <Badge className='key-badge' outline theme='primary'>CTRL + ALT + R</Badge>
+                          <Badge className='key-badge' outline theme='primary'>ALT</Badge> <span className='keyboard-plus'>+</span><Badge className='key-badge' outline theme='primary'>R</Badge>
                         </Col>
                         <Col>
                           Toggle Read Mail
@@ -107,7 +107,7 @@ export default class Layout extends React.Component {
                     )}
                   <Row className='keyboard-row'>
                     <Col>
-                      <Badge className='key-badge' outline theme='primary'>ALT + H</Badge>
+                      <Badge className='key-badge' outline theme='primary'>ALT</Badge> <span className='keyboard-plus'>+</span><Badge className='key-badge' outline theme='primary'>H</Badge>
                     </Col>
                     <Col>
                       Home
@@ -115,7 +115,7 @@ export default class Layout extends React.Component {
                   </Row>
                   <Row className='keyboard-row'>
                     <Col>
-                      <Badge className='key-badge' outline theme='primary'>ALT + I</Badge>
+                      <Badge className='key-badge' outline theme='primary'>ALT</Badge> <span className='keyboard-plus'>+</span><Badge className='key-badge' outline theme='primary'>I</Badge>
                     </Col>
                     <Col>
                       Inbox
@@ -123,7 +123,7 @@ export default class Layout extends React.Component {
                   </Row>
                   <Row className='keyboard-row'>
                     <Col>
-                      <Badge className='key-badge' outline theme='primary'>ALT + Y</Badge>
+                      <Badge className='key-badge' outline theme='primary'>ALT</Badge> <span className='keyboard-plus'>+</span><Badge className='key-badge' outline theme='primary'>Y</Badge>
                     </Col>
                     <Col>
                       History
@@ -131,7 +131,7 @@ export default class Layout extends React.Component {
                   </Row>
                   <Row className='keyboard-row'>
                     <Col>
-                      <Badge className='key-badge' outline theme='primary'>ALT + S</Badge>
+                      <Badge className='key-badge' outline theme='primary'>ALT</Badge> <span className='keyboard-plus'>+</span><Badge className='key-badge' outline theme='primary'>S</Badge>
                     </Col>
                     <Col>
                       Settings
@@ -143,6 +143,10 @@ export default class Layout extends React.Component {
             <style jsx>{`
               :global(.key-badge) {
                 font-size: 90%;
+                padding: 0.7rem;
+              }
+              .keyboard-plus {
+                margin: 5px;
               }
               :global(.keyboard-row > .col:last-child) {
                 font-size: 18px;
