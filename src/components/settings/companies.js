@@ -51,19 +51,18 @@ export default class Companies extends React.Component {
             headerName: 'ID',
             field: 'id',
             width: 200,
-            editable: false,
-            sort: { direction: 'desc', priority: 0 }
+            editable: false
           },
           {
             headerName: 'Domain',
             field: 'mailDomain',
-            width: 200
+            width: 200,
+            sort: { direction: 'asc' }
           },
           {
             headerName: 'Company',
             field: 'name',
-            width: 200,
-            sort: { direction: 'asc', priority: 0 }
+            width: 200
           },
           {
             headerName: 'Recipient',
