@@ -21,7 +21,7 @@ import 'flatpickr/dist/themes/material_blue.css'
 import TimezoneSelector from '../src/components/timezone'
 import { getUnique, convertDateTime } from '../src/components/maintenance/helper'
 import { HotKeys } from 'react-hotkeys'
-
+import { OutTable, ExcelRenderer } from 'react-excel-renderer'
 import ProtectedIcon from '../src/components/ag-grid/protected'
 import SentIcon from '../src/components/ag-grid/sent'
 import { AgGridReact } from 'ag-grid-react'
@@ -116,6 +116,7 @@ export default class Maintenance extends React.Component {
         mailId: 'NT'
       },
       dateTimeWarning: false,
+      openAttachmentModal: false,
       openProtectionSwitchToggle: false,
       openUseImpactPlaceholderToggle: false,
       openReadModal: false,
@@ -220,7 +221,7 @@ export default class Maintenance extends React.Component {
     this.prepareDirectSend = this.prepareDirectSend.bind(this)
     this.toggleHelpModal = this.toggleHelpModal.bind(this)
     this.onGridReady = this.onGridReady.bind(this)
-    // this.showAttachments = this.showAttachments.bind(this)
+    this.showAttachments = this.showAttachments.bind(this)
     // this.toggleProtectionSwitchTooltip = this.toggleProtectionSwitchTooltip.bind(this)
     // this.toggleUseImpactPlaceholderTooltip = this.toggleUseImpactPlaceholderTooltip.bind(this)
   }
@@ -1383,11 +1384,50 @@ export default class Maintenance extends React.Component {
   //
   /// /////////////////////////////////////////////////////////
 
-  // showAttachments () {
-  //   this.setState({
-  //     openAttachmentModal: !this.state.openAttachmentModal
-  //   })
-  // }
+  showAttachments (id) {
+    function fixBase64 (binaryData) {
+      var base64str = binaryData
+      var binary = atob(base64str.replace(/\s/g, ''))
+      var len = binary.length
+      var buffer = new ArrayBuffer(len)
+      var view = new Uint8Array(buffer)
+
+      // save unicode of binary data into 8-bit Array
+      for (var i = 0; i < len; i++) {
+        view[i] = binary.charCodeAt(i)
+      }
+      return view
+    }
+    if (id !== null) {
+      const file = this.state.maintenance.incomingAttachments[id].data
+      // const fileData = decodeURIComponent(escape(window.atob(this.state.maintenance.incomingAttachments[id].data)))
+      let base64 = (file).replace(/_/g, '/')
+      base64 = base64.replace(/-/g, '+')
+      const base64Fixed = fixBase64(base64)
+      var fileData = new Blob([base64Fixed], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;' })
+
+      ExcelRenderer(fileData, (err, resp) => {
+        if (err) {
+          console.log(err)
+        } else {
+          resp.cols.forEach(col => {
+            col.name = resp.rows[0][col.key]
+            col.key = col.key + 1
+          })
+          resp.cols.unshift({ key: 0, name: '' })
+          resp.rows.shift()
+          this.setState({
+            cols: resp.cols,
+            rows: resp.rows
+          })
+        }
+      })
+    }
+    this.setState({
+      openAttachmentModal: !this.state.openAttachmentModal,
+      currentAttachment: id || null
+    })
+  }
 
   handleProtectionSwitch () {
     this.setState({
@@ -1874,7 +1914,7 @@ export default class Maintenance extends React.Component {
                           {Array.isArray(this.state.maintenance.incomingAttachments) && this.state.maintenance.incomingAttachments.length !== 0
                             ? this.state.maintenance.incomingAttachments.map((attachment, index) => {
                               return (
-                                <Button pill size='sm' theme='primary' style={{ marginLeft: '10px' }} key={index}>
+                                <Button pill size='sm' onClick={() => this.showAttachments(attachment.id)} theme='primary' style={{ marginLeft: '10px' }} key={index}>
                                   {attachment.name}
                                 </Button>
                               )
@@ -1904,18 +1944,18 @@ export default class Maintenance extends React.Component {
                 ) : (
                   <></>
                 )}
-              {/* {typeof window !== 'undefined'
+              {typeof window !== 'undefined'
                 ? (
                   <Rnd
                     default={{
-                      x: 1200,
-                      y: 25,
-                      width: 400,
-                      height: 300
+                      x: 1000,
+                      y: 125,
+                      width: 500,
+                      height: 200
                     }}
                     style={{
-                      visibility: openAttachmentModal ? 'visible' : 'hidden',
-                      opacity: openAttachmentModal ? 1 : 0,
+                      visibility: this.state.openAttachmentModal ? 'visible' : 'hidden',
+                      opacity: this.state.openAttachmentModal ? 1 : 0,
                       background: '#fff',
                       overflow: 'hidden',
                       borderRadius: '15px',
@@ -1924,7 +1964,7 @@ export default class Maintenance extends React.Component {
                       boxShadow: '0px 0px 20px 1px var(--dark)'
                     }}
                     minWidth={500}
-                    minHeight={590}
+                    minHeight={400}
                     bounds='window'
                     dragHandleClassName='modal-attachment-header-text'
                   >
@@ -1940,25 +1980,33 @@ export default class Maintenance extends React.Component {
                         }}
                       >
                         Attachments
-                        <Button outline className='close-attachment-modal-btn' theme='light' style={{ borderRadius: '5px', padding: '0.7em 0.9em' }} onClick={this.showAttachments}>
+                        <Button outline className='close-attachment-modal-btn' theme='light' style={{ borderRadius: '5px', padding: '0.7em 0.9em' }} onClick={() => this.showAttachments(null)}>
                           <FontAwesomeIcon
                             className='close-attachment-modal-icon' width='1.5em' style={{ color: 'var(--light)', fontSize: '12px' }}
                             icon={faTimesCircle}
                           />
                         </Button>
                       </ModalHeader>
-                      {Array.isArray(incomingAttachments) && incomingAttachments.length !== 0
-                        ? incomingAttachments.map((attachment, index) => {
+                      <ModalBody>
+                        {this.state.rows && this.state.cols
+                          ? (
+                            <OutTable data={this.state.rows} columns={this.state.cols} tableClassName='ExcelTable2007' tableHeaderRowClass='heading' />
+                          ) : (
+                            null
+                          )}
+                      </ModalBody>
+                      {/* {Array.isArray(this.state.incomingAttachments) && this.state.incomingAttachments.length !== 0
+                        ? this.state.incomingAttachments.map((attachment, index) => {
                           return <Badge key={index} theme='primary'>{attachment.name}</Badge>
                         })
                         : (
-                          <span>N/A</span>
-                        )}
+                          null
+                        )} */}
                     </div>
                   </Rnd>
                 ) : (
                   <></>
-                )} */}
+                )}
               <Modal backdropClassName='modal-backdrop' animation backdrop size='lg' open={openPreviewModal} toggle={this.togglePreviewModal}>
                 <ModalHeader>
                   <div className='modal-preview-text-wrapper'>
@@ -2001,6 +2049,31 @@ export default class Maintenance extends React.Component {
               </Modal>
             </Card>
             <style jsx>{`
+              :global(.ExcelTable2007) {
+                border: 1px solid #ddd;
+                border-collapse: collapse;
+              }
+              :global(.ExcelTable2007 td, th) {
+                white-space: nowrap;
+                border: 1px solid #ddd;
+                padding: 20px;
+              }
+              :global(.ExcelTable2007 th) {
+                background-color: #eee;
+                position: sticky;
+                top: -1px;
+                z-index: 2;
+              }
+              :global(.ExcelTable2007 th:first-of-type) {
+                left: 0;
+                z-index: 3;
+              }
+              :global(.ExcelTable2007 > tbody > tr > td:first-of-type) {
+                background-color: #eee;
+                position: sticky;
+                left: -1px;
+                z-index: 1;
+              }
               :global(.react-draggable) {
                 transition: visibility 200ms linear, opacity 200ms linear;
               }
