@@ -578,7 +578,7 @@ export default class Maintenance extends React.Component {
     if (impact) {
       if (protection === 1 || protection === '1' === protection === true || protection 'true') {
         body = body + '<tr><td>Impact:</td><td>50ms Protection Switch</td></tr>'
-      } else if if (protection === 0 || protection === '0' === protection === false || protection 'false') {
+      } else if (protection === 0 || protection === '0' === protection === false || protection 'false') {
         body = body + '<tr><td>Impact:</td><td>' + this.state.maintenance.impact + '</td></tr>'
       } else {
         body = body + '<tr><td>Impact:</td><td>' + impact + '</td></tr>'
