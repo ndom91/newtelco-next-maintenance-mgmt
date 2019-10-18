@@ -27,7 +27,6 @@ import SentIcon from '../src/components/ag-grid/sent'
 import { AgGridReact } from 'ag-grid-react'
 import { Document, Page } from 'react-pdf'
 import { pdfjs } from 'react-pdf'
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`
 // import { Document, Page } from 'react-pdf/dist/entry.webpack'
 
 import 'ag-grid-community/dist/styles/ag-grid.css'
@@ -69,6 +68,7 @@ import {
   ModalHeader,
   ModalBody
 } from 'shards-react'
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`
 
 const animatedComponents = makeAnimated()
 
@@ -191,7 +191,6 @@ export default class Maintenance extends React.Component {
             }
           }
         ],
-        // context: { componentParent: this },
         frameworkComponents: {
           sendMailBtn: this.sendMailBtns,
           protectedIcon: ProtectedIcon,
@@ -229,8 +228,6 @@ export default class Maintenance extends React.Component {
     this.onGridReady = this.onGridReady.bind(this)
     this.showAttachments = this.showAttachments.bind(this)
     this.handleSendAll = this.handleSendAll.bind(this)
-    // this.toggleProtectionSwitchTooltip = this.toggleProtectionSwitchTooltip.bind(this)
-    // this.toggleUseImpactPlaceholderTooltip = this.toggleUseImpactPlaceholderTooltip.bind(this)
   }
 
   componentDidMount () {
@@ -363,7 +360,6 @@ export default class Maintenance extends React.Component {
   handleGridReady = params => {
     this.gridApi = params.gridApi
     this.gridColumnApi = params.gridColumnApi
-    // params.columnApi.autoSizeColumns()
   }
 
   refreshCells () {
@@ -505,7 +501,6 @@ export default class Maintenance extends React.Component {
     if (!lieferantCidId) {
       return
     }
-    // @param1 - int -1 single LIeferantCID ID
     fetch(`https://${host}/api/customercids/${lieferantCidId}`, {
       method: 'get'
     })
@@ -514,7 +509,6 @@ export default class Maintenance extends React.Component {
         const {
           done
         } = this.state.maintenance
-        // if (data.kundenCIDsResult.length > 1) {
         let currentSentStatus = '0'
         if (done === 1 || done === true || done === '1') {
           currentSentStatus = '1'
@@ -546,11 +540,6 @@ export default class Maintenance extends React.Component {
   prepareDirectSend (recipient, customerCID) {
     const HtmlBody = this.generateMail(customerCID)
     const subject = `Planned Work Notification - NT-${this.state.maintenance.id}`
-    // this.setState({
-    //   mailBodyText: HtmlBody,
-    //   mailPreviewHeaderText: recipient,
-    //   mailPreviewSubjectText: subject
-    // })
     this.sendMail(recipient, customerCID, subject, HtmlBody, false)
   }
 
@@ -576,8 +565,6 @@ export default class Maintenance extends React.Component {
     const timezoneValue = timezone || 'Europe/Dublin'
     const rawStart = moment.tz(startDateTime, timezoneValue)
     const rawEnd = moment.tz(endDateTime, timezoneValue)
-    // const incomingTzStart = moment.tz(rawStart, timezoneValue)
-    // const incomingTzEnd = moment.tz(rawEnd, timezoneValue)
     const utcStart1 = rawStart.tz('GMT').format('YYYY-MM-DD HH:mm:ss')
     const utcEnd1 = rawEnd.tz('GMT').format('YYYY-MM-DD HH:mm:ss')
     const utcStart = this.props.jsonData.profile.startDateTime || utcStart1
@@ -675,7 +662,6 @@ export default class Maintenance extends React.Component {
   }
 
   handleSendAll () {
-    // console.log(this.gridApi) 
     const rowCount = this.gridApi.getDisplayedRowCount() - 1
     this.gridApi.forEachNode((node, index) => {
       setTimeout(() => {
@@ -796,18 +782,12 @@ export default class Maintenance extends React.Component {
     })
   }
 
-  // refreshCells (gridApi) {
-  //   gridApi.refreshCells()
-  // }
-
   handleCreatedByChange (data) {
     // dummy
   }
 
   saveDateTime = (maintId, element, newValue) => {
-    // console.log('presaveTime: ', newValue, this.state.maintenance.timezone)
     let newISOTime = moment.tz(newValue, this.state.maintenance.timezone)
-    // console.log('saveTime: ', newISOTime.toString())
     if (maintId === 'NEW') {
       cogoToast.warn('No CID assigned - Cannot Save', {
         position: 'top-right'
@@ -815,7 +795,6 @@ export default class Maintenance extends React.Component {
       return
     }
     newISOTime = newISOTime.utc().format('YYYY-MM-DD HH:mm:ss')
-    // console.log('preSave1: ', newISOTime)
     const host = window.location.host
     fetch(`https://${host}/api/maintenances/save/dateTime?maintId=${maintId}&element=${element}&value=${newISOTime}`, {
       method: 'get',
@@ -827,26 +806,16 @@ export default class Maintenance extends React.Component {
       .then(resp => resp.json())
       .then(data => {
         if (data.status === 200 && data.statusText === 'OK') {
-          // cogoToast.success('Save Success', {
-          //   position: 'top-right'
-          // })
           console.log(`DateTime Save Success\n${newISOTime}`)
         } else {
           console.warn(`DateTime Save Failed\n${element}\n${newValue}\n${newISOTime}`)
-          // cogoToast.warn(`Error - ${data.err}`, {
-          //   position: 'top-right'
-          // })
         }
       })
       .catch(err => console.error(err))
   }
 
   handleStartDateChange (date) {
-    // console.log(`changeStart\n${date[0]}\n${moment(date[0]).format('YYYY-MM-DD HH:mm:ss')}`)
-    // console.log(date)
-    // const startDate = moment(date[0]).format('YYYY-MM-DD HH:mm:ss')
     const startDate = moment(date[0]).format('YYYY-MM-DD HH:mm:ss')
-    // console.log('sD: ', startDate)
 
     this.setState({
       maintenance: {
@@ -867,10 +836,7 @@ export default class Maintenance extends React.Component {
   }
 
   handleEndDateChange (date) {
-    // console.log(date)
-    // console.log(`changeEnd\n${date[0]}\n${moment(date[0]).format('YYYY-MM-DD HH:mm:ss')}`)
     const endDate = moment(date[0]).format('YYYY-MM-DD HH:mm:ss')
-    // console.log('sD: ', endDate)
 
     this.setState({
       maintenance: {
@@ -1076,52 +1042,6 @@ export default class Maintenance extends React.Component {
   /// /////////////////////////////////////////////////////////
 
   handleDateTimeBlur (element) {
-    // let newValue
-    // const maintId = this.state.maintenance.id
-    // if (element === 'start') {
-    //   if (isValid(parseISO(this.state.maintenance.startDateTime))) {
-    //     newValue = this.state.maintenance.startDateTime
-    //   }
-    // } else if (element === 'end') {
-    //   if (isValid(new Date(this.state.maintenance.endDateTime))) {
-    //     newValue = this.state.maintenance.endDateTime
-    //   }
-    // }
-    // const saveDateTime = (maintId, element, newValue) => {
-    //   const host = window.location.host
-    //   console.log('presaveTime: ', newValue, this.state.maintenance.timezone)
-    //   let newISOTime = moment.tz(newValue, this.state.maintenance.timezone)
-    //   console.log('saveTime: ', newISOTime.toString())
-    //   if (maintId === 'NEW') {
-    //     cogoToast.warn('No CID assigned - Cannot Save', {
-    //       position: 'top-right'
-    //     })
-    //     return
-    //   }
-    //   newISOTime = newISOTime.utc().format('YYYY-MM-DD HH:mm:ss')
-    //   console.log('preSave1: ', newISOTime)
-    //   fetch(`https://${host}/api/maintenances/save/dateTime?maintId=${maintId}&element=${element}&value=${newISOTime}`, {
-    //     method: 'get',
-    //     headers: {
-    //       'Access-Control-Allow-Origin': '*',
-    //       _csrf: this.props.session.csrfToken
-    //     }
-    //   })
-    //     .then(resp => resp.json())
-    //     .then(data => {
-    //       if (data.status === 200 && data.statusText === 'OK') {
-    //         cogoToast.success('Save Success', {
-    //           position: 'top-right'
-    //         })
-    //       } else {
-    //         cogoToast.warn(`Error - ${data.err}`, {
-    //           position: 'top-right'
-    //         })
-    //       }
-    //     })
-    //     .catch(err => console.error(err))
-    // }
-    // saveDateTime(maintId, element, newValue)
     cogoToast.success('Save Success', {
       position: 'top-right'
     })
@@ -1644,17 +1564,17 @@ export default class Maintenance extends React.Component {
                         Calendar
                         </Button>
                         {maintenance.id === 'NEW'
-                      ? (
-                        <Button className='create-btn' onClick={this.handleCreateOnClick}>
-                          <FontAwesomeIcon icon={faPlusCircle} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
+                          ? (
+                            <Button className='create-btn' onClick={this.handleCreateOnClick}>
+                              <FontAwesomeIcon icon={faPlusCircle} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
                           Create
-                        </Button>
-                      ) : (
-                        <Button className='send-bulk' theme='primary' onClick={this.handleSendAll}>
-                          <FontAwesomeIcon icon={faMailBulk} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
+                            </Button>
+                          ) : (
+                            <Button className='send-bulk' theme='primary' onClick={this.handleSendAll}>
+                              <FontAwesomeIcon icon={faMailBulk} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
                           Send All
-                        </Button>
-                      )}
+                            </Button>
+                          )}
                       </ButtonGroup>
                     ) : (
                       <></>
@@ -2064,13 +1984,12 @@ export default class Maintenance extends React.Component {
                           )}
                         {this.state.filetype === 'pdf'
                           ? (
-                            <Document file={btoa(String.fromCharCode.apply(null, this.state.pdfB64))} >
+                            <Document file={btoa(String.fromCharCode.apply(null, this.state.pdfB64))}>
                               <Page pageNumber={1} />
                             </Document>
                           ) : (
                             null
-                          )
-                        }
+                          )}
                       </ModalBody>
                       {/* {Array.isArray(this.state.incomingAttachments) && this.state.incomingAttachments.length !== 0
                         ? this.state.incomingAttachments.map((attachment, index) => {
