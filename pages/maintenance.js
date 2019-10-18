@@ -544,7 +544,7 @@ export default class Maintenance extends React.Component {
   }
 
   // generate Mail contents
-  generateMail = (customerCID) => {
+  generateMail = (customerCID, protection) => {
     const {
       id,
       startDateTime,
@@ -576,7 +576,13 @@ export default class Maintenance extends React.Component {
     let body = `<body style="color:#666666;">${rescheduleText} Dear Colleagues,​​<p><span>We would like to inform you about planned work on the following CID(s):<br><br> <b>${customerCID}</b> <br><br>The maintenance work is with the following details:</span></p><table border="0" cellspacing="2" cellpadding="2" width="775px"><tr><td style='width: 205px;'>Maintenance ID:</td><td><b>NT-${id}</b></td></tr><tr><td>Start date and time:</td><td><b>${utcStart} (${tzSuffixRAW})</b></td></tr><tr><td>Finish date and time:</td><td><b>${utcEnd} (${tzSuffixRAW})</b></td></tr>`
 
     if (impact) {
-      body = body + '<tr><td>Impact:</td><td>' + impact + '</td></tr>'
+      if (protection === 1 || protection === '1' === protection === true || protection 'true') {
+        body = body + '<tr><td>Impact:</td><td>50ms Protection Switch</td></tr>'
+      } else if if (protection === 0 || protection === '0' === protection === false || protection 'false') {
+        body = body + '<tr><td>Impact:</td><td>' + this.state.maintenance.impact + '</td></tr>'
+      } else {
+        body = body + '<tr><td>Impact:</td><td>' + impact + '</td></tr>'
+      }
     }
 
     if (location) {
@@ -666,7 +672,7 @@ export default class Maintenance extends React.Component {
     this.gridApi.forEachNode((node, index) => {
       setTimeout(() => {
         const data = node.data
-        const HtmlBody = this.generateMail(data.kundenCID)
+        const HtmlBody = this.generateMail(data.kundenCID, data.protected)
         const subject = `Planned Work Notification - NT-${this.state.maintenance.id}`
         this.sendMail(data.maintenanceRecipient, data.kundenCID, subject, HtmlBody, false, true)
         cogoToast.success(`Mail Sent - ${data.name}`, {
