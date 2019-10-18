@@ -57,7 +57,8 @@ export default class SupplierCIDs extends React.Component {
           {
             headerName: 'Company',
             field: 'name',
-            width: 200
+            width: 200,
+            editable: false
           },
           {
             headerName: 'Supplier CID',
@@ -77,6 +78,7 @@ export default class SupplierCIDs extends React.Component {
     this.handleDelete = this.handleDelete.bind(this)
     this.handleAddSupplierCid = this.handleAddSupplierCid.bind(this)
     this.toggleSupplierCidDeleteModal = this.toggleSupplierCidDeleteModal.bind(this)
+    this.handleCellEdit = this.handleCellEdit.bind(this)
   }
 
   componentDidMount () {
@@ -213,6 +215,29 @@ export default class SupplierCIDs extends React.Component {
       .catch(err => console.error(err))
   }
 
+  handleCellEdit (params) {
+    const id = params.data.id
+    const newSupplierCid = params.data.derenCID
+
+    const host = window.location.host
+    fetch(`https://${host}/api/settings/edit/suppliercids?id=${id}&suppliercid=${encodeURIComponent(newSupplierCid)}`, {
+      method: 'get'
+    })
+      .then(resp => resp.json())
+      .then(data => {
+        if (data.updateSupplierCidQuery.affectedRows === 1) {
+          cogoToast.success(`Supplier CID ${newSupplierCid} Updated`, {
+            position: 'top-right'
+          })
+        } else {
+          cogoToast.warn(`Error - ${data.err}`, {
+            position: 'top-right'
+          })
+        }
+      })
+      .catch(err => console.error(err))
+  }
+
   render () {
     const {
       newCompanySelection,
@@ -249,6 +274,7 @@ export default class SupplierCIDs extends React.Component {
                 gridOptions={this.state.gridOptions}
                 onGridReady={this.handleGridReady}
                 animateRows
+                onCellEditingStopped={this.handleCellEdit}
                 rowData={this.state.rowData}
                 stopEditingWhenGridLosesFocus
                 onFirstDataRendered={this.onFirstDataRendered.bind(this)}

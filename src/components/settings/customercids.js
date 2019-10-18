@@ -68,12 +68,14 @@ export default class CustomerCIDs extends React.Component {
             headerName: 'Customer',
             field: 'name',
             width: 200,
-            sort: { direction: 'asc', priority: 0 }
+            sort: { direction: 'asc', priority: 0 },
+            editable: false
           },
           {
             headerName: 'Their CID',
             field: 'derenCID',
-            width: 200
+            width: 200,
+            editable: false
           },
           {
             headerName: 'Protected',
@@ -99,6 +101,7 @@ export default class CustomerCIDs extends React.Component {
     this.handleDelete = this.handleDelete.bind(this)
     this.toggleCustomerCidDeleteModal = this.toggleCustomerCidDeleteModal.bind(this)
     this.handleAddCustomerCid = this.handleAddCustomerCid.bind(this)
+    this.handleCellEdit = this.handleCellEdit.bind(this)
   }
 
   componentDidMount () {
@@ -265,6 +268,31 @@ export default class CustomerCIDs extends React.Component {
       .catch(err => console.error(err))
   }
 
+  handleCellEdit (params) {
+    const id = params.data.id
+    const newCustomerCid = params.data.kundenCID
+    const newProtected = params.data.protected
+
+    const host = window.location.host
+    fetch(`https://${host}/api/settings/edit/customercids?id=${id}&customercid=${encodeURIComponent(newCustomerCid)}&protected=${encodeURIComponent(newProtected)}`, {
+      method: 'get'
+    })
+      .then(resp => resp.json())
+      .then(data => {
+        console.log(data)
+        if (data.updateCustomerCidQuery.affectedRows === 1) {
+          cogoToast.success(`Customer CID ${newCustomerCid} Updated`, {
+            position: 'top-right'
+          })
+        } else {
+          cogoToast.warn(`Error - ${data.err}`, {
+            position: 'top-right'
+          })
+        }
+      })
+      .catch(err => console.error(err))
+  }
+
   render () {
     const {
       newNewtelcoCid,
@@ -303,6 +331,8 @@ export default class CustomerCIDs extends React.Component {
                 gridOptions={this.state.gridOptions}
                 onGridReady={this.handleGridReady}
                 rowData={this.state.rowData}
+                onCellEditingStopped={this.handleCellEdit}
+                animateRows
                 stopEditingWhenGridLosesFocus
                 onFirstDataRendered={this.onFirstDataRendered.bind(this)}
               />

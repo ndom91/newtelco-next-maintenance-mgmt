@@ -86,6 +86,7 @@ export default class Companies extends React.Component {
     this.handleAddCompany = this.handleAddCompany.bind(this)
     this.handleDelete = this.handleDelete.bind(this)
     this.toggleCompanyDeleteModal = this.toggleCompanyDeleteModal.bind(this)
+    this.handleCellEdit = this.handleCellEdit.bind(this)
   }
 
   componentDidMount () {
@@ -211,6 +212,32 @@ export default class Companies extends React.Component {
       .catch(err => console.error(err))
   }
 
+  handleCellEdit (params) {
+    const id = params.data.id
+    const newName = params.data.name
+    const newDomain = params.data.mailDomain
+    const newRecipient = params.data.maintenanceRecipient
+
+    const host = window.location.host
+    fetch(`https://${host}/api/settings/edit/companies?id=${id}&name=${encodeURIComponent(newName)}&domain=${encodeURIComponent(newDomain)}&recipient=${encodeURIComponent(newRecipient)}`, {
+      method: 'get'
+    })
+      .then(resp => resp.json())
+      .then(data => {
+        console.log(data)
+        if (data.updateCompanyQuery.affectedRows === 1) {
+          cogoToast.success(`Company ${newName} Updated`, {
+            position: 'top-right'
+          })
+        } else {
+          cogoToast.warn(`Error - ${data.err}`, {
+            position: 'top-right'
+          })
+        }
+      })
+      .catch(err => console.error(err))
+  }
+
   render () {
     const {
       newDomain,
@@ -248,6 +275,7 @@ export default class Companies extends React.Component {
                 gridOptions={this.state.gridOptions}
                 onGridReady={this.handleGridReady}
                 rowData={this.state.rowData}
+                onCellEditingStopped={this.handleCellEdit}
                 animateRows
                 stopEditingWhenGridLosesFocus
                 onFirstDataRendered={this.onFirstDataRendered.bind(this)}
