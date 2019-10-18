@@ -25,8 +25,8 @@ import { OutTable, ExcelRenderer } from 'react-excel-renderer'
 import ProtectedIcon from '../src/components/ag-grid/protected'
 import SentIcon from '../src/components/ag-grid/sent'
 import { AgGridReact } from 'ag-grid-react'
-import { Document, Page } from 'react-pdf'
-import { pdfjs } from 'react-pdf'
+import { Document, Page , pdfjs } from 'react-pdf'
+
 // import { Document, Page } from 'react-pdf/dist/entry.webpack'
 
 import 'ag-grid-community/dist/styles/ag-grid.css'
@@ -576,9 +576,9 @@ export default class Maintenance extends React.Component {
     let body = `<body style="color:#666666;">${rescheduleText} Dear Colleagues,​​<p><span>We would like to inform you about planned work on the following CID(s):<br><br> <b>${customerCID}</b> <br><br>The maintenance work is with the following details:</span></p><table border="0" cellspacing="2" cellpadding="2" width="775px"><tr><td style='width: 205px;'>Maintenance ID:</td><td><b>NT-${id}</b></td></tr><tr><td>Start date and time:</td><td><b>${utcStart} (${tzSuffixRAW})</b></td></tr><tr><td>Finish date and time:</td><td><b>${utcEnd} (${tzSuffixRAW})</b></td></tr>`
 
     if (impact) {
-      if (protection === 1 || protection === '1' === protection === true || protection === 'true') {
+      if (protection === 1 || protection === '1' || protection === true || protection === 'true') {
         body = body + '<tr><td>Impact:</td><td>50ms Protection Switch</td></tr>'
-      } else if (protection === 0 || protection === '0' === protection === false || protection === 'false') {
+      } else if (protection === 0 || protection === '0' || protection === false || protection === 'false') {
         body = body + '<tr><td>Impact:</td><td>' + this.state.maintenance.impact + '</td></tr>'
       } else {
         body = body + '<tr><td>Impact:</td><td>' + impact + '</td></tr>'
