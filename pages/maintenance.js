@@ -42,7 +42,8 @@ import {
   faTimesCircle,
   faRandom,
   faSearch,
-  faHistory
+  faHistory,
+  faMailBulk
 } from '@fortawesome/free-solid-svg-icons'
 import {
   Container,
@@ -222,6 +223,7 @@ export default class Maintenance extends React.Component {
     this.toggleHelpModal = this.toggleHelpModal.bind(this)
     this.onGridReady = this.onGridReady.bind(this)
     this.showAttachments = this.showAttachments.bind(this)
+    this.handleSendAll = this.handleSendAll.bind(this)
     // this.toggleProtectionSwitchTooltip = this.toggleProtectionSwitchTooltip.bind(this)
     // this.toggleUseImpactPlaceholderTooltip = this.toggleUseImpactPlaceholderTooltip.bind(this)
   }
@@ -374,6 +376,23 @@ export default class Maintenance extends React.Component {
         </Button>
       </ButtonGroup>
     )
+  }
+
+  handleSendAll () {
+    // console.log(this.gridApi) 
+    this.gridApi.forEachNode((node, index) => {
+      console.log(node, index)
+      const data = node.data
+      const HtmlBody = this.generateMail(data.kundenCID)
+      const subject = `Planned Work Notification - NT-${this.state.maintenance.id}`
+      this.sendMail(data.maintenanceRecipient, data.kundenCid, subject, HtmlBody, false)
+      cogoToast.success(`Mail Sent - ${data.name}`, {
+        position: 'top-right'
+      })
+    })
+    cogoToast.success('All Mail Send Complete', {
+      position: 'top-right'
+    })
   }
 
   onGridReady (params) {
@@ -1584,10 +1603,18 @@ export default class Maintenance extends React.Component {
                           <FontAwesomeIcon icon={faCalendarAlt} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
                         Calendar
                         </Button>
-                        <Button disabled={maintenance.id !== 'NEW'} className='create-btn' onClick={this.handleCreateOnClick}>
+                        {maintenance.id === 'NEW'
+                      ? (
+                        <Button className='create-btn' onClick={this.handleCreateOnClick}>
                           <FontAwesomeIcon icon={faPlusCircle} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
-                        Create
+                          Create
                         </Button>
+                      ) : (
+                        <Button className='send-bulk' theme='primary' onClick={this.handleSendAll}>
+                          <FontAwesomeIcon icon={faMailBulk} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
+                          Send All
+                        </Button>
+                      )}
                       </ButtonGroup>
                     ) : (
                       <></>
