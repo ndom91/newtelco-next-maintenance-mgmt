@@ -185,7 +185,7 @@ export default class Index extends React.Component {
                   <Link href='/inbox'>
                     <a href='/inbox'>
                       <CardBody className='card-unread-body'>
-                        <UseAnimations animationKey='activity' size={96} className='card-inbox-activity' />
+                        <UseAnimations animationKey='activity' size={34} className='card-inbox-activity' />
                         <p className='card-body-text'>Unread</p>
                       </CardBody>
                     </a>
@@ -199,7 +199,7 @@ export default class Index extends React.Component {
                           {eval(`this.state.${person}.total`)}
                         </span>
                         <Sparklines data={eval(`this.state.${person}.weeks`)} limit={10} width={100} height={40} margin={1}>
-                          <SparklinesLine style={{ strokeWidth: 2, stroke: 'rgba(0, 123, 255, 0.5)', fill: '#007bff', fillOpacity: '0.1' }} />
+                          <SparklinesLine style={{ strokeWidth: 2, stroke: 'rgba(53, 146, 59, 0.5)', fill: '#67B246', fillOpacity: '0.1' }} />
                         </Sparklines>
                       </Badge>
                       <CardBody className='card-person-body'>
@@ -286,8 +286,8 @@ export default class Index extends React.Component {
             }
             :global(.card-inbox-activity) {
               position: absolute; 
-              top: 60px;
-              left: 13%;
+              top: 171px;
+              left: 70%;
               opacity: 0.1;
             }
           `}

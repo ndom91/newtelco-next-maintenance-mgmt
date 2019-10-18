@@ -4,7 +4,8 @@ import Head from 'next/head'
 import ErrorBoundary from '../src/components/errorboundary'
 import './style/app.css'
 import 'bootstrap/dist/css/bootstrap.min.css'
-import 'shards-ui/dist/css/shards.min.css'
+// import 'shards-ui/dist/css/shards.min.css'
+import './style/shards.min.css'
 const LogRocket = require('logrocket')
 // const setupLogRocketReact = require('logrocket-react')
 const Sentry = require('@sentry/browser')
@@ -52,6 +53,9 @@ export default class MyApp extends App {
         </Head>
         <Component {...pageProps} />
         <style jsx global>{`
+          :root {
+            --primary: #67B246 !important;
+          }
           .navbar {
             padding: 0 1.5rem;
           }

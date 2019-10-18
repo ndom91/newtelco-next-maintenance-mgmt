@@ -2120,7 +2120,7 @@ export default class Maintenance extends React.Component {
               :global(.MuiInputBase-root:focus-within) {
                 color: #495057;
                 background-color: #fff;
-                border: 1px solid #007bff !important;
+                border: 1px solid #67B246 !important;
                 border-radius: 0.325rem;
                 box-shadow: 0 0.313rem 0.719rem rgba(0,123,255,.1), 0 0.156rem 0.125rem rgba(0,0,0,.06);
               }
@@ -2259,7 +2259,7 @@ export default class Maintenance extends React.Component {
                 border-right: solid 2px #333;
               }
               :global(.flexible-modal-drag-area) {
-                background: #007bff;
+                background: #67B246;
                 height: 50px;
                 position:absolute;
                 right:0;
@@ -2300,23 +2300,23 @@ export default class Maintenance extends React.Component {
                 transition: box-shadow 250ms cubic-bezier(.27,.01,.38,1.06),border 250ms cubic-bezier(.27,.01,.38,1.06);
               }
               :global(.flatpickr-months) {
-                background: #007bff !important;
+                background: #67B246 !important;
               }
               :global(.flatpickr-month) {
-                background: #007bff !important;
+                background: #67B246 !important;
               }
               :global(.flatpickr-monthDropdown-months) {
-                background: #007bff !important;
+                background: #67B246 !important;
               }
               :global(.flatpickr-weekdays) {
-                background: #007bff !important;
+                background: #67B246 !important;
               }
               :global(.flatpickr-weekday) {
-                background: #007bff !important;
+                background: #67B246 !important;
               }
               :global(.flatpickr-day.selected) {
-                background: #007bff !important;
-                border-color: #007bff !important;
+                background: #67B246 !important;
+                border-color: #67B246 !important;
               }
               :global(.create-btn) {
                 box-shadow: ${this.state.maintenance.id === 'NEW' ? '0 0 0 100vmax rgba(0,0,0,.8)' : 'none'};

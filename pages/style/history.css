@@ -59,15 +59,15 @@ button.btn-primary {
 }
 
 div.ag-row-selected {
-  /* background-color: #007bff !important; */
-  /* border: 2px solid #007bff !important;
+  /* background-color: #67B246 !important; */
+  /* border: 2px solid #67B246 !important;
   background-color: inherit !important; */
   background: repeating-linear-gradient(
     135deg,
     #fff,
     #fff 10px,
-    #007bff38 10px,
-    #007bff38 20px
+    #67B24638 10px,
+    #67B24638 20px
   );
 }
 
