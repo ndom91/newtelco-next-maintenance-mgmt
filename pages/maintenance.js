@@ -378,23 +378,6 @@ export default class Maintenance extends React.Component {
     )
   }
 
-  handleSendAll () {
-    // console.log(this.gridApi) 
-    this.gridApi.forEachNode((node, index) => {
-      console.log(node, index)
-      const data = node.data
-      const HtmlBody = this.generateMail(data.kundenCID)
-      const subject = `Planned Work Notification - NT-${this.state.maintenance.id}`
-      this.sendMail(data.maintenanceRecipient, data.kundenCid, subject, HtmlBody, false)
-      cogoToast.success(`Mail Sent - ${data.name}`, {
-        position: 'top-right'
-      })
-    })
-    cogoToast.success('All Mail Send Complete', {
-      position: 'top-right'
-    })
-  }
-
   onGridReady (params) {
     this.gridApi = params.gridApi
     // this.gridOptions.api.setColumnDefs(yourColumnDefs);
@@ -618,7 +601,7 @@ export default class Maintenance extends React.Component {
   }
 
   // send out the created mail
-  sendMail (recipient, customerCid, subj, htmlBody, isFromPreview) {
+  sendMail (recipient, customerCid, subj, htmlBody, isFromPreview, isFromSendAll) {
     const host = window.location.host
     const body = htmlBody || this.state.mailBodyText
     let subject = subj || this.state.mailPreviewSubjectText
@@ -659,9 +642,11 @@ export default class Maintenance extends React.Component {
           this.setState({
             kundencids: deduplicatedKundenCids
           })
-          cogoToast.success('Mail Sent', {
-            position: 'top-right'
-          })
+          if (!isFromSendAll) {
+            cogoToast.success('Mail Sent', {
+              position: 'top-right'
+            })
+          }
           if (isFromPreview) {
             this.setState({
               openPreviewModal: !this.state.openPreviewModal
@@ -682,6 +667,27 @@ export default class Maintenance extends React.Component {
         }
       })
       .catch(err => console.error(`Error - ${err}`))
+  }
+
+  handleSendAll () {
+    // console.log(this.gridApi) 
+    const rowCount = this.gridApi.getDisplayedRowCount() - 1
+    this.gridApi.forEachNode((node, index) => {
+      setTimeout(() => {
+        const data = node.data
+        const HtmlBody = this.generateMail(data.kundenCID)
+        const subject = `Planned Work Notification - NT-${this.state.maintenance.id}`
+        this.sendMail(data.maintenanceRecipient, data.kundenCID, subject, HtmlBody, false, true)
+        cogoToast.success(`Mail Sent - ${data.name}`, {
+          position: 'top-right'
+        })
+        if (index === rowCount) {
+          cogoToast.success('All Mail Send Complete', {
+            position: 'top-right'
+          })
+        }
+      }, 500 * (index + 1))
+    })
   }
 
   handleCalendarCreate () {
