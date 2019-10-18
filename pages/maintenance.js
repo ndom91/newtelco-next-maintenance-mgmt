@@ -25,6 +25,11 @@ import { OutTable, ExcelRenderer } from 'react-excel-renderer'
 import ProtectedIcon from '../src/components/ag-grid/protected'
 import SentIcon from '../src/components/ag-grid/sent'
 import { AgGridReact } from 'ag-grid-react'
+import { Document, Page } from 'react-pdf'
+import { pdfjs } from 'react-pdf'
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`
+// import { Document, Page } from 'react-pdf/dist/entry.webpack'
+
 import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-material.css'
 
@@ -1409,7 +1414,8 @@ export default class Maintenance extends React.Component {
   //
   /// /////////////////////////////////////////////////////////
 
-  showAttachments (id) {
+  showAttachments (id, filename) {
+    // console.log(filename)
     function fixBase64 (binaryData) {
       var base64str = binaryData
       var binary = atob(base64str.replace(/\s/g, ''))
@@ -1424,29 +1430,57 @@ export default class Maintenance extends React.Component {
       return view
     }
     if (id !== null) {
-      const file = this.state.maintenance.incomingAttachments[id].data
+      // const fileExtRegex = new RegExp('/\.[0-9a-z]+$/')
       // const fileData = decodeURIComponent(escape(window.atob(this.state.maintenance.incomingAttachments[id].data)))
-      let base64 = (file).replace(/_/g, '/')
-      base64 = base64.replace(/-/g, '+')
-      const base64Fixed = fixBase64(base64)
-      var fileData = new Blob([base64Fixed], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;' })
+      let filetype = ''
+      const fileExt = filename.match(/\.[0-9a-z]+$/i)
+      // console.log(fileExt)
+      switch (fileExt[0]) {
+        case '.xls':
+          filetype = 'excel'
+          break
+        case '.pdf':
+          filetype = 'pdf'
+          break
+        case '.html':
+          filetype = 'html'
+          break
+      }
+      // console.log(filename, filetype)
+      const file = this.state.maintenance.incomingAttachments[id].data
+      if (filetype === 'excel') {
+        let base64 = (file).replace(/_/g, '/')
+        base64 = base64.replace(/-/g, '+')
+        const base64Fixed = fixBase64(base64)
+        var fileData = new Blob([base64Fixed], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;' })
 
-      ExcelRenderer(fileData, (err, resp) => {
-        if (err) {
-          console.log(err)
-        } else {
-          resp.cols.forEach(col => {
-            col.name = resp.rows[0][col.key]
-            col.key = col.key + 1
-          })
-          resp.cols.unshift({ key: 0, name: '' })
-          resp.rows.shift()
-          this.setState({
-            cols: resp.cols,
-            rows: resp.rows
-          })
-        }
-      })
+        ExcelRenderer(fileData, (err, resp) => {
+          if (err) {
+            console.log(err)
+          } else {
+            resp.cols.forEach(col => {
+              col.name = resp.rows[0][col.key]
+              col.key = col.key + 1
+            })
+            resp.cols.unshift({ key: 0, name: '' })
+            resp.rows.shift()
+            this.setState({
+              filetype: filetype,
+              cols: resp.cols,
+              rows: resp.rows
+            })
+          }
+        })
+      } else if (filetype === 'pdf') {
+        let base64 = (file).replace(/_/g, '/')
+        base64 = base64.replace(/-/g, '+')
+        const base64Fixed = fixBase64(base64)
+        this.setState({
+          filetype: filetype,
+          pdfid: id,
+          pdfB64: base64Fixed
+        })
+      }
     }
     this.setState({
       openAttachmentModal: !this.state.openAttachmentModal,
@@ -1947,7 +1981,7 @@ export default class Maintenance extends React.Component {
                           {Array.isArray(this.state.maintenance.incomingAttachments) && this.state.maintenance.incomingAttachments.length !== 0
                             ? this.state.maintenance.incomingAttachments.map((attachment, index) => {
                               return (
-                                <Button pill size='sm' onClick={() => this.showAttachments(attachment.id)} theme='primary' style={{ marginLeft: '10px' }} key={index}>
+                                <Button pill size='sm' onClick={() => this.showAttachments(attachment.id, attachment.name)} theme='primary' style={{ marginLeft: '10px' }} key={index}>
                                   {attachment.name}
                                 </Button>
                               )
@@ -2021,12 +2055,22 @@ export default class Maintenance extends React.Component {
                         </Button>
                       </ModalHeader>
                       <ModalBody>
-                        {this.state.rows && this.state.cols
+                        {this.state.filetype === 'excel'
+                        // this.state.rows && this.state.cols
                           ? (
                             <OutTable data={this.state.rows} columns={this.state.cols} tableClassName='ExcelTable2007' tableHeaderRowClass='heading' />
                           ) : (
                             null
                           )}
+                        {this.state.filetype === 'pdf'
+                          ? (
+                            <Document file={btoa(String.fromCharCode.apply(null, this.state.pdfB64))} >
+                              <Page pageNumber={1} />
+                            </Document>
+                          ) : (
+                            null
+                          )
+                        }
                       </ModalBody>
                       {/* {Array.isArray(this.state.incomingAttachments) && this.state.incomingAttachments.length !== 0
                         ? this.state.incomingAttachments.map((attachment, index) => {
