@@ -1400,12 +1400,13 @@ export default class Maintenance extends React.Component {
         let base64 = (file).replace(/_/g, '/')
         base64 = base64.replace(/-/g, '+')
         const base64Fixed = fixBase64(base64)
+        const pdfB64Url = `data:application/pdf;base64,${base64Fixed}`
         const fileData = new Blob([base64Fixed], { type: 'application/pdf' })
         const pdfUrl = URL.createObjectURL(fileData)
         this.setState({
           filetype: filetype,
           pdfid: id,
-          pdfB64: base64Fixed
+          pdfB64: fileData
         })
       }
     }
@@ -1522,44 +1523,328 @@ export default class Maintenance extends React.Component {
     let maintenanceIdDisplay
     if (maintenance.id === 'NEW') {
       maintenanceIdDisplay = maintenance.id
-    } else {
-      maintenanceIdDisplay = `NT-${maintenance.id}`
-    }
+      } else {
+        maintenanceIdDisplay = `NT-${maintenance.id}`
+      }
 
-    const keyMap = {
-      TOGGLE_READ: 'alt+r',
-      TOGGLE_HELP: 'shift+?'
-    }
+      const keyMap = {
+        TOGGLE_READ: 'alt+r',
+        TOGGLE_HELP: 'shift+?'
+      }
 
-    const handlers = {
-      TOGGLE_READ: this.toggleReadModal,
-      TOGGLE_HELP: this.toggleHelpModal
-    }
+      const handlers = {
+        TOGGLE_READ: this.toggleReadModal,
+        TOGGLE_HELP: this.toggleHelpModal
+      }
 
-    if (this.props.session.user) {
-      return (
-        <HotKeys keyMap={keyMap} handlers={handlers}>
-          <Layout unread={this.props.unread} session={this.props.session}>
-            <Helmet>
-              <title>{`Newtelco Maintenance - NT-${maintenance.id}`}</title>
-            </Helmet>
-            {UnreadCount()}
-            <Card style={{ maxWidth: '100%' }}>
-              <CardHeader>
-                <ButtonToolbar style={{ justifyContent: 'space-between' }}>
-                  <ButtonGroup size='md'>
-                    <Button onClick={() => Router.back()} outline>
-                      <FontAwesomeIcon icon={faArrowLeft} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
-                      Back
-                    </Button>
-                  </ButtonGroup>
-                  <span>
-                    <Badge theme='secondary' style={{ fontSize: '2rem', marginRight: '20px' }} outline>
-                      {maintenanceIdDisplay}
-                    </Badge>
-                    <h2 style={{ display: 'inline-block', marginBottom: '0px' }}>{maintenance.name}</h2>
-                  </span>
-                  {this.state.width > 500
+      let HALF_WIDTH = 500
+      if (typeof window !== 'undefined') {
+        HALF_WIDTH = this.state.width !== 0 ? this.state.width / 2 : 500
+      }
+
+
+      if (this.props.session.user) {
+        return (
+          <HotKeys keyMap={keyMap} handlers={handlers}>
+            <Layout unread={this.props.unread} session={this.props.session}>
+              <Helmet>
+                <title>{`Newtelco Maintenance - NT-${maintenance.id}`}</title>
+              </Helmet>
+              {UnreadCount()}
+              <Card style={{ maxWidth: '100%' }}>
+                <CardHeader>
+                  <ButtonToolbar style={{ justifyContent: 'space-between' }}>
+                    <ButtonGroup size='md'>
+                      <Button onClick={() => Router.back()} outline>
+                        <FontAwesomeIcon icon={faArrowLeft} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
+                        Back
+                      </Button>
+                    </ButtonGroup>
+                    <span>
+                      <Badge theme='secondary' style={{ fontSize: '2rem', marginRight: '20px' }} outline>
+                        {maintenanceIdDisplay}
+                      </Badge>
+                      <h2 style={{ display: 'inline-block', marginBottom: '0px' }}>{maintenance.name}</h2>
+                    </span>
+                    {this.state.width > 500
+                      ? (
+                        <ButtonGroup className='btn-group-2' size='md'>
+                          <Button onClick={this.toggleReadModal} outline>
+                            <FontAwesomeIcon icon={faEnvelopeOpenText} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
+                          Read
+                          </Button>
+                          <Button onClick={this.handleCalendarCreate} outline>
+                            <FontAwesomeIcon icon={faCalendarAlt} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
+                          Calendar
+                          </Button>
+                          {maintenance.id === 'NEW'
+                            ? (
+                              <Button className='create-btn' onClick={this.handleCreateOnClick}>
+                                <FontAwesomeIcon icon={faPlusCircle} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
+                            Create
+                              </Button>
+                            ) : (
+                              <Button className='send-bulk' theme='primary' onClick={this.handleSendAll}>
+                                <FontAwesomeIcon icon={faMailBulk} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
+                            Send All
+                              </Button>
+                            )}
+                        </ButtonGroup>
+                      ) : (
+                        <></>
+                      )}
+                  </ButtonToolbar>
+                </CardHeader>
+                <CardBody>
+                  <Container fluid>
+                    <Row style={{ height: '20px' }} />
+                    <Row>
+                      <Col sm='12' lg='6'>
+                        <Row>
+                          <Col>
+                            <Container className='maintenance-subcontainer'>
+                              <Row>
+                                <Col style={{ width: '30vw' }}>
+                                  <FormGroup>
+                                    <label htmlFor='edited-by'>Created By</label>
+                                    <FormInput tabIndex='-1' readOnly id='edited-by-input' name='edited-by' type='text' value={maintenance.bearbeitetvon} onChange={this.handleCreatedByChange} />
+                                  </FormGroup>
+                                  <FormGroup>
+                                    <label htmlFor='updated-by'>Last Updated By</label>
+                                    <FormInput readOnly id='updated-by' name='updated-by' type='text' value={maintenance.updatedBy} onChange={this.handleUpdatedByChange} />
+                                  </FormGroup>
+                                  <FormGroup>
+                                    <label htmlFor='supplier'>Timezone</label>
+                                    <TimezoneSelector
+                                      value={{ value: this.state.maintenance.timezone, label: this.state.maintenance.timezoneLabel }}
+                                      onChange={this.handleTimezoneChange}
+                                      onBlur={this.handleTimezoneBlur}
+                                    />
+                                  </FormGroup>
+                                  <FormGroup>
+                                    <label htmlFor='start-datetime'>Start Date/Time</label>
+                                    <Flatpickr
+                                      data-enable-time
+                                      options={{ time_24hr: 'true', allow_input: 'true' }}
+                                      className='flatpickr end-date-time'
+                                      value={maintenance.startDateTime || null}
+                                      onChange={date => this.handleStartDateChange(date)}
+                                      onClose={() => this.handleDateTimeBlur('start')}
+                                    />
+                                  </FormGroup>
+                                </Col>
+                                <Col style={{ width: '30vw' }}>
+                                  <FormGroup>
+                                    <label htmlFor='maileingang'>Mail Arrived</label>
+                                    <FormInput tabIndex='-1' readOnly id='maileingang-input' name='maileingang' type='text' value={convertDateTime(maintenance.maileingang)} />
+                                  </FormGroup>
+                                  <FormGroup>
+                                    <label htmlFor='updated-at'>Updated At</label>
+                                    <FormInput tabIndex='-1' readOnly id='updated-at' name='updated-at' type='text' value={convertDateTime(maintenance.updatedAt)} onChange={this.handleUpdatedAtChange} />
+                                  </FormGroup>
+                                  <FormGroup>
+                                    <label htmlFor='supplier'>Supplier</label>
+                                    <Select
+                                      value={{ label: this.state.maintenance.name, value: this.state.maintenance.lieferant }}
+                                      onChange={this.handleSupplierChange}
+                                      options={this.state.suppliers}
+                                      noOptionsMessage={() => 'No Suppliers'}
+                                      placeholder='Please select a Supplier'
+                                      onBlur={this.handleSupplierBlur}
+                                    />
+                                  </FormGroup>
+                                  <FormGroup>
+                                    <label htmlFor='end-datetime'>End Date/Time</label>
+                                    <Flatpickr
+                                      data-enable-time
+                                      options={{ time_24hr: 'true', allow_input: 'true' }}
+                                      className='flatpickr end-date-time'
+                                      style={this.state.dateTimeWarning ? { border: '2px solid #dc3545', boxShadow: '0 0 10px 1px #dc3545' } : null}
+                                      value={maintenance.endDateTime || null}
+                                      onChange={date => this.handleEndDateChange(date)}
+                                      onClose={() => this.handleDateTimeBlur('end')}
+                                    />
+                                  </FormGroup>
+                                </Col>
+                              </Row>
+                              <Row>
+                                <Col>
+                                  <FormGroup>
+                                    <label htmlFor='their-cid'>{maintenance.name} CID</label>
+                                    <Select
+                                      value={this.state.selectedLieferant || undefined}
+                                      onChange={this.handleSelectLieferantChange}
+                                      options={this.state.lieferantcids}
+                                      components={animatedComponents}
+                                      isMulti
+                                      noOptionsMessage={() => 'No CIDs for this Supplier'}
+                                      placeholder='Please select a CID'
+                                      onBlur={this.handleCIDBlur}
+                                    />
+                                  </FormGroup>
+                                </Col>
+                              </Row>
+                            </Container>
+                            <Container className='maintenance-subcontainer'>
+                              <Row>
+                                <Col>
+                                  <Row>
+                                    <Col>
+                                      <FormGroup>
+                                        <div className='impact-title-group'>
+                                          <label style={{ flexGrow: '1', margin: '10px' }} htmlFor='impact'>Impact</label>
+                                          <Tooltip
+                                            title='Use Protection Switch Text'
+                                            position='top'
+                                            theme='dark'
+                                            trigger='mouseenter'
+                                            delay='150'
+                                            arrow
+                                            animation='shift'
+                                          >
+                                            <Button id='protectionswitchtext' style={{ padding: '0.35em', marginRight: '10px', marginTop: '10px' }} onClick={this.handleProtectionSwitch} outline theme='secondary'>
+                                              <FontAwesomeIcon width='16px' icon={faRandom} />
+                                            </Button>
+                                          </Tooltip>
+                                          <Tooltip
+                                            title='Use Time Difference Text'
+                                            position='top'
+                                            theme='dark'
+                                            trigger='mouseenter'
+                                            delay='150'
+                                            arrow
+                                            animation='shift'
+                                          >
+                                            <Button id='impactplaceholdertext' style={{ padding: '0.35em', marginTop: '10px' }} onClick={this.useImpactPlaceholder} outline theme='secondary'>
+                                              <FontAwesomeIcon width='16px' icon={faHistory} />
+                                            </Button>
+                                          </Tooltip>
+                                        </div>
+                                        <FormInput onBlur={() => this.handleTextInputBlur('impact')} id='impact' name='impact' type='text' onChange={this.handleImpactChange} placeholder={this.state.impactPlaceholder} value={maintenance.impact || ''} />
+                                      </FormGroup>
+                                    </Col>
+                                    <Col>
+                                      <FormGroup>
+                                        <label htmlFor='location'>Location</label>
+                                        <FormInput onBlur={() => this.handleTextInputBlur('location')} id='location' name='location' type='text' onChange={this.handleLocationChange} value={maintenance.location || ''} />
+                                      </FormGroup>
+                                    </Col>
+                                  </Row>
+                                  <FormGroup>
+                                    <label htmlFor='reason'>Reason</label>
+                                    <FormTextarea id='reason' name='reason' onBlur={() => this.handleTextInputBlur('reason')} onChange={this.handleReasonChange} type='text' value={maintenance.reason || ''} />
+                                  </FormGroup>
+                                </Col>
+                              </Row>
+                            </Container>
+                            <Container style={{ paddingTop: '20px' }} className='maintenance-subcontainer'>
+                              <Row>
+                                <Col>
+                                  <FormGroup className='form-group-toggle'>
+                                    <Badge theme='light' outline>
+                                      <label>
+                                        <Toggle
+                                          checked={maintenance.cancelled === 'false' ? false : !!maintenance.cancelled}
+                                          onChange={(event) => this.handleToggleChange('cancelled', event)}
+                                        />
+                                        <div style={{ marginTop: '10px' }}>Cancelled</div>
+                                      </label>
+                                    </Badge>
+                                    <Badge theme='light' outline>
+                                      <label>
+                                        <Toggle
+                                          icons={{
+                                            checked: <FontAwesomeIcon icon={faFirstAid} width='1em' style={{ color: '#fff' }} />,
+                                            unchecked: null
+                                          }}
+                                          checked={maintenance.emergency === 'false' ? false : !!maintenance.emergency}
+                                          onChange={(event) => this.handleToggleChange('emergency', event)}
+                                        />
+                                        <div style={{ marginTop: '10px' }}>Emergency</div>
+                                      </label>
+                                    </Badge>
+                                    <Badge theme='secondary' outline>
+                                      <label>
+                                        <Toggle
+                                          checked={maintenance.done === 'false' ? false : !!maintenance.done}
+                                          onChange={(event) => this.handleToggleChange('done', event)}
+                                        />
+                                        <div style={{ marginTop: '10px' }}>Done</div>
+                                      </label>
+                                    </Badge>
+                                  </FormGroup>
+                                </Col>
+                              </Row>
+                            </Container>
+                            <Container className='maintenance-subcontainer'>
+                              <Row>
+                                <Col>
+                                  <FormGroup>
+                                    <label htmlFor='notes'>Notes</label>
+                                    <TinyEditor
+                                      initialValue={this.state.notesText}
+                                      apiKey='ttv2x1is9joc0fi7v6f6rzi0u98w2mpehx53mnc1277omr7s'
+                                      onBlur={this.handleNotesBlur}
+                                      init={{
+                                        height: 300,
+                                        menubar: false,
+                                        statusbar: false,
+                                        plugins: [
+                                          'advlist autolink lists link image print preview anchor',
+                                          'searchreplace code',
+                                          'insertdatetime table paste code help wordcount'
+                                        ],
+                                        toolbar:
+                                          `undo redo | formatselect | bold italic backcolor | 
+                                          alignleft aligncenter alignright alignjustify | 
+                                          bullist numlist outdent indent | removeformat | help`
+                                      }}
+                                      onChange={this.handleNotesChange}
+                                    />
+                                  </FormGroup>
+                                </Col>
+                              </Row>
+                            </Container>
+                          </Col>
+                        </Row>
+                      </Col>
+                      <Col sm='12' lg='6'>
+                        <Row>
+                          <Col>
+                            <Container style={{ padding: '20px' }} className='maintenance-subcontainer'>
+                              <Row>
+                                <Col style={{ width: '100%', height: '600px' }}>
+                                  <div
+                                    className='ag-theme-material'
+                                    style={{
+                                      height: '100%',
+                                      width: '100%'
+                                    }}
+                                  >
+                                    <AgGridReact
+                                      gridOptions={this.state.gridOptions}
+                                      rowData={this.state.kundencids}
+                                      onGridReady={params => this.gridApi = params.api}
+                                      pagination
+                                      // batchUpdateWaitMillis={50}
+                                      deltaRowDataMode
+                                      getRowNodeId={(data) => {
+                                        return data.kundenCID
+                                      }}
+                                      onFirstDataRendered={this.onFirstDataRendered.bind(this)}
+                                    />
+                                  </div>
+                                </Col>
+                              </Row>
+                            </Container>
+                          </Col>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Container>
+                </CardBody>
+                <CardFooter className='card-footer'>
+                  {this.state.width < 500
                     ? (
                       <ButtonGroup className='btn-group-2' size='md'>
                         <Button onClick={this.toggleReadModal} outline>
@@ -1570,799 +1855,521 @@ export default class Maintenance extends React.Component {
                           <FontAwesomeIcon icon={faCalendarAlt} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
                         Calendar
                         </Button>
-                        {maintenance.id === 'NEW'
-                          ? (
-                            <Button className='create-btn' onClick={this.handleCreateOnClick}>
-                              <FontAwesomeIcon icon={faPlusCircle} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
-                          Create
-                            </Button>
-                          ) : (
-                            <Button className='send-bulk' theme='primary' onClick={this.handleSendAll}>
-                              <FontAwesomeIcon icon={faMailBulk} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
-                          Send All
-                            </Button>
-                          )}
+                        <Button disabled={maintenance.id !== 'NEW'} className='create-btn' onClick={this.handleCreateOnClick}>
+                          <FontAwesomeIcon icon={faPlusCircle} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
+                        Create
+                        </Button>
                       </ButtonGroup>
                     ) : (
-                      <></>
+                      <span />
                     )}
-                </ButtonToolbar>
-              </CardHeader>
-              <CardBody>
-                <Container fluid>
-                  <Row style={{ height: '20px' }} />
-                  <Row>
-                    <Col sm='12' lg='6'>
-                      <Row>
-                        <Col>
-                          <Container className='maintenance-subcontainer'>
-                            <Row>
-                              <Col style={{ width: '30vw' }}>
-                                <FormGroup>
-                                  <label htmlFor='edited-by'>Created By</label>
-                                  <FormInput tabIndex='-1' readOnly id='edited-by-input' name='edited-by' type='text' value={maintenance.bearbeitetvon} onChange={this.handleCreatedByChange} />
-                                </FormGroup>
-                                <FormGroup>
-                                  <label htmlFor='updated-by'>Last Updated By</label>
-                                  <FormInput readOnly id='updated-by' name='updated-by' type='text' value={maintenance.updatedBy} onChange={this.handleUpdatedByChange} />
-                                </FormGroup>
-                                <FormGroup>
-                                  <label htmlFor='supplier'>Timezone</label>
-                                  <TimezoneSelector
-                                    value={{ value: this.state.maintenance.timezone, label: this.state.maintenance.timezoneLabel }}
-                                    onChange={this.handleTimezoneChange}
-                                    onBlur={this.handleTimezoneBlur}
-                                  />
-                                </FormGroup>
-                                <FormGroup>
-                                  <label htmlFor='start-datetime'>Start Date/Time</label>
-                                  <Flatpickr
-                                    data-enable-time
-                                    options={{ time_24hr: 'true', allow_input: 'true' }}
-                                    className='flatpickr end-date-time'
-                                    value={maintenance.startDateTime || null}
-                                    onChange={date => this.handleStartDateChange(date)}
-                                    onClose={() => this.handleDateTimeBlur('start')}
-                                  />
-                                </FormGroup>
-                              </Col>
-                              <Col style={{ width: '30vw' }}>
-                                <FormGroup>
-                                  <label htmlFor='maileingang'>Mail Arrived</label>
-                                  <FormInput tabIndex='-1' readOnly id='maileingang-input' name='maileingang' type='text' value={convertDateTime(maintenance.maileingang)} />
-                                </FormGroup>
-                                <FormGroup>
-                                  <label htmlFor='updated-at'>Updated At</label>
-                                  <FormInput tabIndex='-1' readOnly id='updated-at' name='updated-at' type='text' value={convertDateTime(maintenance.updatedAt)} onChange={this.handleUpdatedAtChange} />
-                                </FormGroup>
-                                <FormGroup>
-                                  <label htmlFor='supplier'>Supplier</label>
-                                  <Select
-                                    value={{ label: this.state.maintenance.name, value: this.state.maintenance.lieferant }}
-                                    onChange={this.handleSupplierChange}
-                                    options={this.state.suppliers}
-                                    noOptionsMessage={() => 'No Suppliers'}
-                                    placeholder='Please select a Supplier'
-                                    onBlur={this.handleSupplierBlur}
-                                  />
-                                </FormGroup>
-                                <FormGroup>
-                                  <label htmlFor='end-datetime'>End Date/Time</label>
-                                  <Flatpickr
-                                    data-enable-time
-                                    options={{ time_24hr: 'true', allow_input: 'true' }}
-                                    className='flatpickr end-date-time'
-                                    style={this.state.dateTimeWarning ? { border: '2px solid #dc3545', boxShadow: '0 0 10px 1px #dc3545' } : null}
-                                    value={maintenance.endDateTime || null}
-                                    onChange={date => this.handleEndDateChange(date)}
-                                    onClose={() => this.handleDateTimeBlur('end')}
-                                  />
-                                </FormGroup>
-                              </Col>
-                            </Row>
-                            <Row>
-                              <Col>
-                                <FormGroup>
-                                  <label htmlFor='their-cid'>{maintenance.name} CID</label>
-                                  <Select
-                                    value={this.state.selectedLieferant || undefined}
-                                    onChange={this.handleSelectLieferantChange}
-                                    options={this.state.lieferantcids}
-                                    components={animatedComponents}
-                                    isMulti
-                                    noOptionsMessage={() => 'No CIDs for this Supplier'}
-                                    placeholder='Please select a CID'
-                                    onBlur={this.handleCIDBlur}
-                                  />
-                                </FormGroup>
-                              </Col>
-                            </Row>
-                          </Container>
-                          <Container className='maintenance-subcontainer'>
-                            <Row>
-                              <Col>
-                                <Row>
-                                  <Col>
-                                    <FormGroup>
-                                      <div className='impact-title-group'>
-                                        <label style={{ flexGrow: '1', margin: '10px' }} htmlFor='impact'>Impact</label>
-                                        <Tooltip
-                                          title='Use Protection Switch Text'
-                                          position='top'
-                                          theme='dark'
-                                          trigger='mouseenter'
-                                          delay='150'
-                                          arrow
-                                          animation='shift'
-                                        >
-                                          <Button id='protectionswitchtext' style={{ padding: '0.35em', marginRight: '10px', marginTop: '10px' }} onClick={this.handleProtectionSwitch} outline theme='secondary'>
-                                            <FontAwesomeIcon width='16px' icon={faRandom} />
-                                          </Button>
-                                        </Tooltip>
-                                        <Tooltip
-                                          title='Use Time Difference Text'
-                                          position='top'
-                                          theme='dark'
-                                          trigger='mouseenter'
-                                          delay='150'
-                                          arrow
-                                          animation='shift'
-                                        >
-                                          <Button id='impactplaceholdertext' style={{ padding: '0.35em', marginTop: '10px' }} onClick={this.useImpactPlaceholder} outline theme='secondary'>
-                                            <FontAwesomeIcon width='16px' icon={faHistory} />
-                                          </Button>
-                                        </Tooltip>
-                                      </div>
-                                      <FormInput onBlur={() => this.handleTextInputBlur('impact')} id='impact' name='impact' type='text' onChange={this.handleImpactChange} placeholder={this.state.impactPlaceholder} value={maintenance.impact || ''} />
-                                    </FormGroup>
-                                  </Col>
-                                  <Col>
-                                    <FormGroup>
-                                      <label htmlFor='location'>Location</label>
-                                      <FormInput onBlur={() => this.handleTextInputBlur('location')} id='location' name='location' type='text' onChange={this.handleLocationChange} value={maintenance.location || ''} />
-                                    </FormGroup>
-                                  </Col>
-                                </Row>
-                                <FormGroup>
-                                  <label htmlFor='reason'>Reason</label>
-                                  <FormTextarea id='reason' name='reason' onBlur={() => this.handleTextInputBlur('reason')} onChange={this.handleReasonChange} type='text' value={maintenance.reason || ''} />
-                                </FormGroup>
-                              </Col>
-                            </Row>
-                          </Container>
-                          <Container style={{ paddingTop: '20px' }} className='maintenance-subcontainer'>
-                            <Row>
-                              <Col>
-                                <FormGroup className='form-group-toggle'>
-                                  <Badge theme='light' outline>
-                                    <label>
-                                      <Toggle
-                                        checked={maintenance.cancelled === 'false' ? false : !!maintenance.cancelled}
-                                        onChange={(event) => this.handleToggleChange('cancelled', event)}
-                                      />
-                                      <div style={{ marginTop: '10px' }}>Cancelled</div>
-                                    </label>
-                                  </Badge>
-                                  <Badge theme='light' outline>
-                                    <label>
-                                      <Toggle
-                                        icons={{
-                                          checked: <FontAwesomeIcon icon={faFirstAid} width='1em' style={{ color: '#fff' }} />,
-                                          unchecked: null
-                                        }}
-                                        checked={maintenance.emergency === 'false' ? false : !!maintenance.emergency}
-                                        onChange={(event) => this.handleToggleChange('emergency', event)}
-                                      />
-                                      <div style={{ marginTop: '10px' }}>Emergency</div>
-                                    </label>
-                                  </Badge>
-                                  <Badge theme='secondary' outline>
-                                    <label>
-                                      <Toggle
-                                        checked={maintenance.done === 'false' ? false : !!maintenance.done}
-                                        onChange={(event) => this.handleToggleChange('done', event)}
-                                      />
-                                      <div style={{ marginTop: '10px' }}>Done</div>
-                                    </label>
-                                  </Badge>
-                                </FormGroup>
-                              </Col>
-                            </Row>
-                          </Container>
-                          <Container className='maintenance-subcontainer'>
-                            <Row>
-                              <Col>
-                                <FormGroup>
-                                  <label htmlFor='notes'>Notes</label>
-                                  <TinyEditor
-                                    initialValue={this.state.notesText}
-                                    apiKey='ttv2x1is9joc0fi7v6f6rzi0u98w2mpehx53mnc1277omr7s'
-                                    onBlur={this.handleNotesBlur}
-                                    init={{
-                                      height: 300,
-                                      menubar: false,
-                                      statusbar: false,
-                                      plugins: [
-                                        'advlist autolink lists link image print preview anchor',
-                                        'searchreplace code',
-                                        'insertdatetime table paste code help wordcount'
-                                      ],
-                                      toolbar:
-                                        `undo redo | formatselect | bold italic backcolor | 
-                                        alignleft aligncenter alignright alignjustify | 
-                                        bullist numlist outdent indent | removeformat | help`
-                                    }}
-                                    onChange={this.handleNotesChange}
-                                  />
-                                </FormGroup>
-                              </Col>
-                            </Row>
-                          </Container>
-                        </Col>
-                      </Row>
-                    </Col>
-                    <Col sm='12' lg='6'>
-                      <Row>
-                        <Col>
-                          <Container style={{ padding: '20px' }} className='maintenance-subcontainer'>
-                            <Row>
-                              <Col style={{ width: '100%', height: '600px' }}>
-                                <div
-                                  className='ag-theme-material'
-                                  style={{
-                                    height: '100%',
-                                    width: '100%'
-                                  }}
-                                >
-                                  <AgGridReact
-                                    gridOptions={this.state.gridOptions}
-                                    rowData={this.state.kundencids}
-                                    onGridReady={params => this.gridApi = params.api}
-                                    pagination
-                                    // batchUpdateWaitMillis={50}
-                                    deltaRowDataMode
-                                    getRowNodeId={(data) => {
-                                      return data.kundenCID
-                                    }}
-                                    onFirstDataRendered={this.onFirstDataRendered.bind(this)}
-                                  />
-                                </div>
-                              </Col>
-                            </Row>
-                          </Container>
-                        </Col>
-                      </Row>
-                    </Col>
-                  </Row>
-                </Container>
-              </CardBody>
-              <CardFooter className='card-footer'>
-                {this.state.width < 500
+                </CardFooter>
+                {typeof window !== 'undefined'
                   ? (
-                    <ButtonGroup className='btn-group-2' size='md'>
-                      <Button onClick={this.toggleReadModal} outline>
-                        <FontAwesomeIcon icon={faEnvelopeOpenText} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
-                      Read
-                      </Button>
-                      <Button onClick={this.handleCalendarCreate} outline>
-                        <FontAwesomeIcon icon={faCalendarAlt} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
-                      Calendar
-                      </Button>
-                      <Button disabled={maintenance.id !== 'NEW'} className='create-btn' onClick={this.handleCreateOnClick}>
-                        <FontAwesomeIcon icon={faPlusCircle} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
-                      Create
-                      </Button>
-                    </ButtonGroup>
-                  ) : (
-                    <span />
-                  )}
-              </CardFooter>
-              {typeof window !== 'undefined'
-                ? (
-                  <Rnd
-                    default={{
-                      x: 900,
-                      y: 25,
-                      width: 800,
-                      height: 600
-                    }}
-                    style={{
-                      visibility: openReadModal ? 'visible' : 'hidden',
-                      opacity: openReadModal ? 1 : 0,
-                      background: '#fff',
-                      overflow: 'hidden',
-                      borderRadius: '15px',
-                      height: 'auto',
-                      zIndex: '101',
-                      boxShadow: '0px 0px 20px 1px var(--dark)'
-                    }}
-                    minWidth={500}
-                    minHeight={590}
-                    bounds='window'
-                    dragHandleClassName='modal-incoming-header-text'
-                    onResize={(e, direction, ref, delta, position) => {
-                      this.setState({
-                        readHeight: ref.style.height,
-                        readWidth: ref.style.width
-                      })
-                    }}
-                  >
-                    <div style={{ borderRadius: '15px', position: 'relative' }}>
-                      <ModalHeader style={{
-                        background: 'var(--secondary)',
-                        borderRadius: '0px'
+                    <Rnd
+                      default={{
+                        x: HALF_WIDTH,
+                        y: 25,
+                        width: HALF_WIDTH,
+                        height: 600
                       }}
-                      >
-                        <img className='mail-icon' src={this.state.readIconUrl} />
-                        <div className='modal-incoming-header-text'>
-                          <h5 className='modal-incoming-from' style={{ marginBottom: '0px' }}>
-                            {this.state.maintenance.incomingFrom}
-                          </h5>
-                          <small className='modal-incoming-subject'>
-                            {this.state.maintenance.incomingSubject}
-                          </small>
-                          <br />
-                          <small className='modal-incoming-datetime'>
-                            {this.state.maintenance.incomingDate}
-                          </small>
-                          {Array.isArray(this.state.maintenance.incomingAttachments) && this.state.maintenance.incomingAttachments.length !== 0
-                            ? this.state.maintenance.incomingAttachments.map((attachment, index) => {
-                              return (
-                                <Button pill size='sm' onClick={() => this.showAttachments(attachment.id, attachment.name)} theme='primary' style={{ marginLeft: '10px' }} key={index}>
-                                  {attachment.name}
-                                </Button>
-                              )
-                            })
-                            : (
-                              null
-                            )}
-                        </div>
-                        <ButtonGroup style={{ display: 'flex', flexDirection: 'column' }}>
-                          <Button outline className='close-read-modal-btn' theme='light' style={{ borderRadius: '5px 5px 0 0', padding: '0.7em 0.9em' }} onClick={this.toggleReadModal}>
+                      style={{
+                        visibility: openReadModal ? 'visible' : 'hidden',
+                        opacity: openReadModal ? 1 : 0,
+                        background: '#fff',
+                        overflow: 'hidden',
+                        borderRadius: '15px',
+                        height: 'auto',
+                        zIndex: '101',
+                        boxShadow: '0px 0px 20px 1px var(--dark)'
+                      }}
+                      minWidth={700}
+                      minHeight={590}
+                      bounds='window'
+                      dragHandleClassName='modal-incoming-header-text'
+                      onResize={(e, direction, ref, delta, position) => {
+                        this.setState({
+                          readHeight: ref.style.height,
+                          readWidth: ref.style.width
+                        })
+                      }}
+                    >
+                      <div style={{ borderRadius: '15px', position: 'relative' }}>
+                        <ModalHeader style={{
+                          background: 'var(--secondary)',
+                          borderRadius: '0px'
+                        }}
+                        >
+                          <img className='mail-icon' src={this.state.readIconUrl} />
+                          <div className='modal-incoming-header-text'>
+                            <h5 className='modal-incoming-from' style={{ marginBottom: '0px' }}>
+                              {this.state.maintenance.incomingFrom}
+                            </h5>
+                            <small className='modal-incoming-subject'>
+                              {this.state.maintenance.incomingSubject}
+                            </small>
+                            <br />
+                            <small className='modal-incoming-datetime'>
+                              {this.state.maintenance.incomingDate}
+                            </small>
+                            {Array.isArray(this.state.maintenance.incomingAttachments) && this.state.maintenance.incomingAttachments.length !== 0
+                              ? this.state.maintenance.incomingAttachments.map((attachment, index) => {
+                                return (
+                                  <Button pill size='sm' onClick={() => this.showAttachments(attachment.id, attachment.name)} theme='primary' style={{ marginLeft: '10px' }} key={index}>
+                                    {attachment.name}
+                                  </Button>
+                                )
+                              })
+                              : (
+                                null
+                              )}
+                          </div>
+                          <ButtonGroup style={{ display: 'flex', flexDirection: 'column' }}>
+                            <Button outline className='close-read-modal-btn' theme='light' style={{ borderRadius: '5px 5px 0 0', padding: '0.7em 0.9em' }} onClick={this.toggleReadModal}>
+                              <FontAwesomeIcon
+                                className='close-read-modal-icon' width='1.5em' style={{ color: 'var(--light)', fontSize: '12px' }}
+                                icon={faTimesCircle}
+                              />
+                            </Button>
+                            {/* <Button theme='light' style={{ borderRadius: '0', padding: '0.7em 0.9em' }} onClick={this.showAttachments}>
+                              <FontAwesomeIcon width='1.2em' style={{ fontSize: '12px' }} className='translate-icon' icon={faFileExcel} />
+                            </Button> */}
+                            <Button theme='light' style={{ borderRadius: '0 0 5px 5px', padding: '0.7em 0.9em' }} onClick={this.handleTranslate.bind(this)}>
+                              <FontAwesomeIcon width='1.8em' style={{ fontSize: '12px' }} className='translate-icon' icon={faLanguage} />
+                            </Button>
+                          </ButtonGroup>
+                        </ModalHeader>
+                        <ModalBody className='mail-body' dangerouslySetInnerHTML={{ __html: this.state.translated ? this.state.translatedBody : this.state.maintenance.incomingBody }} />
+                      </div>
+                    </Rnd>
+                  ) : (
+                    <></>
+                  )}
+                {typeof window !== 'undefined'
+                  ? (
+                    <Rnd
+                      default={{
+                        x: HALF_WIDTH,
+                        y: 125,
+                        width: 500,
+                        height: 200
+                      }}
+                      style={{
+                        visibility: this.state.openAttachmentModal ? 'visible' : 'hidden',
+                        opacity: this.state.openAttachmentModal ? 1 : 0,
+                        background: '#fff',
+                        overflow: 'hidden',
+                        borderRadius: '15px',
+                        height: 'auto',
+                        zIndex: '101',
+                        boxShadow: '0px 0px 20px 1px var(--dark)'
+                      }}
+                      minWidth={500}
+                      minHeight={400}
+                      bounds='window'
+                      dragHandleClassName='modal-attachment-header-text'
+                    >
+                      <div style={{ borderRadius: '15px', position: 'relative' }}>
+                        <ModalHeader
+                          className='modal-attachment-header-text'
+                          style={{
+                            background: 'var(--secondary)',
+                            borderRadius: '0px',
+                            color: '#fff',
+                            display: 'flex',
+                            justifyContent: 'space-between'
+                          }}
+                        >
+                          Attachments
+                          <Button outline className='close-attachment-modal-btn' theme='light' style={{ borderRadius: '5px', padding: '0.7em 0.9em' }} onClick={() => this.showAttachments(null)}>
                             <FontAwesomeIcon
-                              className='close-read-modal-icon' width='1.5em' style={{ color: 'var(--light)', fontSize: '12px' }}
+                              className='close-attachment-modal-icon' width='1.5em' style={{ color: 'var(--light)', fontSize: '12px' }}
                               icon={faTimesCircle}
                             />
                           </Button>
-                          {/* <Button theme='light' style={{ borderRadius: '0', padding: '0.7em 0.9em' }} onClick={this.showAttachments}>
-                            <FontAwesomeIcon width='1.2em' style={{ fontSize: '12px' }} className='translate-icon' icon={faFileExcel} />
-                          </Button> */}
-                          <Button theme='light' style={{ borderRadius: '0 0 5px 5px', padding: '0.7em 0.9em' }} onClick={this.handleTranslate.bind(this)}>
-                            <FontAwesomeIcon width='1.8em' style={{ fontSize: '12px' }} className='translate-icon' icon={faLanguage} />
-                          </Button>
-                        </ButtonGroup>
-                      </ModalHeader>
-                      <ModalBody className='mail-body' dangerouslySetInnerHTML={{ __html: this.state.translated ? this.state.translatedBody : this.state.maintenance.incomingBody }} />
-                    </div>
-                  </Rnd>
-                ) : (
-                  <></>
-                )}
-              {typeof window !== 'undefined'
-                ? (
-                  <Rnd
-                    default={{
-                      x: 1000,
-                      y: 125,
-                      width: 500,
-                      height: 200
-                    }}
-                    style={{
-                      visibility: this.state.openAttachmentModal ? 'visible' : 'hidden',
-                      opacity: this.state.openAttachmentModal ? 1 : 0,
-                      background: '#fff',
-                      overflow: 'hidden',
-                      borderRadius: '15px',
-                      height: 'auto',
-                      zIndex: '101',
-                      boxShadow: '0px 0px 20px 1px var(--dark)'
-                    }}
-                    minWidth={500}
-                    minHeight={400}
-                    bounds='window'
-                    dragHandleClassName='modal-attachment-header-text'
-                  >
-                    <div style={{ borderRadius: '15px', position: 'relative' }}>
-                      <ModalHeader
-                        className='modal-attachment-header-text'
-                        style={{
-                          background: 'var(--secondary)',
-                          borderRadius: '0px',
-                          color: '#fff',
-                          display: 'flex',
-                          justifyContent: 'space-between'
-                        }}
-                      >
-                        Attachments
-                        <Button outline className='close-attachment-modal-btn' theme='light' style={{ borderRadius: '5px', padding: '0.7em 0.9em' }} onClick={() => this.showAttachments(null)}>
-                          <FontAwesomeIcon
-                            className='close-attachment-modal-icon' width='1.5em' style={{ color: 'var(--light)', fontSize: '12px' }}
-                            icon={faTimesCircle}
-                          />
-                        </Button>
-                      </ModalHeader>
-                      <ModalBody>
-                        {this.state.filetype === 'excel'
-                        // this.state.rows && this.state.cols
-                          ? (
-                            <OutTable data={this.state.rows} columns={this.state.cols} tableClassName='ExcelTable2007' tableHeaderRowClass='heading' />
-                          ) : (
+                        </ModalHeader>
+                        <ModalBody>
+                          {this.state.filetype === 'excel'
+                          // this.state.rows && this.state.cols
+                            ? (
+                              <OutTable data={this.state.rows} columns={this.state.cols} tableClassName='ExcelTable2007' tableHeaderRowClass='heading' />
+                            ) : (
+                              null
+                            )}
+                          {this.state.filetype === 'pdf'
+                            ? (
+                              <PDF file={{ data: this.state.pdfB64 }} scale={1.5} />
+                              // <Document file={ this.state.pdfB64 }>
+                              //   <Page pageNumber={1} />
+                              // </Document>
+                            ) : (
+                              null
+                            )}
+                        </ModalBody>
+                        {/* {Array.isArray(this.state.incomingAttachments) && this.state.incomingAttachments.length !== 0
+                          ? this.state.incomingAttachments.map((attachment, index) => {
+                            return <Badge key={index} theme='primary'>{attachment.name}</Badge>
+                          })
+                          : (
                             null
-                          )}
-                        {this.state.filetype === 'pdf'
-                          ? (
-                            // <PDF file={{ data: this.state.pdfB64 }} scale={1.5} />
-                            <Document file={{ range: this.state.pdfB64 }}>
-                              <Page pageNumber={1} />
-                            </Document>
-                          ) : (
-                            null
-                          )}
-                      </ModalBody>
-                      {/* {Array.isArray(this.state.incomingAttachments) && this.state.incomingAttachments.length !== 0
-                        ? this.state.incomingAttachments.map((attachment, index) => {
-                          return <Badge key={index} theme='primary'>{attachment.name}</Badge>
-                        })
-                        : (
-                          null
-                        )} */}
+                          )} */}
+                      </div>
+                    </Rnd>
+                  ) : (
+                    <></>
+                  )}
+                <Modal backdropClassName='modal-backdrop' animation backdrop size='lg' open={openPreviewModal} toggle={this.togglePreviewModal}>
+                  <ModalHeader>
+                    <div className='modal-preview-text-wrapper'>
+                      <div className='modal-preview-to-text'>
+                        <b style={{ fontWeight: '900' }}>To:</b> {this.state.mailPreviewHeaderText}
+                      </div>
+                      <div className='modal-preview-to-text'>
+                        <b style={{ fontWeight: '900' }}>Cc:</b> service@newtelco.de
+                      </div>
+                      <div className='modal-preview-Subject-text'>
+                        <b style={{ fontWeight: '900' }}>Subject: </b>{this.state.maintenance.emergency ? `[EMERGENCY] ${this.state.mailPreviewSubjectText}` : `${this.state.mailPreviewSubjectText}`}
+                      </div>
                     </div>
-                  </Rnd>
-                ) : (
-                  <></>
-                )}
-              <Modal backdropClassName='modal-backdrop' animation backdrop size='lg' open={openPreviewModal} toggle={this.togglePreviewModal}>
-                <ModalHeader>
-                  <div className='modal-preview-text-wrapper'>
-                    <div className='modal-preview-to-text'>
-                      <b style={{ fontWeight: '900' }}>To:</b> {this.state.mailPreviewHeaderText}
-                    </div>
-                    <div className='modal-preview-to-text'>
-                      <b style={{ fontWeight: '900' }}>Cc:</b> service@newtelco.de
-                    </div>
-                    <div className='modal-preview-Subject-text'>
-                      <b style={{ fontWeight: '900' }}>Subject: </b>{this.state.maintenance.emergency ? `[EMERGENCY] ${this.state.mailPreviewSubjectText}` : `${this.state.mailPreviewSubjectText}`}
-                    </div>
-                  </div>
-                  <Button id='send-mail-btn' style={{ padding: '0.9em 1.1em' }} onClick={() => this.sendMail(this.state.mailPreviewHeaderText, this.state.mailPreviewCustomerCid, this.state.mailPreviewSubjectText, this.state.mailBodyText, true)}>
-                    <FontAwesomeIcon width='1.5em' style={{ fontSize: '12px' }} className='modal-preview-send-icon' icon={faPaperPlane} />
-                  </Button>
-                </ModalHeader>
-                <ModalBody>
-                  <TinyEditor
-                    initialValue={this.state.mailBodyText}
-                    apiKey='ttv2x1is9joc0fi7v6f6rzi0u98w2mpehx53mnc1277omr7s'
-                    init={{
-                      height: 500,
-                      menubar: false,
-                      statusbar: false,
-                      plugins: [
-                        'advlist autolink lists link image print preview anchor',
-                        'searchreplace code',
-                        'insertdatetime table paste code help wordcount'
-                      ],
-                      toolbar:
-                        `undo redo | formatselect | bold italic backcolor | 
-                        alignleft aligncenter alignright alignjustify | 
-                        bullist numlist outdent indent | removeformat | help`
-                    }}
-                    onChange={this.handleEditorChange}
-                  />
+                    <Button id='send-mail-btn' style={{ padding: '0.9em 1.1em' }} onClick={() => this.sendMail(this.state.mailPreviewHeaderText, this.state.mailPreviewCustomerCid, this.state.mailPreviewSubjectText, this.state.mailBodyText, true)}>
+                      <FontAwesomeIcon width='1.5em' style={{ fontSize: '12px' }} className='modal-preview-send-icon' icon={faPaperPlane} />
+                    </Button>
+                  </ModalHeader>
+                  <ModalBody>
+                    <TinyEditor
+                      initialValue={this.state.mailBodyText}
+                      apiKey='ttv2x1is9joc0fi7v6f6rzi0u98w2mpehx53mnc1277omr7s'
+                      init={{
+                        height: 500,
+                        menubar: false,
+                        statusbar: false,
+                        plugins: [
+                          'advlist autolink lists link image print preview anchor',
+                          'searchreplace code',
+                          'insertdatetime table paste code help wordcount'
+                        ],
+                        toolbar:
+                          `undo redo | formatselect | bold italic backcolor | 
+                          alignleft aligncenter alignright alignjustify | 
+                          bullist numlist outdent indent | removeformat | help`
+                      }}
+                      onChange={this.handleEditorChange}
+                    />
 
-                </ModalBody>
-              </Modal>
-            </Card>
-            <style jsx>{`
-              :global(.ExcelTable2007) {
-                border: 1px solid #ddd;
-                border-collapse: collapse;
-              }
-              :global(.ExcelTable2007 td, th) {
-                white-space: nowrap;
-                border: 1px solid #ddd;
-                padding: 20px;
-              }
-              :global(.ExcelTable2007 th) {
-                background-color: #eee;
-                position: sticky;
-                top: -1px;
-                z-index: 2;
-              }
-              :global(.ExcelTable2007 th:first-of-type) {
-                left: 0;
-                z-index: 3;
-              }
-              :global(.ExcelTable2007 > tbody > tr > td:first-of-type) {
-                background-color: #eee;
-                position: sticky;
-                left: -1px;
-                z-index: 1;
-              }
-              :global(.react-draggable) {
-                transition: visibility 200ms linear, opacity 200ms linear;
-              }
-              :global(div[class$="-singleValue"]) {
-                font-size: 0.95rem;
-                color: #495057;
-              }
-              :global(.form-group > label) {
-                margin: 10px !important;
-              }
-              :global(.form-group) {
-                margin-bottom: 0px !important;
-              }
-              :global(.container) {
-                padding: 15px;
-              }
-              .mail-icon {
-                min-width: 96px;
-                height: 96px;
-                border: 2px solid var(--light);
-                background: #fff;
-                padding: 10px;
-                border-radius: 5px;
-                margin-right: 10px;
-              }
-              :global(.MuiFormControl-root) {
-                width: 100%;
-              }
-              :global(.MuiInputBase-root) {
-                color: #495057;
-              }
-              :global(.MuiInputBase-root:hover) {
-                border-color: #8fa4b8 !important;
-              }
-              :global(.MuiOutlinedInput-input) {
-                padding: 10.5px 14px;
-                transition: box-shadow 250ms cubic-bezier(.27,.01,.38,1.06),border 250ms cubic-bezier(.27,.01,.38,1.06);
-              }
-              :global(.Mui-focused) {
-                border: none !important;
-              }
-              :global(.MuiInputBase-root:focus-within) {
-                color: #495057;
-                background-color: #fff;
-                border: 1px solid #67B246 !important;
-                border-radius: 0.325rem;
-                box-shadow: 0 0.313rem 0.719rem rgba(0,123,255,.1), 0 0.156rem 0.125rem rgba(0,0,0,.06);
-              }
-              :global(.MuiIconButton-root:hover) {
-                background-color: none !important;
-              }
-              :global(.fa-language) {
-                font-size: 20px;
-              }
-              :global(.modal-lg) {
-                max-width: 1000px !important;
-              }
-              :global(.tox-toolbar__group) {
-                border-right: none !important;
-              }
-              :global(.tox-tinymce) {
-                border-radius: 5px !important;
-              }
-              :global(.tox-toolbar) {
-                background: none !important;
-              }
-              :global(.maintenance-subcontainer) {
-                border: 1px solid var(--light);
-                border-radius: 0.325rem;
-                margin: 10px 0;
-              }
-              :global(.form-group-toggle > label) {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-              }
-              :global(.form-group-toggle) {
-                display: flex;
-                justify-content: space-around;
-                align-items: center;
-              }
-              .toggle-done {
-                border: 1px solid var(--secondary);
-                border-radius: 0.325rem;
-                padding: 20px;
-              }
-              :global(.rdw-option-active) {
-                box-shadow: none;
-                border: 2px solid var(--primary);
-                border-radius: 5px;
-              }
-              :global(.editor-toolbar) {
-                transition: all 150ms ease-in-out;
-              }
-              :global(.editor-dropdown) {
-                position: relative;
-                font-family: inherit;
-                background-color: transparent;
-                padding: 2px 2px 2px 0;
-                font-size: 10px;
-                border-radius: 0;
-                border: none;
-                border-bottom: 1px solid rgba(0,0,0, 0.12);
-                transition: all 150ms ease-in-out;
-              }
-              :global(.editor-wrapper) {
-                border: 1px solid var(--light);
-                border-radius: 5px;
-              }
-              :global(.editor-wrapper) {
-                padding: 5px;
-              }
-              :global(button.btn-primary) {
-                max-height: 45px;
-              }
-              input {
-                display: block;
-              }
-              label {
-                margin: 15px;
-              }
-              :global(.modal-content) {
-                max-height: calc(${this.state.windowInnerHeight}px - 50px);
-              }
-              :global(.mail-body) {
-                font-family: Poppins, Helvetica;
-                height: ${this.state.readHeight ? `calc(${this.state.readHeight} - 127px)` : '460px'};
-                background: #fff;
-                overflow-y: ${this.state.incomingMailIsHtml ? 'scroll' : 'hidden'};
-              }
-              :global(.mail-body > :first-child) {
-                position: absolute;
-                top: 0;
-                left: 0;
-                height: 100vh;
-                width: 100%;
-                padding: 40px;
-                overflow-y: ${this.state.incomingMailIsHtml ? 'hidden' : 'scroll'};
-              }
-              :global(.modal-backdrop) {
-                background-color: #000;
-                transition: all 150ms ease-in-out;
-              }
-              :global(.modal-backdrop.show) {
-                opacity: 0.5;
-              }
-              .modal-incoming-header-text {
-                flex-grow: 1;
-              }
-              :global(.modal-title) {
-                display: flex;
-                justify-content: space-between;
-                width: 100%;
-                align-items: center;
-              }
-              :global(.modal-content) {
-                max-height: calc(${this.state.windowInnerHeight}px - 50px);
-              }
-              :global(.flexible-modal) {
-                position: absolute;
-                z-index: 1;
-                border: 1px solid #ccc;
-                background: white;
-              }
-              :global(.flexible-modal-mask) {
-                position: fixed;
-                height: 100%;
-                background: rgba(55, 55, 55, 0.6);
-                top:0;
-                left:0;
-                right:0;
-                bottom:0;
-              }
-              :global(.flexible-modal-resizer) {
-                position:absolute;
-                right:0;
-                bottom:0;
-                cursor:se-resize;
-                margin:5px;
-                border-bottom: solid 2px #333;
-                border-right: solid 2px #333;
-              }
-              :global(.flexible-modal-drag-area) {
-                background: #67B246;
-                height: 50px;
-                position:absolute;
-                right:0;
-                top:0;
-                cursor:move;
-              }
-              .modal-incoming-header-text:hover {
-                cursor: move;
-              }
-              .modal-incoming-header-text > * {
-                color: #fff;
-              }
-              :global(.modal-attachment-header-text:hover) {
-                cursor: move;
-              }
-              :global(.modal-attachment-header-text > h5) {
-                color: #fff;
-              }
-              :global(.close-attachment-modal-btn:hover > .close-attachment-modal-icon) {
-                color: var(--dark) !important;
-              }
-              :global(.close-read-modal-btn:hover > .close-read-modal-icon) {
-                color: var(--dark) !important;
-              }
-              :global(.flatpickr) {
-                height: auto;
-                width: 100%;
-                padding: .5rem 1rem;
-                font-size: .95rem;
-                line-height: 1.5;
-                color: #495057;
-                background-color: #fff;
-                border: 1px solid #becad6;
-                font-weight: 300;
-                will-change: border-color,box-shadow;
-                border-radius: .375rem;
-                box-shadow: none;
-                transition: box-shadow 250ms cubic-bezier(.27,.01,.38,1.06),border 250ms cubic-bezier(.27,.01,.38,1.06);
-              }
-              :global(.flatpickr-months) {
-                background: #67B246 !important;
-              }
-              :global(.flatpickr-month) {
-                background: #67B246 !important;
-              }
-              :global(.flatpickr-monthDropdown-months) {
-                background: #67B246 !important;
-              }
-              :global(.flatpickr-weekdays) {
-                background: #67B246 !important;
-              }
-              :global(.flatpickr-weekday) {
-                background: #67B246 !important;
-              }
-              :global(.flatpickr-day.selected) {
-                background: #67B246 !important;
-                border-color: #67B246 !important;
-              }
-              :global(.create-btn) {
-                box-shadow: ${this.state.maintenance.id === 'NEW' ? '0 0 0 100vmax rgba(0,0,0,.8)' : 'none'};
-                pointer-events: ${this.state.maintenance.id === 'NEW' ? 'auto' : 'none'};
-                z-index: 100;
-              }
-              :global(*) {
-                pointer-events: ${this.state.maintenance.id === 'NEW' ? 'none' : 'auto'};
-              }
-              :global(.create-btn:before) {
-                
-              }
-              .impact-title-group {
-                display: flex;
-              }
-              @media only screen and (max-width: 500px) {
-                :global(div.btn-toolbar > .btn-group-md) {
-                  margin-right: 20px;
+                  </ModalBody>
+                </Modal>
+              </Card>
+              <style jsx>{`
+                :global(.ExcelTable2007) {
+                  border: 1px solid #ddd;
+                  border-collapse: collapse;
                 }
-                :global(div.btn-toolbar) {
-                  flex-wrap: no-wrap;
+                :global(.ExcelTable2007 td, th) {
+                  white-space: nowrap;
+                  border: 1px solid #ddd;
+                  padding: 20px;
                 }
-                :global(div.btn-toolbar > span) {
+                :global(.ExcelTable2007 th) {
+                  background-color: #eee;
+                  position: sticky;
+                  top: -1px;
+                  z-index: 2;
+                }
+                :global(.ExcelTable2007 th:first-of-type) {
+                  left: 0;
+                  z-index: 3;
+                }
+                :global(.ExcelTable2007 > tbody > tr > td:first-of-type) {
+                  background-color: #eee;
+                  position: sticky;
+                  left: -1px;
+                  z-index: 1;
+                }
+                :global(.react-draggable) {
+                  transition: visibility 200ms linear, opacity 200ms linear;
+                }
+                :global(div[class$="-singleValue"]) {
+                  font-size: 0.95rem;
+                  color: #495057;
+                }
+                :global(.form-group > label) {
+                  margin: 10px !important;
+                }
+                :global(.form-group) {
+                  margin-bottom: 0px !important;
+                }
+                :global(.container) {
+                  padding: 15px;
+                }
+                .mail-icon {
+                  min-width: 96px;
+                  height: 96px;
+                  border: 2px solid var(--light);
+                  background: #fff;
+                  padding: 10px;
+                  border-radius: 5px;
+                  margin-right: 10px;
+                }
+                :global(.MuiFormControl-root) {
+                  width: 100%;
+                }
+                :global(.MuiInputBase-root) {
+                  color: #495057;
+                }
+                :global(.MuiInputBase-root:hover) {
+                  border-color: #8fa4b8 !important;
+                }
+                :global(.MuiOutlinedInput-input) {
+                  padding: 10.5px 14px;
+                  transition: box-shadow 250ms cubic-bezier(.27,.01,.38,1.06),border 250ms cubic-bezier(.27,.01,.38,1.06);
+                }
+                :global(.Mui-focused) {
+                  border: none !important;
+                }
+                :global(.MuiInputBase-root:focus-within) {
+                  color: #495057;
+                  background-color: #fff;
+                  border: 1px solid #67B246 !important;
+                  border-radius: 0.325rem;
+                  box-shadow: 0 0.313rem 0.719rem rgba(0,123,255,.1), 0 0.156rem 0.125rem rgba(0,0,0,.06);
+                }
+                :global(.MuiIconButton-root:hover) {
+                  background-color: none !important;
+                }
+                :global(.fa-language) {
+                  font-size: 20px;
+                }
+                :global(.modal-lg) {
+                  max-width: 1000px !important;
+                }
+                :global(.tox-toolbar__group) {
+                  border-right: none !important;
+                }
+                :global(.tox-tinymce) {
+                  border-radius: 5px !important;
+                }
+                :global(.tox-toolbar) {
+                  background: none !important;
+                }
+                :global(.maintenance-subcontainer) {
+                  border: 1px solid var(--light);
+                  border-radius: 0.325rem;
+                  margin: 10px 0;
+                }
+                :global(.form-group-toggle > label) {
                   display: flex;
-                  justify-content: center;
-                  flex-wrap: wrap;
                   flex-direction: column;
+                  align-items: center;
+                }
+                :global(.form-group-toggle) {
+                  display: flex;
+                  justify-content: space-around;
+                  align-items: center;
+                }
+                .toggle-done {
+                  border: 1px solid var(--secondary);
+                  border-radius: 0.325rem;
+                  padding: 20px;
+                }
+                :global(.rdw-option-active) {
+                  box-shadow: none;
+                  border: 2px solid var(--primary);
+                  border-radius: 5px;
+                }
+                :global(.editor-toolbar) {
+                  transition: all 150ms ease-in-out;
+                }
+                :global(.editor-dropdown) {
+                  position: relative;
+                  font-family: inherit;
+                  background-color: transparent;
+                  padding: 2px 2px 2px 0;
+                  font-size: 10px;
+                  border-radius: 0;
+                  border: none;
+                  border-bottom: 1px solid rgba(0,0,0, 0.12);
+                  transition: all 150ms ease-in-out;
+                }
+                :global(.editor-wrapper) {
+                  border: 1px solid var(--light);
+                  border-radius: 5px;
+                }
+                :global(.editor-wrapper) {
+                  padding: 5px;
+                }
+                :global(button.btn-primary) {
+                  max-height: 45px;
+                }
+                input {
+                  display: block;
+                }
+                label {
+                  margin: 15px;
+                }
+                :global(.modal-content) {
+                  max-height: calc(${this.state.windowInnerHeight}px - 50px);
+                }
+                :global(.mail-body) {
+                  font-family: Poppins, Helvetica;
+                  height: ${this.state.readHeight ? `calc(${this.state.readHeight} - 127px)` : '460px'};
+                  background: #fff;
+                  overflow-y: ${this.state.incomingMailIsHtml ? 'scroll' : 'hidden'};
+                }
+                :global(.mail-body > :first-child) {
+                  position: absolute;
+                  top: 0;
+                  left: 0;
+                  height: 100vh;
+                  width: 100%;
+                  padding: 40px;
+                  overflow-y: ${this.state.incomingMailIsHtml ? 'hidden' : 'scroll'};
+                }
+                :global(.modal-backdrop) {
+                  background-color: #000;
+                  transition: all 150ms ease-in-out;
+                }
+                :global(.modal-backdrop.show) {
+                  opacity: 0.5;
+                }
+                .modal-incoming-header-text {
                   flex-grow: 1;
                 }
-                :global(div.btn-toolbar > span > h2) {
-                  margin: 0 auto;
-                  padding-right: 20px;
+                :global(.modal-title) {
+                  display: flex;
+                  justify-content: space-between;
+                  width: 100%;
+                  align-items: center;
                 }
-                :global(.card-body) {
-                  padding: 0px;
+                :global(.modal-content) {
+                  max-height: calc(${this.state.windowInnerHeight}px - 50px);
                 }
-              }
-            `}
-            </style>
-          </Layout>
-        </HotKeys>
-      )
-    } else {
-      return <RequireLogin />
+                :global(.flexible-modal) {
+                  position: absolute;
+                  z-index: 1;
+                  border: 1px solid #ccc;
+                  background: white;
+                }
+                :global(.flexible-modal-mask) {
+                  position: fixed;
+                  height: 100%;
+                  background: rgba(55, 55, 55, 0.6);
+                  top:0;
+                  left:0;
+                  right:0;
+                  bottom:0;
+                }
+                :global(.flexible-modal-resizer) {
+                  position:absolute;
+                  right:0;
+                  bottom:0;
+                  cursor:se-resize;
+                  margin:5px;
+                  border-bottom: solid 2px #333;
+                  border-right: solid 2px #333;
+                }
+                :global(.flexible-modal-drag-area) {
+                  background: #67B246;
+                  height: 50px;
+                  position:absolute;
+                  right:0;
+                  top:0;
+                  cursor:move;
+                }
+                .modal-incoming-header-text:hover {
+                  cursor: move;
+                }
+                .modal-incoming-header-text > * {
+                  color: #fff;
+                }
+                :global(.modal-attachment-header-text:hover) {
+                  cursor: move;
+                }
+                :global(.modal-attachment-header-text > h5) {
+                  color: #fff;
+                }
+                :global(.close-attachment-modal-btn:hover > .close-attachment-modal-icon) {
+                  color: var(--dark) !important;
+                }
+                :global(.close-read-modal-btn:hover > .close-read-modal-icon) {
+                  color: var(--dark) !important;
+                }
+                :global(.flatpickr) {
+                  height: auto;
+                  width: 100%;
+                  padding: .5rem 1rem;
+                  font-size: .95rem;
+                  line-height: 1.5;
+                  color: #495057;
+                  background-color: #fff;
+                  border: 1px solid #becad6;
+                  font-weight: 300;
+                  will-change: border-color,box-shadow;
+                  border-radius: .375rem;
+                  box-shadow: none;
+                  transition: box-shadow 250ms cubic-bezier(.27,.01,.38,1.06),border 250ms cubic-bezier(.27,.01,.38,1.06);
+                }
+                :global(.flatpickr-months) {
+                  background: #67B246 !important;
+                }
+                :global(.flatpickr-month) {
+                  background: #67B246 !important;
+                }
+                :global(.flatpickr-monthDropdown-months) {
+                  background: #67B246 !important;
+                }
+                :global(.flatpickr-weekdays) {
+                  background: #67B246 !important;
+                }
+                :global(.flatpickr-weekday) {
+                  background: #67B246 !important;
+                }
+                :global(.flatpickr-day.selected) {
+                  background: #67B246 !important;
+                  border-color: #67B246 !important;
+                }
+                :global(.create-btn) {
+                  box-shadow: ${this.state.maintenance.id === 'NEW' ? '0 0 0 100vmax rgba(0,0,0,.8)' : 'none'};
+                  pointer-events: ${this.state.maintenance.id === 'NEW' ? 'auto' : 'none'};
+                  z-index: 100;
+                }
+                :global(*) {
+                  pointer-events: ${this.state.maintenance.id === 'NEW' ? 'none' : 'auto'};
+                }
+                :global(.create-btn:before) {
+                  
+                }
+                .impact-title-group {
+                  display: flex;
+                }
+                @media only screen and (max-width: 500px) {
+                  :global(div.btn-toolbar > .btn-group-md) {
+                    margin-right: 20px;
+                  }
+                  :global(div.btn-toolbar) {
+                    flex-wrap: no-wrap;
+                  }
+                  :global(div.btn-toolbar > span) {
+                    display: flex;
+                    justify-content: center;
+                    flex-wrap: wrap;
+                    flex-direction: column;
+                    flex-grow: 1;
+                  }
+                  :global(div.btn-toolbar > span > h2) {
+                    margin: 0 auto;
+                    padding-right: 20px;
+                  }
+                  :global(.card-body) {
+                    padding: 0px;
+                  }
+                }
+              `}
+              </style>
+            </Layout>
+          </HotKeys>
+        )
+      } else {
+        return <RequireLogin />
+      }
     }
   }
-}
