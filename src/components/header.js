@@ -268,6 +268,7 @@ class Header extends React.Component {
           .logout-btn {
             cursor: pointer;
             background: none;
+            margin-bottom: 6px;
             border: none;
             color: #fff;
             outline: none;

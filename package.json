@@ -64,6 +64,7 @@
     "react-hotkeys": "^2.0.0",
     "react-instantsearch-dom": "^5.7.0",
     "react-pdf": "^4.1.0",
+    "react-pdf-js-infinite": "^1.2.0",
     "react-read-pdf": "^2.0.9",
     "react-rnd": "^10.1.1",
     "react-select": "^3.0.8",

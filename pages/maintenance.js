@@ -25,9 +25,9 @@ import { OutTable, ExcelRenderer } from 'react-excel-renderer'
 import ProtectedIcon from '../src/components/ag-grid/protected'
 import SentIcon from '../src/components/ag-grid/sent'
 import { AgGridReact } from 'ag-grid-react'
-import { Document, Page , pdfjs } from 'react-pdf'
-
-// import { Document, Page } from 'react-pdf/dist/entry.webpack'
+import { Document, Page, pdfjs } from 'react-pdf'
+// import ReactPDF from 'react-pdf/dist/entry.js'
+import PDF from 'react-pdf-js-infinite'
 
 import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-material.css'
@@ -68,7 +68,6 @@ import {
   ModalHeader,
   ModalBody
 } from 'shards-react'
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`
 
 const animatedComponents = makeAnimated()
 
@@ -1401,6 +1400,8 @@ export default class Maintenance extends React.Component {
         let base64 = (file).replace(/_/g, '/')
         base64 = base64.replace(/-/g, '+')
         const base64Fixed = fixBase64(base64)
+        const fileData = new Blob([base64Fixed], { type: 'application/pdf' })
+        const pdfUrl = URL.createObjectURL(fileData)
         this.setState({
           filetype: filetype,
           pdfid: id,
@@ -1990,7 +1991,8 @@ export default class Maintenance extends React.Component {
                           )}
                         {this.state.filetype === 'pdf'
                           ? (
-                            <Document file={btoa(String.fromCharCode.apply(null, this.state.pdfB64))}>
+                            // <PDF file={{ data: this.state.pdfB64 }} scale={1.5} />
+                            <Document file={{ range: this.state.pdfB64 }}>
                               <Page pageNumber={1} />
                             </Document>
                           ) : (
