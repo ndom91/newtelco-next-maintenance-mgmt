@@ -25,9 +25,8 @@ import { OutTable, ExcelRenderer } from 'react-excel-renderer'
 import ProtectedIcon from '../src/components/ag-grid/protected'
 import SentIcon from '../src/components/ag-grid/sent'
 import { AgGridReact } from 'ag-grid-react'
-import { Document, Page, pdfjs } from 'react-pdf'
-// import ReactPDF from 'react-pdf/dist/entry.js'
 import PDF from 'react-pdf-js-infinite'
+import { PDFDownloadLink, View, Document, Page } from 'react-pdf'
 
 import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-material.css'
@@ -68,6 +67,12 @@ import {
   ModalHeader,
   ModalBody
 } from 'shards-react'
+
+const PdfAttachment = (props) => (
+  <Document file={props.doc}>
+    <Page pageNumber={1} />
+  </Document>
+)
 
 const animatedComponents = makeAnimated()
 
@@ -119,6 +124,10 @@ export default class Maintenance extends React.Component {
         location: '',
         reason: '',
         mailId: 'NT'
+      },
+      attachmentModalSize: {
+        width: 673,
+        height: 300
       },
       dateTimeWarning: false,
       openAttachmentModal: false,
@@ -281,7 +290,6 @@ export default class Maintenance extends React.Component {
         startDateTime: moment.tz(this.props.jsonData.profile.startDateTime, 'GMT').tz('Etc/GMT-2').format('YYYY-MM-DD HH:mm:ss'),
         endDateTime: moment.tz(this.props.jsonData.profile.endDateTime, 'GMT').tz('Etc/GMT-2').format('YYYY-MM-DD HH:mm:ss')
       }
-      console.log(`Start\n${this.props.jsonData.profile.startDateTime}\n${moment.tz(this.props.jsonData.profile.startDateTime, 'GMT')}\n${newMaintenance.startDateTime}`)
 
       this.setState({
         maintenance: newMaintenance,
@@ -1340,7 +1348,6 @@ export default class Maintenance extends React.Component {
   /// /////////////////////////////////////////////////////////
 
   showAttachments (id, filename) {
-    // console.log(filename)
     function fixBase64 (binaryData) {
       var base64str = binaryData
       var binary = atob(base64str.replace(/\s/g, ''))
@@ -1355,12 +1362,12 @@ export default class Maintenance extends React.Component {
       return view
     }
     if (id !== null) {
-      // const fileExtRegex = new RegExp('/\.[0-9a-z]+$/')
-      // const fileData = decodeURIComponent(escape(window.atob(this.state.maintenance.incomingAttachments[id].data)))
       let filetype = ''
       const fileExt = filename.match(/\.[0-9a-z]+$/i)
-      // console.log(fileExt)
       switch (fileExt[0]) {
+        case '.xlsx':
+          filetype = 'excel'
+          break
         case '.xls':
           filetype = 'excel'
           break
@@ -1371,9 +1378,9 @@ export default class Maintenance extends React.Component {
           filetype = 'html'
           break
       }
-      // console.log(filename, filetype)
-      const file = this.state.maintenance.incomingAttachments[id].data
       if (filetype === 'excel') {
+        const pdfIndex = this.state.maintenance.incomingAttachments.findIndex(el => el.mime === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        const file = this.state.maintenance.incomingAttachments[pdfIndex].data
         let base64 = (file).replace(/_/g, '/')
         base64 = base64.replace(/-/g, '+')
         const base64Fixed = fixBase64(base64)
@@ -1392,28 +1399,37 @@ export default class Maintenance extends React.Component {
             this.setState({
               filetype: filetype,
               cols: resp.cols,
-              rows: resp.rows
+              rows: resp.rows,
+              openAttachmentModal: !this.state.openAttachmentModal,
+              currentAttachment: id || null
             })
           }
         })
       } else if (filetype === 'pdf') {
+        const pdfIndex = this.state.maintenance.incomingAttachments.findIndex(el => el.mime === 'application/pdf')
+        const file = this.state.maintenance.incomingAttachments[pdfIndex].data
         let base64 = (file).replace(/_/g, '/')
         base64 = base64.replace(/-/g, '+')
         const base64Fixed = fixBase64(base64)
-        const pdfB64Url = `data:application/pdf;base64,${base64Fixed}`
         const fileData = new Blob([base64Fixed], { type: 'application/pdf' })
-        const pdfUrl = URL.createObjectURL(fileData)
         this.setState({
+          attachmentModalSize: {
+            height: 800,
+            width: 950
+          },
           filetype: filetype,
           pdfid: id,
-          pdfB64: fileData
+          pdfB64: fileData,
+          openAttachmentModal: !this.state.openAttachmentModal,
+          currentAttachment: id || null
         })
       }
+    } else {
+      this.setState({
+        openAttachmentModal: !this.state.openAttachmentModal,
+        currentAttachment: id || null
+      })
     }
-    this.setState({
-      openAttachmentModal: !this.state.openAttachmentModal,
-      currentAttachment: id || null
-    })
   }
 
   handleProtectionSwitch () {
@@ -1523,543 +1539,530 @@ export default class Maintenance extends React.Component {
     let maintenanceIdDisplay
     if (maintenance.id === 'NEW') {
       maintenanceIdDisplay = maintenance.id
-      } else {
-        maintenanceIdDisplay = `NT-${maintenance.id}`
-      }
+    } else {
+      maintenanceIdDisplay = `NT-${maintenance.id}`
+    }
 
-      const keyMap = {
-        TOGGLE_READ: 'alt+r',
-        TOGGLE_HELP: 'shift+?'
-      }
+    const keyMap = {
+      TOGGLE_READ: 'alt+r',
+      TOGGLE_HELP: 'shift+?'
+    }
 
-      const handlers = {
-        TOGGLE_READ: this.toggleReadModal,
-        TOGGLE_HELP: this.toggleHelpModal
-      }
+    const handlers = {
+      TOGGLE_READ: this.toggleReadModal,
+      TOGGLE_HELP: this.toggleHelpModal
+    }
 
-      let HALF_WIDTH = 500
-      if (typeof window !== 'undefined') {
-        HALF_WIDTH = this.state.width !== 0 ? this.state.width / 2 : 500
-      }
+    let HALF_WIDTH = 500
+    if (typeof window !== 'undefined') {
+      HALF_WIDTH = this.state.width !== 0 ? this.state.width / 2 : 500
+    }
 
-
-      if (this.props.session.user) {
-        return (
-          <HotKeys keyMap={keyMap} handlers={handlers}>
-            <Layout unread={this.props.unread} session={this.props.session}>
-              <Helmet>
-                <title>{`Newtelco Maintenance - NT-${maintenance.id}`}</title>
-              </Helmet>
-              {UnreadCount()}
-              <Card style={{ maxWidth: '100%' }}>
-                <CardHeader>
-                  <ButtonToolbar style={{ justifyContent: 'space-between' }}>
-                    <ButtonGroup size='md'>
-                      <Button onClick={() => Router.back()} outline>
-                        <FontAwesomeIcon icon={faArrowLeft} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
+    if (this.props.session.user) {
+      return (
+        <HotKeys keyMap={keyMap} handlers={handlers}>
+          <Layout unread={this.props.unread} session={this.props.session}>
+            <Helmet>
+              <title>{`Newtelco Maintenance - NT-${maintenance.id}`}</title>
+            </Helmet>
+            {UnreadCount()}
+            <Card style={{ maxWidth: '100%' }}>
+              <CardHeader>
+                <ButtonToolbar style={{ justifyContent: 'space-between' }}>
+                  <ButtonGroup size='md'>
+                    <Button onClick={() => Router.back()} outline>
+                      <FontAwesomeIcon icon={faArrowLeft} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
                         Back
-                      </Button>
-                    </ButtonGroup>
-                    <span>
-                      <Badge theme='secondary' style={{ fontSize: '2rem', marginRight: '20px' }} outline>
-                        {maintenanceIdDisplay}
-                      </Badge>
-                      <h2 style={{ display: 'inline-block', marginBottom: '0px' }}>{maintenance.name}</h2>
-                    </span>
-                    {this.state.width > 500
-                      ? (
-                        <ButtonGroup className='btn-group-2' size='md'>
-                          <Button onClick={this.toggleReadModal} outline>
-                            <FontAwesomeIcon icon={faEnvelopeOpenText} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
-                          Read
-                          </Button>
-                          <Button onClick={this.handleCalendarCreate} outline>
-                            <FontAwesomeIcon icon={faCalendarAlt} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
-                          Calendar
-                          </Button>
-                          {maintenance.id === 'NEW'
-                            ? (
-                              <Button className='create-btn' onClick={this.handleCreateOnClick}>
-                                <FontAwesomeIcon icon={faPlusCircle} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
-                            Create
-                              </Button>
-                            ) : (
-                              <Button className='send-bulk' theme='primary' onClick={this.handleSendAll}>
-                                <FontAwesomeIcon icon={faMailBulk} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
-                            Send All
-                              </Button>
-                            )}
-                        </ButtonGroup>
-                      ) : (
-                        <></>
-                      )}
-                  </ButtonToolbar>
-                </CardHeader>
-                <CardBody>
-                  <Container fluid>
-                    <Row style={{ height: '20px' }} />
-                    <Row>
-                      <Col sm='12' lg='6'>
-                        <Row>
-                          <Col>
-                            <Container className='maintenance-subcontainer'>
-                              <Row>
-                                <Col style={{ width: '30vw' }}>
-                                  <FormGroup>
-                                    <label htmlFor='edited-by'>Created By</label>
-                                    <FormInput tabIndex='-1' readOnly id='edited-by-input' name='edited-by' type='text' value={maintenance.bearbeitetvon} onChange={this.handleCreatedByChange} />
-                                  </FormGroup>
-                                  <FormGroup>
-                                    <label htmlFor='updated-by'>Last Updated By</label>
-                                    <FormInput readOnly id='updated-by' name='updated-by' type='text' value={maintenance.updatedBy} onChange={this.handleUpdatedByChange} />
-                                  </FormGroup>
-                                  <FormGroup>
-                                    <label htmlFor='supplier'>Timezone</label>
-                                    <TimezoneSelector
-                                      value={{ value: this.state.maintenance.timezone, label: this.state.maintenance.timezoneLabel }}
-                                      onChange={this.handleTimezoneChange}
-                                      onBlur={this.handleTimezoneBlur}
-                                    />
-                                  </FormGroup>
-                                  <FormGroup>
-                                    <label htmlFor='start-datetime'>Start Date/Time</label>
-                                    <Flatpickr
-                                      data-enable-time
-                                      options={{ time_24hr: 'true', allow_input: 'true' }}
-                                      className='flatpickr end-date-time'
-                                      value={maintenance.startDateTime || null}
-                                      onChange={date => this.handleStartDateChange(date)}
-                                      onClose={() => this.handleDateTimeBlur('start')}
-                                    />
-                                  </FormGroup>
-                                </Col>
-                                <Col style={{ width: '30vw' }}>
-                                  <FormGroup>
-                                    <label htmlFor='maileingang'>Mail Arrived</label>
-                                    <FormInput tabIndex='-1' readOnly id='maileingang-input' name='maileingang' type='text' value={convertDateTime(maintenance.maileingang)} />
-                                  </FormGroup>
-                                  <FormGroup>
-                                    <label htmlFor='updated-at'>Updated At</label>
-                                    <FormInput tabIndex='-1' readOnly id='updated-at' name='updated-at' type='text' value={convertDateTime(maintenance.updatedAt)} onChange={this.handleUpdatedAtChange} />
-                                  </FormGroup>
-                                  <FormGroup>
-                                    <label htmlFor='supplier'>Supplier</label>
-                                    <Select
-                                      value={{ label: this.state.maintenance.name, value: this.state.maintenance.lieferant }}
-                                      onChange={this.handleSupplierChange}
-                                      options={this.state.suppliers}
-                                      noOptionsMessage={() => 'No Suppliers'}
-                                      placeholder='Please select a Supplier'
-                                      onBlur={this.handleSupplierBlur}
-                                    />
-                                  </FormGroup>
-                                  <FormGroup>
-                                    <label htmlFor='end-datetime'>End Date/Time</label>
-                                    <Flatpickr
-                                      data-enable-time
-                                      options={{ time_24hr: 'true', allow_input: 'true' }}
-                                      className='flatpickr end-date-time'
-                                      style={this.state.dateTimeWarning ? { border: '2px solid #dc3545', boxShadow: '0 0 10px 1px #dc3545' } : null}
-                                      value={maintenance.endDateTime || null}
-                                      onChange={date => this.handleEndDateChange(date)}
-                                      onClose={() => this.handleDateTimeBlur('end')}
-                                    />
-                                  </FormGroup>
-                                </Col>
-                              </Row>
-                              <Row>
-                                <Col>
-                                  <FormGroup>
-                                    <label htmlFor='their-cid'>{maintenance.name} CID</label>
-                                    <Select
-                                      value={this.state.selectedLieferant || undefined}
-                                      onChange={this.handleSelectLieferantChange}
-                                      options={this.state.lieferantcids}
-                                      components={animatedComponents}
-                                      isMulti
-                                      noOptionsMessage={() => 'No CIDs for this Supplier'}
-                                      placeholder='Please select a CID'
-                                      onBlur={this.handleCIDBlur}
-                                    />
-                                  </FormGroup>
-                                </Col>
-                              </Row>
-                            </Container>
-                            <Container className='maintenance-subcontainer'>
-                              <Row>
-                                <Col>
-                                  <Row>
-                                    <Col>
-                                      <FormGroup>
-                                        <div className='impact-title-group'>
-                                          <label style={{ flexGrow: '1', margin: '10px' }} htmlFor='impact'>Impact</label>
-                                          <Tooltip
-                                            title='Use Protection Switch Text'
-                                            position='top'
-                                            theme='dark'
-                                            trigger='mouseenter'
-                                            delay='150'
-                                            arrow
-                                            animation='shift'
-                                          >
-                                            <Button id='protectionswitchtext' style={{ padding: '0.35em', marginRight: '10px', marginTop: '10px' }} onClick={this.handleProtectionSwitch} outline theme='secondary'>
-                                              <FontAwesomeIcon width='16px' icon={faRandom} />
-                                            </Button>
-                                          </Tooltip>
-                                          <Tooltip
-                                            title='Use Time Difference Text'
-                                            position='top'
-                                            theme='dark'
-                                            trigger='mouseenter'
-                                            delay='150'
-                                            arrow
-                                            animation='shift'
-                                          >
-                                            <Button id='impactplaceholdertext' style={{ padding: '0.35em', marginTop: '10px' }} onClick={this.useImpactPlaceholder} outline theme='secondary'>
-                                              <FontAwesomeIcon width='16px' icon={faHistory} />
-                                            </Button>
-                                          </Tooltip>
-                                        </div>
-                                        <FormInput onBlur={() => this.handleTextInputBlur('impact')} id='impact' name='impact' type='text' onChange={this.handleImpactChange} placeholder={this.state.impactPlaceholder} value={maintenance.impact || ''} />
-                                      </FormGroup>
-                                    </Col>
-                                    <Col>
-                                      <FormGroup>
-                                        <label htmlFor='location'>Location</label>
-                                        <FormInput onBlur={() => this.handleTextInputBlur('location')} id='location' name='location' type='text' onChange={this.handleLocationChange} value={maintenance.location || ''} />
-                                      </FormGroup>
-                                    </Col>
-                                  </Row>
-                                  <FormGroup>
-                                    <label htmlFor='reason'>Reason</label>
-                                    <FormTextarea id='reason' name='reason' onBlur={() => this.handleTextInputBlur('reason')} onChange={this.handleReasonChange} type='text' value={maintenance.reason || ''} />
-                                  </FormGroup>
-                                </Col>
-                              </Row>
-                            </Container>
-                            <Container style={{ paddingTop: '20px' }} className='maintenance-subcontainer'>
-                              <Row>
-                                <Col>
-                                  <FormGroup className='form-group-toggle'>
-                                    <Badge theme='light' outline>
-                                      <label>
-                                        <Toggle
-                                          checked={maintenance.cancelled === 'false' ? false : !!maintenance.cancelled}
-                                          onChange={(event) => this.handleToggleChange('cancelled', event)}
-                                        />
-                                        <div style={{ marginTop: '10px' }}>Cancelled</div>
-                                      </label>
-                                    </Badge>
-                                    <Badge theme='light' outline>
-                                      <label>
-                                        <Toggle
-                                          icons={{
-                                            checked: <FontAwesomeIcon icon={faFirstAid} width='1em' style={{ color: '#fff' }} />,
-                                            unchecked: null
-                                          }}
-                                          checked={maintenance.emergency === 'false' ? false : !!maintenance.emergency}
-                                          onChange={(event) => this.handleToggleChange('emergency', event)}
-                                        />
-                                        <div style={{ marginTop: '10px' }}>Emergency</div>
-                                      </label>
-                                    </Badge>
-                                    <Badge theme='secondary' outline>
-                                      <label>
-                                        <Toggle
-                                          checked={maintenance.done === 'false' ? false : !!maintenance.done}
-                                          onChange={(event) => this.handleToggleChange('done', event)}
-                                        />
-                                        <div style={{ marginTop: '10px' }}>Done</div>
-                                      </label>
-                                    </Badge>
-                                  </FormGroup>
-                                </Col>
-                              </Row>
-                            </Container>
-                            <Container className='maintenance-subcontainer'>
-                              <Row>
-                                <Col>
-                                  <FormGroup>
-                                    <label htmlFor='notes'>Notes</label>
-                                    <TinyEditor
-                                      initialValue={this.state.notesText}
-                                      apiKey='ttv2x1is9joc0fi7v6f6rzi0u98w2mpehx53mnc1277omr7s'
-                                      onBlur={this.handleNotesBlur}
-                                      init={{
-                                        height: 300,
-                                        menubar: false,
-                                        statusbar: false,
-                                        plugins: [
-                                          'advlist autolink lists link image print preview anchor',
-                                          'searchreplace code',
-                                          'insertdatetime table paste code help wordcount'
-                                        ],
-                                        toolbar:
-                                          `undo redo | formatselect | bold italic backcolor | 
-                                          alignleft aligncenter alignright alignjustify | 
-                                          bullist numlist outdent indent | removeformat | help`
-                                      }}
-                                      onChange={this.handleNotesChange}
-                                    />
-                                  </FormGroup>
-                                </Col>
-                              </Row>
-                            </Container>
-                          </Col>
-                        </Row>
-                      </Col>
-                      <Col sm='12' lg='6'>
-                        <Row>
-                          <Col>
-                            <Container style={{ padding: '20px' }} className='maintenance-subcontainer'>
-                              <Row>
-                                <Col style={{ width: '100%', height: '600px' }}>
-                                  <div
-                                    className='ag-theme-material'
-                                    style={{
-                                      height: '100%',
-                                      width: '100%'
-                                    }}
-                                  >
-                                    <AgGridReact
-                                      gridOptions={this.state.gridOptions}
-                                      rowData={this.state.kundencids}
-                                      onGridReady={params => this.gridApi = params.api}
-                                      pagination
-                                      // batchUpdateWaitMillis={50}
-                                      deltaRowDataMode
-                                      getRowNodeId={(data) => {
-                                        return data.kundenCID
-                                      }}
-                                      onFirstDataRendered={this.onFirstDataRendered.bind(this)}
-                                    />
-                                  </div>
-                                </Col>
-                              </Row>
-                            </Container>
-                          </Col>
-                        </Row>
-                      </Col>
-                    </Row>
-                  </Container>
-                </CardBody>
-                <CardFooter className='card-footer'>
-                  {this.state.width < 500
+                    </Button>
+                  </ButtonGroup>
+                  <span>
+                    <Badge theme='secondary' style={{ fontSize: '2rem', marginRight: '20px' }} outline>
+                      {maintenanceIdDisplay}
+                    </Badge>
+                    <h2 style={{ display: 'inline-block', marginBottom: '0px' }}>{maintenance.name}</h2>
+                  </span>
+                  {this.state.width > 500
                     ? (
                       <ButtonGroup className='btn-group-2' size='md'>
                         <Button onClick={this.toggleReadModal} outline>
                           <FontAwesomeIcon icon={faEnvelopeOpenText} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
-                        Read
+                          Read
                         </Button>
                         <Button onClick={this.handleCalendarCreate} outline>
                           <FontAwesomeIcon icon={faCalendarAlt} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
-                        Calendar
+                          Calendar
                         </Button>
-                        <Button disabled={maintenance.id !== 'NEW'} className='create-btn' onClick={this.handleCreateOnClick}>
-                          <FontAwesomeIcon icon={faPlusCircle} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
-                        Create
-                        </Button>
+                        {maintenance.id === 'NEW'
+                          ? (
+                            <Button className='create-btn' onClick={this.handleCreateOnClick}>
+                              <FontAwesomeIcon icon={faPlusCircle} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
+                            Create
+                            </Button>
+                          ) : (
+                            <Button className='send-bulk' theme='primary' onClick={this.handleSendAll}>
+                              <FontAwesomeIcon icon={faMailBulk} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
+                            Send All
+                            </Button>
+                          )}
                       </ButtonGroup>
                     ) : (
-                      <span />
+                        <></>
                     )}
-                </CardFooter>
-                {typeof window !== 'undefined'
+                </ButtonToolbar>
+              </CardHeader>
+              <CardBody>
+                <Container fluid>
+                  <Row style={{ height: '20px' }} />
+                  <Row>
+                    <Col sm='12' lg='6'>
+                      <Row>
+                        <Col>
+                          <Container className='maintenance-subcontainer'>
+                            <Row>
+                              <Col style={{ width: '30vw' }}>
+                                <FormGroup>
+                                  <label htmlFor='edited-by'>Created By</label>
+                                  <FormInput tabIndex='-1' readOnly id='edited-by-input' name='edited-by' type='text' value={maintenance.bearbeitetvon} onChange={this.handleCreatedByChange} />
+                                </FormGroup>
+                                <FormGroup>
+                                  <label htmlFor='updated-by'>Last Updated By</label>
+                                  <FormInput readOnly id='updated-by' name='updated-by' type='text' value={maintenance.updatedBy} onChange={this.handleUpdatedByChange} />
+                                </FormGroup>
+                                <FormGroup>
+                                  <label htmlFor='supplier'>Timezone</label>
+                                  <TimezoneSelector
+                                    value={{ value: this.state.maintenance.timezone, label: this.state.maintenance.timezoneLabel }}
+                                    onChange={this.handleTimezoneChange}
+                                    onBlur={this.handleTimezoneBlur}
+                                  />
+                                </FormGroup>
+                                <FormGroup>
+                                  <label htmlFor='start-datetime'>Start Date/Time</label>
+                                  <Flatpickr
+                                    data-enable-time
+                                    options={{ time_24hr: 'true', allow_input: 'true' }}
+                                    className='flatpickr end-date-time'
+                                    value={maintenance.startDateTime || null}
+                                    onChange={date => this.handleStartDateChange(date)}
+                                    onClose={() => this.handleDateTimeBlur('start')}
+                                  />
+                                </FormGroup>
+                              </Col>
+                              <Col style={{ width: '30vw' }}>
+                                <FormGroup>
+                                  <label htmlFor='maileingang'>Mail Arrived</label>
+                                  <FormInput tabIndex='-1' readOnly id='maileingang-input' name='maileingang' type='text' value={convertDateTime(maintenance.maileingang)} />
+                                </FormGroup>
+                                <FormGroup>
+                                  <label htmlFor='updated-at'>Updated At</label>
+                                  <FormInput tabIndex='-1' readOnly id='updated-at' name='updated-at' type='text' value={convertDateTime(maintenance.updatedAt)} onChange={this.handleUpdatedAtChange} />
+                                </FormGroup>
+                                <FormGroup>
+                                  <label htmlFor='supplier'>Supplier</label>
+                                  <Select
+                                    value={{ label: this.state.maintenance.name, value: this.state.maintenance.lieferant }}
+                                    onChange={this.handleSupplierChange}
+                                    options={this.state.suppliers}
+                                    noOptionsMessage={() => 'No Suppliers'}
+                                    placeholder='Please select a Supplier'
+                                    onBlur={this.handleSupplierBlur}
+                                  />
+                                </FormGroup>
+                                <FormGroup>
+                                  <label htmlFor='end-datetime'>End Date/Time</label>
+                                  <Flatpickr
+                                    data-enable-time
+                                    options={{ time_24hr: 'true', allow_input: 'true' }}
+                                    className='flatpickr end-date-time'
+                                    style={this.state.dateTimeWarning ? { border: '2px solid #dc3545', boxShadow: '0 0 10px 1px #dc3545' } : null}
+                                    value={maintenance.endDateTime || null}
+                                    onChange={date => this.handleEndDateChange(date)}
+                                    onClose={() => this.handleDateTimeBlur('end')}
+                                  />
+                                </FormGroup>
+                              </Col>
+                            </Row>
+                            <Row>
+                              <Col>
+                                <FormGroup>
+                                  <label htmlFor='their-cid'>{maintenance.name} CID</label>
+                                  <Select
+                                    value={this.state.selectedLieferant || undefined}
+                                    onChange={this.handleSelectLieferantChange}
+                                    options={this.state.lieferantcids}
+                                    components={animatedComponents}
+                                    isMulti
+                                    noOptionsMessage={() => 'No CIDs for this Supplier'}
+                                    placeholder='Please select a CID'
+                                    onBlur={this.handleCIDBlur}
+                                  />
+                                </FormGroup>
+                              </Col>
+                            </Row>
+                          </Container>
+                          <Container className='maintenance-subcontainer'>
+                            <Row>
+                              <Col>
+                                <Row>
+                                  <Col>
+                                    <FormGroup>
+                                      <div className='impact-title-group'>
+                                        <label style={{ flexGrow: '1', margin: '10px' }} htmlFor='impact'>Impact</label>
+                                        <Tooltip
+                                          title='Use Protection Switch Text'
+                                          position='top'
+                                          theme='dark'
+                                          trigger='mouseenter'
+                                          delay='150'
+                                          arrow
+                                          animation='shift'
+                                        >
+                                          <Button id='protectionswitchtext' style={{ padding: '0.35em', marginRight: '10px', marginTop: '10px' }} onClick={this.handleProtectionSwitch} outline theme='secondary'>
+                                            <FontAwesomeIcon width='16px' icon={faRandom} />
+                                          </Button>
+                                        </Tooltip>
+                                        <Tooltip
+                                          title='Use Time Difference Text'
+                                          position='top'
+                                          theme='dark'
+                                          trigger='mouseenter'
+                                          delay='150'
+                                          arrow
+                                          animation='shift'
+                                        >
+                                          <Button id='impactplaceholdertext' style={{ padding: '0.35em', marginTop: '10px' }} onClick={this.useImpactPlaceholder} outline theme='secondary'>
+                                            <FontAwesomeIcon width='16px' icon={faHistory} />
+                                          </Button>
+                                        </Tooltip>
+                                      </div>
+                                      <FormInput onBlur={() => this.handleTextInputBlur('impact')} id='impact' name='impact' type='text' onChange={this.handleImpactChange} placeholder={this.state.impactPlaceholder} value={maintenance.impact || ''} />
+                                    </FormGroup>
+                                  </Col>
+                                  <Col>
+                                    <FormGroup>
+                                      <label htmlFor='location'>Location</label>
+                                      <FormInput onBlur={() => this.handleTextInputBlur('location')} id='location' name='location' type='text' onChange={this.handleLocationChange} value={maintenance.location || ''} />
+                                    </FormGroup>
+                                  </Col>
+                                </Row>
+                                <FormGroup>
+                                  <label htmlFor='reason'>Reason</label>
+                                  <FormTextarea id='reason' name='reason' onBlur={() => this.handleTextInputBlur('reason')} onChange={this.handleReasonChange} type='text' value={maintenance.reason || ''} />
+                                </FormGroup>
+                              </Col>
+                            </Row>
+                          </Container>
+                          <Container style={{ paddingTop: '20px' }} className='maintenance-subcontainer'>
+                            <Row>
+                              <Col>
+                                <FormGroup className='form-group-toggle'>
+                                  <Badge theme='light' outline>
+                                    <label>
+                                      <Toggle
+                                        checked={maintenance.cancelled === 'false' ? false : !!maintenance.cancelled}
+                                        onChange={(event) => this.handleToggleChange('cancelled', event)}
+                                      />
+                                      <div style={{ marginTop: '10px' }}>Cancelled</div>
+                                    </label>
+                                  </Badge>
+                                  <Badge theme='light' outline>
+                                    <label>
+                                      <Toggle
+                                        icons={{
+                                          checked: <FontAwesomeIcon icon={faFirstAid} width='1em' style={{ color: '#fff' }} />,
+                                          unchecked: null
+                                        }}
+                                        checked={maintenance.emergency === 'false' ? false : !!maintenance.emergency}
+                                        onChange={(event) => this.handleToggleChange('emergency', event)}
+                                      />
+                                      <div style={{ marginTop: '10px' }}>Emergency</div>
+                                    </label>
+                                  </Badge>
+                                  <Badge theme='secondary' outline>
+                                    <label>
+                                      <Toggle
+                                        checked={maintenance.done === 'false' ? false : !!maintenance.done}
+                                        onChange={(event) => this.handleToggleChange('done', event)}
+                                      />
+                                      <div style={{ marginTop: '10px' }}>Done</div>
+                                    </label>
+                                  </Badge>
+                                </FormGroup>
+                              </Col>
+                            </Row>
+                          </Container>
+                          <Container className='maintenance-subcontainer'>
+                            <Row>
+                              <Col>
+                                <FormGroup>
+                                  <label htmlFor='notes'>Notes</label>
+                                  <TinyEditor
+                                    initialValue={this.state.notesText}
+                                    apiKey='ttv2x1is9joc0fi7v6f6rzi0u98w2mpehx53mnc1277omr7s'
+                                    onBlur={this.handleNotesBlur}
+                                    init={{
+                                      height: 300,
+                                      menubar: false,
+                                      statusbar: false,
+                                      plugins: [
+                                        'advlist autolink lists link image print preview anchor',
+                                        'searchreplace code',
+                                        'insertdatetime table paste code help wordcount'
+                                      ],
+                                      toolbar:
+                                          `undo redo | formatselect | bold italic backcolor | 
+                                          alignleft aligncenter alignright alignjustify | 
+                                          bullist numlist outdent indent | removeformat | help`
+                                    }}
+                                    onChange={this.handleNotesChange}
+                                  />
+                                </FormGroup>
+                              </Col>
+                            </Row>
+                          </Container>
+                        </Col>
+                      </Row>
+                    </Col>
+                    <Col sm='12' lg='6'>
+                      <Row>
+                        <Col>
+                          <Container style={{ padding: '20px' }} className='maintenance-subcontainer'>
+                            <Row>
+                              <Col style={{ width: '100%', height: '600px' }}>
+                                <div
+                                  className='ag-theme-material'
+                                  style={{
+                                    height: '100%',
+                                    width: '100%'
+                                  }}
+                                >
+                                  <AgGridReact
+                                    gridOptions={this.state.gridOptions}
+                                    rowData={this.state.kundencids}
+                                    onGridReady={params => this.gridApi = params.api}
+                                    pagination
+                                    // batchUpdateWaitMillis={50}
+                                    deltaRowDataMode
+                                    getRowNodeId={(data) => {
+                                      return data.kundenCID
+                                    }}
+                                    onFirstDataRendered={this.onFirstDataRendered.bind(this)}
+                                  />
+                                </div>
+                              </Col>
+                            </Row>
+                          </Container>
+                        </Col>
+                      </Row>
+                    </Col>
+                  </Row>
+                </Container>
+              </CardBody>
+              <CardFooter className='card-footer'>
+                {this.state.width < 500
                   ? (
-                    <Rnd
-                      default={{
-                        x: HALF_WIDTH,
-                        y: 25,
-                        width: HALF_WIDTH,
-                        height: 600
-                      }}
-                      style={{
-                        visibility: openReadModal ? 'visible' : 'hidden',
-                        opacity: openReadModal ? 1 : 0,
-                        background: '#fff',
-                        overflow: 'hidden',
-                        borderRadius: '15px',
-                        height: 'auto',
-                        zIndex: '101',
-                        boxShadow: '0px 0px 20px 1px var(--dark)'
-                      }}
-                      minWidth={700}
-                      minHeight={590}
-                      bounds='window'
-                      dragHandleClassName='modal-incoming-header-text'
-                      onResize={(e, direction, ref, delta, position) => {
-                        this.setState({
-                          readHeight: ref.style.height,
-                          readWidth: ref.style.width
-                        })
-                      }}
-                    >
-                      <div style={{ borderRadius: '15px', position: 'relative' }}>
-                        <ModalHeader style={{
-                          background: 'var(--secondary)',
-                          borderRadius: '0px'
-                        }}
-                        >
-                          <img className='mail-icon' src={this.state.readIconUrl} />
-                          <div className='modal-incoming-header-text'>
-                            <h5 className='modal-incoming-from' style={{ marginBottom: '0px' }}>
-                              {this.state.maintenance.incomingFrom}
-                            </h5>
-                            <small className='modal-incoming-subject'>
-                              {this.state.maintenance.incomingSubject}
-                            </small>
-                            <br />
-                            <small className='modal-incoming-datetime'>
-                              {this.state.maintenance.incomingDate}
-                            </small>
-                            {Array.isArray(this.state.maintenance.incomingAttachments) && this.state.maintenance.incomingAttachments.length !== 0
-                              ? this.state.maintenance.incomingAttachments.map((attachment, index) => {
-                                return (
-                                  <Button pill size='sm' onClick={() => this.showAttachments(attachment.id, attachment.name)} theme='primary' style={{ marginLeft: '10px' }} key={index}>
-                                    {attachment.name}
-                                  </Button>
-                                )
-                              })
-                              : (
-                                null
-                              )}
-                          </div>
-                          <ButtonGroup style={{ display: 'flex', flexDirection: 'column' }}>
-                            <Button outline className='close-read-modal-btn' theme='light' style={{ borderRadius: '5px 5px 0 0', padding: '0.7em 0.9em' }} onClick={this.toggleReadModal}>
-                              <FontAwesomeIcon
-                                className='close-read-modal-icon' width='1.5em' style={{ color: 'var(--light)', fontSize: '12px' }}
-                                icon={faTimesCircle}
-                              />
-                            </Button>
-                            {/* <Button theme='light' style={{ borderRadius: '0', padding: '0.7em 0.9em' }} onClick={this.showAttachments}>
-                              <FontAwesomeIcon width='1.2em' style={{ fontSize: '12px' }} className='translate-icon' icon={faFileExcel} />
-                            </Button> */}
-                            <Button theme='light' style={{ borderRadius: '0 0 5px 5px', padding: '0.7em 0.9em' }} onClick={this.handleTranslate.bind(this)}>
-                              <FontAwesomeIcon width='1.8em' style={{ fontSize: '12px' }} className='translate-icon' icon={faLanguage} />
-                            </Button>
-                          </ButtonGroup>
-                        </ModalHeader>
-                        <ModalBody className='mail-body' dangerouslySetInnerHTML={{ __html: this.state.translated ? this.state.translatedBody : this.state.maintenance.incomingBody }} />
-                      </div>
-                    </Rnd>
+                    <ButtonGroup className='btn-group-2' size='md'>
+                      <Button onClick={this.toggleReadModal} outline>
+                        <FontAwesomeIcon icon={faEnvelopeOpenText} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
+                        Read
+                      </Button>
+                      <Button onClick={this.handleCalendarCreate} outline>
+                        <FontAwesomeIcon icon={faCalendarAlt} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
+                        Calendar
+                      </Button>
+                      <Button disabled={maintenance.id !== 'NEW'} className='create-btn' onClick={this.handleCreateOnClick}>
+                        <FontAwesomeIcon icon={faPlusCircle} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
+                        Create
+                      </Button>
+                    </ButtonGroup>
                   ) : (
-                    <></>
+                    <span />
                   )}
-                {typeof window !== 'undefined'
-                  ? (
-                    <Rnd
-                      default={{
-                        x: HALF_WIDTH,
-                        y: 125,
-                        width: 500,
-                        height: 200
+              </CardFooter>
+              {typeof window !== 'undefined'
+                ? (
+                  <Rnd
+                    default={{
+                      x: HALF_WIDTH,
+                      y: 25,
+                      width: HALF_WIDTH,
+                      height: 600
+                    }}
+                    style={{
+                      visibility: openReadModal ? 'visible' : 'hidden',
+                      opacity: openReadModal ? 1 : 0,
+                      background: '#fff',
+                      overflow: 'hidden',
+                      borderRadius: '15px',
+                      height: 'auto',
+                      zIndex: '101',
+                      boxShadow: '0px 0px 20px 1px var(--dark)'
+                    }}
+                    minWidth={700}
+                    minHeight={590}
+                    bounds='window'
+                    dragHandleClassName='modal-incoming-header-text'
+                    onResize={(e, direction, ref, delta, position) => {
+                      this.setState({
+                        readHeight: ref.style.height,
+                        readWidth: ref.style.width
+                      })
+                    }}
+                  >
+                    <div style={{ borderRadius: '15px', position: 'relative' }}>
+                      <ModalHeader style={{
+                        background: 'var(--secondary)',
+                        borderRadius: '0px'
                       }}
-                      style={{
-                        visibility: this.state.openAttachmentModal ? 'visible' : 'hidden',
-                        opacity: this.state.openAttachmentModal ? 1 : 0,
-                        background: '#fff',
-                        overflow: 'hidden',
-                        borderRadius: '15px',
-                        height: 'auto',
-                        zIndex: '101',
-                        boxShadow: '0px 0px 20px 1px var(--dark)'
-                      }}
-                      minWidth={500}
-                      minHeight={400}
-                      bounds='window'
-                      dragHandleClassName='modal-attachment-header-text'
-                    >
-                      <div style={{ borderRadius: '15px', position: 'relative' }}>
-                        <ModalHeader
-                          className='modal-attachment-header-text'
-                          style={{
-                            background: 'var(--secondary)',
-                            borderRadius: '0px',
-                            color: '#fff',
-                            display: 'flex',
-                            justifyContent: 'space-between'
-                          }}
-                        >
-                          Attachments
-                          <Button outline className='close-attachment-modal-btn' theme='light' style={{ borderRadius: '5px', padding: '0.7em 0.9em' }} onClick={() => this.showAttachments(null)}>
+                      >
+                        <img className='mail-icon' src={this.state.readIconUrl} />
+                        <div className='modal-incoming-header-text'>
+                          <h5 className='modal-incoming-from' style={{ marginBottom: '0px' }}>
+                            {this.state.maintenance.incomingFrom}
+                          </h5>
+                          <small className='modal-incoming-subject'>
+                            {this.state.maintenance.incomingSubject}
+                          </small>
+                          <br />
+                          <small className='modal-incoming-datetime'>
+                            {this.state.maintenance.incomingDate}
+                          </small>
+                          {Array.isArray(this.state.maintenance.incomingAttachments) && this.state.maintenance.incomingAttachments.length !== 0
+                            ? this.state.maintenance.incomingAttachments.map((attachment, index) => {
+                              return (
+                                <Button pill size='sm' onClick={() => this.showAttachments(attachment.id, attachment.name)} theme='primary' style={{ marginLeft: '10px' }} key={index}>
+                                  {attachment.name}
+                                </Button>
+                              )
+                            })
+                            : (
+                              null
+                            )}
+                        </div>
+                        <ButtonGroup style={{ display: 'flex', flexDirection: 'column' }}>
+                          <Button outline className='close-read-modal-btn' theme='light' style={{ borderRadius: '5px 5px 0 0', padding: '0.7em 0.9em' }} onClick={this.toggleReadModal}>
                             <FontAwesomeIcon
-                              className='close-attachment-modal-icon' width='1.5em' style={{ color: 'var(--light)', fontSize: '12px' }}
+                              className='close-read-modal-icon' width='1.5em' style={{ color: 'var(--light)', fontSize: '12px' }}
                               icon={faTimesCircle}
                             />
                           </Button>
-                        </ModalHeader>
-                        <ModalBody>
-                          {this.state.filetype === 'excel'
-                          // this.state.rows && this.state.cols
-                            ? (
-                              <OutTable data={this.state.rows} columns={this.state.cols} tableClassName='ExcelTable2007' tableHeaderRowClass='heading' />
-                            ) : (
-                              null
-                            )}
-                          {this.state.filetype === 'pdf'
-                            ? (
-                              <PDF file={{ data: this.state.pdfB64 }} scale={1.5} />
-                              // <Document file={ this.state.pdfB64 }>
-                              //   <Page pageNumber={1} />
-                              // </Document>
-                            ) : (
-                              null
-                            )}
-                        </ModalBody>
-                        {/* {Array.isArray(this.state.incomingAttachments) && this.state.incomingAttachments.length !== 0
-                          ? this.state.incomingAttachments.map((attachment, index) => {
-                            return <Badge key={index} theme='primary'>{attachment.name}</Badge>
-                          })
-                          : (
-                            null
-                          )} */}
-                      </div>
-                    </Rnd>
-                  ) : (
-                    <></>
-                  )}
-                <Modal backdropClassName='modal-backdrop' animation backdrop size='lg' open={openPreviewModal} toggle={this.togglePreviewModal}>
-                  <ModalHeader>
-                    <div className='modal-preview-text-wrapper'>
-                      <div className='modal-preview-to-text'>
-                        <b style={{ fontWeight: '900' }}>To:</b> {this.state.mailPreviewHeaderText}
-                      </div>
-                      <div className='modal-preview-to-text'>
-                        <b style={{ fontWeight: '900' }}>Cc:</b> service@newtelco.de
-                      </div>
-                      <div className='modal-preview-Subject-text'>
-                        <b style={{ fontWeight: '900' }}>Subject: </b>{this.state.maintenance.emergency ? `[EMERGENCY] ${this.state.mailPreviewSubjectText}` : `${this.state.mailPreviewSubjectText}`}
-                      </div>
+                          <Button theme='light' style={{ borderRadius: '0 0 5px 5px', padding: '0.7em 0.9em' }} onClick={this.handleTranslate.bind(this)}>
+                            <FontAwesomeIcon width='1.8em' style={{ fontSize: '12px' }} className='translate-icon' icon={faLanguage} />
+                          </Button>
+                        </ButtonGroup>
+                      </ModalHeader>
+                      <ModalBody className='mail-body' dangerouslySetInnerHTML={{ __html: this.state.translated ? this.state.translatedBody : this.state.maintenance.incomingBody }} />
                     </div>
-                    <Button id='send-mail-btn' style={{ padding: '0.9em 1.1em' }} onClick={() => this.sendMail(this.state.mailPreviewHeaderText, this.state.mailPreviewCustomerCid, this.state.mailPreviewSubjectText, this.state.mailBodyText, true)}>
-                      <FontAwesomeIcon width='1.5em' style={{ fontSize: '12px' }} className='modal-preview-send-icon' icon={faPaperPlane} />
-                    </Button>
-                  </ModalHeader>
-                  <ModalBody>
-                    <TinyEditor
-                      initialValue={this.state.mailBodyText}
-                      apiKey='ttv2x1is9joc0fi7v6f6rzi0u98w2mpehx53mnc1277omr7s'
-                      init={{
-                        height: 500,
-                        menubar: false,
-                        statusbar: false,
-                        plugins: [
-                          'advlist autolink lists link image print preview anchor',
-                          'searchreplace code',
-                          'insertdatetime table paste code help wordcount'
-                        ],
-                        toolbar:
+                  </Rnd>
+                ) : (
+                    <></>
+                )}
+              {typeof window !== 'undefined'
+                ? (
+                  <Rnd
+                    default={{
+                      x: HALF_WIDTH,
+                      y: 125,
+                      width: this.state.filetype === 'pdf' ? '1100' : '400',
+                      height: this.state.filetype === 'pdf' ? '600' : '450'
+                    }}
+                    style={{
+                      visibility: this.state.openAttachmentModal ? 'visible' : 'hidden',
+                      opacity: this.state.openAttachmentModal ? 1 : 0,
+                      background: '#fff',
+                      overflow: 'hidden',
+                      borderRadius: '15px',
+                      height: 'auto',
+                      zIndex: '101',
+                      boxShadow: '0px 0px 20px 1px var(--dark)'
+                    }}
+                    minWidth={500}
+                    minHeight={400}
+                    bounds='window'
+                    dragHandleClassName='modal-attachment-header-text'
+                  >
+                    <div style={{ borderRadius: '15px', position: 'relative' }}>
+                      <ModalHeader
+                        className='modal-attachment-header-text'
+                        style={{
+                          background: 'var(--secondary)',
+                          borderRadius: '0px',
+                          color: '#fff',
+                          display: 'flex',
+                          justifyContent: 'space-between'
+                        }}
+                      >
+                          Attachments
+                        <Button outline className='close-attachment-modal-btn' theme='light' style={{ borderRadius: '5px', padding: '0.7em 0.9em' }} onClick={() => this.showAttachments(null)}>
+                          <FontAwesomeIcon
+                            className='close-attachment-modal-icon' width='1.5em' style={{ color: 'var(--light)', fontSize: '12px' }}
+                            icon={faTimesCircle}
+                          />
+                        </Button>
+                      </ModalHeader>
+                      <ModalBody style={this.state.filetype === 'pdf' ? { overflow: 'scroll', height: '450px' } : null}>
+                        {this.state.filetype === 'excel'
+                          // this.state.rows && this.state.cols
+                          ? (
+                            <OutTable data={this.state.rows} columns={this.state.cols} tableClassName='ExcelTable2007' tableHeaderRowClass='heading' />
+                          ) : (
+                            null
+                          )}
+                        {this.state.filetype === 'pdf'
+                          ? (
+                            // <PdfAttachment doc={this.state.pdfB64} />
+                            <PDF file={this.state.pdfB64} scale={1.75} />
+                          ) : (
+                            null
+                          )}
+                      </ModalBody>
+                    </div>
+                  </Rnd>
+                ) : (
+                  null
+                )}
+              <Modal backdropClassName='modal-backdrop' animation backdrop size='lg' open={openPreviewModal} toggle={this.togglePreviewModal}>
+                <ModalHeader>
+                  <div className='modal-preview-text-wrapper'>
+                    <div className='modal-preview-to-text'>
+                      <b style={{ fontWeight: '900' }}>To:</b> {this.state.mailPreviewHeaderText}
+                    </div>
+                    <div className='modal-preview-to-text'>
+                      <b style={{ fontWeight: '900' }}>Cc:</b> service@newtelco.de
+                    </div>
+                    <div className='modal-preview-Subject-text'>
+                      <b style={{ fontWeight: '900' }}>Subject: </b>{this.state.maintenance.emergency ? `[EMERGENCY] ${this.state.mailPreviewSubjectText}` : `${this.state.mailPreviewSubjectText}`}
+                    </div>
+                  </div>
+                  <Button id='send-mail-btn' style={{ padding: '0.9em 1.1em' }} onClick={() => this.sendMail(this.state.mailPreviewHeaderText, this.state.mailPreviewCustomerCid, this.state.mailPreviewSubjectText, this.state.mailBodyText, true)}>
+                    <FontAwesomeIcon width='1.5em' style={{ fontSize: '12px' }} className='modal-preview-send-icon' icon={faPaperPlane} />
+                  </Button>
+                </ModalHeader>
+                <ModalBody>
+                  <TinyEditor
+                    initialValue={this.state.mailBodyText}
+                    apiKey='ttv2x1is9joc0fi7v6f6rzi0u98w2mpehx53mnc1277omr7s'
+                    init={{
+                      height: 500,
+                      menubar: false,
+                      statusbar: false,
+                      plugins: [
+                        'advlist autolink lists link image print preview anchor',
+                        'searchreplace code',
+                        'insertdatetime table paste code help wordcount'
+                      ],
+                      toolbar:
                           `undo redo | formatselect | bold italic backcolor | 
                           alignleft aligncenter alignright alignjustify | 
                           bullist numlist outdent indent | removeformat | help`
-                      }}
-                      onChange={this.handleEditorChange}
-                    />
+                    }}
+                    onChange={this.handleEditorChange}
+                  />
 
-                  </ModalBody>
-                </Modal>
-              </Card>
-              <style jsx>{`
+                </ModalBody>
+              </Modal>
+            </Card>
+            <style jsx>{`
                 :global(.ExcelTable2007) {
                   border: 1px solid #ddd;
                   border-collapse: collapse;
@@ -2364,12 +2367,12 @@ export default class Maintenance extends React.Component {
                   }
                 }
               `}
-              </style>
-            </Layout>
-          </HotKeys>
-        )
-      } else {
-        return <RequireLogin />
-      }
+            </style>
+          </Layout>
+        </HotKeys>
+      )
+    } else {
+      return <RequireLogin />
     }
   }
+}
