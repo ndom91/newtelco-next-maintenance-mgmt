@@ -56,13 +56,13 @@ export default class Companies extends React.Component {
           {
             headerName: 'Domain',
             field: 'mailDomain',
-            width: 200,
-            sort: { direction: 'asc' }
+            width: 200
           },
           {
             headerName: 'Company',
             field: 'name',
-            width: 200
+            width: 200,
+            sort: { direction: 'desc' }
           },
           {
             headerName: 'Recipient',
@@ -108,6 +108,7 @@ export default class Companies extends React.Component {
     window.gridApi = params.api
     this.gridColumnApi = params.columnApi
     params.api.sizeColumnsToFit()
+    params.api.setSortModel({ colId: 'name', sort: 'asc' })
   };
 
   onFirstDataRendered (params) {

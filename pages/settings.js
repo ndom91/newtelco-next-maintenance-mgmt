@@ -112,22 +112,22 @@ class Settings extends React.Component {
               <h2>Settings</h2>
               <Nav pills>
                 <NavItem active={companies}>
-                  <Link href={{ pathname: '/settings', query: { tab: 'companies' } }} as='/settings/companies'>
+                  <Link href={{ pathname: '/settings', query: { tab: 'companies' } }}>
                     <NavLink href=''>Companies</NavLink>
                   </Link>
                 </NavItem>
                 <NavItem active={customercids}>
-                  <Link href={{ pathname: '/settings', query: { tab: 'customercids' } }} as='/settings/customercids'>
+                  <Link href={{ pathname: '/settings', query: { tab: 'customercids' } }}>
                     <NavLink href=''>Customer CIDs</NavLink>
                   </Link>
                 </NavItem>
                 <NavItem active={suppliercids}>
-                  <Link href={{ pathname: '/settings', query: { tab: 'suppliercids' } }} as='/settings/suppliercids'>
+                  <Link href={{ pathname: '/settings', query: { tab: 'suppliercids' } }}>
                     <NavLink href=''>Supplier CIDs</NavLink>
                   </Link>
                 </NavItem>
                 <NavItem active={templates}>
-                  <Link href={{ pathname: '/settings', query: { tab: 'templates' } }} as='/settings/templates'>
+                  <Link href={{ pathname: '/settings', query: { tab: 'templates' } }}>
                     <NavLink href=''>Templates</NavLink>
                   </Link>
                 </NavItem>

@@ -26,7 +26,6 @@ import ProtectedIcon from '../src/components/ag-grid/protected'
 import SentIcon from '../src/components/ag-grid/sent'
 import { AgGridReact } from 'ag-grid-react'
 import PDF from 'react-pdf-js-infinite'
-import { PDFDownloadLink, View, Document, Page } from 'react-pdf'
 
 import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-material.css'
@@ -67,12 +66,6 @@ import {
   ModalHeader,
   ModalBody
 } from 'shards-react'
-
-const PdfAttachment = (props) => (
-  <Document file={props.doc}>
-    <Page pageNumber={1} />
-  </Document>
-)
 
 const animatedComponents = makeAnimated()
 
@@ -127,7 +120,7 @@ export default class Maintenance extends React.Component {
       },
       attachmentModalSize: {
         width: 673,
-        height: 300
+        height: 400
       },
       dateTimeWarning: false,
       openAttachmentModal: false,
@@ -1423,6 +1416,10 @@ export default class Maintenance extends React.Component {
           openAttachmentModal: !this.state.openAttachmentModal,
           currentAttachment: id || null
         })
+      } else {
+        cogoToast.warn('Filetype not supported', {
+          position: 'top-right'
+        })
       }
     } else {
       this.setState({
@@ -1963,8 +1960,8 @@ export default class Maintenance extends React.Component {
                     default={{
                       x: HALF_WIDTH,
                       y: 125,
-                      width: this.state.filetype === 'pdf' ? '1100' : '400',
-                      height: this.state.filetype === 'pdf' ? '600' : '450'
+                      width: this.state.filetype === 'pdf' ? '1100' : '520',
+                      height: this.state.filetype === 'pdf' ? '600' : '520'
                     }}
                     style={{
                       visibility: this.state.openAttachmentModal ? 'visible' : 'hidden',
@@ -1974,6 +1971,7 @@ export default class Maintenance extends React.Component {
                       borderRadius: '15px',
                       height: 'auto',
                       zIndex: '101',
+                      width: this.state.filetype === 'pdf' ? '1100' : '400',
                       boxShadow: '0px 0px 20px 1px var(--dark)'
                     }}
                     minWidth={500}

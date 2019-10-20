@@ -68,7 +68,7 @@ export default class CustomerCIDs extends React.Component {
             headerName: 'Customer',
             field: 'name',
             width: 200,
-            sort: { direction: 'asc', priority: 0 },
+            // sort: { direction: 'asc', priority: 0 },
             editable: false
           },
           {
@@ -150,6 +150,7 @@ export default class CustomerCIDs extends React.Component {
   onFirstDataRendered (params) {
     // params.columnApi.autoSizeColumns()
     // params.columnApi.sizeColumnsToFit()
+    // params.api.setSortModel({ colId: 'name', sort: 'desc' })
   }
 
   toggleCustomerCidAdd () {
@@ -253,7 +254,7 @@ export default class CustomerCIDs extends React.Component {
           })
         }
         const newRowData = this.state.rowData
-        newRowData.push({ 
+        newRowData.push({
           id: insertId,
           derenCID: newSupplierSelection.label,
           kundenCID: newNewtelcoCid,
