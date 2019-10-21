@@ -1,10 +1,14 @@
 import React from 'react'
 import Link from 'next/link'
+import Router from 'next/router'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 // import AlgoliaSearch from './autocomplete'
-import { InstantSearch, connectAutoComplete } from 'react-instantsearch-dom'
-import AgAutocomplete from 'react-algoliasearch'
-import algoliasearch from 'algoliasearch/lite'
+// import { InstantSearch, connectAutoComplete } from 'react-instantsearch-dom'
+// import AgAutocomplete from 'react-algoliasearch'
+// import algoliasearch from 'algoliasearch/lite'
+import algoliasearch from 'algoliasearch'
+import Autocomplete from 'algolia-react-autocomplete'
+import 'algolia-react-autocomplete/build/css/index.css'
 import {
   faPowerOff,
   faSearch
@@ -23,28 +27,63 @@ import {
   FormInput,
   Collapse
 } from 'shards-react'
-import { connectHits } from 'react-instantsearch-dom'
+// import { connectHits } from 'react-instantsearch-dom'
 
-const Hits = ({ hits }) => (
-  <ol>
-    {hits.map(hit => (
-      <li key={hit.objectID}>{hit.name}</li>
-    ))}
-  </ol>
-)
+// const Hits = ({ hits }) => (
+//   <ol>
+//     {hits.map(hit => (
+//       <li key={hit.objectID}>{hit.name}</li>
+//     ))}
+//   </ol>
+// )
 
-const CustomHits = connectHits(Hits)
+// id: 514
+// name: "Airtel"
+// derenCID: "10763572"
+// startDateTime: "2019-10-18 22:00:00"
+// endDateTime: "2019-10-19 02:00:00"
+// betroffeneCIDs: "011663"
+// mailDomain: "airtel.com"
+// location: "South Africa"
+// objectID: "968790270"
+
+// const CustomHits = connectHits(Hits)
 
 class Header extends React.Component {
   constructor (props) {
     super(props)
+
+    this.client = algoliasearch(
+      'O7K4XJKBHU',
+      '769a2cd0f2b32f30d4dc9ab78a643c0d'
+    )
+
+    this.indexes = [
+      {
+        source: this.client.initIndex('maintenance'),
+        displayKey: 'name',
+        templates: {
+          suggestion: (suggestion) => {
+            const newtelcoCID = suggestion.betroffeneCIDs || ''
+            return (
+              <span>
+                <div> <b style={{ fontWeight: '900' }}>{suggestion.id}</b> - {suggestion.name}</div>
+                <div> {suggestion.derenCID} -> {newtelcoCID.substr(0, 20)}</div>
+              </span>
+            )
+          }
+        }
+      }
+    ]
 
     this.toggleNavbar = this.toggleNavbar.bind(this)
     this.toggle = this.toggle.bind(this)
 
     this.state = {
       collapseOpen: false,
-      open: false
+      selection: null,
+      open: false,
+      hideResults: true
     }
   }
 
@@ -63,12 +102,26 @@ class Header extends React.Component {
     })
   }
 
-  render () {
-    const searchClient = algoliasearch(
-      'O7K4XJKBHU',
-      '769a2cd0f2b32f30d4dc9ab78a643c0d'
-    )
+  handleSearchFocus = () => {
+    this.setState({
+      hideResults: false
+    })
+  }
 
+  handleSearchBlur = () => {
+    this.setState({
+      hideResults: true
+    })
+  }
+
+  onSelectionChange = selection => {
+    const newLocation = `/maintenance?id=${selection.id}`
+    Router.push(newLocation)
+    // Router.pushRoute(`/maintenance?id=${selection.id}`)
+    // this.setState({ selection })
+  }
+
+  render () {
     return (
       <Navbar type='dark' theme='secondary' expand='md'>
         <NavbarBrand href='/'>
@@ -147,7 +200,26 @@ class Header extends React.Component {
                   <FontAwesomeIcon icon={faSearch} className='search-icon' width='1em' style={{  color: 'secondary' }} />
                 </InputGroupText>
               </InputGroupAddon>
-              <FormInput style={{ cursor: 'not-allowed' }} className='border-0 nav-search' placeholder='Coming Soon...' />
+              {/* <FormInput style={{ cursor: 'not-allowed' }} className='border-0 nav-search' placeholder='Coming Soon...' /> */}
+              <Autocomplete
+                indexes={this.indexes}
+                onSelectionChange={this.onSelectionChange}
+              >
+                <input
+                  key='input'
+                  type='search'
+                  id='aa-search-input'
+                  className='aa-input-search nav-search'
+                  placeholder='Search...'
+                  name='search'
+                  autoComplete='off'
+                  onFocus={this.handleSearchFocus}
+                  onBlur={this.handleSearchBlur}
+                />
+                <svg className='aa-input-icon' viewBox='654 -372 1664 1664'>
+                  <path d='M1806,332c0-123.3-43.8-228.8-131.5-316.5C1586.8-72.2,1481.3-116,1358-116s-228.8,43.8-316.5,131.5  C953.8,103.2,910,208.7,910,332s43.8,228.8,131.5,316.5C1129.2,736.2,1234.7,780,1358,780s228.8-43.8,316.5-131.5  C1762.2,560.8,1806,455.3,1806,332z M2318,1164c0,34.7-12.7,64.7-38,90s-55.3,38-90,38c-36,0-66-12.7-90-38l-343-342  c-119.3,82.7-252.3,124-399,124c-95.3,0-186.5-18.5-273.5-55.5s-162-87-225-150s-113-138-150-225S654,427.3,654,332  s18.5-186.5,55.5-273.5s87-162,150-225s138-113,225-150S1262.7-372,1358-372s186.5,18.5,273.5,55.5s162,87,225,150s113,138,150,225  S2062,236.7,2062,332c0,146.7-41.3,279.7-124,399l343,343C2305.7,1098.7,2318,1128.7,2318,1164z' />
+                </svg>
+              </Autocomplete>
               <NavItem>
                 <NavLink>
                   <form id='signout' method='post' action='/auth/signout' onSubmit={this.handleSignOutSubmit}>
@@ -172,38 +244,41 @@ class Header extends React.Component {
                 margin-left: 10px;
               }
             }
-          #algolia-autocomplete-listbox-2 {
-            background: #fff;
+          :global(.algolia-react-autocomplete) {
+            width: auto;
+          }
+          :global(.aa-dropdown-menus) {
+            visibility: ${this.state.hideResults ? 'hidden' : 'visible'};
+          }
+          :global(.aa-dropdown-menu) {
+            margin-top: 0px;
+            position: absolute;
+            left: 0px;
+            top: 45px;
             border-radius: 5px 5px 0 0;
-            padding: 5px;
+            width: 310px;
           }
-          .algolia-autocomplete {
-            width: 100%;
+          :global(.aa-suggestions) {
+            position: absolute;
+            background: #ececec;
+            z-index: 100;
+            max-height: 500px;
+            overflow-y: scroll;
+            box-shadow: 8px 0 8px -8px, 0 8px 8px -8px, -8px 0 8px -8px;
+            box-shadow: 0px 11px 28px 4px rgba(50, 50, 50, 0.95);
+            box-shadow: 0px 10px 35px 2px rgba(0, 0, 0, 0.75);
+            top: 0px;
+            border-radius: 5px;
           }
-          .algolia-autocomplete .aa-input, .algolia-autocomplete .aa-hint {
-            width: 100%;
+          :global(.aa-suggestions-category) {
+            visibility: hidden;
           }
-          .algolia-autocomplete .aa-hint {
-            color: #999;
+          :global(.aa-suggestions-results) {
+            color: #67B246;
           }
-          .algolia-autocomplete .aa-dropdown-menu {
-            width: 100%;
-            background-color: #fff;
-            border: 1px solid #999;
-            border-top: none;
+          :global(.aa-dropdown-menu > div) {
+            display: block;
           }
-          .algolia-autocomplete .aa-dropdown-menu .aa-suggestion {
-            cursor: pointer;
-            padding: 5px 4px;
-          }
-          .algolia-autocomplete .aa-dropdown-menu .aa-suggestion.aa-cursor {
-            background-color: #B2D7FF;
-          }
-          .algolia-autocomplete .aa-dropdown-menu .aa-suggestion em {
-            font-weight: bold;
-            font-style: normal;
-          }
-
           :global(.unread-badge) {
             position: absolute;
             top: -2px;
@@ -222,15 +297,23 @@ class Header extends React.Component {
             pointer-events: none !important;
             font-size: 18px !important;
           }
+          :global(.search-icon) {
+            pointer-events: none !important;
+          }
           :global(.nav-search::placeholder) {
             color: transparent;
           }
           :global(.nav-search) {
+            height: 42px;
+            outline: none;
+            border-radius: 7px;
+            color: rgba(0,0,0,0);
             padding-left: 0px !important;
             padding-right: 0px !important;
             width: 45px !important;
             overflow: hidden;
             background: transparent;
+            border: 0px;
 
             -webkit-transition: width 0.3s;
             -moz-transition: width 0.3s;
@@ -243,14 +326,12 @@ class Header extends React.Component {
           }
           :global(.nav-search:focus) {
             padding-left: 40px !important;
-            width: 230px !important;
+            width: 310px !important;
             background-color: #fff;
-            border-color: #66CC75;
+            color: rgba(0,0,0,1);
+            border: 2px solid #67B246;
             cursor: text;
-            
-            -webkit-box-shadow: 0 0 5px rgba(109,207,246,.5);
-            -moz-box-shadow: 0 0 5px rgba(109,207,246,.5);
-            box-shadow: 0 0 5px rgba(109,207,246,.5);
+            box-shadow: 0 0 5px 2px rgba(103, 178, 70, 0.54);
           }
           .menu-label {
             font-family: Poppins, Helvetica;

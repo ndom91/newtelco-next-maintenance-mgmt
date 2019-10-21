@@ -64,7 +64,8 @@ import {
   FormInput,
   Modal,
   ModalHeader,
-  ModalBody
+  ModalBody,
+  Progress
 } from 'shards-react'
 
 const animatedComponents = makeAnimated()
@@ -685,6 +686,20 @@ export default class Maintenance extends React.Component {
         }
       }, 500 * (index + 1))
     })
+  }
+
+  sentProgress = () => {
+    if (this.state.kundencids.length !== 0) {
+      const total = this.state.kundencids.length
+      let progressSent = 0
+      this.state.kundencids.forEach(cid => {
+        if (cid.sent === '1') {
+          progressSent = progressSent + 1
+        }
+      })
+      const result = (progressSent / total) * 100
+      return result
+    }
   }
 
   handleCalendarCreate () {
@@ -1550,6 +1565,7 @@ export default class Maintenance extends React.Component {
       TOGGLE_HELP: this.toggleHelpModal
     }
 
+
     let HALF_WIDTH = 500
     if (typeof window !== 'undefined') {
       HALF_WIDTH = this.state.width !== 0 ? this.state.width / 2 : 500
@@ -1824,6 +1840,16 @@ export default class Maintenance extends React.Component {
                       <Row>
                         <Col>
                           <Container style={{ padding: '20px' }} className='maintenance-subcontainer'>
+                            <Row>
+                              <Col>
+                                {this.state.kundencids.length !== 0
+                                  ? (
+                                    <Progress theme='primary' value={this.sentProgress()} />
+                                  ) : (
+                                    null
+                                  )}
+                              </Col>
+                            </Row>
                             <Row>
                               <Col style={{ width: '100%', height: '600px' }}>
                                 <div

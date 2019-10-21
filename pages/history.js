@@ -344,13 +344,12 @@ export default class History extends React.Component {
               }
             `}
             </style>
-            <Modal className='mail-modal-body' animation backdrop backdropClassName='modal-backdrop' open={this.state.openNewModal} size='lg' toggle={this.toggleNewModal}>
-              <ModalHeader />
+            <Modal className='mail-modal-body' animation backdrop backdropClassName='modal-backdrop' open={this.state.openNewModal} size='md' toggle={this.toggleNewModal}>
+              <ModalHeader className='modal-delete-header'>
+                New Maintenance
+              </ModalHeader>
               <ModalBody className='mail-body'>
-                <Container>
-                  <Row>
-                    <h2>New Maintenance</h2>
-                  </Row>
+                <Container className='container-interior'>
                   <Row>
                     <Col>
                       <FormGroup>
@@ -366,7 +365,9 @@ export default class History extends React.Component {
                       </FormGroup>
                     </Col>
                   </Row>
-                  <Row>
+                </Container>
+                <Row style={{ marginTop: '30px' }}>
+                  <Col>
                     <Link
                       href={{
                         pathname: '/maintenance',
@@ -378,13 +379,12 @@ export default class History extends React.Component {
                       }}
                       as='/maintenance/new'
                     >
-                      <Button outline theme='primary'>
+                      <Button style={{ width: '100%' }} outline theme='primary'>
                         Go
                       </Button>
                     </Link>
-                  </Row>
-
-                </Container>
+                  </Col>
+                </Row>
               </ModalBody>
             </Modal>
             <Modal className='delete-modal' animation backdrop backdropClassName='modal-backdrop' open={this.state.openConfirmDeleteModal} size='md' toggle={this.toggleConfirmDeleteModal}>

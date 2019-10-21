@@ -25,6 +25,8 @@
     "@sentry/browser": "^5.7.1",
     "@tinymce/tinymce-react": "^3.3.2",
     "@zeit/next-css": "^1.0.1",
+    "algolia-react-autocomplete": "^1.0.5",
+    "algoliasearch": "^3.35.1",
     "ant-design-draggable-modal": "0.0.13",
     "antd": "^3.23.6",
     "bootstrap": "^4.3.1",
