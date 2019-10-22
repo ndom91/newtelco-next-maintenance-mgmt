@@ -25,3 +25,7 @@ ALTER TABLE `maintenancedb` CHANGE `betroffeneCIDs` `betroffeneCIDs` VARCHAR(102
 ALTER TABLE `maintenancedb` ADD `timezoneLabel` VARCHAR(128) NULL AFTER `timezone`;
 
 ALTER TABLE `maintenancedb` CHANGE `betroffeneKunden` `betroffeneKunden` VARCHAR(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL;
+
+CREATE TABLE `maintenance`.`freeze` ( `id` INT(8) NOT NULL AUTO_INCREMENT , `companyId` INT(12) NOT NULL , `startDateTime` DATETIME NOT NULL , `endDateTime` DATETIME NOT NULL , PRIMARY KEY (`id`(8))) ENGINE = InnoDB;
+
+ALTER TABLE `freeze` ADD `notes` LONGTEXT NULL AFTER `endDateTime`;

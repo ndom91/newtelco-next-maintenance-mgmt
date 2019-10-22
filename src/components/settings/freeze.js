@@ -5,6 +5,11 @@ import { AgGridReact } from 'ag-grid-react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Select from 'react-select'
 import { HotKeys } from 'react-hotkeys'
+import StartDateTime from '../ag-grid/startdatetime'
+import EndDateTime from '../ag-grid/enddatetime'
+import Flatpickr from 'react-flatpickr'
+import moment from 'moment-timezone'
+import 'flatpickr/dist/themes/material_blue.css'
 import {
   faPlusCircle
 } from '@fortawesome/free-solid-svg-icons'
@@ -22,13 +27,14 @@ import {
   ModalHeader,
   ModalBody,
   FormGroup,
-  FormInput
+  FormInput,
+  FormTextarea
 } from 'shards-react'
 
-export default class SupplierCIDs extends React.Component {
+export default class Freeze extends React.Component {
   static async getInitialProps ({ req, query }) {
     const host = req ? req.headers['x-forwarded-host'] : location.host
-    const pageRequest = `https://${host}/api/settings/lieferantcids`
+    const pageRequest = `https://${host}/api/settings/freeze`
     const res = await fetch(pageRequest)
     const json = await res.json()
     return {
@@ -61,35 +67,51 @@ export default class SupplierCIDs extends React.Component {
             editable: false
           },
           {
-            headerName: 'Supplier CID',
-            field: 'derenCID',
-            width: 200
+            headerName: 'Start Date',
+            field: 'startDateTime',
+            width: 200,
+            cellRenderer: 'startdateTime'
+          },
+          {
+            headerName: 'End Date',
+            field: 'endDateTime',
+            width: 200,
+            cellRenderer: 'enddateTime'
+          },
+          {
+            headerName: 'Notes',
+            field: 'notes',
+            width: 300
           }
         ],
-        rowSelection: 'single'
+        rowSelection: 'single',
+        frameworkComponents: {
+          startdateTime: StartDateTime,
+          enddateTime: EndDateTime
+        }
       },
-      openSupplierCidAdd: false,
+      openFreezeAdd: false,
       openConfirmDeleteModal: false
     }
     this.handleCompanyChange = this.handleCompanyChange.bind(this)
-    this.handleSupplierCidChange = this.handleSupplierCidChange.bind(this)
+    // this.handleSupplierCidChange = this.handleSupplierCidChange.bind(this)
     this.handleSaveOnClick = this.handleSaveOnClick.bind(this)
-    this.toggleSupplierCidAdd = this.toggleSupplierCidAdd.bind(this)
+    this.toggleFreezeAddModal = this.toggleFreezeAddModal.bind(this)
     this.handleDelete = this.handleDelete.bind(this)
-    this.handleAddSupplierCid = this.handleAddSupplierCid.bind(this)
-    this.toggleSupplierCidDeleteModal = this.toggleSupplierCidDeleteModal.bind(this)
+    this.handleFreezeAdd = this.handleFreezeAdd.bind(this)
+    this.toggleFreezeDeleteModal = this.toggleFreezeDeleteModal.bind(this)
     this.handleCellEdit = this.handleCellEdit.bind(this)
   }
 
   componentDidMount () {
     const host = window.location.host
-    fetch(`https://${host}/api/lieferantcids/settings`, {
+    fetch(`https://${host}/api/freeze`, {
       method: 'get'
     })
       .then(resp => resp.json())
       .then(data => {
         this.setState({
-          rowData: data.lieferantCIDsResult
+          rowData: data.freezeQuery
         })
       })
       .catch(err => console.error(err))
@@ -113,9 +135,9 @@ export default class SupplierCIDs extends React.Component {
     params.api.sizeColumnsToFit()
   }
 
-  toggleSupplierCidAdd () {
+  toggleFreezeAddModal () {
     this.setState({
-      openSupplierCidAdd: !this.state.openSupplierCidAdd
+      openFreezeAdd: !this.state.openFreezeAdd
     })
   }
 
@@ -126,18 +148,40 @@ export default class SupplierCIDs extends React.Component {
 
   handleCompanyChange (selectedOption) {
     this.setState({
-      newCompanySelection: {
+      newCompany: {
         value: selectedOption.value,
         label: selectedOption.label
       }
     })
   }
 
-  handleSupplierCidChange (ev) {
+  handleNotesChange = (event) => {
     this.setState({
-      newSupplierCid: ev.target.value
+      newNotes: event.target.value
     })
   }
+
+  handleNewStartChange = (date) => {
+    const startDate = moment(date[0]).format('YYYY-MM-DD HH:mm:ss')
+    console.log(date)
+    this.setState({
+      newStartDateTime: startDate
+    })
+  }
+
+  handleNewEndChange = (date) => {
+    const endDate = moment(date[0]).format('YYYY-MM-DD HH:mm:ss')
+    console.log(date)
+    this.setState({
+      newEndDateTime: endDate
+    })
+  }
+
+  // handleSupplierCidChange (ev) {
+  //   this.setState({
+  //     newSupplierCid: ev.target.value
+  //   })
+  // }
 
   handleSaveOnClick () {
 
@@ -145,7 +189,7 @@ export default class SupplierCIDs extends React.Component {
 
   handleDelete () {
     const host = window.location.host
-    const supplierCidId = this.state.supplierCidIdToDelete
+    const supplierCidId = this.state.freezeIdToDelete
     fetch(`https://${host}/api/settings/delete/suppliercids?id=${supplierCidId}`, {
       method: 'get'
     })
@@ -170,34 +214,37 @@ export default class SupplierCIDs extends React.Component {
     })
   }
 
-  toggleSupplierCidDeleteModal () {
+  toggleFreezeDeleteModal () {
     if (window.gridApi) {
       const row = window.gridApi.getSelectedRows()
-      const supplierCidId = row[0].id
-      const supplierCid = row[0].derenCID
+      const freezeId = row[0].id
+      const freezeCompany = row[0].name
       this.setState({
         openConfirmDeleteModal: !this.state.openConfirmDeleteModal,
-        supplierCidIdToDelete: supplierCidId,
-        supplierCidNameToDelete: supplierCid
+        freezeIdToDelete: freezeId,
+        freezeCompanyToDelete: freezeCompany
       })
     }
   }
 
-  handleAddSupplierCid () {
+  handleFreezeAdd () {
     const {
-      newCompanySelection,
-      newSupplierCid
+      newCompany,
+      newStartDateTime,
+      newEndDateTime,
+      newNotes
     } = this.state
 
     const host = window.location.host
-    fetch(`https://${host}/api/settings/add/suppliercids?cid=${encodeURIComponent(newSupplierCid)}&company=${encodeURIComponent(newCompanySelection.value)}`, {
+    fetch(`https://${host}/api/settings/add/freeze?companyid=${encodeURIComponent(newCompany.value)}&startdatetime=${encodeURIComponent(newStartDateTime)}&enddatetime=${encodeURIComponent(newEndDateTime)}&notes=${encodeURIComponent(newNotes)}`, {
       method: 'get'
     })
       .then(resp => resp.json())
       .then(data => {
-        const insertId = data.insertSupplierCidQuery.insertId
-        if (data.insertSupplierCidQuery.affectedRows === 1 && data.insertSupplierCidQuery.warningCount === 0) {
-          cogoToast.success(`Supplier CID ${newSupplierCid} Added`, {
+        const insertId = data.insertFreezeQuery.insertId
+        const newCompanyName = this.state.newCompany.label
+        if (data.insertFreezeQuery.affectedRows === 1 && data.insertFreezeQuery.warningCount === 0) {
+          cogoToast.success(`Freeze for ${newCompanyName} Added`, {
             position: 'top-right'
           })
         } else {
@@ -206,11 +253,12 @@ export default class SupplierCIDs extends React.Component {
           })
         }
         const newRowData = this.state.rowData
-        newRowData.push({ id: insertId, derenCID: newSupplierCid, name: newCompanySelection.label })
+        newRowData.push({ id: insertId, name: newCompany.label, startdatetime: newStartDateTime, enddatetime: newEndDateTime, notes: newNotes })
         this.setState({
           rowData: newRowData,
-          openSupplierCidAdd: !this.state.openSupplierCidAdd
+          openFreezeAdd: !this.state.openFreezeAdd
         })
+        window.gridApi.refreshCells()
       })
       .catch(err => console.error(err))
   }
@@ -220,7 +268,7 @@ export default class SupplierCIDs extends React.Component {
     const newSupplierCid = params.data.derenCID
 
     const host = window.location.host
-    fetch(`https://${host}/api/settings/edit/suppliercids?id=${id}&suppliercid=${encodeURIComponent(newSupplierCid)}`, {
+    fetch(`https://${host}/api/settings/edit/freeze?id=${id}&suppliercid=${encodeURIComponent(newSupplierCid)}`, {
       method: 'get'
     })
       .then(resp => resp.json())
@@ -240,8 +288,7 @@ export default class SupplierCIDs extends React.Component {
 
   render () {
     const {
-      newCompanySelection,
-      newSupplierCid
+      newCompany
     } = this.state
 
     const keyMap = {
@@ -249,15 +296,15 @@ export default class SupplierCIDs extends React.Component {
     }
 
     const handlers = {
-      DELETE_MAINT: this.toggleSupplierCidDeleteModal
+      DELETE_MAINT: this.toggleFreezeDeleteModal
     }
 
     return (
       <>
         <HotKeys keyMap={keyMap} handlers={handlers}>
           <CardTitle>
-            <span className='section-title'>Newtelco CIDs</span>
-            <Button onClick={this.toggleSupplierCidAdd} outline theme='primary'>
+            <span className='section-title'>Network Freezes</span>
+            <Button onClick={this.toggleFreezeAddModal} outline theme='primary'>
               <FontAwesomeIcon width='1.125em' style={{ marginRight: '10px' }} icon={faPlusCircle} />
               Add
             </Button>
@@ -281,9 +328,9 @@ export default class SupplierCIDs extends React.Component {
               />
             </div>
           </div>
-          <Modal className='modal-body' animation backdrop backdropClassName='modal-backdrop' open={this.state.openSupplierCidAdd} size='md' toggle={this.toggleSupplierCidAdd}>
+          <Modal className='modal-body' animation backdrop backdropClassName='modal-backdrop' open={this.state.openFreezeAdd} size='md' toggle={this.toggleFreezeAddModal}>
             <ModalHeader>
-              New Supplier CID
+              New Freeze
             </ModalHeader>
             <ModalBody className='modal-body'>
               <Container className='container-border'>
@@ -294,7 +341,7 @@ export default class SupplierCIDs extends React.Component {
                         Customer
                       </label>
                       <Select
-                        value={newCompanySelection}
+                        value={newCompany}
                         onChange={this.handleCompanyChange}
                         options={this.state.companySelections}
                         noOptionsMessage={() => 'No Companies Available'}
@@ -303,23 +350,47 @@ export default class SupplierCIDs extends React.Component {
                     </FormGroup>
                     <FormGroup>
                       <label>
-                        Supplier CID
+                        Start Date/Time
                       </label>
-                      <FormInput id='updated-by' name='updated-by' type='text' value={newSupplierCid} onChange={this.handleSupplierCidChange} />
+                      <Flatpickr
+                        data-enable-time
+                        options={{ time_24hr: 'true', allow_input: 'true' }}
+                        className='flatpickr end-date-time'
+                        value={this.state.newStartDateTime || null}
+                        onChange={date => this.handleNewStartChange(date)}
+                      />
+                    </FormGroup>
+                    <FormGroup>
+                      <label>
+                        End Date/Time
+                      </label>
+                      <Flatpickr
+                        data-enable-time
+                        options={{ time_24hr: 'true', allow_input: 'true' }}
+                        className='flatpickr end-date-time'
+                        value={this.state.newEndDateTime || null}
+                        onChange={date => this.handleNewEndChange(date)}
+                      />
+                    </FormGroup>
+                    <FormGroup>
+                      <label>
+                        Notes
+                      </label>
+                      <FormTextarea onChange={this.handleNotesChange} />
                     </FormGroup>
                   </Col>
                 </Row>
               </Container>
               <Row style={{ display: 'flex', justifyContent: 'flex-end' }}>
                 <Col>
-                  <Button onClick={this.handleAddSupplierCid} style={{ width: '100%', marginTop: '15px' }} theme='primary'>
-                    Save
+                  <Button onClick={this.handleFreezeAdd} style={{ width: '100%', marginTop: '15px' }} theme='primary'>
+                      Save
                   </Button>
                 </Col>
               </Row>
             </ModalBody>
           </Modal>
-          <Modal className='delete-modal' animation backdrop backdropClassName='modal-backdrop' open={this.state.openConfirmDeleteModal} size='md' toggle={this.toggleSupplierCidDeleteModal}>
+          <Modal className='delete-modal' animation backdrop backdropClassName='modal-backdrop' open={this.state.openConfirmDeleteModal} size='md' toggle={this.toggleFreezeDeleteModal}>
             <ModalHeader className='modal-delete-header'>
               Confirm Delete
             </ModalHeader>
@@ -327,14 +398,14 @@ export default class SupplierCIDs extends React.Component {
               <Container className='container-border'>
                 <Row>
                   <Col>
-                    Are you sure you want to delete <b style={{ fontWeight: '900' }}> {this.state.supplierCidNameToDelete}</b> ({this.state.supplierCidIdToDelete})
+                    Are you sure you want to delete <b style={{ fontWeight: '900' }}> {this.state.freezeCompanyToDelete}</b> ({this.state.freezeIdToDelete})
                   </Col>
                 </Row>
               </Container>
               <Row style={{ marginTop: '20px' }}>
                 <Col>
                   <ButtonGroup style={{ width: '100%' }}>
-                    <Button onClick={this.toggleSupplierCidDeleteModal} outline theme='secondary'>
+                    <Button onClick={this.toggleFreezeDeleteModal} outline theme='secondary'>
                       Cancel
                     </Button>
                     <Button onClick={this.handleDelete} theme='danger'>
@@ -366,6 +437,40 @@ export default class SupplierCIDs extends React.Component {
               :global(.ag-cell.ag-cell-inline-editing) {
                 padding: 10px !important;
                 height: inherit !important;
+              }
+              :global(.flatpickr) {
+                height: auto;
+                width: 100%;
+                padding: .5rem 1rem;
+                font-size: .95rem;
+                line-height: 1.5;
+                color: #495057;
+                background-color: #fff;
+                border: 1px solid #becad6;
+                font-weight: 300;
+                will-change: border-color,box-shadow;
+                border-radius: .375rem;
+                box-shadow: none;
+                transition: box-shadow 250ms cubic-bezier(.27,.01,.38,1.06),border 250ms cubic-bezier(.27,.01,.38,1.06);
+              }
+              :global(.flatpickr-months) {
+                background: #67B246 !important;
+              }
+              :global(.flatpickr-month) {
+                background: #67B246 !important;
+              }
+              :global(.flatpickr-monthDropdown-months) {
+                background: #67B246 !important;
+              }
+              :global(.flatpickr-weekdays) {
+                background: #67B246 !important;
+              }
+              :global(.flatpickr-weekday) {
+                background: #67B246 !important;
+              }
+              :global(.flatpickr-day.selected) {
+                background: #67B246 !important;
+                border-color: #67B246 !important;
               }
             `}
           </style>

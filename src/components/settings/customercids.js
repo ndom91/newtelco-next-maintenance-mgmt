@@ -393,14 +393,14 @@ export default class CustomerCIDs extends React.Component {
                     </FormGroup>
                   </Col>
                 </Row>
-                <Row style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                  <Col>
-                    <Button onClick={this.handleAddCustomerCid} style={{ width: '100%', marginTop: '15px' }} theme='primary'>
-                      Save
-                    </Button>
-                  </Col>
-                </Row>
               </Container>
+              <Row style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <Col>
+                  <Button onClick={this.handleAddCustomerCid} style={{ width: '100%', marginTop: '15px' }} theme='primary'>
+                    Save
+                  </Button>
+                </Col>
+              </Row>
             </ModalBody>
           </Modal>
           <Modal className='delete-modal' animation backdrop backdropClassName='modal-backdrop' open={this.state.openConfirmDeleteModal} size='md' toggle={this.toggleConfirmDeleteModal}>
