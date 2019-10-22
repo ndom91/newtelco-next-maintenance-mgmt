@@ -1,18 +1,16 @@
 import React from 'react'
 import Link from 'next/link'
-import Router from 'next/router'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-// import AlgoliaSearch from './autocomplete'
-// import { InstantSearch, connectAutoComplete } from 'react-instantsearch-dom'
-// import AgAutocomplete from 'react-algoliasearch'
-// import algoliasearch from 'algoliasearch/lite'
+import DarkmodeSwitch from './darkmode'
 import algoliasearch from 'algoliasearch'
 import Autocomplete from 'algolia-react-autocomplete'
 import 'algolia-react-autocomplete/build/css/index.css'
 import {
   faPowerOff,
   faSearch,
-  faAngleRight
+  faAngleRight,
+  faClock,
+  faEthernet
 } from '@fortawesome/free-solid-svg-icons'
 import {
   Navbar,
@@ -25,30 +23,8 @@ import {
   InputGroup,
   InputGroupAddon,
   InputGroupText,
-  FormInput,
   Collapse
 } from 'shards-react'
-// import { connectHits } from 'react-instantsearch-dom'
-
-// const Hits = ({ hits }) => (
-//   <ol>
-//     {hits.map(hit => (
-//       <li key={hit.objectID}>{hit.name}</li>
-//     ))}
-//   </ol>
-// )
-
-// id: 514
-// name: "Airtel"
-// derenCID: "10763572"
-// startDateTime: "2019-10-18 22:00:00"
-// endDateTime: "2019-10-19 02:00:00"
-// betroffeneCIDs: "011663"
-// mailDomain: "airtel.com"
-// location: "South Africa"
-// objectID: "968790270"
-
-// const CustomHits = connectHits(Hits)
 
 class Header extends React.Component {
   constructor (props) {
@@ -69,8 +45,11 @@ class Header extends React.Component {
             return (
               <span>
                 <div> <b style={{ fontWeight: '900' }}>{suggestion.id}</b> - {suggestion.name}</div>
-                <div style={{ fontSize: '80%' }}>{suggestion.startDateTime} - {suggestion.endDateTime}</div>
                 <div style={{ fontSize: '80%' }}>
+                  <FontAwesomeIcon icon={faClock} className='search-list-icons' width='0.8em' style={{ color: 'secondary', margin: '3px 5px' }} />{suggestion.startDateTime} - {suggestion.endDateTime}
+                </div>
+                <div style={{ fontSize: '80%' }}>
+                  <FontAwesomeIcon icon={faEthernet} className='search-list-icons' width='0.8em' style={{ color: 'secondary', margin: '3px 5px' }} />
                   {suggestion.derenCID}
                   {suggestion.betroffeneCIDs
                     ? (
@@ -96,7 +75,8 @@ class Header extends React.Component {
       collapseOpen: false,
       selection: null,
       open: false,
-      hideResults: true
+      hideResults: true,
+      night: false
     }
   }
 
@@ -154,26 +134,21 @@ class Header extends React.Component {
         hideResults: true
       })
     }, 1000)
-    // setTimeout(
-    //   this.setState({
-    //     hideResults: true
-    //   }), 100)
   }
 
-  // onSelectionChange = selection => {
-  //   const newLocation = `/maintenance?id=${selection.id}`
-  //   Router.push(newLocation)
-  //   // Router.pushRoute(`/maintenance?id=${selection.id}`)
-  //   // this.setState({ selection })
+  // onToggleNight = () => {
+  //   this.setState({
+  //     night: !this.state.night
+  //   })
   // }
 
   render () {
     return (
-      <Navbar type='dark' theme='secondary' expand='md'>
+      <Navbar type='dark' theme={this.state.night ? 'dark' : 'secondary'} expand='md'>
         <NavbarBrand href='/'>
 
           <svg version='1.0' xmlns='http://www.w3.org/2000/svg' width='48px' height='48px' viewBox='0 0 1280 1280' preserveAspectRatio='xMidYMid meet'>
-            <g id='layer101' fill='#ffffff' stroke='none'>
+            <g id='layer101' fill='var(--white)' stroke='none'>
               <path d='M40 625 l0 -345 79 0 c73 0 81 2 98 24 10 14 52 73 93 131 41 58 92 129 113 157 l37 52 0 -183 0 -182 88 3 87 3 3 334 c2 261 -1 336 -10 343 -7 4 -45 8 -85 8 l-72 0 -33 -47 c-18 -27 -36 -52 -40 -58 -14 -17 -152 -208 -173 -240 l-20 -30 -5 185 -5 185 -77 3 -78 3 0 -346z' />
               <path d='M867 964 c-4 -4 -7 -126 -7 -271 l0 -263 -105 0 -105 0 0 -75 0 -75 298 2 297 3 0 70 0 70 -107 3 -108 3 -2 267 -3 267 -75 3 c-42 1 -79 0 -83 -4z' />
             </g>
@@ -185,16 +160,32 @@ class Header extends React.Component {
 
           <Nav navbar>
             <NavItem>
-              <Link href='/' passHref>
+              <Link
+                href={{
+                  pathname: '/',
+                  query: {
+                    night: this.props.night
+                  }
+                }}
+                passHref
+              >
                 <NavLink>
                   <span className='menu-label'>Home</span>
                 </NavLink>
               </Link>
             </NavItem>
             <NavItem style={{ position: 'relative' }}>
-              <Link href='/inbox' passHref>
+              <Link
+                href={{
+                  pathname: '/inbox',
+                  query: {
+                    night: this.props.night
+                  }
+                }}
+                passHref
+              >
                 <NavLink>
-                  <Badge className='unread-badge' pill theme='dark'>
+                  <Badge className='unread-badge' pill theme={this.state.night ? 'primary' : 'dark'}>
                     {this.props.unread}
                   </Badge>
                   <span style={{ position: 'relative', zIndex: '2' }} className='menu-label'>Inbox</span>
@@ -202,7 +193,15 @@ class Header extends React.Component {
               </Link>
             </NavItem>
             <NavItem>
-              <Link href='/history' passHref>
+              <Link
+                href={{
+                  pathname: '/history',
+                  query: {
+                    night: this.props.night
+                  }
+                }}
+                passHref
+              >
                 <NavLink>
                   <span className='menu-label'>History</span>
                 </NavLink>
@@ -213,7 +212,8 @@ class Header extends React.Component {
                 href={{
                   pathname: '/settings',
                   query: {
-                    tab: 'companies'
+                    tab: 'companies',
+                    night: this.props.night
                   }
                 }}
                 passHref
@@ -225,31 +225,14 @@ class Header extends React.Component {
             </NavItem>
           </Nav>
           <Nav style={{ justifyContent: 'flex-end' }} navbar className='ml-auto'>
-            {/* <InstantSearch
-              indexName='maintenance'
-              searchClient={searchClient}
-              createURL={searchState => `maintenance/?id=${searchState.query.id}`}
-            >
-              <CustomHits />
-            </InstantSearch> */}
-            {/* <AgAutocomplete
-              apiKey={'769a2cd0f2b32f30d4dc9ab78a643c0d'}
-              appId={'O7K4XJKBHU'}
-              displayKey='id'
-              indices={[{index: 'maintenance'}]}
-              inputId='input-search'
-              placeholder='Search...'
-            /> */}
             <InputGroup id='search-group' style={{ width: '100%', alignItems: 'center' }} size='sm' seamless>
               <InputGroupAddon type='prepend'>
                 <InputGroupText className='input-group-search'>
                   <FontAwesomeIcon icon={faSearch} className='search-icon' width='1em' style={{ color: 'secondary' }} />
                 </InputGroupText>
               </InputGroupAddon>
-              {/* <FormInput style={{ cursor: 'not-allowed' }} className='border-0 nav-search' placeholder='Coming Soon...' /> */}
               <Autocomplete
                 indexes={this.indexes}
-                // onSelectionChange={this.onSelectionChange}
                 onSelectionChange={this.props.handleSearchSelection}
               >
                 <input
@@ -279,9 +262,15 @@ class Header extends React.Component {
                   </form>
                 </NavLink>
               </NavItem>
+              <NavItem>
+                <DarkmodeSwitch value={this.props.night} onChange={this.props.toggleNight} />
+              </NavItem>
             </InputGroup>
           </Nav>
         </Collapse>
+        {/* html {
+            background-color: #e6e4e8;
+          } */}
         <style jsx>{`
             @media only screen and (max-width: 500px) {
               :global(#search-group) {
@@ -291,6 +280,10 @@ class Header extends React.Component {
                 margin-left: 10px;
               }
             }
+          :global(.search-list-icons) {
+            margin: 0px;
+            margin-right: 3px;
+          }
           :global(.algolia-react-autocomplete) {
             width: auto;
           }
@@ -307,11 +300,9 @@ class Header extends React.Component {
           }
           :global(.aa-suggestion:hover) {
             box-shadow: 0 0 10px 1px #67B246;
-            color: #67B246;
+            color: #5a6169;
           }
           :global(.aa-suggestion) {
-            border-top: 1px solid #e1e3e4;
-            border-bottom: 1px solid #e1e3e4;
             margin-top: 7px;
             margin-bottom: 7px;
           }
@@ -341,7 +332,7 @@ class Header extends React.Component {
             top: -2px;
             right: 2px;
             z-index: 1;
-            color: #fff;
+            color: var(--white);
             opacity: 0.5;
           }
           :global(.nav-link) {
@@ -390,7 +381,7 @@ class Header extends React.Component {
           :global(.nav-search:focus) {
             padding-left: 40px !important;
             width: 310px !important;
-            background-color: #fff;
+            background-color: var(--white);
             color: rgba(0,0,0,1);
             border: 2px solid #67B246;
             cursor: text;
@@ -415,7 +406,7 @@ class Header extends React.Component {
             background: none;
             margin-bottom: 6px;
             border: none;
-            color: #fff;
+            color: var(--white);
             outline: none;
             opacity: 0.5;
             transition: all 350ms ease-in-out;

@@ -383,8 +383,8 @@ export default class CustomerCIDs extends React.Component {
                       </label>
                       <Toggle
                         icons={{
-                          checked: <FontAwesomeIcon icon={faLock} width='0.7em' style={{ left: '10px', top: '-12px', color: '#fff' }} />,
-                          unchecked: <FontAwesomeIcon icon={faLockOpen} width='0.9em' style={{ right: '12px', top: '-12px', color: '#fff' }} />
+                          checked: <FontAwesomeIcon icon={faLock} width='0.7em' style={{ left: '10px', top: '-12px', color: 'var(--white)' }} />,
+                          unchecked: <FontAwesomeIcon icon={faLockOpen} width='0.9em' style={{ right: '12px', top: '-12px', color: 'var(--white)' }} />
                         }}
                         checked={newProtection}
                         onChange={(event) => this.handleProtectionChange(event)}

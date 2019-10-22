@@ -60,7 +60,7 @@ export default class ErrorBoundary extends React.Component {
               background: var(--light);
             }
             :global(.card-body) {
-              background: #fff;
+              background: var(--white);
             }
             :global(.error-card) {
               max-width: 800px;

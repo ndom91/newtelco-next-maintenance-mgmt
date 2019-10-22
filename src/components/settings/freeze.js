@@ -445,7 +445,7 @@ export default class Freeze extends React.Component {
                 font-size: .95rem;
                 line-height: 1.5;
                 color: #495057;
-                background-color: #fff;
+                background-color: var(--white);
                 border: 1px solid #becad6;
                 font-weight: 300;
                 will-change: border-color,box-shadow;

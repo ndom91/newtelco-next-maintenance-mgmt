@@ -22,7 +22,7 @@ export default class extends React.Component {
       <>
         <style jsx global>{`
           body{ 
-            background-color: #fff;
+            background-color: var(--white);
           }
           .circle-loader {
             position: absolute;

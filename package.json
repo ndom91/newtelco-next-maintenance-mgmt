@@ -76,7 +76,8 @@
     "serverless-mysql": "^1.5.1",
     "shards-react": "^1.0.3",
     "shards-ui": "^3.0.0",
-    "sql-template-strings": "^2.2.2"
+    "sql-template-strings": "^2.2.2",
+    "styled-components": "^4.4.0"
   },
   "devDependencies": {
     "@zeit/next-sass": "^1.0.1",

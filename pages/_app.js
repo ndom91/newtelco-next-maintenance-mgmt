@@ -32,7 +32,17 @@ export default class MyApp extends App {
       })
     }
 
+    this.state = {
+      night: false
+    }
+
     return { pageProps }
+  }
+
+  onToggleNight = () => {
+    this.setState({
+      night: !this.state.night
+    })
   }
 
   render () {
@@ -55,6 +65,27 @@ export default class MyApp extends App {
         <style jsx global>{`
           :root {
             --primary: #67B246 !important;
+          }
+          .darkmode {
+            background-color: #121212 !important;
+            color: var(--light) !important;
+          }
+          .darkmode-bgdark {
+            background-color: #121212 !important;
+            color: #fff !important;
+          }
+          .darkmode-bgdark-dp2 {
+            background-color: #272727 !important;
+            color: #fff !important;
+          }
+          .darkmode-boxshadow {
+            box-shadow: 0 0 20px 2px rgba(0,0,0,0.6) !important;
+          }
+          .darkmode-fgdark {
+            color: #272727 !important;
+          }
+          .darkmode-fgdark-dp2 {
+            color: #1f1f1f !important;
           }
           .navbar {
             padding: 0 1.5rem;

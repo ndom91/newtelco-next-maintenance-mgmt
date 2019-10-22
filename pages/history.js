@@ -423,7 +423,7 @@ export default class History extends React.Component {
             </Modal>
             <style jsx>{`
                 :global(.export-btn:hover) {
-                  background: #fff;
+                  background: var(--white);
                   color: var(--dark);
                   box-shadow: 0 0 5px 1px var(--secondary);
                 }

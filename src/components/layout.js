@@ -17,7 +17,8 @@ export default class Layout extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      openHelpModal: false
+      openHelpModal: false,
+      night: false
     }
     this.handleSignOutSubmit = this.handleSignOutSubmit.bind(this)
     this.toggleHelpModal = this.toggleHelpModal.bind(this)
@@ -38,6 +39,62 @@ export default class Layout extends React.Component {
   toggleHelpModal () {
     this.setState({
       openHelpModal: !this.state.openHelpModal
+    })
+  }
+
+  addClass = (elements, myClass) => {
+    if (!elements) { return }
+    if (typeof (elements) === 'string') {
+      elements = document.querySelectorAll(elements)
+    } else if (elements.tagName) { elements = [elements] }
+    for (var i = 0; i < elements.length; i++) {
+      if ((' ' + elements[i].className + ' ').indexOf(' ' + myClass + ' ') < 0) {
+        elements[i].className += ' ' + myClass
+      }
+    }
+  }
+
+  removeClass = (elements, myClass) => {
+    if (!elements) { return }
+    if (typeof (elements) === 'string') {
+      elements = document.querySelectorAll(elements)
+    } else if (elements.tagName) { elements = [elements] }
+    var reg = new RegExp('(^| )' + myClass + '($| )', 'g')
+    for (var i = 0; i < elements.length; i++) {
+      elements[i].className = elements[i].className.replace(reg, ' ')
+    }
+  }
+
+  onToggleNight = () => {
+    if (this.state.night) {
+      this.removeClass('html', 'darkmode')
+      this.removeClass('.unread-badge', 'darkmode')
+      this.removeClass('.bg-secondary', 'darkmode-bgdark-dp2')
+      this.removeClass('.card-body', 'darkmode-bgdark')
+      this.removeClass('.card-header', 'darkmode-bgdark-dp2')
+      this.removeClass('.card-footer', 'darkmode-bgdark-dp2')
+      this.removeClass('.card-footer', 'darkmode-fgdark-dp2')
+      this.removeClass('h1,h2,h3,h4,h5,h6', 'darkmode-bgdark-dp2')
+      this.removeClass('.card', 'darkmode-bgdark-dp2')
+      this.removeClass('.card', 'darkmode-boxshadow')
+      this.removeClass('.badge-primary', 'darkmode-fgdark')
+      this.removeClass('.list-group-item', 'darkmode-bgdark-dp2')
+    } else {
+      this.addClass('html', 'darkmode')
+      this.addClass('.unread-badge', 'darkmode')
+      this.addClass('.bg-secondary', 'darkmode-bgdark-dp2')
+      this.addClass('.card-body', 'darkmode-bgdark')
+      this.addClass('.card-header', 'darkmode-bgdark-dp2')
+      this.addClass('.card-footer', 'darkmode-bgdark-dp2')
+      this.addClass('.card-footer', 'darkmode-fgdark-dp2')
+      this.addClass('h1,h2,h3,h4,h5,h6', 'darkmode-bgdark-dp2')
+      this.addClass('.card', 'darkmode-bgdark-dp2')
+      this.addClass('.card', 'darkmode-boxshadow')
+      this.addClass('.badge-primary', 'darkmode-fgdark')
+      this.addClass('.list-group-item', 'darkmode-bgdark-dp2')
+    }
+    this.setState({
+      night: !this.state.night
     })
   }
 
@@ -65,7 +122,7 @@ export default class Layout extends React.Component {
     return (
       <div>
         <HotKeys keyMap={keyMap} handlers={handlers}>
-          <Header handleSearchSelection={this.props.handleSearchSelection} unread={this.props.unread} session={this.props.session} />
+          <Header night={this.state.night} toggleNight={this.onToggleNight} handleSearchSelection={this.props.handleSearchSelection} unread={this.props.unread} session={this.props.session} />
           <Container fluid>
             <Row style={{ height: '20px' }} />
             <Row>
@@ -141,6 +198,12 @@ export default class Layout extends React.Component {
               </ModalBody>
             </Modal>
             <style jsx>{`
+              :root {
+                --white: ${this.state.night ? '#444' : '#fff'} !important;
+              }
+              html {
+                background-color: var(--white);
+              }
               :global(.key-badge) {
                 font-size: 90%;
                 padding: 0.7rem;

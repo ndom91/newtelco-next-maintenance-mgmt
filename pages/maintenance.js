@@ -1788,7 +1788,7 @@ export default class Maintenance extends React.Component {
                                     <label>
                                       <Toggle
                                         icons={{
-                                          checked: <FontAwesomeIcon icon={faFirstAid} width='1em' style={{ color: '#fff' }} />,
+                                          checked: <FontAwesomeIcon icon={faFirstAid} width='1em' style={{ color: 'var(--white)' }} />,
                                           unchecked: null
                                         }}
                                         checked={maintenance.emergency === 'false' ? false : !!maintenance.emergency}
@@ -1920,7 +1920,7 @@ export default class Maintenance extends React.Component {
                     style={{
                       visibility: openReadModal ? 'visible' : 'hidden',
                       opacity: openReadModal ? 1 : 0,
-                      background: '#fff',
+                      background: 'var(--white)',
                       overflow: 'hidden',
                       borderRadius: '15px',
                       height: 'auto',
@@ -1998,7 +1998,7 @@ export default class Maintenance extends React.Component {
                     style={{
                       visibility: this.state.openAttachmentModal ? 'visible' : 'hidden',
                       opacity: this.state.openAttachmentModal ? 1 : 0,
-                      background: '#fff',
+                      background: '#var(--white)',
                       overflow: 'hidden',
                       borderRadius: '15px',
                       height: 'auto',
@@ -2017,7 +2017,7 @@ export default class Maintenance extends React.Component {
                         style={{
                           background: 'var(--secondary)',
                           borderRadius: '0px',
-                          color: '#fff',
+                          color: '#fvar(--white)',
                           display: 'flex',
                           justifyContent: 'space-between'
                         }}
@@ -2138,7 +2138,7 @@ export default class Maintenance extends React.Component {
                   min-width: 96px;
                   height: 96px;
                   border: 2px solid var(--light);
-                  background: #fff;
+                  background: var(--white);
                   padding: 10px;
                   border-radius: 5px;
                   margin-right: 10px;
@@ -2161,7 +2161,7 @@ export default class Maintenance extends React.Component {
                 }
                 :global(.MuiInputBase-root:focus-within) {
                   color: #495057;
-                  background-color: #fff;
+                  background-color: var(--white);
                   border: 1px solid #67B246 !important;
                   border-radius: 0.325rem;
                   box-shadow: 0 0.313rem 0.719rem rgba(0,123,255,.1), 0 0.156rem 0.125rem rgba(0,0,0,.06);
@@ -2245,7 +2245,7 @@ export default class Maintenance extends React.Component {
                 :global(.mail-body) {
                   font-family: Poppins, Helvetica;
                   height: ${this.state.readHeight ? `calc(${this.state.readHeight} - 127px)` : '460px'};
-                  background: #fff;
+                  background: var(--white);
                   overflow-y: ${this.state.incomingMailIsHtml ? 'scroll' : 'hidden'};
                 }
                 :global(.mail-body > :first-child) {
@@ -2312,13 +2312,13 @@ export default class Maintenance extends React.Component {
                   cursor: move;
                 }
                 .modal-incoming-header-text > * {
-                  color: #fff;
+                  color: var(--white);
                 }
                 :global(.modal-attachment-header-text:hover) {
                   cursor: move;
                 }
                 :global(.modal-attachment-header-text > h5) {
-                  color: #fff;
+                  color: var(--white);
                 }
                 :global(.close-attachment-modal-btn:hover > .close-attachment-modal-icon) {
                   color: var(--dark) !important;
@@ -2333,7 +2333,7 @@ export default class Maintenance extends React.Component {
                   font-size: .95rem;
                   line-height: 1.5;
                   color: #495057;
-                  background-color: #fff;
+                  background-color: var(--white);
                   border: 1px solid #becad6;
                   font-weight: 300;
                   will-change: border-color,box-shadow;

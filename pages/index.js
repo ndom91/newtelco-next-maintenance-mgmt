@@ -258,6 +258,9 @@ export default class Index extends React.Component {
               width: 250px;
               position: absolute;
             }
+            :global(.card-header) {
+              font-weight: 300 !important
+            }
             :global(.card-badge) {
               font-size: 196px;
               cursor: pointer;
