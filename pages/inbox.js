@@ -2,6 +2,7 @@ import React from 'react'
 import Layout from '../src/components/layout'
 import Footer from '../src/components/footer'
 import Link from 'next/link'
+import Router from 'next/router'
 import RequireLogin from '../src/components/require-login'
 import fetch from 'isomorphic-unfetch'
 import { NextAuth } from 'next-auth/client'
@@ -219,7 +220,6 @@ export default class Inbox extends React.Component {
   }
 
   handleSearchSelection = selection => {
-    console.log(selection)
     const newLocation = `/maintenance?id=${selection.id}`
     Router.push(newLocation)
     // Router.pushRoute(`/maintenance?id=${selection.id}`)
@@ -510,7 +510,7 @@ export default class Inbox extends React.Component {
               overflow-y: ${this.state.incomingMailIsHtml ? 'scroll' : 'hidden'};
             }
             :global(.mail-body > :first-child) {
-              position: absolute;
+              position: ${this.state.incomingMailIsHtml ? 'relative' : 'absolute'};
               top: 0;
               left: 0;
               height: 100vh;

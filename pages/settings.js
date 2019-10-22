@@ -94,7 +94,6 @@ class Settings extends React.Component {
   }
 
   handleSearchSelection = selection => {
-    console.log(selection)
     const newLocation = `/maintenance?id=${selection.id}`
     Router.push(newLocation)
     // Router.pushRoute(`/maintenance?id=${selection.id}`)

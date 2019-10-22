@@ -9,6 +9,7 @@ import Select from 'react-select'
 import cogoToast from 'cogo-toast'
 import Link from 'next/link'
 import moment from 'moment-timezone'
+import Router from 'next/router'
 import { NextAuth } from 'next-auth/client'
 import RequireLogin from '../src/components/require-login'
 import Footer from '../src/components/footer'
@@ -283,7 +284,6 @@ export default class History extends React.Component {
   }
 
   handleSearchSelection = selection => {
-    console.log(selection)
     const newLocation = `/maintenance?id=${selection.id}`
     Router.push(newLocation)
     // Router.pushRoute(`/maintenance?id=${selection.id}`)

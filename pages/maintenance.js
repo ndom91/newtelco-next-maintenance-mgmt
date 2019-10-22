@@ -1536,7 +1536,6 @@ export default class Maintenance extends React.Component {
   }
 
   handleSearchSelection = selection => {
-    console.log(selection)
     const newLocation = `/maintenance?id=${selection.id}`
     Router.push(newLocation)
     // Router.pushRoute(`/maintenance?id=${selection.id}`)
@@ -2250,7 +2249,7 @@ export default class Maintenance extends React.Component {
                   overflow-y: ${this.state.incomingMailIsHtml ? 'scroll' : 'hidden'};
                 }
                 :global(.mail-body > :first-child) {
-                  position: absolute;
+                  position: ${this.state.incomingMailIsHtml ? 'relative' : 'absolute'};
                   top: 0;
                   left: 0;
                   height: 100vh;

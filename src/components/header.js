@@ -139,6 +139,7 @@ class Header extends React.Component {
 
   handleSearchFocus = () => {
     this.removeClass('.nav-search', 'blur')
+    this.addClass('.nav-search', 'delay')
     this.setState({
       hideResults: false
     })
@@ -344,6 +345,12 @@ class Header extends React.Component {
           :global(.nav-search::placeholder) {
             color: transparent;
           }
+          :global(.delay) {
+            transition-delay: 1s;
+          }
+          :global(.nav-search) {
+            transition: width 0.3s 0s ease;
+          }
           :global(.nav-search.blur) {
             height: 42px;
             outline: none;
@@ -356,10 +363,8 @@ class Header extends React.Component {
             background: transparent;
             border: 0px;
 
-            -webkit-transition: width 0.3s;
-            -moz-transition: width 0.3s;
-            transition: width 0.3s;
-            animation-delay: 1s;
+            transition: width 0.3s 1s ease;
+            transition-delay: 0s !important;
 
             -webkit-backface-visibility: hidden;
           }
