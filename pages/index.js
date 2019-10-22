@@ -168,11 +168,19 @@ export default class Index extends React.Component {
     clearInterval(this.unreadInterval)
   }
 
+  handleSearchSelection = selection => {
+    console.log(selection)
+    const newLocation = `/maintenance?id=${selection.id}`
+    Router.push(newLocation)
+    // Router.pushRoute(`/maintenance?id=${selection.id}`)
+    // this.setState({ selection })
+  }
+
   render () {
     // console.log(this.props.session)
     if (this.props.session.user) {
       return (
-        <Layout unread={this.props.unread} session={this.props.session}>
+        <Layout handleSearchSelection={this.handleSearchSelection} unread={this.props.unread} session={this.props.session}>
           {UnreadCount()}
           <Card style={{ maxWidth: '100%' }}>
             <CardHeader><h2>Newtelco Maintenance</h2></CardHeader>

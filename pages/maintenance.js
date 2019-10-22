@@ -1535,6 +1535,14 @@ export default class Maintenance extends React.Component {
     }
   }
 
+  handleSearchSelection = selection => {
+    console.log(selection)
+    const newLocation = `/maintenance?id=${selection.id}`
+    Router.push(newLocation)
+    // Router.pushRoute(`/maintenance?id=${selection.id}`)
+    // this.setState({ selection })
+  }
+
   /// /////////////////////////////////////////////////////////
   //
   //                      RENDER
@@ -1565,7 +1573,6 @@ export default class Maintenance extends React.Component {
       TOGGLE_HELP: this.toggleHelpModal
     }
 
-
     let HALF_WIDTH = 500
     if (typeof window !== 'undefined') {
       HALF_WIDTH = this.state.width !== 0 ? this.state.width / 2 : 500
@@ -1574,7 +1581,7 @@ export default class Maintenance extends React.Component {
     if (this.props.session.user) {
       return (
         <HotKeys keyMap={keyMap} handlers={handlers}>
-          <Layout unread={this.props.unread} session={this.props.session}>
+          <Layout handleSearchSelection={this.handleSearchSelection} unread={this.props.unread} session={this.props.session}>
             <Helmet>
               <title>{`Newtelco Maintenance - NT-${maintenance.id}`}</title>
             </Helmet>
@@ -1619,7 +1626,7 @@ export default class Maintenance extends React.Component {
                           )}
                       </ButtonGroup>
                     ) : (
-                        <></>
+                      <></>
                     )}
                 </ButtonToolbar>
               </CardHeader>
@@ -1978,7 +1985,7 @@ export default class Maintenance extends React.Component {
                     </div>
                   </Rnd>
                 ) : (
-                    <></>
+                  <></>
                 )}
               {typeof window !== 'undefined'
                 ? (

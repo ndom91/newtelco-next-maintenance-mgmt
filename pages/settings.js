@@ -2,7 +2,7 @@ import React from 'react'
 import { NextAuth } from 'next-auth/client'
 import Link from 'next/link'
 import fetch from 'isomorphic-unfetch'
-import { withRouter } from 'next/router'
+import Router, { withRouter } from 'next/router'
 import RequireLogin from '../src/components/require-login'
 import Layout from '../src/components/layout'
 import Companies from '../src/components/settings/companies'
@@ -93,6 +93,14 @@ class Settings extends React.Component {
     }
   }
 
+  handleSearchSelection = selection => {
+    console.log(selection)
+    const newLocation = `/maintenance?id=${selection.id}`
+    Router.push(newLocation)
+    // Router.pushRoute(`/maintenance?id=${selection.id}`)
+    // this.setState({ selection })
+  }
+
   render () {
     const {
       active: {
@@ -110,7 +118,7 @@ class Settings extends React.Component {
 
     if (this.props.session.user) {
       return (
-        <Layout unread={this.props.unread} session={this.props.session}>
+        <Layout unread={this.props.unread} handleSearchSelection={this.handleSearchSelection} session={this.props.session}>
           {UnreadCount()}
           <Card style={{ maxWidth: '100%' }}>
             <CardHeader>

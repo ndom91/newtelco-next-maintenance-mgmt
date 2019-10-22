@@ -218,6 +218,14 @@ export default class Inbox extends React.Component {
       .catch(err => console.error(`Error - ${err}`))
   }
 
+  handleSearchSelection = selection => {
+    console.log(selection)
+    const newLocation = `/maintenance?id=${selection.id}`
+    Router.push(newLocation)
+    // Router.pushRoute(`/maintenance?id=${selection.id}`)
+    // this.setState({ selection })
+  }
+
   render () {
     if (this.props.session.user) {
       const {
@@ -226,7 +234,7 @@ export default class Inbox extends React.Component {
       } = this.state
 
       return (
-        <Layout unread={this.props.unread} session={this.props.session}>
+        <Layout handleSearchSelection={this.handleSearchSelection} unread={this.props.unread} session={this.props.session}>
           {UnreadCount()}
           <Card style={{ maxWidth: '100%' }}>
             <CardHeader><h2>Inbox</h2></CardHeader>

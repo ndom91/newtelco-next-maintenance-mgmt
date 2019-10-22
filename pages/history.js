@@ -282,6 +282,14 @@ export default class History extends React.Component {
     }
   }
 
+  handleSearchSelection = selection => {
+    console.log(selection)
+    const newLocation = `/maintenance?id=${selection.id}`
+    Router.push(newLocation)
+    // Router.pushRoute(`/maintenance?id=${selection.id}`)
+    // this.setState({ selection })
+  }
+
   render () {
     const keyMap = {
       DELETE_MAINT: 'alt+l'
@@ -293,7 +301,7 @@ export default class History extends React.Component {
     if (this.props.session.user) {
       return (
         <HotKeys keyMap={keyMap} handlers={handlers}>
-          <Layout unread={this.props.unread} session={this.props.session}>
+          <Layout handleSearchSelection={this.handleSearchSelection} unread={this.props.unread} session={this.props.session}>
             {UnreadCount()}
             <Card style={{ maxWidth: '100%' }}>
               <CardHeader>
@@ -433,7 +441,7 @@ export default class History extends React.Component {
                   border-radius: 0.325em;
                   padding: 30px;
                 }
-            `} 
+            `}
             </style>
           </Layout>
         </HotKeys>

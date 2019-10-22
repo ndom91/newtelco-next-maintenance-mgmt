@@ -65,7 +65,7 @@ export default class Layout extends React.Component {
     return (
       <div>
         <HotKeys keyMap={keyMap} handlers={handlers}>
-          <Header unread={this.props.unread} session={this.props.session} />
+          <Header handleSearchSelection={this.props.handleSearchSelection} unread={this.props.unread} session={this.props.session} />
           <Container fluid>
             <Row style={{ height: '20px' }} />
             <Row>

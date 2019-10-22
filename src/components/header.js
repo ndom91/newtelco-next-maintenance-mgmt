@@ -11,7 +11,8 @@ import Autocomplete from 'algolia-react-autocomplete'
 import 'algolia-react-autocomplete/build/css/index.css'
 import {
   faPowerOff,
-  faSearch
+  faSearch,
+  faAngleRight
 } from '@fortawesome/free-solid-svg-icons'
 import {
   Navbar,
@@ -68,7 +69,18 @@ class Header extends React.Component {
             return (
               <span>
                 <div> <b style={{ fontWeight: '900' }}>{suggestion.id}</b> - {suggestion.name}</div>
-                <div> {suggestion.derenCID} -> {newtelcoCID.substr(0, 20)}</div>
+                <div>
+                  {suggestion.derenCID}
+                  {suggestion.betroffeneCIDs
+                    ? (
+                      <>
+                        <FontAwesomeIcon icon={faAngleRight} className='search-icon' width='0.5em' style={{ color: 'secondary', margin: '3px 5px' }} />
+                        <span>{newtelcoCID.substr(0, 20)}</span>
+                      </>
+                    ) : (
+                      null
+                    )}
+                </div>
               </span>
             )
           }
@@ -84,6 +96,29 @@ class Header extends React.Component {
       selection: null,
       open: false,
       hideResults: true
+    }
+  }
+
+  addClass = (elements, myClass) => {
+    if (!elements) { return }
+    if (typeof (elements) === 'string') {
+      elements = document.querySelectorAll(elements)
+    } else if (elements.tagName) { elements = [elements] }
+    for (var i = 0; i < elements.length; i++) {
+      if ((' ' + elements[i].className + ' ').indexOf(' ' + myClass + ' ') < 0) {
+        elements[i].className += ' ' + myClass
+      }
+    }
+  }
+
+  removeClass = (elements, myClass) => {
+    if (!elements) { return }
+    if (typeof (elements) === 'string') {
+      elements = document.querySelectorAll(elements)
+    } else if (elements.tagName) { elements = [elements] }
+    var reg = new RegExp('(^| )' + myClass + '($| )', 'g')
+    for (var i = 0; i < elements.length; i++) {
+      elements[i].className = elements[i].className.replace(reg, ' ')
     }
   }
 
@@ -103,23 +138,28 @@ class Header extends React.Component {
   }
 
   handleSearchFocus = () => {
+    this.removeClass('.nav-search', 'blur')
     this.setState({
       hideResults: false
     })
   }
 
   handleSearchBlur = () => {
-    this.setState({
-      hideResults: true
-    })
+    setTimeout(() => {
+      this.addClass('.nav-search', 'blur')
+    }, 1000)
+    // setTimeout(
+    //   this.setState({
+    //     hideResults: true
+    //   }), 100)
   }
 
-  onSelectionChange = selection => {
-    const newLocation = `/maintenance?id=${selection.id}`
-    Router.push(newLocation)
-    // Router.pushRoute(`/maintenance?id=${selection.id}`)
-    // this.setState({ selection })
-  }
+  // onSelectionChange = selection => {
+  //   const newLocation = `/maintenance?id=${selection.id}`
+  //   Router.push(newLocation)
+  //   // Router.pushRoute(`/maintenance?id=${selection.id}`)
+  //   // this.setState({ selection })
+  // }
 
   render () {
     return (
@@ -197,19 +237,20 @@ class Header extends React.Component {
             <InputGroup id='search-group' style={{ width: '100%', alignItems: 'center' }} size='sm' seamless>
               <InputGroupAddon type='prepend'>
                 <InputGroupText className='input-group-search'>
-                  <FontAwesomeIcon icon={faSearch} className='search-icon' width='1em' style={{  color: 'secondary' }} />
+                  <FontAwesomeIcon icon={faSearch} className='search-icon' width='1em' style={{ color: 'secondary' }} />
                 </InputGroupText>
               </InputGroupAddon>
               {/* <FormInput style={{ cursor: 'not-allowed' }} className='border-0 nav-search' placeholder='Coming Soon...' /> */}
               <Autocomplete
                 indexes={this.indexes}
-                onSelectionChange={this.onSelectionChange}
+                // onSelectionChange={this.onSelectionChange}
+                onSelectionChange={this.props.handleSearchSelection}
               >
                 <input
                   key='input'
                   type='search'
                   id='aa-search-input'
-                  className='aa-input-search nav-search'
+                  className='aa-input-search nav-search blur'
                   placeholder='Search...'
                   name='search'
                   autoComplete='off'
@@ -303,7 +344,7 @@ class Header extends React.Component {
           :global(.nav-search::placeholder) {
             color: transparent;
           }
-          :global(.nav-search) {
+          :global(.nav-search.blur) {
             height: 42px;
             outline: none;
             border-radius: 7px;
@@ -318,6 +359,7 @@ class Header extends React.Component {
             -webkit-transition: width 0.3s;
             -moz-transition: width 0.3s;
             transition: width 0.3s;
+            animation-delay: 1s;
 
             -webkit-backface-visibility: hidden;
           }
