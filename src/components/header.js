@@ -69,7 +69,8 @@ class Header extends React.Component {
             return (
               <span>
                 <div> <b style={{ fontWeight: '900' }}>{suggestion.id}</b> - {suggestion.name}</div>
-                <div>
+                <div style={{ fontSize: '80%' }}>{suggestion.startDateTime} - {suggestion.endDateTime}</div>
+                <div style={{ fontSize: '80%' }}>
                   {suggestion.derenCID}
                   {suggestion.betroffeneCIDs
                     ? (
@@ -148,6 +149,10 @@ class Header extends React.Component {
   handleSearchBlur = () => {
     setTimeout(() => {
       this.addClass('.nav-search', 'blur')
+      this.removeClass('.nav-search', 'delay')
+      this.setState({
+        hideResults: true
+      })
     }, 1000)
     // setTimeout(
     //   this.setState({
@@ -300,6 +305,16 @@ class Header extends React.Component {
             border-radius: 5px 5px 0 0;
             width: 310px;
           }
+          :global(.aa-suggestion:hover) {
+            box-shadow: 0 0 10px 1px #67B246;
+            color: #67B246;
+          }
+          :global(.aa-suggestion) {
+            border-top: 1px solid #e1e3e4;
+            border-bottom: 1px solid #e1e3e4;
+            margin-top: 7px;
+            margin-bottom: 7px;
+          }
           :global(.aa-suggestions) {
             position: absolute;
             background: #ececec;
@@ -346,7 +361,7 @@ class Header extends React.Component {
             color: transparent;
           }
           :global(.delay) {
-            transition-delay: 1s;
+            transition-delay: 1s !important;
           }
           :global(.nav-search) {
             transition: width 0.3s 0s ease;
@@ -363,12 +378,13 @@ class Header extends React.Component {
             background: transparent;
             border: 0px;
 
-            transition: width 0.3s 1s ease;
-            transition-delay: 0s !important;
+            transition: width 1s 1s ease;
+            transition-delay: 1s !important;
 
             -webkit-backface-visibility: hidden;
           }
           :global(.nav-search:hover) {
+            transition-delay: 0s !important;
             cursor: pointer;
           }
           :global(.nav-search:focus) {
@@ -379,6 +395,7 @@ class Header extends React.Component {
             border: 2px solid #67B246;
             cursor: text;
             box-shadow: 0 0 5px 2px rgba(103, 178, 70, 0.54);
+            transition-delay: 0s !important;
           }
           .menu-label {
             font-family: Poppins, Helvetica;
