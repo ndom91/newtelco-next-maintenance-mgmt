@@ -78,6 +78,10 @@ export default class MyApp extends App {
             background-color: #272727 !important;
             color: #fff !important;
           }
+          .darkmode-bgdark-dp4 {
+            background-color: #121212 !important;
+            color: #fff !important;
+          }
           .darkmode-boxshadow {
             box-shadow: 0 0 20px 2px rgba(0,0,0,0.6) !important;
           }

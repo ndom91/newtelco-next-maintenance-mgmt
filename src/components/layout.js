@@ -34,11 +34,12 @@ export default class Layout extends React.Component {
       this.addClass('.card-header', 'darkmode-bgdark-dp2')
       this.addClass('.card-footer', 'darkmode-bgdark-dp2')
       this.addClass('.card-footer', 'darkmode-fgdark-dp2')
-      this.addClass('h1,h2,h3,h4,h5,h6', 'darkmode-bgdark-dp2')
+      this.addClass('h1,h2,h3,h5,h6', 'darkmode-bgdark-dp2')
       this.addClass('.card', 'darkmode-bgdark-dp2')
       this.addClass('.card', 'darkmode-boxshadow')
       this.addClass('.badge-primary', 'darkmode-fgdark')
       this.addClass('.list-group-item', 'darkmode-bgdark-dp2')
+      this.addClass('.inbox0-text', 'darkmode-bgdark-dp4')
     } else if (!this.state.night) {
       this.removeClass('html', 'darkmode')
       this.removeClass('.unread-badge', 'darkmode')
@@ -47,11 +48,12 @@ export default class Layout extends React.Component {
       this.removeClass('.card-header', 'darkmode-bgdark-dp2')
       this.removeClass('.card-footer', 'darkmode-bgdark-dp2')
       this.removeClass('.card-footer', 'darkmode-fgdark-dp2')
-      this.removeClass('h1,h2,h3,h4,h5,h6', 'darkmode-bgdark-dp2')
+      this.removeClass('h1,h2,h3,h5,h6', 'darkmode-bgdark-dp2')
       this.removeClass('.card', 'darkmode-bgdark-dp2')
       this.removeClass('.card', 'darkmode-boxshadow')
       this.removeClass('.badge-primary', 'darkmode-fgdark')
       this.removeClass('.list-group-item', 'darkmode-bgdark-dp2')
+      this.removeClass('.inbox0-text', 'darkmode-bgdark-dp4')
     }
   }
 
@@ -105,11 +107,12 @@ export default class Layout extends React.Component {
       this.removeClass('.card-header', 'darkmode-bgdark-dp2')
       this.removeClass('.card-footer', 'darkmode-bgdark-dp2')
       this.removeClass('.card-footer', 'darkmode-fgdark-dp2')
-      this.removeClass('h1,h2,h3,h4,h5,h6', 'darkmode-bgdark-dp2')
+      this.removeClass('h1,h2,h3,h5,h6', 'darkmode-bgdark-dp2')
       this.removeClass('.card', 'darkmode-bgdark-dp2')
       this.removeClass('.card', 'darkmode-boxshadow')
       this.removeClass('.badge-primary', 'darkmode-fgdark')
       this.removeClass('.list-group-item', 'darkmode-bgdark-dp2')
+      this.removeClass('.inbox0-text', 'darkmode-bgdark-dp4')
     } else {
       this.addClass('html', 'darkmode')
       this.addClass('.unread-badge', 'darkmode')
@@ -118,11 +121,12 @@ export default class Layout extends React.Component {
       this.addClass('.card-header', 'darkmode-bgdark-dp2')
       this.addClass('.card-footer', 'darkmode-bgdark-dp2')
       this.addClass('.card-footer', 'darkmode-fgdark-dp2')
-      this.addClass('h1,h2,h3,h4,h5,h6', 'darkmode-bgdark-dp2')
+      this.addClass('h1,h2,h3,h5,h6', 'darkmode-bgdark-dp2')
       this.addClass('.card', 'darkmode-bgdark-dp2')
       this.addClass('.card', 'darkmode-boxshadow')
       this.addClass('.badge-primary', 'darkmode-fgdark')
       this.addClass('.list-group-item', 'darkmode-bgdark-dp2')
+      this.addClass('.inbox0-text', 'darkmode-bgdark-dp4')
     }
     this.setState({
       night: !this.state.night
