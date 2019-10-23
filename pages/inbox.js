@@ -36,7 +36,7 @@ import {
 export default class Inbox extends React.Component {
   static async getInitialProps ({ req, query }) {
     const host = req ? req.headers['x-forwarded-host'] : location.host
-    const pageRequest = `https://api.${host}/inbox` // ?page=${query.page || 1}&limit=${query.limit || 41}`
+    const pageRequest = `https://api.${host}/inbox`
     const res = await fetch(pageRequest, {
       mode: 'cors',
       headers: {
@@ -293,6 +293,7 @@ export default class Inbox extends React.Component {
                                       body: mail.body
                                     }
                                   }}
+                                  passHref
                                   as='/maintenance/new'
                                 >
                                   <Button className='mail-edit-btn pencil-icon' outline>
