@@ -21,7 +21,7 @@ import {
 const people = ['fwaleska', 'alissitsin', 'sstergiou']
 
 export default class Index extends React.Component {
-  static async getInitialProps ({ res, req }) {
+  static async getInitialProps ({ res, req, query }) {
     const host = req ? req.headers['x-forwarded-host'] : location.host
     const pageRequest = `https://api.${host}/inbox/count` // ?page=${query.page || 1}&limit=${query.limit || 41}`
     const fetchRes = await fetch(pageRequest, {
@@ -53,6 +53,7 @@ export default class Index extends React.Component {
     return {
       jsonData: json,
       unread: display,
+      night: query.night,
       session: await NextAuth.init({ req })
     }
   }
@@ -171,15 +172,13 @@ export default class Index extends React.Component {
   handleSearchSelection = selection => {
     const newLocation = `/maintenance?id=${selection.id}`
     Router.push(newLocation)
-    // Router.pushRoute(`/maintenance?id=${selection.id}`)
-    // this.setState({ selection })
   }
 
   render () {
     // console.log(this.props.session)
     if (this.props.session.user) {
       return (
-        <Layout handleSearchSelection={this.handleSearchSelection} unread={this.props.unread} session={this.props.session}>
+        <Layout night={this.props.night} handleSearchSelection={this.handleSearchSelection} unread={this.props.unread} session={this.props.session}>
           {UnreadCount()}
           <Card style={{ maxWidth: '100%' }}>
             <CardHeader><h2>Newtelco Maintenance</h2></CardHeader>

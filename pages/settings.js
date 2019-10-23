@@ -22,7 +22,7 @@ import {
 } from 'shards-react'
 
 class Settings extends React.Component {
-  static async getInitialProps ({ req }) {
+  static async getInitialProps ({ req, query }) {
     const host = req ? req.headers['x-forwarded-host'] : location.host
     const pageRequest2 = `https://api.${host}/inbox/count`
     const res2 = await fetch(pageRequest2)
@@ -35,6 +35,7 @@ class Settings extends React.Component {
     }
     return {
       unread: display,
+      night: query.night,
       session: await NextAuth.init({ req })
     }
   }
@@ -117,7 +118,7 @@ class Settings extends React.Component {
 
     if (this.props.session.user) {
       return (
-        <Layout unread={this.props.unread} handleSearchSelection={this.handleSearchSelection} session={this.props.session}>
+        <Layout night={this.props.night} unread={this.props.unread} handleSearchSelection={this.handleSearchSelection} session={this.props.session}>
           {UnreadCount()}
           <Card style={{ maxWidth: '100%' }}>
             <CardHeader>

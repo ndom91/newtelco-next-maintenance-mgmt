@@ -34,7 +34,7 @@ import {
 } from 'shards-react'
 
 export default class Inbox extends React.Component {
-  static async getInitialProps ({ req }) {
+  static async getInitialProps ({ req, query }) {
     const host = req ? req.headers['x-forwarded-host'] : location.host
     const pageRequest = `https://api.${host}/inbox` // ?page=${query.page || 1}&limit=${query.limit || 41}`
     const res = await fetch(pageRequest, {
@@ -56,6 +56,7 @@ export default class Inbox extends React.Component {
     return {
       jsonData: json,
       unread: display,
+      night: query.night,
       session: await NextAuth.init({ req })
     }
   }
@@ -234,7 +235,7 @@ export default class Inbox extends React.Component {
       } = this.state
 
       return (
-        <Layout handleSearchSelection={this.handleSearchSelection} unread={this.props.unread} session={this.props.session}>
+        <Layout night={this.props.night} handleSearchSelection={this.handleSearchSelection} unread={this.props.unread} session={this.props.session}>
           {UnreadCount()}
           <Card style={{ maxWidth: '100%' }}>
             <CardHeader><h2>Inbox</h2></CardHeader>

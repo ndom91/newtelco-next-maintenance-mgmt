@@ -86,6 +86,7 @@ export default class Maintenance extends React.Component {
       return {
         jsonData: { profile: query },
         unread: display,
+        night: query.night,
         session: await NextAuth.init({ req })
       }
     } else {
@@ -95,6 +96,7 @@ export default class Maintenance extends React.Component {
       return {
         jsonData: json,
         unread: display,
+        night: query.night,
         session: await NextAuth.init({ req })
       }
     }
@@ -1580,7 +1582,7 @@ export default class Maintenance extends React.Component {
     if (this.props.session.user) {
       return (
         <HotKeys keyMap={keyMap} handlers={handlers}>
-          <Layout handleSearchSelection={this.handleSearchSelection} unread={this.props.unread} session={this.props.session}>
+          <Layout night={this.props.night} handleSearchSelection={this.handleSearchSelection} unread={this.props.unread} session={this.props.session}>
             <Helmet>
               <title>{`Newtelco Maintenance - NT-${maintenance.id}`}</title>
             </Helmet>

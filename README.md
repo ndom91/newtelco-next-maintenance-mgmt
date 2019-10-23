@@ -7,6 +7,7 @@
 - Gmail API - Create maintenance entries directly from incoming Emails as well as send mails to notify clients
 - Google Translate API - Translate Russian mails directly in the read preview
 - Google Calendar API - Create calendar entries at the click of a button
+- Clean, professional, responsive UI
 - TinyMCE WYSIWYG Editor
 - Export history data to CSV
 - LogRocket + Sentry Error Logging

@@ -63,6 +63,7 @@ export default class History extends React.Component {
     return {
       jsonData: json,
       unread: display,
+      night: query.night,
       session: await NextAuth.init({ req })
     }
   }
@@ -301,7 +302,7 @@ export default class History extends React.Component {
     if (this.props.session.user) {
       return (
         <HotKeys keyMap={keyMap} handlers={handlers}>
-          <Layout handleSearchSelection={this.handleSearchSelection} unread={this.props.unread} session={this.props.session}>
+          <Layout night={this.props.night} handleSearchSelection={this.handleSearchSelection} unread={this.props.unread} session={this.props.session}>
             {UnreadCount()}
             <Card style={{ maxWidth: '100%' }}>
               <CardHeader>

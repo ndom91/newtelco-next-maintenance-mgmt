@@ -167,6 +167,7 @@ class Header extends React.Component {
                     night: this.props.night
                   }
                 }}
+                as='/'
                 passHref
               >
                 <NavLink>
@@ -182,6 +183,7 @@ class Header extends React.Component {
                     night: this.props.night
                   }
                 }}
+                as='/inbox'
                 passHref
               >
                 <NavLink>
@@ -200,6 +202,7 @@ class Header extends React.Component {
                     night: this.props.night
                   }
                 }}
+                as='/history'
                 passHref
               >
                 <NavLink>
@@ -216,6 +219,7 @@ class Header extends React.Component {
                     night: this.props.night
                   }
                 }}
+                as='/settings'
                 passHref
               >
                 <NavLink>

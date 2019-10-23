@@ -16,12 +16,43 @@ import {
 export default class Layout extends React.Component {
   constructor (props) {
     super(props)
+    const nightTrue = this.props.night === 'true'
     this.state = {
       openHelpModal: false,
-      night: false
+      night: nightTrue || false
     }
     this.handleSignOutSubmit = this.handleSignOutSubmit.bind(this)
     this.toggleHelpModal = this.toggleHelpModal.bind(this)
+  }
+
+  componentDidMount () {
+    if (this.state.night) {
+      this.addClass('html', 'darkmode')
+      this.addClass('.unread-badge', 'darkmode')
+      this.addClass('.bg-secondary', 'darkmode-bgdark-dp2')
+      this.addClass('.card-body', 'darkmode-bgdark')
+      this.addClass('.card-header', 'darkmode-bgdark-dp2')
+      this.addClass('.card-footer', 'darkmode-bgdark-dp2')
+      this.addClass('.card-footer', 'darkmode-fgdark-dp2')
+      this.addClass('h1,h2,h3,h4,h5,h6', 'darkmode-bgdark-dp2')
+      this.addClass('.card', 'darkmode-bgdark-dp2')
+      this.addClass('.card', 'darkmode-boxshadow')
+      this.addClass('.badge-primary', 'darkmode-fgdark')
+      this.addClass('.list-group-item', 'darkmode-bgdark-dp2')
+    } else if (!this.state.night) {
+      this.removeClass('html', 'darkmode')
+      this.removeClass('.unread-badge', 'darkmode')
+      this.removeClass('.bg-secondary', 'darkmode-bgdark-dp2')
+      this.removeClass('.card-body', 'darkmode-bgdark')
+      this.removeClass('.card-header', 'darkmode-bgdark-dp2')
+      this.removeClass('.card-footer', 'darkmode-bgdark-dp2')
+      this.removeClass('.card-footer', 'darkmode-fgdark-dp2')
+      this.removeClass('h1,h2,h3,h4,h5,h6', 'darkmode-bgdark-dp2')
+      this.removeClass('.card', 'darkmode-bgdark-dp2')
+      this.removeClass('.card', 'darkmode-boxshadow')
+      this.removeClass('.badge-primary', 'darkmode-fgdark')
+      this.removeClass('.list-group-item', 'darkmode-bgdark-dp2')
+    }
   }
 
   handleSignOutSubmit (event) {
