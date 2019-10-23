@@ -4,11 +4,15 @@
 
 ## Features
 
-- Gmail API - Create maintenance entries directly from Emails as well as send mails directly to clients to inform them
+- Gmail API - Create maintenance entries directly from incoming Emails as well as send mails to notify clients
 - Google Translate API - Translate Russian mails directly in the read preview
 - Google Calendar API - Create calendar entries at the click of a button
+- TinyMCE WYSIWYG Editor
 - Export history data to CSV
 - LogRocket + Sentry Error Logging
+- Keyboard Shortcuts
+- Darkmode :)
+- SMTP Outbound Mail
 - Blazing fast SPA built on:  
   - Next.js / React
   - Custom Next.js Server (Express)
@@ -18,6 +22,7 @@
   - Nedb
   - Passport
   - Ag-Grid
+  - Algolia Search
 
 ## Setup
 
