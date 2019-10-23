@@ -22,7 +22,7 @@ function DarkmodeSwitch ({ value, onChange }) {
             }
           }}
         >
-          <S.DayNightSwitch>
+          <S.DayNightSwitch style={{ backgroundColor: '#67B246' }}>
             <S.Stars>
               <S.Star index={1} size={2} x={10} y={3} />
               <S.Star index={2} size={1} x={3} y={7} />
@@ -31,7 +31,7 @@ function DarkmodeSwitch ({ value, onChange }) {
               <S.Star index={5} size={1} x={19} y={4} />
               <S.Star index={6} size={2} x={22} y={14} />
             </S.Stars>
-            <S.Circle>
+            <S.Circle style={{ backgroundColor: '#797676', border: '2px solid #fff', color: '#fff' }}>
               {/* <S.Moon icon={faMoon} />  */}
               <FontAwesomeIcon icon={faMoon} width='0.5em' />
             </S.Circle>
