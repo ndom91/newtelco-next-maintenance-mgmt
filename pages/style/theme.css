@@ -3,14 +3,23 @@
     --primary: #67B246 !important;
     --primary-bg: #fff !important;
     --secondary-bg: #5a61690f !important;
+    --third-bg: #212529 !important;
+    --font-color: #212529 !important;
+    --inv-font-color: #fff !important;
+    --bg-font-color: #5a6169 !important;
+    --border-color: #d4d5d8;
 }
 
 [data-theme="dark"] {
     --primary: #67B246 !important;
     --primary-bg: #272727 !important;
     --secondary-bg: #121212 !important;
+    --third-bg: #42454b !important;
+    --font-color: #e1e1ff !important;
+    --inv-font-color: #373a3d !important;
+    --bg-font-color: #3a3a3a !important;
+    --border-color: #3a3a3a;
+
     --secondary-color: #818cab;
-    --font-color: #e1e1ff;
     --bg-color: #161625;
-    --heading-color: #818cab;
 }

@@ -263,6 +263,7 @@ export default class Index extends React.Component {
             :global(.card-badge) {
               font-size: 196px;
               cursor: pointer;
+              color: var(--inv-font-color);
             }
             :global(.card-unread-body) {
               cursor: pointer;
@@ -277,8 +278,12 @@ export default class Index extends React.Component {
               display: flex;
               justify-content: space-around;
             }
+            :global(.card-stats) {
+              border-radius: 0.625em;
+            }
             :global(.card-inboxUnread) {
               max-width: 350px;
+              border-radius: 0.625em;
             }
             :global(.card-person-body) {
               display: flex;

@@ -440,11 +440,24 @@ export default class Inbox extends React.Component {
               align-self: center;
               transition: all 150ms ease-in-out;
             }
+            :global(.inbox-btn-group) {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              flex-direction: row;
+            }
+            :global(.list-group-item) {
+              background-color: var(--primary-bg);
+              color: var(--font-color);
+              border-color: var(--border-color);
+            }
             :global(.list-group-item-heading) {
               margin: 0 10px;
+              color: var(--font-color);
             }
             :global(.list-group-item-text) {
               margin: 0 10px;
+              color: var(--font-color);
             }
             :global(.mail-open-icon) {
               color: var(--primary);

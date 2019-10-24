@@ -136,15 +136,15 @@ class Header extends React.Component {
     }, 1000)
   }
 
-  // onToggleNight = () => {
-  //   this.setState({
-  //     night: !this.state.night
-  //   })
-  // }
+  onToggleNight = () => {
+    this.setState({
+      night: !this.state.night
+    })
+  }
 
   render () {
     return (
-      <Navbar type='dark' theme={this.state.night ? 'dark' : 'secondary'} expand='md'>
+      <Navbar type='dark' theme={this.props.night ? 'dark' : 'secondary'} expand='md'>
         <NavbarBrand href='/'>
 
           <svg version='1.0' xmlns='http://www.w3.org/2000/svg' width='48px' height='48px' viewBox='0 0 1280 1280' preserveAspectRatio='xMidYMid meet'>
@@ -187,7 +187,7 @@ class Header extends React.Component {
                 passHref
               >
                 <NavLink>
-                  <Badge className='unread-badge' pill theme={this.state.night ? 'primary' : 'dark'}>
+                  <Badge className='unread-badge' pill>
                     {this.props.unread}
                   </Badge>
                   <span style={{ position: 'relative', zIndex: '2' }} className='menu-label'>Inbox</span>
@@ -336,7 +336,8 @@ class Header extends React.Component {
             top: -2px;
             right: 2px;
             z-index: 1;
-            color: var(--white);
+            color: var(--font-color);
+            background-color: var(--third-bg);
             opacity: 0.5;
           }
           :global(.nav-link) {
@@ -385,8 +386,8 @@ class Header extends React.Component {
           :global(.nav-search:focus) {
             padding-left: 40px !important;
             width: 310px !important;
-            background-color: var(--white);
-            color: rgba(0,0,0,1);
+            background-color: var(--primary-bg);
+            color: var(--font-color);
             border: 2px solid #67B246;
             cursor: text;
             box-shadow: 0 0 5px 2px rgba(103, 178, 70, 0.54);

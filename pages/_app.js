@@ -56,9 +56,6 @@ export default class MyApp extends App {
           .navbar {
             padding: 0 1.5rem;
           }
-          html {
-            background-color: var(--primary-bg);
-          }
           body,
           .container,
           .container-fluid,

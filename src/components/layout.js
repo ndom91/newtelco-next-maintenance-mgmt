@@ -241,9 +241,27 @@ export default class Layout extends React.Component {
               </ModalBody>
             </Modal>
             <style jsx>{`
-              html {
+              :global(html) {
                 background-color: var(--secondary-bg);
                 color: var(--light);
+              }
+              :global(.card) {
+                border-radius: 1rem;
+                background-color: var(--primary-bg);
+              }
+              :global(.card-header > h2) {
+                color: var(--font-color);
+              }
+              :global(.card-header) {
+                background-color: var(--secondary-bg);
+                color: var(--font-color);
+              }
+              :global(.card-body) {
+                background-color: var(--primary-bg);
+              }
+              :global(.card-footer) {
+                background-color: var(--secondary-bg);
+                color: var(--bg-font-color);
               }
               :global(.key-badge) {
                 font-size: 90%;
