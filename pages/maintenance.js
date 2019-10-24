@@ -2254,7 +2254,7 @@ export default class Maintenance extends React.Component {
                   position: ${this.state.incomingMailIsHtml ? 'relative' : 'absolute'};
                   top: 0;
                   left: 0;
-                  height: 100vh;
+                  height: ${this.state.incomingMailIsHtml ? '100vh' : '100%'};
                   width: 100%;
                   padding: 40px;
                   overflow-y: ${this.state.incomingMailIsHtml ? 'hidden' : 'scroll'};

@@ -263,6 +263,9 @@ export default class Layout extends React.Component {
                 background-color: var(--secondary-bg);
                 color: var(--bg-font-color);
               }
+              :global([class^="ct-"]) {
+                pointer-events: none
+              }
               :global(.key-badge) {
                 font-size: 90%;
                 padding: 0.7rem;
