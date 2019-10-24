@@ -59,13 +59,10 @@ button.btn-primary {
 }
 
 div.ag-row-selected {
-  /* background-color: #67B246 !important; */
-  /* border: 2px solid #67B246 !important;
-  background-color: inherit !important; */
   background: repeating-linear-gradient(
     135deg,
-    #fff,
-    #fff 10px,
+    var(--primary-bg),
+    var(--primary-bg) 10px,
     #67B24638 10px,
     #67B24638 20px
   );

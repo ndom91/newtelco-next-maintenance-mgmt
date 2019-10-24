@@ -2019,7 +2019,7 @@ export default class Maintenance extends React.Component {
                         style={{
                           background: 'var(--secondary)',
                           borderRadius: '0px',
-                          color: '#fvar(--white)',
+                          color: 'var(--white)',
                           display: 'flex',
                           justifyContent: 'space-between'
                         }}
@@ -2163,7 +2163,7 @@ export default class Maintenance extends React.Component {
                 }
                 :global(.MuiInputBase-root:focus-within) {
                   color: #495057;
-                  background-color: var(--white);
+                  background-color: var(--primary-bg);
                   border: 1px solid #67B246 !important;
                   border-radius: 0.325rem;
                   box-shadow: 0 0.313rem 0.719rem rgba(0,123,255,.1), 0 0.156rem 0.125rem rgba(0,0,0,.06);
@@ -2328,14 +2328,25 @@ export default class Maintenance extends React.Component {
                 :global(.close-read-modal-btn:hover > .close-read-modal-icon) {
                   color: var(--dark) !important;
                 }
+                :global(.form-group > label) {
+                  color: var(--font-color);
+                }
+                :global(.form-control, .form-control) {
+                  color: var(--font-color);
+                  background-color: var(--primary-bg);
+                }
+                :global(.form-control:disabled, .form-control[readonly]) {
+                  color: var(--font-color);
+                  background-color: var(--primary-bg);
+                }
                 :global(.flatpickr) {
                   height: auto;
                   width: 100%;
                   padding: .5rem 1rem;
                   font-size: .95rem;
                   line-height: 1.5;
-                  color: #495057;
-                  background-color: var(--white);
+                  color: var(--font-color);
+                  background-color: var(--primary-bg);
                   border: 1px solid #becad6;
                   font-weight: 300;
                   will-change: border-color,box-shadow;

@@ -4,10 +4,11 @@
     --primary-bg: #fff !important;
     --secondary-bg: #5a61690f !important;
     --third-bg: #212529 !important;
-    --font-color: #3d4146 !important;
+    --font-color: #212529 !important;
     --inv-font-color: #fff !important;
     --bg-font-color: #5a6169 !important;
     --border-color: #d4d5d8;
+    --unread-color: #d4d5d8;
 }
 
 [data-theme="dark"] {
@@ -18,7 +19,8 @@
     --font-color: #e1e1ff !important;
     --inv-font-color: #373a3d !important;
     --bg-font-color: #3a3a3a !important;
-    --border-color: #3a3a3a;
+    --unread-color: #d4d5d8;
+    --border-color: #707990;
 
     --secondary-color: #818cab;
     --bg-color: #161625;

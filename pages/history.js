@@ -429,6 +429,10 @@ export default class History extends React.Component {
                 :global(.delete-modal) {
                   margin-top: 50px;
                 }
+                :global(.card-header > .btn-toolbar > h2) {
+                  color: var(--font-color);
+                  font-weight: 100 !important;
+                }
                 :global(.modal-title > h2) {
                   margin-bottom: 0px;
                 }
@@ -457,6 +461,9 @@ export default class History extends React.Component {
                   background-color: ${this.props.night === 'true' ? '#272727' : '#fff'} !important;
                   color: ${this.props.night === 'true' ? '#fff' : ''};
                 }
+                :global(.ag-theme-material .ag-row-selected) {
+                  background-color: ${this.props.night === 'true' ? '' : '#eee'};
+                }
                 :global(.btn-dark) {
                   color: ${this.props.night === 'true' ? '#fff' : ''};
                   border-color: ${this.props.night === 'true' ? '#fff' : ''};
@@ -467,6 +474,13 @@ export default class History extends React.Component {
                 }
                 :global(.row-emergency) {
                   background: ${this.props.night === 'true' ? 'repeating-linear-gradient( 45deg, #272727, #272727 10px, #c3565f2d 10px, #c3565f2d 20px) !important' : ''};
+                }
+                :global(.ag-theme-material .ag-header-group-cell:not(.ag-column-resizing) + .ag-header-group-cell:hover, .ag-theme-material .ag-header-group-cell:not(.ag-column-resizing) + .ag-header-group-cell.ag-column-resizing, .ag-theme-material .ag-header-cell:not(.ag-column-resizing) + .ag-header-cell:hover, .ag-theme-material .ag-header-cell:not(.ag-column-resizing) + .ag-header-cell.ag-column-resizing, .ag-theme-material .ag-header-group-cell:first-of-type:hover, .ag-theme-material .ag-header-group-cell:first-of-type.ag-column-resizing, .ag-theme-material .ag-header-cell:first-of-type:hover, .ag-theme-material .ag-header-cell:first-of-type.ag-column-resizing) {
+                  background-color: var(--bg-secondary);
+                }
+                :global(.btn-dark:hover) {
+                  box-shadow: ${this.props.night === 'true' ? '0 0 5px 1px var(--secondary)' : ''};
+                  border: ${this.props.night === 'true' ? '1px solid #fff' : ''};
                 }
             `}
             </style>

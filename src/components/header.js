@@ -336,7 +336,7 @@ class Header extends React.Component {
             top: -2px;
             right: 2px;
             z-index: 1;
-            color: var(--font-color);
+            color: var(--unread-color);
             background-color: var(--third-bg);
             opacity: 0.5;
           }

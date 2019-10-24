@@ -303,6 +303,34 @@ export default class Layout extends React.Component {
               :global(.card-header > h2) {
                 font-weight: 100 !important;
               }
+              :global(.ag-theme-material) {
+                background-color: ${this.state.night ? '#272727' : '#fff'} !important;
+              }
+              :global(.ag-root-wrapper-body.ag-layout-normal) {
+                background-color: ${this.state.night ? '#272727' : '#fff'} !important;
+                color: ${this.state.night ? '#fff' : ''};
+              }
+              :global(.ag-theme-material .ag-paging-panel) {
+                color: ${this.state.night ? '#fff' : ''};
+              }
+              :global(.ag-theme-material .ag-row-hover) {
+                background-color: ${this.state.night ? '#121212' : ''};
+              }
+              :global(.ag-theme-material .ag-header) {
+                background-color: ${this.state.night ? '#272727' : '#fff'} !important;
+                color: ${this.state.night ? '#fff' : ''};
+              }
+              :global(.ag-theme-material .ag-row-selected) {
+                background-color: ${this.state.night ? '' : '#eee'};
+              }
+              :global(.btn-dark) {
+                color: ${this.state.night ? '#fff' : ''};
+                border-color: ${this.state.night ? '#fff' : ''};
+              }
+              :global(.btn-outline-dark) {
+                color: ${this.state.night ? '#fff' : ''};
+                border-color: ${this.state.night ? '#fff' : ''};
+              }
               @media only screen and (min-width: 1024px) {
                 :global(div.toplevel-col) {
                   flex: 1;

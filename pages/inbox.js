@@ -390,6 +390,7 @@ export default class Inbox extends React.Component {
               font-family: Poppins, Helvetica;
               font-weight: 200 !important;
               margin-top: 20px;
+              color: var(--font-color);
             }
             :global(.inbox0-wrapper) {
               display: flex;
