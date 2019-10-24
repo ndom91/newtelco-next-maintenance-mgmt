@@ -1,0 +1,16 @@
+
+[data-theme="light"] {
+    --primary: #67B246 !important;
+    --primary-bg: #fff !important;
+    --secondary-bg: #5a61690f !important;
+}
+
+[data-theme="dark"] {
+    --primary: #67B246 !important;
+    --primary-bg: #272727 !important;
+    --secondary-bg: #121212 !important;
+    --secondary-color: #818cab;
+    --font-color: #e1e1ff;
+    --bg-color: #161625;
+    --heading-color: #818cab;
+}

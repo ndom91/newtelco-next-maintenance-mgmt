@@ -1,11 +1,6 @@
-/* :root {
-  --primary: #67B246 !important;
-} */
-
 .fa-edit {
   cursor: pointer;
   font-size: 22px;
-  /* color: #67B246; */
 }
 
 .card-header > h2 {

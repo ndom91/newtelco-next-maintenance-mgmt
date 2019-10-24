@@ -325,7 +325,7 @@ export default class History extends React.Component {
               <CardBody>
                 <div className='table-wrapper'>
                   <div
-                    className='ag-theme-material'
+                    className={`ag-theme-material ${this.props.night === 'true' ? 'darkmode-aggrid' : ''}`}
                     style={{
                       height: '700px',
                       width: '100%'
@@ -334,11 +334,9 @@ export default class History extends React.Component {
                     <AgGridReact
                       gridOptions={this.state.gridOptions}
                       rowData={this.state.rowData}
-                      // onGridReady={params => this.gridApi = params.api}
                       onGridReady={this.handleGridReady}
                       animateRows
                       pagination
-                      // onRowDoubleClicked={this.handleRowDoubleClick}
                       onFirstDataRendered={this.onFirstDataRendered.bind(this)}
                     />
                   </div>

@@ -26,7 +26,7 @@ export const DayNightSwitch = styled.div(
     transition: `all ${transitionTime}ms linear`,
     ...hover(
       {
-        transform: 'scale(1.05)'
+        transform: 'scale(1.00)'
       },
       {
         transform: 'scale(1.03)'

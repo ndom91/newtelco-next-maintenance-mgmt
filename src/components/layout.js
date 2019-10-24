@@ -1,5 +1,6 @@
 import React from 'react'
 import Header from './header'
+import Head from 'next/head'
 import Router from 'next/router'
 import { NextAuth } from 'next-auth/client'
 import { HotKeys } from 'react-hotkeys'
@@ -25,37 +26,37 @@ export default class Layout extends React.Component {
     this.toggleHelpModal = this.toggleHelpModal.bind(this)
   }
 
-  componentDidMount () {
-    if (this.state.night) {
-      this.addClass('html', 'darkmode')
-      this.addClass('.unread-badge', 'darkmode')
-      this.addClass('.bg-secondary', 'darkmode-bgdark-dp2')
-      this.addClass('.card-body', 'darkmode-bgdark')
-      this.addClass('.card-header', 'darkmode-bgdark-dp2')
-      this.addClass('.card-footer', 'darkmode-bgdark-dp2')
-      this.addClass('.card-footer', 'darkmode-fgdark-dp2')
-      this.addClass('h1,h2,h3,h5,h6', 'darkmode-bgdark-dp2')
-      this.addClass('.card', 'darkmode-bgdark-dp2')
-      this.addClass('.card', 'darkmode-boxshadow')
-      this.addClass('.badge-primary', 'darkmode-fgdark')
-      this.addClass('.list-group-item', 'darkmode-bgdark-dp2')
-      this.addClass('.inbox0-text', 'darkmode-bgdark-dp4')
-    } else if (!this.state.night) {
-      this.removeClass('html', 'darkmode')
-      this.removeClass('.unread-badge', 'darkmode')
-      this.removeClass('.bg-secondary', 'darkmode-bgdark-dp2')
-      this.removeClass('.card-body', 'darkmode-bgdark')
-      this.removeClass('.card-header', 'darkmode-bgdark-dp2')
-      this.removeClass('.card-footer', 'darkmode-bgdark-dp2')
-      this.removeClass('.card-footer', 'darkmode-fgdark-dp2')
-      this.removeClass('h1,h2,h3,h5,h6', 'darkmode-bgdark-dp2')
-      this.removeClass('.card', 'darkmode-bgdark-dp2')
-      this.removeClass('.card', 'darkmode-boxshadow')
-      this.removeClass('.badge-primary', 'darkmode-fgdark')
-      this.removeClass('.list-group-item', 'darkmode-bgdark-dp2')
-      this.removeClass('.inbox0-text', 'darkmode-bgdark-dp4')
-    }
-  }
+  // componentDidMount () {
+  //   if (this.state.night) {
+  //     this.addClass('html', 'darkmode')
+  //     this.addClass('.unread-badge', 'darkmode')
+  //     this.addClass('.bg-secondary', 'darkmode-bgdark-dp2')
+  //     this.addClass('.card-body', 'darkmode-bgdark')
+  //     this.addClass('.card-header', 'darkmode-bgdark-dp2')
+  //     this.addClass('.card-footer', 'darkmode-bgdark-dp2')
+  //     this.addClass('.card-footer', 'darkmode-fgdark-dp2')
+  //     this.addClass('h1,h2,h3,h5,h6', 'darkmode-bgdark-dp2')
+  //     this.addClass('.card', 'darkmode-bgdark-dp2')
+  //     this.addClass('.card', 'darkmode-boxshadow')
+  //     this.addClass('.badge-primary', 'darkmode-fgdark')
+  //     this.addClass('.list-group-item', 'darkmode-bgdark-dp2')
+  //     this.addClass('.inbox0-text', 'darkmode-bgdark-dp4')
+  //   } else if (!this.state.night) {
+  //     this.removeClass('html', 'darkmode')
+  //     this.removeClass('.unread-badge', 'darkmode')
+  //     this.removeClass('.bg-secondary', 'darkmode-bgdark-dp2')
+  //     this.removeClass('.card-body', 'darkmode-bgdark')
+  //     this.removeClass('.card-header', 'darkmode-bgdark-dp2')
+  //     this.removeClass('.card-footer', 'darkmode-bgdark-dp2')
+  //     this.removeClass('.card-footer', 'darkmode-fgdark-dp2')
+  //     this.removeClass('h1,h2,h3,h5,h6', 'darkmode-bgdark-dp2')
+  //     this.removeClass('.card', 'darkmode-bgdark-dp2')
+  //     this.removeClass('.card', 'darkmode-boxshadow')
+  //     this.removeClass('.badge-primary', 'darkmode-fgdark')
+  //     this.removeClass('.list-group-item', 'darkmode-bgdark-dp2')
+  //     this.removeClass('.inbox0-text', 'darkmode-bgdark-dp4')
+  //   }
+  // }
 
   handleSignOutSubmit (event) {
     event.preventDefault()
@@ -100,33 +101,37 @@ export default class Layout extends React.Component {
 
   onToggleNight = () => {
     if (this.state.night) {
-      this.removeClass('html', 'darkmode')
-      this.removeClass('.unread-badge', 'darkmode')
-      this.removeClass('.bg-secondary', 'darkmode-bgdark-dp2')
-      this.removeClass('.card-body', 'darkmode-bgdark')
-      this.removeClass('.card-header', 'darkmode-bgdark-dp2')
-      this.removeClass('.card-footer', 'darkmode-bgdark-dp2')
-      this.removeClass('.card-footer', 'darkmode-fgdark-dp2')
-      this.removeClass('h1,h2,h3,h5,h6', 'darkmode-bgdark-dp2')
-      this.removeClass('.card', 'darkmode-bgdark-dp2')
-      this.removeClass('.card', 'darkmode-boxshadow')
-      this.removeClass('.badge-primary', 'darkmode-fgdark')
-      this.removeClass('.list-group-item', 'darkmode-bgdark-dp2')
-      this.removeClass('.inbox0-text', 'darkmode-bgdark-dp4')
+      // this.removeClass('html', 'darkmode')
+      // this.removeClass('.unread-badge', 'darkmode')
+      // this.removeClass('.bg-secondary', 'darkmode-bgdark-dp2')
+      // this.removeClass('.card-body', 'darkmode-bgdark')
+      // this.removeClass('.card-header', 'darkmode-bgdark-dp2')
+      // this.removeClass('.card-footer', 'darkmode-bgdark-dp2')
+      // this.removeClass('.card-footer', 'darkmode-fgdark-dp2')
+      // this.removeClass('h1,h2,h3,h5,h6', 'darkmode-bgdark-dp2')
+      // this.removeClass('.card', 'darkmode-bgdark-dp2')
+      // this.removeClass('.card', 'darkmode-boxshadow')
+      // this.removeClass('.badge-primary', 'darkmode-fgdark')
+      // this.removeClass('.list-group-item', 'darkmode-bgdark-dp2')
+      // this.removeClass('.inbox0-text', 'darkmode-bgdark-dp4')
+      document.documentElement.setAttribute('data-theme', 'light')
+      window.localStorage.setItem('theme', 'light')
     } else {
-      this.addClass('html', 'darkmode')
-      this.addClass('.unread-badge', 'darkmode')
-      this.addClass('.bg-secondary', 'darkmode-bgdark-dp2')
-      this.addClass('.card-body', 'darkmode-bgdark')
-      this.addClass('.card-header', 'darkmode-bgdark-dp2')
-      this.addClass('.card-footer', 'darkmode-bgdark-dp2')
-      this.addClass('.card-footer', 'darkmode-fgdark-dp2')
-      this.addClass('h1,h2,h3,h5,h6', 'darkmode-bgdark-dp2')
-      this.addClass('.card', 'darkmode-bgdark-dp2')
-      this.addClass('.card', 'darkmode-boxshadow')
-      this.addClass('.badge-primary', 'darkmode-fgdark')
-      this.addClass('.list-group-item', 'darkmode-bgdark-dp2')
-      this.addClass('.inbox0-text', 'darkmode-bgdark-dp4')
+      // this.addClass('html', 'darkmode')
+      // this.addClass('.unread-badge', 'darkmode')
+      // this.addClass('.bg-secondary', 'darkmode-bgdark-dp2')
+      // this.addClass('.card-body', 'darkmode-bgdark')
+      // this.addClass('.card-header', 'darkmode-bgdark-dp2')
+      // this.addClass('.card-footer', 'darkmode-bgdark-dp2')
+      // this.addClass('.card-footer', 'darkmode-fgdark-dp2')
+      // this.addClass('h1,h2,h3,h5,h6', 'darkmode-bgdark-dp2')
+      // this.addClass('.card', 'darkmode-bgdark-dp2')
+      // this.addClass('.card', 'darkmode-boxshadow')
+      // this.addClass('.badge-primary', 'darkmode-fgdark')
+      // this.addClass('.list-group-item', 'darkmode-bgdark-dp2')
+      // this.addClass('.inbox0-text', 'darkmode-bgdark-dp4')
+      document.documentElement.setAttribute('data-theme', 'dark')
+      window.localStorage.setItem('theme', 'dark')
     }
     this.setState({
       night: !this.state.night
@@ -157,6 +162,9 @@ export default class Layout extends React.Component {
     return (
       <div>
         <HotKeys keyMap={keyMap} handlers={handlers}>
+          <Head>
+            <link rel='stylesheet' type='text/css' src={this.state.night ? '/static/css/darkmode.css' : ''} />
+          </Head>
           <Header night={this.state.night} toggleNight={this.onToggleNight} handleSearchSelection={this.props.handleSearchSelection} unread={this.props.unread} session={this.props.session} />
           <Container fluid>
             <Row style={{ height: '20px' }} />
@@ -233,11 +241,9 @@ export default class Layout extends React.Component {
               </ModalBody>
             </Modal>
             <style jsx>{`
-              :root {
-                --white: ${this.state.night ? '#444' : '#fff'} !important;
-              }
               html {
-                background-color: var(--white);
+                background-color: var(--secondary-bg);
+                color: var(--light);
               }
               :global(.key-badge) {
                 font-size: 90%;
@@ -272,6 +278,9 @@ export default class Layout extends React.Component {
               }
               :global(.toplevel-col) {
                 margin-bottom: 50px !important;
+              }
+              :global(.card-header > h2) {
+                font-weight: 100 !important;
               }
               @media only screen and (min-width: 1024px) {
                 :global(div.toplevel-col) {

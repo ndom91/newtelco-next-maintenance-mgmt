@@ -315,7 +315,7 @@ export default class Inbox extends React.Component {
                   {!Array.isArray(inboxMails) && (
                     <div className='inbox0-wrapper'>
                       <img src='/static/images/inbox0.svg' alt='Inbox 0' style={{ width: '400px' }} />
-                      <h4 className='inbox0-text'>Congrats, you've reached Inbox 0</h4>
+                      <h4 className='inbox0-text'>Congrats, nothing to do!</h4>
                     </div>
                   )}
                 </TransitionGroup>
@@ -431,7 +431,8 @@ export default class Inbox extends React.Component {
               height: 50px;
               width: 50px;
               padding: 0;
-              align-self: center;
+              display: flex;
+              justify-content: center;
             }
             :global(.mail-badge) {
               min-width: 68px;

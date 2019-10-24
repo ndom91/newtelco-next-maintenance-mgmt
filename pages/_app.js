@@ -3,8 +3,8 @@ import App from 'next/app'
 import Head from 'next/head'
 import ErrorBoundary from '../src/components/errorboundary'
 import './style/app.css'
+import './style/theme.css'
 import 'bootstrap/dist/css/bootstrap.min.css'
-// import 'shards-ui/dist/css/shards.min.css'
 import './style/shards.min.css'
 const LogRocket = require('logrocket')
 // const setupLogRocketReact = require('logrocket-react')
@@ -32,17 +32,7 @@ export default class MyApp extends App {
       })
     }
 
-    this.state = {
-      night: false
-    }
-
     return { pageProps }
-  }
-
-  onToggleNight = () => {
-    this.setState({
-      night: !this.state.night
-    })
   }
 
   render () {
@@ -63,42 +53,45 @@ export default class MyApp extends App {
         </Head>
         <Component {...pageProps} />
         <style jsx global>{`
-          :root {
-            --primary: #67B246 !important;
-          }
-          .darkmode {
-            background-color: #121212 !important;
-            color: var(--light) !important;
-          }
-          .darkmode-bgdark {
-            background-color: #121212 !important;
-            color: #fff !important;
-          }
-          .darkmode-bgdark-dp2 {
-            background-color: #272727 !important;
-            color: #fff !important;
-          }
-          .darkmode-bgdark-dp4 {
-            background-color: #121212 !important;
-            color: #fff !important;
-          }
-          .darkmode-boxshadow {
-            box-shadow: 0 0 20px 2px rgba(0,0,0,0.6) !important;
-          }
-          .darkmode-fgdark {
-            color: #272727 !important;
-          }
-          .darkmode-fgdark-dp2 {
-            color: #1f1f1f !important;
-          }
           .navbar {
             padding: 0 1.5rem;
+          }
+          html {
+            background-color: var(--primary-bg);
           }
           body,
           .container,
           .container-fluid,
           .row {
             background: none;
+          }
+          :global(.ag-theme-material .ag-row) {
+            border-color: #495057 !important;
+          }
+          :global(.darkmode) {
+            background-color: #121212 !important;
+            color: var(--light) !important;
+          }
+          :global(.darkmode-bgdark) {
+            background-color: #121212 !important;
+            color: #fff !important;
+          }
+          :global(.darkmode-bgdark-dp2) {
+            background-color: #272727 !important;
+            color: #fff !important;
+          }
+          :global(.darkmode-bgdark-dp4) {
+            background-color: #121212 !important;
+            color: #fff !important;
+          }
+          :global(.darkmode-boxshadow) {
+            box-shadow: 0 0 20px 2px rgba(0,0,0,0.6) !important;
+          }
+          :global(.darkmode-fgdark) {
+            color: #272727 !important;
+          }
+          :global(.darkmode-fgdark-dp2) {
+            color: #1f1f1f !important;
           }
         `}
         </style>
