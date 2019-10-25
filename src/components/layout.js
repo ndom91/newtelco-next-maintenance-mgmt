@@ -76,28 +76,28 @@ export default class Layout extends React.Component {
     })
   }
 
-  addClass = (elements, myClass) => {
-    if (!elements) { return }
-    if (typeof (elements) === 'string') {
-      elements = document.querySelectorAll(elements)
-    } else if (elements.tagName) { elements = [elements] }
-    for (var i = 0; i < elements.length; i++) {
-      if ((' ' + elements[i].className + ' ').indexOf(' ' + myClass + ' ') < 0) {
-        elements[i].className += ' ' + myClass
-      }
-    }
-  }
+  // addClass = (elements, myClass) => {
+  //   if (!elements) { return }
+  //   if (typeof (elements) === 'string') {
+  //     elements = document.querySelectorAll(elements)
+  //   } else if (elements.tagName) { elements = [elements] }
+  //   for (var i = 0; i < elements.length; i++) {
+  //     if ((' ' + elements[i].className + ' ').indexOf(' ' + myClass + ' ') < 0) {
+  //       elements[i].className += ' ' + myClass
+  //     }
+  //   }
+  // }
 
-  removeClass = (elements, myClass) => {
-    if (!elements) { return }
-    if (typeof (elements) === 'string') {
-      elements = document.querySelectorAll(elements)
-    } else if (elements.tagName) { elements = [elements] }
-    var reg = new RegExp('(^| )' + myClass + '($| )', 'g')
-    for (var i = 0; i < elements.length; i++) {
-      elements[i].className = elements[i].className.replace(reg, ' ')
-    }
-  }
+  // removeClass = (elements, myClass) => {
+  //   if (!elements) { return }
+  //   if (typeof (elements) === 'string') {
+  //     elements = document.querySelectorAll(elements)
+  //   } else if (elements.tagName) { elements = [elements] }
+  //   var reg = new RegExp('(^| )' + myClass + '($| )', 'g')
+  //   for (var i = 0; i < elements.length; i++) {
+  //     elements[i].className = elements[i].className.replace(reg, ' ')
+  //   }
+  // }
 
   onToggleNight = () => {
     if (this.state.night) {

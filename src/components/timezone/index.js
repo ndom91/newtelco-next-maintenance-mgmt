@@ -207,6 +207,7 @@ class TimezoneSelector extends React.Component {
 
     return (
       <Select
+        className='maint-select'
         value={this.props.value || selectedOption}
         onChange={this.props.onChange || this.handleChange}
         options={options}

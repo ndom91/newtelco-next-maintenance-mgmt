@@ -96,7 +96,6 @@ export default class Maintenance extends React.Component {
       return {
         jsonData: json,
         unread: display,
-        night: query.night,
         session: await NextAuth.init({ req })
       }
     }
@@ -104,8 +103,10 @@ export default class Maintenance extends React.Component {
 
   constructor (props) {
     super(props)
+    const night = window.localStorage.getItem('theme')
     this.state = {
       width: 0,
+      night: night === 'dark',
       maintenance: {
         incomingAttachments: [],
         incomingBody: this.props.jsonData.profile.body,
@@ -1582,7 +1583,7 @@ export default class Maintenance extends React.Component {
     if (this.props.session.user) {
       return (
         <HotKeys keyMap={keyMap} handlers={handlers}>
-          <Layout night={this.props.night} handleSearchSelection={this.handleSearchSelection} unread={this.props.unread} session={this.props.session}>
+          <Layout night={this.state.night.toString()} handleSearchSelection={this.handleSearchSelection} unread={this.props.unread} session={this.props.session}>
             <Helmet>
               <title>{`Newtelco Maintenance - NT-${maintenance.id}`}</title>
             </Helmet>
@@ -1652,6 +1653,7 @@ export default class Maintenance extends React.Component {
                                 <FormGroup>
                                   <label htmlFor='supplier'>Timezone</label>
                                   <TimezoneSelector
+                                    className='maint-select'
                                     value={{ value: this.state.maintenance.timezone, label: this.state.maintenance.timezoneLabel }}
                                     onChange={this.handleTimezoneChange}
                                     onBlur={this.handleTimezoneBlur}
@@ -1681,6 +1683,7 @@ export default class Maintenance extends React.Component {
                                 <FormGroup>
                                   <label htmlFor='supplier'>Supplier</label>
                                   <Select
+                                    className='maint-select'
                                     value={{ label: this.state.maintenance.name, value: this.state.maintenance.lieferant }}
                                     onChange={this.handleSupplierChange}
                                     options={this.state.suppliers}
@@ -1708,6 +1711,7 @@ export default class Maintenance extends React.Component {
                                 <FormGroup>
                                   <label htmlFor='their-cid'>{maintenance.name} CID</label>
                                   <Select
+                                    className='maint-select'
                                     value={this.state.selectedLieferant || undefined}
                                     onChange={this.handleSelectLieferantChange}
                                     options={this.state.lieferantcids}
@@ -2158,8 +2162,35 @@ export default class Maintenance extends React.Component {
                   padding: 10.5px 14px;
                   transition: box-shadow 250ms cubic-bezier(.27,.01,.38,1.06),border 250ms cubic-bezier(.27,.01,.38,1.06);
                 }
+                :global(.card-header h2) {
+                  color: var(--font-color);
+                  font-weight: 100 !important;
+                }
+                :global(.maint-select *) {
+                  background-color: var(--primary-bg);
+                  color: var(--font-color);
+                }
+                :global(div[class$="-singleValue"]) {
+                  background-color: var(--primary-bg);
+                  color: var(--font-color);
+                }
                 :global(.Mui-focused) {
                   border: none !important;
+                }
+                :global(.tox .tox-tbtn svg) {
+                  fill: var(--font-color);
+                }
+                :global(.tox .tox-tbtn) {
+                  color: var(--font-color);
+                }
+                :global(.tox .tox-edit-area__iframe *) {
+                  color: var(--font-color);
+                }
+                :global(.tox .tox-edit-area__iframe) {
+                  background-color: var(--primary-bg);
+                }
+                :global(.progress) {
+                  background-color: var(--inv-font-color);
                 }
                 :global(.MuiInputBase-root:focus-within) {
                   color: #495057;
@@ -2205,6 +2236,13 @@ export default class Maintenance extends React.Component {
                   border: 1px solid var(--secondary);
                   border-radius: 0.325rem;
                   padding: 20px;
+                }
+                :global(.badge-outline-secondary > label) {
+                  color: var(--font-color);
+                  box-shadow: ${this.state.night === 'true' ? '0 0 5px 1px #fff' : ''};
+                }
+                :global(.badge-outline-light > label) {
+                  color: var(--font-color);
                 }
                 :global(.rdw-option-active) {
                   box-shadow: none;
@@ -2337,7 +2375,7 @@ export default class Maintenance extends React.Component {
                 }
                 :global(.form-control:disabled, .form-control[readonly]) {
                   color: var(--font-color);
-                  background-color: var(--primary-bg);
+                  background-color: var(--disabled-input);
                 }
                 :global(.flatpickr) {
                   height: auto;

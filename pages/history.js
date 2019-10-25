@@ -462,7 +462,7 @@ export default class History extends React.Component {
                   color: ${this.props.night === 'true' ? '#fff' : ''};
                 }
                 :global(.ag-theme-material .ag-row-selected) {
-                  background-color: ${this.props.night === 'true' ? '' : '#eee'};
+                  background-color: ${this.props.night === 'true' ? '' : '#eee'} !important;
                 }
                 :global(.btn-dark) {
                   color: ${this.props.night === 'true' ? '#fff' : ''};
