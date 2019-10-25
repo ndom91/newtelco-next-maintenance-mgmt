@@ -62,9 +62,6 @@ export default class MyApp extends App {
           .row {
             background: none;
           }
-          :global(.ag-theme-material .ag-row) {
-            border-color: #495057 !important;
-          }
           :global(.darkmode) {
             background-color: #121212 !important;
             color: var(--light) !important;

@@ -272,16 +272,51 @@ class Header extends React.Component {
             </InputGroup>
           </Nav>
         </Collapse>
-        {/* html {
-            background-color: #e6e4e8;
-          } */}
         <style jsx>{`
             @media only screen and (max-width: 500px) {
               :global(#search-group) {
                 margin: 10px 0;
               }
               :global(.logout-btn) {
-                margin-left: 10px;
+              }
+              :global(.logout-btn-wrapper) {
+                display: flex;
+                justify-content: flex-end;
+              }
+              :global(#signout) {
+                text-align: center;
+                border: 2px solid #67B246;
+                padding: 4px;
+                width: 42px;
+                margin-left: 17px;
+                border-radius: 10px;
+                box-shadow: 0 0 10px 1px #67B246;
+              }
+              :global(#aa-search-input) {
+                padding-left: 40px !important;
+                width: 310px !important;
+                background-color: var(--primary-bg);
+                color: var(--font-color);
+                border: 2px solid #67B246;
+                cursor: text;
+                box-shadow: 0 0 5px 2px rgba(103, 178, 70, 0.54);
+                transition-delay: 0s !important;
+              }
+              :global(.input-group-text) {
+                max-height: 60px;
+              }
+              :global(.darkmode-wrapper) {
+                position: absolute;
+                top: -60px;
+                right: -5px;
+              }
+              :global(.nav.nav-pills) {
+                flex-direction: column;
+                align-items: flex-end;
+              }
+              :global(.unread-badge) {
+                padding: 11px;
+                font-size: 135%;
               }
             }
           :global(.search-list-icons) {

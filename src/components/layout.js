@@ -26,38 +26,6 @@ export default class Layout extends React.Component {
     this.toggleHelpModal = this.toggleHelpModal.bind(this)
   }
 
-  // componentDidMount () {
-  //   if (this.state.night) {
-  //     this.addClass('html', 'darkmode')
-  //     this.addClass('.unread-badge', 'darkmode')
-  //     this.addClass('.bg-secondary', 'darkmode-bgdark-dp2')
-  //     this.addClass('.card-body', 'darkmode-bgdark')
-  //     this.addClass('.card-header', 'darkmode-bgdark-dp2')
-  //     this.addClass('.card-footer', 'darkmode-bgdark-dp2')
-  //     this.addClass('.card-footer', 'darkmode-fgdark-dp2')
-  //     this.addClass('h1,h2,h3,h5,h6', 'darkmode-bgdark-dp2')
-  //     this.addClass('.card', 'darkmode-bgdark-dp2')
-  //     this.addClass('.card', 'darkmode-boxshadow')
-  //     this.addClass('.badge-primary', 'darkmode-fgdark')
-  //     this.addClass('.list-group-item', 'darkmode-bgdark-dp2')
-  //     this.addClass('.inbox0-text', 'darkmode-bgdark-dp4')
-  //   } else if (!this.state.night) {
-  //     this.removeClass('html', 'darkmode')
-  //     this.removeClass('.unread-badge', 'darkmode')
-  //     this.removeClass('.bg-secondary', 'darkmode-bgdark-dp2')
-  //     this.removeClass('.card-body', 'darkmode-bgdark')
-  //     this.removeClass('.card-header', 'darkmode-bgdark-dp2')
-  //     this.removeClass('.card-footer', 'darkmode-bgdark-dp2')
-  //     this.removeClass('.card-footer', 'darkmode-fgdark-dp2')
-  //     this.removeClass('h1,h2,h3,h5,h6', 'darkmode-bgdark-dp2')
-  //     this.removeClass('.card', 'darkmode-bgdark-dp2')
-  //     this.removeClass('.card', 'darkmode-boxshadow')
-  //     this.removeClass('.badge-primary', 'darkmode-fgdark')
-  //     this.removeClass('.list-group-item', 'darkmode-bgdark-dp2')
-  //     this.removeClass('.inbox0-text', 'darkmode-bgdark-dp4')
-  //   }
-  // }
-
   handleSignOutSubmit (event) {
     event.preventDefault()
     NextAuth.signout()
@@ -76,60 +44,11 @@ export default class Layout extends React.Component {
     })
   }
 
-  // addClass = (elements, myClass) => {
-  //   if (!elements) { return }
-  //   if (typeof (elements) === 'string') {
-  //     elements = document.querySelectorAll(elements)
-  //   } else if (elements.tagName) { elements = [elements] }
-  //   for (var i = 0; i < elements.length; i++) {
-  //     if ((' ' + elements[i].className + ' ').indexOf(' ' + myClass + ' ') < 0) {
-  //       elements[i].className += ' ' + myClass
-  //     }
-  //   }
-  // }
-
-  // removeClass = (elements, myClass) => {
-  //   if (!elements) { return }
-  //   if (typeof (elements) === 'string') {
-  //     elements = document.querySelectorAll(elements)
-  //   } else if (elements.tagName) { elements = [elements] }
-  //   var reg = new RegExp('(^| )' + myClass + '($| )', 'g')
-  //   for (var i = 0; i < elements.length; i++) {
-  //     elements[i].className = elements[i].className.replace(reg, ' ')
-  //   }
-  // }
-
   onToggleNight = () => {
     if (this.state.night) {
-      // this.removeClass('html', 'darkmode')
-      // this.removeClass('.unread-badge', 'darkmode')
-      // this.removeClass('.bg-secondary', 'darkmode-bgdark-dp2')
-      // this.removeClass('.card-body', 'darkmode-bgdark')
-      // this.removeClass('.card-header', 'darkmode-bgdark-dp2')
-      // this.removeClass('.card-footer', 'darkmode-bgdark-dp2')
-      // this.removeClass('.card-footer', 'darkmode-fgdark-dp2')
-      // this.removeClass('h1,h2,h3,h5,h6', 'darkmode-bgdark-dp2')
-      // this.removeClass('.card', 'darkmode-bgdark-dp2')
-      // this.removeClass('.card', 'darkmode-boxshadow')
-      // this.removeClass('.badge-primary', 'darkmode-fgdark')
-      // this.removeClass('.list-group-item', 'darkmode-bgdark-dp2')
-      // this.removeClass('.inbox0-text', 'darkmode-bgdark-dp4')
       document.documentElement.setAttribute('data-theme', 'light')
       window.localStorage.setItem('theme', 'light')
     } else {
-      // this.addClass('html', 'darkmode')
-      // this.addClass('.unread-badge', 'darkmode')
-      // this.addClass('.bg-secondary', 'darkmode-bgdark-dp2')
-      // this.addClass('.card-body', 'darkmode-bgdark')
-      // this.addClass('.card-header', 'darkmode-bgdark-dp2')
-      // this.addClass('.card-footer', 'darkmode-bgdark-dp2')
-      // this.addClass('.card-footer', 'darkmode-fgdark-dp2')
-      // this.addClass('h1,h2,h3,h5,h6', 'darkmode-bgdark-dp2')
-      // this.addClass('.card', 'darkmode-bgdark-dp2')
-      // this.addClass('.card', 'darkmode-boxshadow')
-      // this.addClass('.badge-primary', 'darkmode-fgdark')
-      // this.addClass('.list-group-item', 'darkmode-bgdark-dp2')
-      // this.addClass('.inbox0-text', 'darkmode-bgdark-dp4')
       document.documentElement.setAttribute('data-theme', 'dark')
       window.localStorage.setItem('theme', 'dark')
     }
@@ -249,8 +168,13 @@ export default class Layout extends React.Component {
                 border-radius: 1rem;
                 background-color: var(--primary-bg);
               }
+              :global(.card-body h5) {
+                color: var(--font-color);
+                font-weight: 100 !important;
+              }
               :global(.card-header > h2) {
                 color: var(--font-color);
+                font-weight: 100 !important;
               }
               :global(.card-header) {
                 background-color: var(--secondary-bg);
@@ -300,9 +224,6 @@ export default class Layout extends React.Component {
               :global(.toplevel-col) {
                 margin-bottom: 50px !important;
               }
-              :global(.card-header > h2) {
-                font-weight: 100 !important;
-              }
               :global(.ag-theme-material) {
                 background-color: ${this.state.night ? '#272727' : '#fff'} !important;
               }
@@ -313,6 +234,9 @@ export default class Layout extends React.Component {
               :global(.ag-theme-material .ag-paging-panel) {
                 color: ${this.state.night ? '#fff' : ''};
               }
+              :global(.ag-theme-material .ag-row) {
+                border-color: ${this.state.night ? '#313131 !important' : '#e1e3e4 !important'};
+              }
               :global(.ag-theme-material .ag-row-hover) {
                 background-color: ${this.state.night ? '#121212' : ''};
               }
@@ -321,7 +245,16 @@ export default class Layout extends React.Component {
                 color: ${this.state.night ? '#fff' : ''};
               }
               :global(.ag-theme-material .ag-row-selected) {
-                background-color: ${this.state.night ? '' : '#eee'};
+                background-color: ${this.state.night ? '#67B246' : '#eee'} !important;
+              }
+              :global(.ag-theme-material .ag-header-group-cell:not(.ag-column-resizing) + .ag-header-group-cell:hover, .ag-theme-material .ag-header-group-cell:not(.ag-column-resizing) + .ag-header-group-cell.ag-column-resizing, .ag-theme-material .ag-header-cell:not(.ag-column-resizing) + .ag-header-cell:hover, .ag-theme-material .ag-header-cell:not(.ag-column-resizing) + .ag-header-cell.ag-column-resizing, .ag-theme-material .ag-header-group-cell:first-of-type:hover, .ag-theme-material .ag-header-group-cell:first-of-type.ag-column-resizing, .ag-theme-material .ag-header-cell:first-of-type:hover, .ag-theme-material .ag-header-cell:first-of-type.ag-column-resizing) {
+                background-color: var(--bg-secondary);
+              }
+              :global(.ag-theme-material .ag-paging-page-summary-panel .ag-paging-button.ag-disabled .ag-icon) {
+                color: ${this.state.night ? '#fff' : ''};
+              }
+              :global(.row-emergency) {
+                background: ${this.state.night ? 'repeating-linear-gradient( 45deg, #272727, #272727 10px, #c3565f2d 10px, #c3565f2d 20px) !important' : ''};
               }
               :global(.btn-dark) {
                 color: ${this.state.night ? '#fff' : ''};

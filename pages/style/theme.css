@@ -10,6 +10,7 @@
     --border-color: #d4d5d8;
     --unread-color: #d4d5d8;
     --disabled-input: #d4d5d8;
+    --border-color: #e1e3e4;
 }
 
 [data-theme="dark"] {
@@ -23,6 +24,7 @@
     --unread-color: #d4d5d8;
     --border-color: #707990;
     --disabled-input: #121212;
+    --border-color: #313131;
 
     --secondary-color: #818cab;
     --bg-color: #161625;

@@ -82,6 +82,10 @@ export default class Maintenance extends React.Component {
     } else {
       display = count.count
     }
+    // let night
+    // if (typeof window !== 'undefined') {
+    //   night = window.localStorage.getItem('theme')
+    // }
     if (query.id === 'NEW') {
       return {
         jsonData: { profile: query },
@@ -96,6 +100,7 @@ export default class Maintenance extends React.Component {
       return {
         jsonData: json,
         unread: display,
+        // night: night === 'dark',
         session: await NextAuth.init({ req })
       }
     }
@@ -103,7 +108,10 @@ export default class Maintenance extends React.Component {
 
   constructor (props) {
     super(props)
-    const night = window.localStorage.getItem('theme')
+    let night
+    if (typeof window !== 'undefined') {
+      night = window.localStorage.getItem('theme')
+    }
     this.state = {
       width: 0,
       night: night === 'dark',
@@ -254,6 +262,11 @@ export default class Maintenance extends React.Component {
       }
     }
 
+    const night = window.localStorage.getItem('theme')
+    this.setState({
+      night: night === 'dark'
+    })
+
     // preapre NEW maintenance
     if (this.props.jsonData.profile.id === 'NEW') {
       const {
@@ -267,7 +280,7 @@ export default class Maintenance extends React.Component {
       }
       this.setState({
         maintenance: maintenance,
-        width: window.innerWidth
+        width: window.outerWidth
       })
     } else {
       // prepare page for existing maintenance
@@ -290,7 +303,7 @@ export default class Maintenance extends React.Component {
 
       this.setState({
         maintenance: newMaintenance,
-        width: window.innerWidth
+        width: window.outerWidth
       })
     }
 
@@ -2218,7 +2231,7 @@ export default class Maintenance extends React.Component {
                   background: none !important;
                 }
                 :global(.maintenance-subcontainer) {
-                  border: 1px solid var(--light);
+                  border: 1px solid var(--border-color);
                   border-radius: 0.325rem;
                   margin: 10px 0;
                 }
@@ -2237,9 +2250,14 @@ export default class Maintenance extends React.Component {
                   border-radius: 0.325rem;
                   padding: 20px;
                 }
+                :global(.btn-toolbar .badge-outline-secondary) {
+                  box-shadow: unset;
+                }
+                :global(.form-group-toggle > .badge-outline-secondary) {
+                  box-shadow: ${this.state.night ? '0 0 5px 1px #fff' : ''};
+                }
                 :global(.badge-outline-secondary > label) {
                   color: var(--font-color);
-                  box-shadow: ${this.state.night === 'true' ? '0 0 5px 1px #fff' : ''};
                 }
                 :global(.badge-outline-light > label) {
                   color: var(--font-color);
@@ -2366,7 +2384,7 @@ export default class Maintenance extends React.Component {
                 :global(.close-read-modal-btn:hover > .close-read-modal-icon) {
                   color: var(--dark) !important;
                 }
-                :global(.form-group > label) {
+                :global(.form-group label) {
                   color: var(--font-color);
                 }
                 :global(.form-control, .form-control) {
@@ -2376,6 +2394,9 @@ export default class Maintenance extends React.Component {
                 :global(.form-control:disabled, .form-control[readonly]) {
                   color: var(--font-color);
                   background-color: var(--disabled-input);
+                }
+                :global(.btn-outline-secondary) {
+                  color: var(--font-color);
                 }
                 :global(.flatpickr) {
                   height: auto;
@@ -2426,8 +2447,14 @@ export default class Maintenance extends React.Component {
                   display: flex;
                 }
                 @media only screen and (max-width: 500px) {
+                  :global(html) {
+                    max-width: ${this.state.width}px;
+                  }
                   :global(div.btn-toolbar > .btn-group-md) {
                     margin-right: 20px;
+                  }
+                  :global(.btn-group-2) {
+                    width: 100%;
                   }
                   :global(div.btn-toolbar) {
                     flex-wrap: no-wrap;
@@ -2440,8 +2467,14 @@ export default class Maintenance extends React.Component {
                     flex-grow: 1;
                   }
                   :global(div.btn-toolbar > span > h2) {
-                    margin: 0 auto;
+                    margin: 5px auto 0 auto;
                     padding-right: 20px;
+                  }
+                  :global(.card-header h2) {
+                    margin-top: 5px;
+                  }
+                  :global(.card-header) {
+                    height: 110px;
                   }
                   :global(.card-body) {
                     padding: 0px;
