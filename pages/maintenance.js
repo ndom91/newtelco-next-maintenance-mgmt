@@ -1944,7 +1944,7 @@ export default class Maintenance extends React.Component {
                       borderRadius: '15px',
                       height: 'auto',
                       zIndex: '101',
-                      boxShadow: '0px 0px 20px 1px var(--dark)'
+                      boxShadow: '0px 0px 20px 1px var(--third-bg)'
                     }}
                     minWidth={700}
                     minHeight={590}
@@ -1959,7 +1959,7 @@ export default class Maintenance extends React.Component {
                   >
                     <div style={{ borderRadius: '15px', position: 'relative' }}>
                       <ModalHeader style={{
-                        background: 'var(--secondary)',
+                        backgroundColor: 'var(--third-bg)',
                         borderRadius: '0px'
                       }}
                       >
@@ -2303,10 +2303,11 @@ export default class Maintenance extends React.Component {
                 :global(.mail-body) {
                   font-family: Poppins, Helvetica;
                   height: ${this.state.readHeight ? `calc(${this.state.readHeight} - 127px)` : '460px'};
-                  background: var(--white);
+                  background: var(--primary-bg);
+                  color: var(--font-color);
                   overflow-y: ${this.state.incomingMailIsHtml ? 'scroll' : 'hidden'};
                 }
-                :global(.mail-body > :first-child) {
+                :global(.mail-body > div:first-child) {
                   position: ${this.state.incomingMailIsHtml ? 'relative' : 'absolute'};
                   top: 0;
                   left: 0;
