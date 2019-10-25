@@ -26,6 +26,13 @@ export default class Layout extends React.Component {
     this.toggleHelpModal = this.toggleHelpModal.bind(this)
   }
 
+  componentDidMount () {
+    const night = window.localStorage.getItem('theme')
+    this.setState({
+      night: night === 'dark'
+    })
+  }
+
   handleSignOutSubmit (event) {
     event.preventDefault()
     NextAuth.signout()

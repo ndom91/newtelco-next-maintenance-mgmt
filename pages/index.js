@@ -245,6 +245,9 @@ export default class Index extends React.Component {
                 width: 76px !important;
               }
             }
+            :global(.badge-primary[href]:focus, .badge-primary[href]:hover) {
+              color: var(--primary-bg);
+            }
             :global(.card-person-badge > svg) {
               position: absolute;
               left: 0px;
