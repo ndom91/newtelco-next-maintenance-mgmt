@@ -523,17 +523,27 @@ export default class Inbox extends React.Component {
             }
             :global(.mail-body) {
               font-family: Poppins, Helvetica;
-              height: 550px;
+              height: ${this.state.incomingMailIsHtml ? '100%' : '550px'};
               overflow-y: ${this.state.incomingMailIsHtml ? 'scroll' : 'hidden'};
+              background-color: var(--primary-bg);
+              color: var(--font-color);
             }
             :global(.mail-body > :first-child) {
               position: ${this.state.incomingMailIsHtml ? 'relative' : 'absolute'};
               top: 0;
               left: 0;
-              height: 100vh;
+              height: ${this.state.incomingMailIsHtml ? '' : '100%'};
               width: 100%;
               padding: 40px;
               overflow-y: ${this.state.incomingMailIsHtml ? 'hidden' : 'scroll'};
+              background-color: var(--primary-bg);
+            }
+            :global(.mail-modal-body .modal-header) {
+              background-color: var(--secondary-bg);
+              color: var(--font-color);
+            }
+            :global(.mail-body *) {
+              color: var(--font-color);
             }
             :global(.modal-backdrop) {
               background-color: #000;
