@@ -9,7 +9,8 @@
     --bg-font-color: #5a6169 !important;
     --border-color: #d4d5d8;
     --unread-color: #d4d5d8;
-    --disabled-input: #d4d5d8;
+    --input: #fff;
+    --disabled-input: #f1f1f1;
     --border-color: #e1e3e4;
 }
 
@@ -23,7 +24,8 @@
     --bg-font-color: #3a3a3a !important;
     --unread-color: #d4d5d8;
     --border-color: #707990;
-    --disabled-input: #121212;
+    --input: #121212;
+    --disabled-input: #272727;
     --border-color: #313131;
 
     --secondary-color: #818cab;

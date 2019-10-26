@@ -2195,11 +2195,11 @@ export default class Maintenance extends React.Component {
                   font-weight: 100 !important;
                 }
                 :global(.maint-select *) {
-                  background-color: var(--disabled-input);
+                  background-color: var(--input);
                   color: var(--font-color) !important;
                 }
                 :global(div[class$="-singleValue"]) {
-                  background-color: var(--disabled-input);
+                  background-color: var(--input);
                   color: var(--font-color);
                 }
                 :global(.Mui-focused) {
@@ -2222,7 +2222,7 @@ export default class Maintenance extends React.Component {
                 }
                 :global(.MuiInputBase-root:focus-within) {
                   color: #495057;
-                  background-color: var(--disabled-input);
+                  background-color: var(--input);
                   border: 1px solid #67B246 !important;
                   border-radius: 0.325rem;
                   box-shadow: 0 0.313rem 0.719rem rgba(0,123,255,.1), 0 0.156rem 0.125rem rgba(0,0,0,.06);
@@ -2405,11 +2405,11 @@ export default class Maintenance extends React.Component {
                 }
                 :global(.form-control, .form-control) {
                   color: var(--font-color);
-                  background-color: var(--disabled-input);
+                  background-color: var(--input);
                 }
                 :global(.form-control:disabled, .form-control[readonly]) {
                   color: var(--font-color);
-                  background-color: var(--primary-bg);
+                  background-color: var(--disabled-input);
                 }
                 :global(.btn-outline-secondary) {
                   color: var(--font-color);
@@ -2421,7 +2421,7 @@ export default class Maintenance extends React.Component {
                   font-size: .95rem;
                   line-height: 1.5;
                   color: var(--font-color);
-                  background-color: var(--disabled-input);
+                  background-color: var(--input);
                   border: 1px solid #becad6;
                   font-weight: 300;
                   will-change: border-color,box-shadow;
