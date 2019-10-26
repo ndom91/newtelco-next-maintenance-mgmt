@@ -1941,9 +1941,9 @@ export default class Maintenance extends React.Component {
                 ? (
                   <Rnd
                     default={{
-                      x: HALF_WIDTH,
+                      x: window.outerWidth / 2,
                       y: 25,
-                      width: HALF_WIDTH,
+                      width: (window.outerWidth / 2) * 0.8,
                       height: 600
                     }}
                     style={{
