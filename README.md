@@ -12,7 +12,8 @@
 - Export history data to CSV
 - LogRocket + Sentry Error Logging
 - Keyboard Shortcuts
-- Darkmode :)
+- Darkmode :)  
+![darkmode switch](https://imgur.com/XpHgYlX.gif)
 - SMTP Outbound Mail
 - Blazing fast SPA built on:  
   - Next.js / React
@@ -55,11 +56,15 @@ It is currently setup so that the host is dynamic, you can reverse proxy it out 
 
 ### Screenshots
 
+
 ![screenshot 1](https://imgur.com/NN1F2OM.png)
 
-![screenshot 2](https://imgur.com/5ZNu8Ao.png)
+![screenshot 2](https://imgur.com/pCtKK5R.png)
 
 ![screenshot 3](https://imgur.com/v1E8xo1.png)
 
+![screenshot 4](https://imgur.com/3QymwYQ.png)
+
+![screenshot 5](https://imgur.com/wz4LOzy.png)
 
 **Internal Application used by NewTelco GmbH**
