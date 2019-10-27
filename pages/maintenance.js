@@ -412,7 +412,7 @@ export default class Maintenance extends React.Component {
   }
 
   onFirstDataRendered (params) {
-    params.columnApi.autoSizeColumns()
+    // params.columnApi.autoSizeColumns()
     // params.columnApi.sizeColumnsToFit()
   }
 
@@ -548,20 +548,27 @@ export default class Maintenance extends React.Component {
           newKundenCids.push(cid)
         })
         const uniqueKundenCids = getUnique(newKundenCids, 'kundenCID')
+        const startDate = this.state.maintenance.startDateTime
+        const endDate = this.state.maintenance.endDateTime
         uniqueKundenCids.forEach(cid => {
-          fetch(`https://${host}/api/maintenances/freeze?companyid=${cid.kunde}`, {
+          fetch(`https://${host}/api/maintenances/freeze?companyid=${cid.kunde}&startDate=${startDate}&endDate=${endDate}`, {
             method: 'get'
           })
             .then(resp => resp.json())
             .then(data => {
               if (data.freezeQuery.length === 0) {
+                this.setState({
+                  kundencids: uniqueKundenCids
+                })
                 return
               }
               const freezeEntry = data.freezeQuery[0]
               const uniqueCids = uniqueKundenCids
               const frozenCids = uniqueCids.findIndex(el => el.kunde === freezeEntry.companyId)
-              cogoToast.warn(`Warning - ${uniqueKundenCids[frozenCids].name} has active Network Freeze!`, {
-                position: 'top-right'
+              cogoToast.error(`${uniqueKundenCids[frozenCids].name} has active Network Freeze at that time!`, {
+                position: 'top-right',
+                hideAfter: 5,
+                onClick: () => Router.push('/settings?tab=freeze')
               })
               uniqueKundenCids[frozenCids].frozen = true
               this.setState({

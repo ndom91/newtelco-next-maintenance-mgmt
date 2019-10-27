@@ -58,7 +58,8 @@ export default class Freeze extends React.Component {
             headerName: 'ID',
             field: 'id',
             width: 80,
-            editable: false
+            editable: false,
+            sort: { direction: 'asc', priority: 1 }
           },
           {
             headerName: 'Company',
