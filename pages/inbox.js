@@ -348,7 +348,7 @@ export default class Inbox extends React.Component {
             @media only screen and (max-width: 500px) {
               :global(.inbox-btn-group) {
                 display: flex;
-                flex-direction: column;
+                flex-direction: column !important;
                 justify-content: center;
               }
               :global(.mail-open-icon) {
@@ -363,6 +363,7 @@ export default class Inbox extends React.Component {
               :global(.mail-badge) {
                 border: 1px solid var(--primary);
                 min-width: 66px !important;
+                min-height: 64px !important;
                 width: 66px;
                 border-radius: 5px 5px 0px 0px;
               }
@@ -380,7 +381,7 @@ export default class Inbox extends React.Component {
               }
               :global(.fa-pencil-alt),
               :global(.fa-trash-alt) {
-                font-size: 25px;
+                font-size: 20px;
               }
               .mail-info {
                 max-width: 80%;
@@ -418,6 +419,7 @@ export default class Inbox extends React.Component {
             }
             .mail-wrapper {
               display: flex;
+              align-items: center;
             }
             :global(#translate-tooltip) {
               transition: all 200ms ease-in-out;
@@ -437,9 +439,11 @@ export default class Inbox extends React.Component {
             }
             :global(.mail-badge) {
               min-width: 68px;
-              min-height: 64px;
-              align-self: center;
+              max-height: 64px;
               transition: all 150ms ease-in-out;
+              display: flex;
+              justify-content: center;
+              align-items: center;
             }
             :global(.inbox-btn-group) {
               display: flex;
@@ -463,9 +467,9 @@ export default class Inbox extends React.Component {
             :global(.mail-open-icon) {
               color: var(--primary);
               align-self: center;
-              margin-left: -50px;
-              margin-bottom: -5px;
-              font-size: 24px;
+              margin-left: -40px;
+              margin-bottom: 0px;
+              font-size: 20px;
               visibility: hidden;
               opacity: 0;
               transition: visibility 0s, opacity 200ms ease-in-out;
@@ -478,11 +482,12 @@ export default class Inbox extends React.Component {
               transition: visibility 0s, opacity 200ms ease-in-out;
             }
             .mail-icon {
-              height: 50px;
-              width: 50px;
-              transform: translate(-9px, 0px);
+              height: 40px;
+              width: 40px;
+              transform: translate(-5px, 0px);
               transition: all 150ms ease-in-out;
               transition: visibility 0s, opacity 200ms ease-in-out;
+              margin: 5px 0;
             }
             :global(.mail-badge:hover) > .mail-icon {
               visibility: hidden;

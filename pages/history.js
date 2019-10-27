@@ -445,7 +445,7 @@ export default class History extends React.Component {
                   padding: 30px;
                 }
                 :global(.export-btn:hover path){
-                  stroke: var(--inv-font-color);
+                  stroke: ${this.props.night === 'true' ? 'var(--inv-font-color)' : '#000'};
                 }
                 :global(.export-btn path){
                   stroke: var(--font-color);

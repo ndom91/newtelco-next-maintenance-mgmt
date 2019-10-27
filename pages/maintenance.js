@@ -210,7 +210,16 @@ export default class Maintenance extends React.Component {
           sentIcon: SentIcon
         },
         paginationPageSize: 10,
-        rowClass: 'row-class'
+        rowClass: 'row-class',
+        rowClassRules: {
+          'row-frozen': function (params) {
+            const frozen = params.data.frozen
+            if (frozen === 1 || frozen === true) {
+              return true
+            }
+            return false
+          }
+        }
       }
     }
     this.toggleReadModal = this.toggleReadModal.bind(this)
@@ -403,7 +412,7 @@ export default class Maintenance extends React.Component {
   }
 
   onFirstDataRendered (params) {
-    // params.columnApi.autoSizeColumns()
+    params.columnApi.autoSizeColumns()
     // params.columnApi.sizeColumnsToFit()
   }
 
@@ -539,12 +548,38 @@ export default class Maintenance extends React.Component {
           newKundenCids.push(cid)
         })
         const uniqueKundenCids = getUnique(newKundenCids, 'kundenCID')
-        this.setState({
-          kundencids: uniqueKundenCids
+        uniqueKundenCids.forEach(cid => {
+          fetch(`https://${host}/api/maintenances/freeze?companyid=${cid.kunde}`, {
+            method: 'get'
+          })
+            .then(resp => resp.json())
+            .then(data => {
+              if (data.freezeQuery.length === 0) {
+                return
+              }
+              const freezeEntry = data.freezeQuery[0]
+              const uniqueCids = uniqueKundenCids
+              const frozenCids = uniqueCids.findIndex(el => el.kunde === freezeEntry.companyId)
+              cogoToast.warn(`Warning - ${uniqueKundenCids[frozenCids].name} has active Network Freeze!`, {
+                position: 'top-right'
+              })
+              uniqueKundenCids[frozenCids].frozen = true
+              this.setState({
+                kundencids: uniqueKundenCids
+              })
+            })
+            .catch(err => console.error(`Error - ${err}`))
+          if (this.gridApi) {
+            this.gridApi.refreshCells()
+          }
+        }, () => {
+          this.setState({
+            kundencids: uniqueKundenCids
+          })
+          if (this.gridApi) {
+            this.gridApi.refreshCells()
+          }
         })
-        if (this.gridApi) {
-          this.gridApi.refreshCells()
-        }
       })
       .catch(err => console.error(`Error - ${err}`))
   }
@@ -1899,7 +1934,6 @@ export default class Maintenance extends React.Component {
                                     rowData={this.state.kundencids}
                                     onGridReady={params => this.gridApi = params.api}
                                     pagination
-                                    // batchUpdateWaitMillis={50}
                                     deltaRowDataMode
                                     getRowNodeId={(data) => {
                                       return data.kundenCID
@@ -2461,6 +2495,12 @@ export default class Maintenance extends React.Component {
                 }
                 .impact-title-group {
                   display: flex;
+                }
+                :global(.row-frozen) {
+                  border: 1px solid #dc3545;
+                  box-shadow: 0 0 5px 1px #dc3545;
+                  background-color: #dc35451f;
+                  width: 100%;
                 }
                 @media only screen and (max-width: 500px) {
                   :global(html) {
