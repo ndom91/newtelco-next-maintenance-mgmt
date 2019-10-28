@@ -744,7 +744,7 @@ export default class Maintenance extends React.Component {
       const newStart = moment(this.state.rescheduleData[latest].startDateTime).format('YYYY.MM.DD HH:mm:ss')
       const newEnd = moment(this.state.rescheduleData[latest].endDateTime).format('YYYY.MM.DD HH:mm:ss')
       const rcounter = this.state.rescheduleData[latest].rcounter
-      maintenanceIntro = `We regret to inform you that the following maintenance has been rescheduled.\n\nThe new times are as follows:\n\n<table border="0" cellspacing="2" cellpadding="2" width="775px"><tr><td style='width: 205px;'>Maintenance ID:</td><td><b>NT-${id}-${rcounter}</b></td></tr><tr><td>Start date and time:</td><td><b>${newStart} (${tzSuffixRAW})</b></td></tr><tr><td>Finish date and time:</td><td><b>${newEnd} (${tzSuffixRAW})</b></td></tr></table><br><hr>\nDear Colleages,<br><br>We would like to inform you about planned work on the following CID(s):\n`
+      maintenanceIntro = `We regret to inform you that the following maintenance has been rescheduled.\n\nThe new times are as follows:\n\n<table border="0" cellspacing="2" cellpadding="2" width="775px"><tr><td style='width: 205px;'>Maintenance ID:</td><td><b>NT-${id}-${rcounter}</b></td></tr><tr><td>Start date and time:</td><td><b>${newStart} (${tzSuffixRAW})</b></td></tr><tr><td>Finish date and time:</td><td><b>${newEnd} (${tzSuffixRAW})</b></td></tr></table><hr>\nDear Colleages,<br><br>We would like to inform you about planned work on the following CID(s):\n`
     }
 
     let body = `<body style="color:#666666;">${rescheduleText} Dear Colleagues,​​<p><span>${maintenanceIntro}<br><br> <b>${customerCID}</b> <br><br>The maintenance work is with the following details:</span></p><table border="0" cellspacing="2" cellpadding="2" width="775px"><tr><td style='width: 205px;'>Maintenance ID:</td><td><b>NT-${id}</b></td></tr><tr><td>Start date and time:</td><td><b>${utcStart} (${tzSuffixRAW})</b></td></tr><tr><td>Finish date and time:</td><td><b>${utcEnd} (${tzSuffixRAW})</b></td></tr>`
@@ -2475,10 +2475,10 @@ export default class Maintenance extends React.Component {
                       <b style={{ fontWeight: '900' }}>
                         Subject:
                       </b>
-                      {this.state.rescheduleData.length !== 0 && '[RESCHEDULED] '}
-                      {this.state.maintenance.emergency && '[EMERGENCY] '}
-                      {this.state.maintenance.cancelled && '[CANCELLED] '}
-                      {this.state.mailPreviewSubjectText}-{this.state.rescheduleData.length !== 0 && this.state.rescheduleData[this.state.rescheduleData.length - 1].rcounter}
+                      {this.state.rescheduleData.length !== 0 && ' [RESCHEDULED]'}
+                      {this.state.maintenance.emergency && ' [EMERGENCY]'}
+                      {this.state.maintenance.cancelled && ' [CANCELLED]'}
+                      {' ' + this.state.mailPreviewSubjectText}-{this.state.rescheduleData.length !== 0 && this.state.rescheduleData[this.state.rescheduleData.length - 1].rcounter}
                     </div>
                   </div>
                   <Button id='send-mail-btn' style={{ padding: '0.9em 1.1em' }} onClick={() => this.sendMail(this.state.mailPreviewHeaderText, this.state.mailPreviewCustomerCid, this.state.mailPreviewSubjectText, this.state.mailBodyText, true)}>
