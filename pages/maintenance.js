@@ -739,6 +739,14 @@ export default class Maintenance extends React.Component {
       maintenanceIntro = `We would like to inform you that these planned works (<b>NT-${id}</b>) have been <b>cancelled</b> with the following CID(s):`
     }
 
+    if (this.state.rescheduleData.length !== 0) {
+      const latest = this.state.rescheduleData.length - 1
+      const newStart = moment(this.state.rescheduleData[latest].startDateTime).format('YYYY.MM.DD HH:mm:ss')
+      const newEnd = moment(this.state.rescheduleData[latest].endDateTime).format('YYYY.MM.DD HH:mm:ss')
+      const rcounter = this.state.rescheduleData[latest].rcounter
+      maintenanceIntro = `We regret to inform you that the following maintenance has been rescheduled.\n\nThe new times are as follows:\n\n<table border="0" cellspacing="2" cellpadding="2" width="775px"><tr><td style='width: 205px;'>Maintenance ID:</td><td><b>NT-${id}-${rcounter}</b></td></tr><tr><td>Start date and time:</td><td><b>${newStart} (${tzSuffixRAW})</b></td></tr><tr><td>Finish date and time:</td><td><b>${newEnd} (${tzSuffixRAW})</b></td></tr></table><br><hr>\nDear Colleages,<br><br>We would like to inform you about planned work on the following CID(s):\n`
+    }
+
     let body = `<body style="color:#666666;">${rescheduleText} Dear Colleagues,​​<p><span>${maintenanceIntro}<br><br> <b>${customerCID}</b> <br><br>The maintenance work is with the following details:</span></p><table border="0" cellspacing="2" cellpadding="2" width="775px"><tr><td style='width: 205px;'>Maintenance ID:</td><td><b>NT-${id}</b></td></tr><tr><td>Start date and time:</td><td><b>${utcStart} (${tzSuffixRAW})</b></td></tr><tr><td>Finish date and time:</td><td><b>${utcEnd} (${tzSuffixRAW})</b></td></tr>`
 
     if (impact || protection) {
@@ -778,6 +786,9 @@ export default class Maintenance extends React.Component {
     const cancelled = this.state.maintenance.cancelled
     if (cancelled === 'true' || cancelled === true || cancelled === '1' || cancelled === 1) {
       subject = `[CANCELLED] ${subject}`
+    }
+    if (this.state.rescheduleData.length !== 0) {
+      subject = `[RESCHEDULED] ${subject}-${this.state.rescheduleData[this.state.rescheduleData.length - 1].rcounter}`
     }
 
     fetch(`https://api.${host}/mail/send`, {
@@ -2464,9 +2475,10 @@ export default class Maintenance extends React.Component {
                       <b style={{ fontWeight: '900' }}>
                         Subject:
                       </b>
-                      {this.state.maintenance.cancelled && '[CANCELLED] '}
+                      {this.state.rescheduleData.length !== 0 && '[RESCHEDULED] '}
                       {this.state.maintenance.emergency && '[EMERGENCY] '}
-                      {this.state.mailPreviewSubjectText}
+                      {this.state.maintenance.cancelled && '[CANCELLED] '}
+                      {this.state.mailPreviewSubjectText}-{this.state.rescheduleData.length !== 0 && this.state.rescheduleData[this.state.rescheduleData.length - 1].rcounter}
                     </div>
                   </div>
                   <Button id='send-mail-btn' style={{ padding: '0.9em 1.1em' }} onClick={() => this.sendMail(this.state.mailPreviewHeaderText, this.state.mailPreviewCustomerCid, this.state.mailPreviewSubjectText, this.state.mailBodyText, true)}>
