@@ -190,13 +190,13 @@ export default class Freeze extends React.Component {
 
   handleDelete () {
     const host = window.location.host
-    const supplierCidId = this.state.freezeIdToDelete
-    fetch(`https://${host}/api/settings/delete/suppliercids?id=${supplierCidId}`, {
+    const freezeId = this.state.freezeIdToDelete
+    fetch(`https://${host}/api/settings/delete/freeze?id=${freezeId}`, {
       method: 'get'
     })
       .then(resp => resp.json())
       .then(data => {
-        if (data.deleteSupplierCidQuery.affectedRows === 1) {
+        if (data.deleteFreezeQuery.affectedRows === 1) {
           cogoToast.success('Delete Success', {
             position: 'top-right'
           })
@@ -208,7 +208,7 @@ export default class Freeze extends React.Component {
       })
       .catch(err => console.error(err))
 
-    const newRowData = this.state.rowData.filter(el => el.id !== supplierCidId)
+    const newRowData = this.state.rowData.filter(el => el.id !== freezeId)
     this.setState({
       rowData: newRowData,
       openConfirmDeleteModal: !this.state.openConfirmDeleteModal
@@ -265,17 +265,20 @@ export default class Freeze extends React.Component {
   }
 
   handleCellEdit (params) {
+    console.log(params.data)
     const id = params.data.id
-    const newSupplierCid = params.data.derenCID
+    const startdate = moment(params.data.startDateTime).format('YYYY.MM.DD HH:mm:ss')
+    const enddate = moment(params.data.endDateTime).format('YYYY.MM.DD HH:mm:ss')
+    const notes = params.data.notes
 
     const host = window.location.host
-    fetch(`https://${host}/api/settings/edit/freeze?id=${id}&suppliercid=${encodeURIComponent(newSupplierCid)}`, {
+    fetch(`https://${host}/api/settings/edit/freeze?id=${id}&startdate=${encodeURIComponent(startdate)}&enddate=${encodeURIComponent(enddate)}&notes=${encodeURIComponent(notes)}`, {
       method: 'get'
     })
       .then(resp => resp.json())
       .then(data => {
-        if (data.updateSupplierCidQuery.affectedRows === 1) {
-          cogoToast.success(`Supplier CID ${newSupplierCid} Updated`, {
+        if (data.updateFreezeQuery.affectedRows === 1) {
+          cogoToast.success(`Freeze ${id} Updated`, {
             position: 'top-right'
           })
         } else {
@@ -329,7 +332,7 @@ export default class Freeze extends React.Component {
               />
             </div>
           </div>
-          <Modal className='modal-body' animation backdrop backdropClassName='modal-backdrop' open={this.state.openFreezeAdd} size='md' toggle={this.toggleFreezeAddModal}>
+          <Modal className='' animation backdrop backdropClassName='modal-backdrop' open={this.state.openFreezeAdd} size='md' toggle={this.toggleFreezeAddModal}>
             <ModalHeader>
               New Freeze
             </ModalHeader>
@@ -351,7 +354,7 @@ export default class Freeze extends React.Component {
                     </FormGroup>
                     <FormGroup>
                       <label>
-                        Start Date/Time
+                        Start Date/Time (in GMT)
                       </label>
                       <Flatpickr
                         data-enable-time
@@ -363,7 +366,7 @@ export default class Freeze extends React.Component {
                     </FormGroup>
                     <FormGroup>
                       <label>
-                        End Date/Time
+                        End Date/Time (in GMT)
                       </label>
                       <Flatpickr
                         data-enable-time
@@ -424,8 +427,12 @@ export default class Freeze extends React.Component {
                 margin: 10px 0;
                 padding: 1.5rem;
               }
+              :global(.modal-body) {
+                background-color: var(--primary-bg);
+              }
               :global(.modal-header) {
-                background: var(--light);
+                background: var(--secondary-bg);
+                color: var(--font-color);
                 display: flex;
                 justify-content: flex-start;
                 align-content: center;
