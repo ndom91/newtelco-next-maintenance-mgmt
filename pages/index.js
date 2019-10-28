@@ -3,19 +3,24 @@ import Layout from '../src/components/layout'
 import Link from 'next/link'
 import RequireLogin from '../src/components/require-login'
 import { NextAuth } from 'next-auth/client'
+import ReactTooltip from 'react-tooltip'
 import Router from 'next/router'
 import fetch from 'isomorphic-unfetch'
 import Fonts from '../src/components/fonts'
 import UnreadCount from '../src/components/unreadcount'
 import Footer from '../src/components/footer'
 import { Sparklines, SparklinesLine } from 'react-sparklines'
+import CalendarHeatmap from 'react-calendar-heatmap'
+import 'react-calendar-heatmap/dist/styles.css'
 import UseAnimations from 'react-useanimations'
 import {
   Badge,
   Container,
   Card,
   CardHeader,
-  CardBody
+  CardBody,
+  Row,
+  Col
 } from 'shards-react'
 
 const people = ['fwaleska', 'alissitsin', 'sstergiou']
@@ -23,7 +28,7 @@ const people = ['fwaleska', 'alissitsin', 'sstergiou']
 export default class Index extends React.Component {
   static async getInitialProps ({ res, req, query }) {
     const host = req ? req.headers['x-forwarded-host'] : location.host
-    const pageRequest = `https://api.${host}/inbox/count` // ?page=${query.page || 1}&limit=${query.limit || 41}`
+    const pageRequest = `https://api.${host}/inbox/count`
     const fetchRes = await fetch(pageRequest, {
       mode: 'cors',
       headers: {
@@ -74,67 +79,9 @@ export default class Index extends React.Component {
         total: 0,
         weeks: []
       },
-      logRocketLoaded: false
+      heatmapData: []
     }
-    // this.checkUnreadCount = this.checkUnreadCount.bind(this)
   }
-
-  // checkUnreadCount () {
-  //   const host = window.location.host
-  //   fetch(`https://api.${host}/inbox/count`, {
-  //     method: 'get'
-  //   })
-  //     .then(resp => resp.json())
-  //     .then(data => {
-  //       let display
-  //       if (data === 'No unread emails') {
-  //         display = 0
-  //       } else {
-  //         display = data.count
-  //         if (document !== undefined) {
-  //           const favicon = document.getElementById('favicon')
-  //           const faviconSize = 16
-
-  //           const canvas = document.createElement('canvas')
-  //           canvas.width = faviconSize
-  //           canvas.height = faviconSize
-
-  //           const context = canvas.getContext('2d')
-  //           const img = document.createElement('img')
-  //           img.src = favicon.href
-
-  //           img.onload = () => {
-  //             // Draw Original Favicon as Background
-  //             context.drawImage(img, 0, 0, faviconSize, faviconSize)
-
-  //             // Draw Notification Circle
-  //             context.beginPath()
-  //             context.arc(canvas.width - faviconSize / 4, faviconSize / 4, faviconSize / 4, 0, 2 * Math.PI)
-  //             context.fillStyle = '#FF0000'
-  //             context.fill()
-
-  //             // Draw Notification Number
-  //             // context.font = '9px "helvetica", sans-serif'
-  //             // context.textAlign = 'center'
-  //             // context.textBaseline = 'middle'
-  //             // context.fillStyle = '#FFFFFF'
-  //             // context.fillText(display, canvas.width - faviconSize / 3, faviconSize / 3)
-
-  //             // Replace favicon
-  //             favicon.href = canvas.toDataURL('image/png')
-  //             this.setState({
-  //               faviconEl: favicon
-  //             })
-  //           }
-  //         }
-  //       }
-  //       // console.log('loop ' + new Date())
-  //       this.setState({
-  //         unread: display
-  //       })
-  //     })
-  //     .catch(err => console.error(`Error - ${err}`))
-  // }
 
   fetchPersonStats (person) {
     const host = window.location.host
@@ -163,6 +110,17 @@ export default class Index extends React.Component {
     people.forEach(person => {
       this.fetchPersonStats(person)
     })
+    const host = window.location.host
+    fetch(`https://${host}/api/maintenances/heatmap`, {
+      method: 'get'
+    })
+      .then(resp => resp.json())
+      .then(data => {
+        this.setState({
+          heatmapData: data.maintenances
+        })
+      })
+      .catch(err => console.error(`Error - ${err}`))
   }
 
   componentWillUnmount () {
@@ -175,7 +133,6 @@ export default class Index extends React.Component {
   }
 
   render () {
-    // console.log(this.props.session)
     if (this.props.session.user) {
       return (
         <Layout night={this.props.night} handleSearchSelection={this.handleSearchSelection} unread={this.props.unread} session={this.props.session}>
@@ -184,36 +141,66 @@ export default class Index extends React.Component {
             <CardHeader><h2>Newtelco Maintenance</h2></CardHeader>
             <CardBody>
               <Container className='card-container'>
-                <Card className='card-inboxUnread'>
-                  <Link href='/inbox' passHref>
-                    <Badge className='card-badge'>{this.props.unread}</Badge>
-                  </Link>
-                  <Link href='/inbox'>
-                    <a href='/inbox'>
-                      <CardBody className='card-unread-body'>
-                        <UseAnimations animationKey='activity' size={34} className='card-inbox-activity' />
-                        <p className='card-body-text'>Unread</p>
-                      </CardBody>
-                    </a>
-                  </Link>
-                </Card>
-                {people.map(person => {
-                  return (
-                    <Card key={person} className='card-stats'>
-                      <Badge className='card-person-badge' outline>
-                        <span>
-                          {eval(`this.state.${person}.total`)}
-                        </span>
-                        <Sparklines data={eval(`this.state.${person}.weeks`)} limit={10} width={100} height={40} margin={1}>
-                          <SparklinesLine style={{ strokeWidth: 2, stroke: 'rgba(53, 146, 59, 0.5)', fill: '#67B246', fillOpacity: '0.1' }} />
-                        </Sparklines>
-                      </Badge>
-                      <CardBody className='card-person-body'>
-                        <p className='card-body-text'>{person}</p>
-                      </CardBody>
+                <Row>
+                  <Col>
+                    <Card className='card-inboxUnread'>
+                      <Link href='/inbox' passHref>
+                        <Badge className='card-badge'>{this.props.unread}</Badge>
+                      </Link>
+                      <Link href='/inbox' passHref>
+                        <CardBody className='card-unread-body'>
+                          <UseAnimations animationKey='activity' size={34} className='card-inbox-activity' />
+                          <p className='card-body-text'>Unread</p>
+                        </CardBody>
+                      </Link>
                     </Card>
-                  )
-                }, this)}
+                  </Col>
+                  {people.map(person => {
+                    return (
+                      <Col key={person}>
+                        <Card className='card-stats'>
+                          <Badge className='card-person-badge' outline>
+                            <span>
+                              {eval(`this.state.${person}.total`)}
+                            </span>
+                            <Sparklines data={eval(`this.state.${person}.weeks`)} limit={10} width={100} height={40} margin={1}>
+                              <SparklinesLine style={{ strokeWidth: 2, stroke: 'rgba(53, 146, 59, 0.5)', fill: '#67B246', fillOpacity: '0.1' }} />
+                            </Sparklines>
+                          </Badge>
+                          <CardBody className='card-person-body'>
+                            <p className='card-body-text'>{person}</p>
+                          </CardBody>
+                        </Card>
+                      </Col>
+                    )
+                  }, this)}
+                </Row>
+                <Row style={{ width: '90vw', padding: '50px' }}>
+                  <Col>
+                    <div
+                      style={{ width: '100%' }}
+                    >
+                      <CalendarHeatmap
+                        startDate={new Date('2019-01-01')}
+                        endDate={new Date()}
+                        values={this.state.heatmapData}
+                        showWeekdayLabels
+                        classForValue={value => {
+                          if (!value) {
+                            return 'color-empty'
+                          }
+                          return `color-github-${value.value}`
+                        }}
+                        tooltipDataAttrs={value => {
+                          return {
+                            'data-tip': `${value.format} has ${value.value || '0'} maintenance(s)`
+                          }
+                        }}
+                      />
+                    </div>
+                    <ReactTooltip />
+                  </Col>
+                </Row>
               </Container>
             </CardBody>
             <Footer />
@@ -244,6 +231,10 @@ export default class Index extends React.Component {
                 left: 12% !important;
                 width: 76px !important;
               }
+            }
+            :global(.break) {
+              flex-basis: 100%;
+              height: 0;
             }
             :global(.badge-primary[href]:focus, .badge-primary[href]:hover) {
               color: var(--primary-bg);
@@ -280,6 +271,7 @@ export default class Index extends React.Component {
             :global(.card-container) {
               display: flex;
               justify-content: space-around;
+              flex-wrap: wrap;
             }
             :global(.card-stats) {
               border-radius: 0.625em;
@@ -306,6 +298,53 @@ export default class Index extends React.Component {
               top: 171px;
               left: 70%;
               opacity: 0.1;
+            }
+            :global(.react-calendar-heatmap text) {
+              font-size: 10px;
+              fill: #aaa;
+            }
+            :global(.react-calendar-heatmap .react-calendar-heatmap-small-text) {
+              font-size: 5px;
+            }
+            :global(.react-calendar-heatmap rect:hover) {
+              stroke: #555;
+              stroke-width: 1px;
+            }
+            :global(.react-calendar-heatmap .color-empty) {
+              fill: #eeeeee;
+            }
+            :global(.react-calendar-heatmap .color-filled) {
+              fill: #8cc665;
+            }
+            :global(.react-calendar-heatmap .color-github-0) {
+              fill: #eeeeee;
+            }
+            :global(.react-calendar-heatmap .color-github-1) {
+              fill: #d6e685;
+            }
+            :global(.react-calendar-heatmap .color-github-2) {
+              fill: #8cc665;
+            }
+            :global(.react-calendar-heatmap .color-github-3) {
+              fill: #44a340;
+            }
+            :global(.react-calendar-heatmap .color-github-4) {
+              fill: #1e6823;
+            }
+            :global(.react-calendar-heatmap .color-github-5) {
+              fill: #16521a;
+            }
+            :global(.react-calendar-heatmap .color-github-6) {
+              fill: #114014;
+            }
+            :global(.react-calendar-heatmap .color-github-7) {
+              fill: #0a290c;
+            }
+            :global(.react-calendar-heatmap .color-github-8) {
+              fill: #051906;
+            }
+            :global(.react-calendar-heatmap .color-github-9) {
+              fill: #020a02;
             }
           `}
           </style>
