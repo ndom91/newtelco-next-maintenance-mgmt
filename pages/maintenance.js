@@ -48,7 +48,8 @@ import {
   faRandom,
   faSearch,
   faHistory,
-  faMailBulk
+  faMailBulk,
+  faCheck
 } from '@fortawesome/free-solid-svg-icons'
 import {
   Container,
@@ -145,12 +146,17 @@ export default class Maintenance extends React.Component {
       openPreviewModal: false,
       openHelpModal: false,
       openRescheduleModal: false,
+      openConfirmDeleteModal: false,
       reschedule: {
         startDateTime: null,
         endDateTime: null,
         impact: null
       },
       rescheduleData: [],
+      rescheduleToDelete: {
+        id: null,
+        rcounter: null
+      },
       translateTooltipOpen: false,
       translated: false,
       translatedBody: '',
@@ -165,22 +171,24 @@ export default class Maintenance extends React.Component {
           resizable: true,
           sortable: true,
           filter: true,
+          editable: true,
           selectable: true
         },
         columnDefs: [
           {
             headerName: 'ID',
             field: 'rcounter',
-            width: 120,
+            width: 100,
+            editable: false,
             sort: { direction: 'asc', priority: 0 }
           }, {
             headerName: 'Start',
-            field: 'sdt',
+            field: 'startDateTime',
             width: 210,
             cellRenderer: 'startdateTime'
           }, {
             headerName: 'End',
-            field: 'edt',
+            field: 'endDateTime',
             width: 210,
             cellRenderer: 'enddateTime'
           }, {
@@ -190,7 +198,7 @@ export default class Maintenance extends React.Component {
           }, {
             headerName: 'Sent',
             field: 'sent',
-            cellRenderer: 'sentIcon',
+            cellRenderer: 'sentBtn',
             width: 100,
             cellStyle: {
               display: 'flex',
@@ -200,11 +208,12 @@ export default class Maintenance extends React.Component {
             }
           }
         ],
-        paginationPageSize: 5,
+        rowSelection: 'single',
+        paginationPageSize: 10,
         frameworkComponents: {
           startdateTime: StartDateTime,
           enddateTime: EndDateTime,
-          sentIcon: SentIcon
+          sentBtn: this.sentBtn
         }
       },
       gridOptions: {
@@ -313,6 +322,10 @@ export default class Maintenance extends React.Component {
     this.handleRescheduleImpactChange = this.handleRescheduleImpactChange.bind(this)
     this.handleRescheduleStartDateTimeChange = this.handleRescheduleStartDateTimeChange.bind(this)
     this.handleRescheduleSave = this.handleRescheduleSave.bind(this)
+    this.handleRescheduleCellEdit = this.handleRescheduleCellEdit.bind(this)
+    this.toggleRescheduleSentBtn = this.toggleRescheduleSentBtn.bind(this)
+    this.toggleConfirmDeleteRescheduleModal = this.toggleConfirmDeleteRescheduleModal.bind(this)
+    this.handleDeleteReschedule = this.handleDeleteReschedule.bind(this)
   }
 
   componentDidMount () {
@@ -439,13 +452,6 @@ export default class Maintenance extends React.Component {
       })
     }
 
-  }
-
-  handleRescheduleGridReady (params) {
-    this.rescheduleGridApi = params.api
-    window.rescheduleGridApi = params.api
-    this.gridColumnApi = params.columnApi
-    const host = window.location.host
     fetch(`https://${host}/api/reschedule?id=${this.props.jsonData.profile.id}`, {
       method: 'get'
     })
@@ -456,6 +462,11 @@ export default class Maintenance extends React.Component {
         })
       })
       .catch(err => console.error(`Error Loading Reschedules - ${err}`))
+  }
+
+  handleRescheduleGridReady (params) {
+    this.rescheduleGridApi = params.api
+    params.api.setRowData(this.state.rescheduleData)
   }
 
   /// /////////////////////////////////////////////////////////
@@ -473,6 +484,16 @@ export default class Maintenance extends React.Component {
     this.gridApi.refreshCells()
   }
 
+  sentBtn = (row) => {
+    return (
+      <ButtonGroup>
+        <Button onClick={() => this.toggleRescheduleSentBtn(row.data.rcounter)} style={{ padding: '0.7em' }} size='sm' outline>
+          <FontAwesomeIcon width='1.325em' icon={row.data.sent === 1 ? faCheck : faTimesCircle} />
+        </Button>
+      </ButtonGroup>
+    )
+  }
+
   sendMailBtns = (row) => {
     return (
       <ButtonGroup>
@@ -488,7 +509,6 @@ export default class Maintenance extends React.Component {
 
   onGridReady (params) {
     this.gridApi = params.gridApi
-    // this.gridOptions.api.setColumnDefs(yourColumnDefs);
     params.api.setRowData(this.state.kundencids)
   }
 
@@ -1565,7 +1585,7 @@ export default class Maintenance extends React.Component {
             position: 'top-right'
           })
           const newRescheduleData = this.state.rescheduleData
-          newRescheduleData.push({ id: this.state.rescheduleData.length + 1, startDateTime: moment(newStartDateTime).format(), endDateTime: moment(newEndDateTime).format(), impact: newImpact })
+          newRescheduleData.push({ rcounter: this.state.rescheduleData.length + 1, startDateTime: moment(newStartDateTime).format(), endDateTime: moment(newEndDateTime).format(), impact: newImpact, sent: 0 })
           this.setState({
             rescheduleData: newRescheduleData,
             reschedule: {
@@ -1574,11 +1594,105 @@ export default class Maintenance extends React.Component {
               endDateTime: null
             }
           })
-          window.rescheduleGridApi.refreshCells()
-          this.rescheduleGridApi.refreshCells()
+          // this.rescheduleGridApi.insertItemsAtIndex(0, { id: this.state.rescheduleData.length + 1, startDateTime: moment(newStartDateTime).format(), endDateTime: moment(newEndDateTime).format(), impact: newImpact })
+          this.rescheduleGridApi.setRowData(newRescheduleData)
+          // this.rescheduleGridApi.refreshCells()
         }
       })
       .catch(err => console.error(`Error Saving Reschedule - ${err}`))
+  }
+
+  handleRescheduleCellEdit (params) {
+    console.log(params)
+    const rcounter = params.data.rcounter
+    const newStartDateTime = moment(params.data.startDateTime).format('YYYY.MM.DD HH:mm:ss')
+    const newEndDateTime = moment(params.data.endDateTime).format('YYYY.MM.DD HH:mm:ss')
+    const newImpact = params.data.impact
+
+    const host = window.location.host
+    fetch(`https://${host}/api/reschedule/edit?mid=${this.state.maintenance.id}&impact=${encodeURIComponent(newImpact)}&sdt=${encodeURIComponent(newStartDateTime)}&edt=${encodeURIComponent(newEndDateTime)}&rcounter=${rcounter}`, {
+      method: 'get'
+    })
+      .then(resp => resp.json())
+      .then(data => {
+        if (data.editRescheduleQuery.affectedRows === 1) {
+          cogoToast.success('Reschedule Edit - Success', {
+            position: 'top-right'
+          })
+        }
+      })
+      .catch(err => console.error(`Reschedule Edit Error - ${err}`))
+  }
+
+  toggleRescheduleSentBtn (rcounter) {
+    const newRescheduleData = this.state.rescheduleData
+    const reschedIndex = newRescheduleData.findIndex(el => el.rcounter === rcounter)
+    const currentSentStatus = newRescheduleData[reschedIndex].sent
+    let newSentStatus
+    if (currentSentStatus === 1) {
+      newRescheduleData[reschedIndex].sent = 0
+      newSentStatus = 0
+    } else if (currentSentStatus === 0) {
+      newRescheduleData[reschedIndex].sent = 1
+      newSentStatus = 1
+    }
+    this.setState({
+      rescheduleData: newRescheduleData
+    })
+    const host = window.location.host
+    fetch(`https://${host}/api/reschedule/sent?mid=${this.state.maintenance.id}&rcounter=${rcounter}&sent=${newSentStatus}`, {
+      method: 'get'
+    })
+      .then(resp => resp.json())
+      .then(data => {
+        if (data.editRescheduleQuery.affectedRows === 1) {
+          cogoToast.success('Reschedule Sent Change - Success', {
+            position: 'top-right'
+          })
+        }
+      })
+      .catch(err => console.error(`Reschedule Sent Change Error - ${err}`))
+    this.rescheduleGridApi.refreshCells()
+  }
+
+  toggleConfirmDeleteRescheduleModal () {
+    if (this.rescheduleGridApi) {
+      const row = this.rescheduleGridApi.getSelectedRows()
+      const rescheduleId = `NT-${this.state.maintenance.id}-${row[0].rcounter}`
+      this.setState({
+        rescheduleToDelete: {
+          id: rescheduleId,
+          rcounter: row[0].rcounter
+        },
+        openConfirmDeleteModal: !this.state.openConfirmDeleteModal
+      })
+    }
+  }
+
+  handleDeleteReschedule () {
+    const host = window.location.host
+    fetch(`https://${host}/api/reschedule/delete?mid=${this.state.maintenance.id}&rcounter=${this.state.rescheduleToDelete.rcounter}`, {
+      method: 'get'
+    })
+      .then(resp => resp.json())
+      .then(data => {
+        if (data.deleteRescheduleQuery.affectedRows === 1) {
+          cogoToast.success('Reschedule Delete Success', {
+            position: 'top-right'
+          })
+          const newRescheduleData = this.state.rescheduleData.filter(resched => resched.rcounter !== this.state.rescheduleToDelete.rcounter)
+          this.rescheduleGridApi.setRowData(newRescheduleData)
+          this.setState({
+            openConfirmDeleteModal: !this.state.openConfirmDeleteModal,
+            rescheduleData: newRescheduleData
+          })
+        } else {
+          cogoToast.warn('Reschedule Delete Error', {
+            position: 'top-right'
+          })
+        }
+      })
+      .catch(err => console.error(`Reschedule Delete Error - ${err}`))
   }
 
   /// /////////////////////////////////////////////////////////
@@ -1797,12 +1911,14 @@ export default class Maintenance extends React.Component {
 
     const keyMap = {
       TOGGLE_READ: 'alt+r',
-      TOGGLE_HELP: 'shift+?'
+      TOGGLE_HELP: 'shift+?',
+      DELETE_RESCHEDULE: 'alt+l'
     }
 
     const handlers = {
       TOGGLE_READ: this.toggleReadModal,
-      TOGGLE_HELP: this.toggleHelpModal
+      TOGGLE_HELP: this.toggleHelpModal,
+      DELETE_RESCHEDULE: this.toggleConfirmDeleteRescheduleModal
     }
 
     let HALF_WIDTH = 500
@@ -2042,9 +2158,11 @@ export default class Maintenance extends React.Component {
                                       <div style={{ marginTop: '10px' }}>Done</div>
                                     </label>
                                   </Badge>
-                                  <Button 
+                                  <Button
+                                    outline
                                     onClick={this.toggleRescheduleModal}
-                                    style={{ width: '126px', minHeight: '98px', maxHeight: 'unset' }}>
+                                    className='reschedule-btn'
+                                  >
                                     Reschedule
                                   </Button>
                                 </FormGroup>
@@ -2089,6 +2207,11 @@ export default class Maintenance extends React.Component {
                           <Container style={{ padding: '20px' }} className='maintenance-subcontainer'>
                             <Row>
                               <Col>
+                                <span style={{ color: 'var(--font-color)', fontWeight: '300 !important', fontSize: '1.5rem' }}>Customer CIDs</span>
+                              </Col>
+                            </Row>
+                            <Row>
+                              <Col>
                                 {this.state.kundencids.length !== 0
                                   ? (
                                     <Progress theme='primary' value={this.sentProgress()} />
@@ -2121,26 +2244,43 @@ export default class Maintenance extends React.Component {
                               </Col>
                             </Row>
                           </Container>
-                          <Container style={{ padding: '20px' }} className='maintenance-subcontainer'>
-                            <Row>
-                              <Col style={{ width: '100%', height: '600px' }}>
-                                <div
-                                  className='ag-theme-material'
-                                  style={{
-                                    height: '100%',
-                                    width: '100%'
-                                  }}
-                                >
-                                  <AgGridReact
-                                    gridOptions={this.state.rescheduleGridOptions}
-                                    rowData={this.state.rescheduleData}
-                                    onGridReady={this.handleRescheduleGridReady}
-                                    pagination
-                                  />
-                                </div>
-                              </Col>
-                            </Row>
-                          </Container>
+                          {this.state.rescheduleData.length !== 0
+                            ? (
+                              <Container style={{ padding: '20px' }} className='maintenance-subcontainer'>
+                                <Row>
+                                  <Col>
+                                    <span style={{ color: 'var(--font-color)', fontWeight: '300 !important', fontSize: '1.5rem' }}>Reschedule</span>
+                                  </Col>
+                                </Row>
+                                <Row>
+                                  <Col style={{ width: '100%', height: '600px' }}>
+                                    <div
+                                      className='ag-theme-material'
+                                      style={{
+                                        height: '100%',
+                                        width: '100%'
+                                      }}
+                                    >
+                                      <AgGridReact
+                                        gridOptions={this.state.rescheduleGridOptions}
+                                        rowData={this.state.rescheduleData}
+                                        onGridReady={this.handleRescheduleGridReady}
+                                        pagination
+                                        onCellEditingStopped={this.handleRescheduleCellEdit}
+                                        animateRows
+                                        deltaRowDataMode
+                                        getRowNodeId={(data) => {
+                                          return data.rcounter
+                                        }}
+                                        stopEditingWhenGridLosesFocus
+                                      />
+                                    </div>
+                                  </Col>
+                                </Row>
+                              </Container>
+                            ) : (
+                              null
+                            )}
                         </Col>
                       </Row>
                     </Col>
@@ -2356,20 +2496,15 @@ export default class Maintenance extends React.Component {
 
                 </ModalBody>
               </Modal>
-              <Modal backdropClassName='modal-backdrop' animation backdrop size='md' open={openRescheduleModal} toggle={this.toggleRescheduleModal} style={{ maxWidth: '600px' }}>
+              <Modal backdropClassName='modal-backdrop' animation backdrop size='md' open={openRescheduleModal} toggle={this.toggleRescheduleModal} style={{ width: '600px' }}>
                 <ModalHeader className='reschedule'>
                   Reschedule Maintenance
                 </ModalHeader>
                 <ModalBody className='modal-body reschedule'>
-                  <Row>
-                    <Col>
-                      Reschedule #{this.state.rescheduleData.length + 1}
-                    </Col>
-                  </Row>
-                  <Container className='container-border'>
+                  <Container stlye={{ paddingTop: '0px !important' }} className='container-border'>
                     <Col>
                       <Row>
-                        <FormGroup style={{ margin: '10px 15px', width: '100%', marginBottom: '10px !important' }}>
+                        <FormGroup style={{ margin: '0px 15px', width: '100%', marginBottom: '10px !important' }}>
                           <label htmlFor='resched-impact'>
                             Impact
                           </label>
@@ -2409,6 +2544,32 @@ export default class Maintenance extends React.Component {
                       <Button onClick={this.handleRescheduleSave} style={{ width: '100%', marginTop: '15px' }} theme='primary'>
                         Save
                       </Button>
+                    </Col>
+                  </Row>
+                </ModalBody>
+              </Modal>
+              <Modal className='delete-modal' animation backdrop backdropClassName='modal-backdrop' open={this.state.openConfirmDeleteModal} size='md' toggle={this.toggleConfirmDeleteRescheduleModal}>
+                <ModalHeader className='modal-delete-header'>
+                  Confirm Delete Reschedule
+                </ModalHeader>
+                <ModalBody>
+                  <Container className='container-border'>
+                    <Row>
+                      <Col>
+                        Are you sure you want to delete <b style={{ fontWeight: '900' }}> {this.state.rescheduleToDelete.id}</b>
+                      </Col>
+                    </Row>
+                  </Container>
+                  <Row style={{ marginTop: '20px' }}>
+                    <Col>
+                      <ButtonGroup style={{ width: '100%' }}>
+                        <Button onClick={this.toggleConfirmDeleteRescheduleModal} outline theme='secondary'>
+                          Cancel
+                        </Button>
+                        <Button onClick={this.handleDeleteReschedule} theme='danger'>
+                          Confirm
+                        </Button>
+                      </ButtonGroup>
                     </Col>
                   </Row>
                 </ModalBody>
@@ -2458,6 +2619,20 @@ export default class Maintenance extends React.Component {
                   position: sticky;
                   left: -1px;
                   z-index: 1;
+                }
+                :global(.reschedule-btn) {
+                  font-size: .85rem;
+                  font-weight: 500;
+                  padding: .60rem;
+                  border-width: 2px;
+                  width: 105px;
+                  min-height: 88px;
+                  max-height: unset;
+                }
+                :global(.reschedule-btn:hover, .reschedule-btn:active, .reschedule-btn:focus) {
+                  background-color: var(--primary-bg);
+                  color: #67B246;
+                  box-shadow: 0 0 5px 1px #67B246;
                 }
                 :global(.react-draggable) {
                   transition: visibility 200ms linear, opacity 200ms linear;
@@ -2567,6 +2742,10 @@ export default class Maintenance extends React.Component {
                   justify-content: space-around;
                   align-items: center;
                 }
+                :global(.ag-cell.ag-cell-inline-editing) {
+                  padding: 10px !important;
+                  height: inherit !important;
+                }
                 .toggle-done {
                   border: 1px solid var(--secondary);
                   border-radius: 0.325rem;
@@ -2576,7 +2755,7 @@ export default class Maintenance extends React.Component {
                   box-shadow: unset;
                 }
                 :global(.form-group-toggle > .badge-outline-secondary) {
-                  box-shadow: ${this.state.night ? '0 0 5px 1px #fff' : ''};
+                  border: ${this.state.night ? '2px solid #fff' : ''};
                 }
                 :global(.badge-outline-secondary > label) {
                   color: var(--font-color);
