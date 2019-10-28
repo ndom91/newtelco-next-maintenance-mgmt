@@ -120,14 +120,24 @@ export default class Layout extends React.Component {
                     )}
                   {typeof window !== 'undefined' && window.location.pathname === '/maintenance'
                     ? (
-                      <Row className='keyboard-row'>
-                        <Col>
-                          <Badge className='key-badge' outline theme='primary'>ALT</Badge> <span className='keyboard-plus'>+</span><Badge className='key-badge' outline theme='primary'>R</Badge>
-                        </Col>
-                        <Col>
-                          Toggle Read Mail
-                        </Col>
-                      </Row>
+                      <>
+                        <Row className='keyboard-row'>
+                          <Col>
+                            <Badge className='key-badge' outline theme='primary'>ALT</Badge> <span className='keyboard-plus'>+</span><Badge className='key-badge' outline theme='primary'>R</Badge>
+                          </Col>
+                          <Col>
+                            Toggle Read Mail
+                          </Col>
+                        </Row>
+                        <Row className='keyboard-row'>
+                          <Col>
+                            <Badge className='key-badge' outline theme='primary'>ALT</Badge> <span className='keyboard-plus'>+</span><Badge className='key-badge' outline theme='primary'>L</Badge>
+                          </Col>
+                          <Col>
+                            Delete Selected Reschedule
+                          </Col>
+                        </Row>
+                      </>
                     ) : (
                       null
                     )}

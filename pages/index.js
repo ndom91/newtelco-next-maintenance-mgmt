@@ -311,7 +311,7 @@ export default class Index extends React.Component {
               stroke-width: 1px;
             }
             :global(.react-calendar-heatmap .color-empty) {
-              fill: #eeeeee;
+              fill: var(--secondary-bg);
             }
             :global(.react-calendar-heatmap .color-filled) {
               fill: #8cc665;
