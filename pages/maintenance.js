@@ -1,6 +1,7 @@
 import React from 'react'
 import Layout from '../src/components/layout'
 import fetch from 'isomorphic-unfetch'
+import Footer from '../src/components/footer'
 import RequireLogin from '../src/components/require-login'
 import { NextAuth } from 'next-auth/client'
 import Toggle from 'react-toggle'
@@ -24,6 +25,8 @@ import { HotKeys } from 'react-hotkeys'
 import { OutTable, ExcelRenderer } from 'react-excel-renderer'
 import ProtectedIcon from '../src/components/ag-grid/protected'
 import SentIcon from '../src/components/ag-grid/sent'
+import StartDateTime from '../src/components/ag-grid/startdatetime'
+import EndDateTime from '../src/components/ag-grid/enddatetime'
 import { AgGridReact } from 'ag-grid-react'
 import PDF from 'react-pdf-js-infinite'
 
@@ -141,6 +144,13 @@ export default class Maintenance extends React.Component {
       openReadModal: false,
       openPreviewModal: false,
       openHelpModal: false,
+      openRescheduleModal: false,
+      reschedule: {
+        startDateTime: null,
+        endDateTime: null,
+        impact: null
+      },
+      rescheduleData: [],
       translateTooltipOpen: false,
       translated: false,
       translatedBody: '',
@@ -150,6 +160,53 @@ export default class Maintenance extends React.Component {
       kundencids: [],
       windowInnerHeight: 0,
       unreadCount: '',
+      rescheduleGridOptions: {
+        defaultColDef: {
+          resizable: true,
+          sortable: true,
+          filter: true,
+          selectable: true
+        },
+        columnDefs: [
+          {
+            headerName: 'ID',
+            field: 'rcounter',
+            width: 120,
+            sort: { direction: 'asc', priority: 0 }
+          }, {
+            headerName: 'Start',
+            field: 'sdt',
+            width: 210,
+            cellRenderer: 'startdateTime'
+          }, {
+            headerName: 'End',
+            field: 'edt',
+            width: 210,
+            cellRenderer: 'enddateTime'
+          }, {
+            headerName: 'Impact',
+            field: 'impact',
+            width: 150
+          }, {
+            headerName: 'Sent',
+            field: 'sent',
+            cellRenderer: 'sentIcon',
+            width: 100,
+            cellStyle: {
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              height: '100%'
+            }
+          }
+        ],
+        paginationPageSize: 5,
+        frameworkComponents: {
+          startdateTime: StartDateTime,
+          enddateTime: EndDateTime,
+          sentIcon: SentIcon
+        }
+      },
       gridOptions: {
         defaultColDef: {
           resizable: true,
@@ -250,6 +307,12 @@ export default class Maintenance extends React.Component {
     this.onGridReady = this.onGridReady.bind(this)
     this.showAttachments = this.showAttachments.bind(this)
     this.handleSendAll = this.handleSendAll.bind(this)
+    this.toggleRescheduleModal = this.toggleRescheduleModal.bind(this)
+    this.handleRescheduleGridReady = this.handleRescheduleGridReady.bind(this)
+    this.handleRescheduleEndDateTimeChange = this.handleRescheduleEndDateTimeChange.bind(this)
+    this.handleRescheduleImpactChange = this.handleRescheduleImpactChange.bind(this)
+    this.handleRescheduleStartDateTimeChange = this.handleRescheduleStartDateTimeChange.bind(this)
+    this.handleRescheduleSave = this.handleRescheduleSave.bind(this)
   }
 
   componentDidMount () {
@@ -375,6 +438,24 @@ export default class Maintenance extends React.Component {
         impactPlaceholder: impactCalculation
       })
     }
+
+  }
+
+  handleRescheduleGridReady (params) {
+    this.rescheduleGridApi = params.api
+    window.rescheduleGridApi = params.api
+    this.gridColumnApi = params.columnApi
+    const host = window.location.host
+    fetch(`https://${host}/api/reschedule?id=${this.props.jsonData.profile.id}`, {
+      method: 'get'
+    })
+      .then(resp => resp.json())
+      .then(data => {
+        this.setState({
+          rescheduleData: data.reschedules
+        })
+      })
+      .catch(err => console.error(`Error Loading Reschedules - ${err}`))
   }
 
   /// /////////////////////////////////////////////////////////
@@ -700,7 +781,11 @@ export default class Maintenance extends React.Component {
         if (status === 200 && statusText === 'OK') {
           const activeRowIndex = this.state.kundencids.findIndex(el => el.kundenCID === customerCid)
           const kundenCidRow = this.state.kundencids[activeRowIndex]
-          kundenCidRow.sent = '1'
+          if (this.state.maintenance.cancelled === true && this.state.maintenance.done === true) {
+            kundenCidRow.sent = '2'
+          } else {
+            kundenCidRow.sent = '1'
+          }
           const updatedKundenCids = [
             ...this.state.kundencids,
             kundenCidRow
@@ -761,7 +846,7 @@ export default class Maintenance extends React.Component {
       const total = this.state.kundencids.length
       let progressSent = 0
       this.state.kundencids.forEach(cid => {
-        if (cid.sent === '1') {
+        if (cid.sent === '1' || cid.sent === '2') {
           progressSent = progressSent + 1
         }
       })
@@ -1417,6 +1502,85 @@ export default class Maintenance extends React.Component {
     })
   }
 
+  toggleRescheduleModal () {
+    this.setState({
+      openRescheduleModal: !this.state.openRescheduleModal
+    })
+  }
+
+  /// /////////////////////////////////////////////////////////
+  //
+  //                    RESCHEDULE
+  //
+  /// /////////////////////////////////////////////////////////
+
+  handleRescheduleStartDateTimeChange (date) {
+    const startDate = moment(date[0]).format('YYYY-MM-DD HH:mm:ss')
+
+    this.setState({
+      reschedule: {
+        ...this.state.reschedule,
+        startDateTime: startDate
+      }
+    })
+  }
+
+  handleRescheduleEndDateTimeChange (date) {
+    const endDate = moment(date[0]).format('YYYY-MM-DD HH:mm:ss')
+
+    this.setState({
+      reschedule: {
+        ...this.state.reschedule,
+        endDateTime: endDate
+      }
+    })
+  }
+
+  handleRescheduleImpactChange (event) {
+    this.setState({
+      reschedule: {
+        ...this.state.reschedule,
+        impact: event.target.value
+      }
+    })
+  }
+
+  handleRescheduleSave () {
+    const newImpact = this.state.reschedule.impact
+    const newStartDateTime = this.state.reschedule.startDateTime
+    const newEndDateTime = this.state.reschedule.endDateTime
+
+    const host = window.location.host
+    fetch(`https://${host}/api/reschedule/save?mid=${this.state.maintenance.id}&impact=${encodeURIComponent(newImpact)}&sdt=${encodeURIComponent(newStartDateTime)}&edt=${encodeURIComponent(newEndDateTime)}&rcounter=${this.state.rescheduleData.length + 1}&user=${encodeURIComponent(this.props.session.user.email)}`, {
+      method: 'get'
+    })
+      .then(resp => resp.json())
+      .then(data => {
+        console.log(data.insertRescheduleQuery)
+        if (data.insertRescheduleQuery.affectedRows === 1) {
+          this.setState({
+            openRescheduleModal: !this.state.openRescheduleModal
+          })
+          cogoToast.success('Reschedule Save Complete', {
+            position: 'top-right'
+          })
+          const newRescheduleData = this.state.rescheduleData
+          newRescheduleData.push({ id: this.state.rescheduleData.length + 1, startDateTime: moment(newStartDateTime).format(), endDateTime: moment(newEndDateTime).format(), impact: newImpact })
+          this.setState({
+            rescheduleData: newRescheduleData,
+            reschedule: {
+              impact: null,
+              startDateTime: null,
+              endDateTime: null
+            }
+          })
+          window.rescheduleGridApi.refreshCells()
+          this.rescheduleGridApi.refreshCells()
+        }
+      })
+      .catch(err => console.error(`Error Saving Reschedule - ${err}`))
+  }
+
   /// /////////////////////////////////////////////////////////
   //
   //                    OTHER ACTIONS
@@ -1620,7 +1784,8 @@ export default class Maintenance extends React.Component {
     const {
       maintenance,
       openReadModal,
-      openPreviewModal
+      openPreviewModal,
+      openRescheduleModal
     } = this.state
 
     let maintenanceIdDisplay
@@ -1877,6 +2042,11 @@ export default class Maintenance extends React.Component {
                                       <div style={{ marginTop: '10px' }}>Done</div>
                                     </label>
                                   </Badge>
+                                  <Button 
+                                    onClick={this.toggleRescheduleModal}
+                                    style={{ width: '126px', minHeight: '98px', maxHeight: 'unset' }}>
+                                    Reschedule
+                                  </Button>
                                 </FormGroup>
                               </Col>
                             </Row>
@@ -1951,33 +2121,53 @@ export default class Maintenance extends React.Component {
                               </Col>
                             </Row>
                           </Container>
+                          <Container style={{ padding: '20px' }} className='maintenance-subcontainer'>
+                            <Row>
+                              <Col style={{ width: '100%', height: '600px' }}>
+                                <div
+                                  className='ag-theme-material'
+                                  style={{
+                                    height: '100%',
+                                    width: '100%'
+                                  }}
+                                >
+                                  <AgGridReact
+                                    gridOptions={this.state.rescheduleGridOptions}
+                                    rowData={this.state.rescheduleData}
+                                    onGridReady={this.handleRescheduleGridReady}
+                                    pagination
+                                  />
+                                </div>
+                              </Col>
+                            </Row>
+                          </Container>
                         </Col>
                       </Row>
                     </Col>
                   </Row>
                 </Container>
               </CardBody>
-              <CardFooter className='card-footer'>
-                {this.state.width < 500
-                  ? (
+              {this.state.width < 500
+                ? (
+                  <CardFooter className='card-footer'>
                     <ButtonGroup className='btn-group-2' size='md'>
                       <Button onClick={this.toggleReadModal} outline>
                         <FontAwesomeIcon icon={faEnvelopeOpenText} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
-                        Read
+                          Read
                       </Button>
                       <Button onClick={this.handleCalendarCreate} outline>
                         <FontAwesomeIcon icon={faCalendarAlt} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
-                        Calendar
+                          Calendar
                       </Button>
                       <Button disabled={maintenance.id !== 'NEW'} className='create-btn' onClick={this.handleCreateOnClick}>
                         <FontAwesomeIcon icon={faPlusCircle} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
-                        Create
+                          Create
                       </Button>
                     </ButtonGroup>
-                  ) : (
-                    <span />
-                  )}
-              </CardFooter>
+                  </CardFooter>
+                ) : (
+                  <Footer />
+                )}
               {typeof window !== 'undefined'
                 ? (
                   <Rnd
@@ -2166,8 +2356,84 @@ export default class Maintenance extends React.Component {
 
                 </ModalBody>
               </Modal>
+              <Modal backdropClassName='modal-backdrop' animation backdrop size='md' open={openRescheduleModal} toggle={this.toggleRescheduleModal} style={{ maxWidth: '600px' }}>
+                <ModalHeader className='reschedule'>
+                  Reschedule Maintenance
+                </ModalHeader>
+                <ModalBody className='modal-body reschedule'>
+                  <Row>
+                    <Col>
+                      Reschedule #{this.state.rescheduleData.length + 1}
+                    </Col>
+                  </Row>
+                  <Container className='container-border'>
+                    <Col>
+                      <Row>
+                        <FormGroup style={{ margin: '10px 15px', width: '100%', marginBottom: '10px !important' }}>
+                          <label htmlFor='resched-impact'>
+                            Impact
+                          </label>
+                          <FormInput id='resched-impact' name='resched-impact' type='text' value={this.state.reschedule.impact} onChange={this.handleRescheduleImpactChange} />
+                        </FormGroup>
+                      </Row>
+                      <Row style={{ display: 'flex', flexWrap: 'nowrap' }}>
+                        <FormGroup style={{ margin: '0 15px' }}>
+                          <label>
+                            Start Date/Time (in GMT)
+                          </label>
+                          <Flatpickr
+                            data-enable-time
+                            options={{ time_24hr: 'true', allow_input: 'true' }}
+                            className='flatpickr end-date-time'
+                            value={this.state.reschedule.startDateTime || null}
+                            onChange={date => this.handleRescheduleStartDateTimeChange(date)}
+                          />
+                        </FormGroup>
+                        <FormGroup style={{ margin: '0 15px' }}>
+                          <label>
+                            End Date/Time (in GMT)
+                          </label>
+                          <Flatpickr
+                            data-enable-time
+                            options={{ time_24hr: 'true', allow_input: 'true' }}
+                            className='flatpickr end-date-time'
+                            value={this.state.reschedule.endDateTime || null}
+                            onChange={date => this.handleRescheduleEndDateTimeChange(date)}
+                          />
+                        </FormGroup>
+                      </Row>
+                    </Col>
+                  </Container>
+                  <Row style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                    <Col>
+                      <Button onClick={this.handleRescheduleSave} style={{ width: '100%', marginTop: '15px' }} theme='primary'>
+                        Save
+                      </Button>
+                    </Col>
+                  </Row>
+                </ModalBody>
+              </Modal>
             </Card>
             <style jsx>{`
+                :global(.modal-body.reschedule) {
+                  background-color: var(--primary-bg);
+                }
+                :global(.modal-header.reschedule *) {
+                  color: var(--font-color);
+                }
+                :global(.modal-header.reschedule) {
+                  background: var(--secondary-bg);
+                  color: var(--font-color);
+                  display: flex;
+                  justify-content: flex-start;
+                  align-content: center;
+                }
+                :global(.container-border) {
+                  border: 1px solid var(--border-color);
+                  border-radius: 0.325rem;
+                  margin: 10px 0;
+                  padding: 1.5rem;
+                }
                 :global(.ExcelTable2007) {
                   border: 1px solid #ddd;
                   border-collapse: collapse;
