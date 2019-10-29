@@ -281,6 +281,20 @@ export default class Layout extends React.Component {
                 color: ${this.state.night ? '#fff' : ''};
                 border-color: ${this.state.night ? '#fff' : ''};
               }
+              :global(::-webkit-scrollbar-track) {
+                  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0);
+                  border-radius: 10px;
+                  background-color: rgba(0,0,0,0);
+              }
+              :global(::-webkit-scrollbar) {
+                width: 8px;
+                background-color: transparent;
+              }
+              :global(::-webkit-scrollbar-thumb) {
+                border-radius: 10px;
+                -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.2);
+                background-color: rgba(0,0,0,0.4);
+              }
               @media only screen and (min-width: 1024px) {
                 :global(div.toplevel-col) {
                   flex: 1;

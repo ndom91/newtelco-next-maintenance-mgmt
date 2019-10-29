@@ -462,6 +462,34 @@ export default class History extends React.Component {
                   box-shadow: ${this.props.night === 'true' ? '0 0 5px 1px var(--secondary)' : ''};
                   border: ${this.props.night === 'true' ? '1px solid #fff' : ''};
                 }
+                :global(.ag-horizontal-right-spacer::-webkit-scrollbar) {
+                  width: 0px;
+                  height: 0px;
+                  background: transparent;
+                }
+                :global(.ag-horizontal-left-spacer::-webkit-scrollbar) {
+                  width: 0px;
+                  height: 0px;
+                  background: transparent;
+                }
+                :global(::-webkit-scrollbar) {
+                  height: 8px;
+                  background: rgba(0,0,0,0.2);
+                }
+                :global(::-webkit-scrollbar-track) {
+                    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0);
+                    border-radius: 10px;
+                    background-color: rgba(0,0,0,0);
+                }
+                :global(::-webkit-scrollbar) {
+                  width: 12px;
+                  background-color: transparent;
+                }
+                :global(::-webkit-scrollbar-thumb) {
+                  border-radius: 10px;
+                  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.2);
+                  background-color: rgba(0,0,0,0.4);
+                }
             `}
             </style>
           </Layout>
