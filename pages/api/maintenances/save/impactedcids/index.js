@@ -5,8 +5,9 @@ const escape = require('sql-template-strings')
 module.exports = async (req, res) => {
   const cids = req.query.cids
   const maintId = req.query.maintId
+  const updatedBy = req.query.updatedby
 
-  const affectedCIDsQuery = await db.query(escape`UPDATE maintenancedb SET betroffeneCIDs = ${cids} WHERE id = ${maintId}`)
+  const affectedCIDsQuery = await db.query(escape`UPDATE maintenancedb SET betroffeneCIDs = ${cids}, updatedBy = '${updatedBy}' WHERE id = ${maintId}`)
 
   if (affectedCIDsQuery.affectedRows >= 1) {
     res.status(200).json({ statusText: 'OK', status: 200 })

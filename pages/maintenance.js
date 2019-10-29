@@ -127,7 +127,7 @@ export default class Maintenance extends React.Component {
         bearbeitetvon: '',
         maileingang: '',
         updatedAt: '',
-        updatedBy: '',
+        updatedBy: this.props.jsonData.profile.updatedBy,
         name: '',
         impact: '',
         location: '',
@@ -1001,8 +1001,10 @@ export default class Maintenance extends React.Component {
       return
     }
     newISOTime = newISOTime.utc().format('YYYY-MM-DD HH:mm:ss')
+    const activeUserEmail = this.props.session.user.email
+    const activeUser = activeUserEmail.substring(0, activeUserEmail.lastIndexOf('@'))
     const host = window.location.host
-    fetch(`https://${host}/api/maintenances/save/dateTime?maintId=${maintId}&element=${element}&value=${newISOTime}`, {
+    fetch(`https://${host}/api/maintenances/save/dateTime?maintId=${maintId}&element=${element}&value=${newISOTime}&updatedby=${activeUser}`, {
       method: 'get',
       headers: {
         'Access-Control-Allow-Origin': '*',
@@ -1080,6 +1082,8 @@ export default class Maintenance extends React.Component {
   handleToggleChange (element, event) {
     const host = window.location.host
     const maintId = this.state.maintenance.id
+    const activeUserEmail = this.props.session.user.email
+    const activeUser = activeUserEmail.substring(0, activeUserEmail.lastIndexOf('@'))
     let newValue = !eval(`this.state.maintenance.${element}`)
     if (typeof newValue === 'string') {
       if (newValue === 'false') {
@@ -1113,7 +1117,7 @@ export default class Maintenance extends React.Component {
         }
       })
 
-      fetch(`https://${host}/api/maintenances/save/impactedcids?cids=${impactedCIDs}&maintId=${this.state.maintenance.id}`, {
+      fetch(`https://${host}/api/maintenances/save/impactedcids?cids=${impactedCIDs}&maintId=${this.state.maintenance.id}&updatedby=${activeUser}`, {
         method: 'get',
         headers: {
           'Access-Control-Allow-Origin': '*',
@@ -1272,7 +1276,9 @@ export default class Maintenance extends React.Component {
         })
         return
       }
-      fetch(`https://${host}/api/maintenances/save/lieferant?maintId=${maintId}&cid=${idParameter}`, {
+      const activeUserEmail = this.props.session.user.email
+      const activeUser = activeUserEmail.substring(0, activeUserEmail.lastIndexOf('@'))
+      fetch(`https://${host}/api/maintenances/save/lieferant?maintId=${maintId}&cid=${idParameter}&updatedby=${activeUser}`, {
         method: 'get',
         headers: {
           'Access-Control-Allow-Origin': '*',
@@ -1284,6 +1290,12 @@ export default class Maintenance extends React.Component {
           if (data.status === 200 && data.statusText === 'OK') {
             cogoToast.success('Save Success', {
               position: 'top-right'
+            })
+            this.setState({
+              maintenance: {
+                ...this.state.maintenance,
+                updatedBy: activeUser
+              }
             })
           } else {
             cogoToast.warn(`Error - ${data.err}`, {
@@ -1310,8 +1322,10 @@ export default class Maintenance extends React.Component {
   handleTimezoneBlur (ev) {
     const incomingTimezone = this.state.maintenance.timezone || 'Europe/Amsterdam'
     const incomingTimezoneLabel = encodeURIComponent(this.state.maintenance.timezoneLabel || '(GMT+02:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna')
+    const activeUserEmail = this.props.session.user.email
+    const activeUser = activeUserEmail.substring(0, activeUserEmail.lastIndexOf('@'))
     const host = window.location.host
-    fetch(`https://${host}/api/maintenances/save/timezone?maintId=${this.state.maintenance.id}&timezone=${incomingTimezone}&timezoneLabel=${incomingTimezoneLabel}`, {
+    fetch(`https://${host}/api/maintenances/save/timezone?maintId=${this.state.maintenance.id}&timezone=${incomingTimezone}&timezoneLabel=${incomingTimezoneLabel}&updatedby=${activeUser}`, {
       method: 'get',
       headers: {
         'Access-Control-Allow-Origin': '*',
@@ -1323,6 +1337,12 @@ export default class Maintenance extends React.Component {
         if (data.status === 200 && data.statusText === 'OK') {
           cogoToast.success('Save Success', {
             position: 'top-right'
+          })
+          this.setState({
+            maintenance: {
+              ...this.state.maintenance,
+              updatedBy: activeUser
+            }
           })
         } else {
           cogoToast.warn(`Error - ${data.err}`, {
@@ -1338,6 +1358,8 @@ export default class Maintenance extends React.Component {
     const newValue = eval(`this.state.maintenance.${element}`)
     const originalValue = eval(`this.props.jsonData.profile.${element}`)
     const maintId = this.state.maintenance.id
+    const activeUserEmail = this.props.session.user.email
+    const activeUser = activeUserEmail.substring(0, activeUserEmail.lastIndexOf('@'))
 
     if (newValue === originalValue) {
       return
@@ -1349,7 +1371,7 @@ export default class Maintenance extends React.Component {
       })
       return
     }
-    fetch(`https://${host}/api/maintenances/save/textinput?maintId=${maintId}&element=${element}&value=${newValue}`, {
+    fetch(`https://${host}/api/maintenances/save/textinput?maintId=${maintId}&element=${element}&value=${newValue}&updatedby=${activeUser}`, {
       method: 'get',
       headers: {
         'Access-Control-Allow-Origin': '*',
@@ -1361,6 +1383,12 @@ export default class Maintenance extends React.Component {
         if (data.status === 200 && data.statusText === 'OK') {
           cogoToast.success('Save Success', {
             position: 'top-right'
+          })
+          this.setState({
+            maintenance: {
+              ...this.state.maintenance,
+              updatedBy: activeUser
+            }
           })
         } else {
           cogoToast.warn(`Error - ${data.err}`, {
@@ -1375,6 +1403,8 @@ export default class Maintenance extends React.Component {
     const host = window.location.host
     const newValue = this.state.maintenance.notes
     const originalValue = this.props.jsonData.profile.notes
+    const activeUserEmail = this.props.session.user.email
+    const activeUser = activeUserEmail.substring(0, activeUserEmail.lastIndexOf('@'))
     if (newValue === originalValue) {
       return
     }
@@ -1385,7 +1415,7 @@ export default class Maintenance extends React.Component {
       })
       return
     }
-    fetch(`https://${host}/api/maintenances/save/notes?maintId=${maintId}&value=${newValue}`, {
+    fetch(`https://${host}/api/maintenances/save/notes?maintId=${maintId}&value=${newValue}&updatedby=${activeUser}`, {
       method: 'get',
       headers: {
         'Access-Control-Allow-Origin': '*',
@@ -1397,6 +1427,12 @@ export default class Maintenance extends React.Component {
         if (data.status === 200 && data.statusText === 'OK') {
           cogoToast.success('Save Success', {
             position: 'top-right'
+          })
+          this.setState({
+            maintenance: {
+              ...this.state.maintenance,
+              updatedBy: activeUser
+            }
           })
         } else {
           cogoToast.warn(`Error - ${data.err}`, {
@@ -1411,13 +1447,15 @@ export default class Maintenance extends React.Component {
     const host = window.location.host
     const newValue = this.state.maintenance.lieferant
     const maintId = this.state.maintenance.id
+    const activeUserEmail = this.props.session.user.email
+    const activeUser = activeUserEmail.substring(0, activeUserEmail.lastIndexOf('@'))
     if (maintId === 'NEW') {
       cogoToast.warn('No CID assigned - Cannot Save', {
         position: 'top-right'
       })
       return
     }
-    fetch(`https://${host}/api/maintenances/save/supplier?maintId=${maintId}&value=${newValue}`, {
+    fetch(`https://${host}/api/maintenances/save/supplier?maintId=${maintId}&value=${newValue}&updatedby=${activeUser}`, {
       method: 'get',
       headers: {
         'Access-Control-Allow-Origin': '*',
@@ -1429,6 +1467,12 @@ export default class Maintenance extends React.Component {
         if (data.status === 200 && data.statusText === 'OK') {
           cogoToast.success('Save Success', {
             position: 'top-right'
+          })
+          this.setState({
+            maintenance: {
+              ...this.state.maintenance,
+              updatedBy: activeUser
+            }
           })
         } else {
           cogoToast.warn(`Error - ${data.err}`, {

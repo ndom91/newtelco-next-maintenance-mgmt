@@ -5,8 +5,9 @@ module.exports = async (req, res) => {
   // console.log('1', req)
   const cidIds = req.query.cid
   const maintId = req.query.maintId
+  const updatedBy = req.query.updatedby
   const cidIdsQuery = await db.query(escape`
-    UPDATE maintenancedb SET derenCIDid = ${cidIds} WHERE id = ${maintId}
+    UPDATE maintenancedb SET derenCIDid = ${cidIds}, updatedBy = '${updatedBy}' WHERE id = ${maintId}
   `)
   if (cidIdsQuery.affectedRows >= 1) {
     res.status(200).json({ statusText: 'OK', status: 200 })

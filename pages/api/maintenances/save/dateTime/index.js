@@ -5,14 +5,15 @@ module.exports = async (req, res) => {
   const element = req.query.element
   const maintId = req.query.maintId
   const value = req.query.value
+  const updatedBy = req.query.updatedby
   let cidIdsQuery
   if (element === 'start') {
     cidIdsQuery = await db.query(escape`
-      UPDATE maintenancedb SET startDateTime = ${value} WHERE id = ${maintId}
+      UPDATE maintenancedb SET startDateTime = ${value}, updatedBy = '${updatedBy}' WHERE id = ${maintId}
     `)
   } else if (element === 'end') {
     cidIdsQuery = await db.query(escape`
-      UPDATE maintenancedb SET endDateTime = ${value} WHERE id = ${maintId}
+      UPDATE maintenancedb SET endDateTime = ${value}, updatedBy = '${updatedBy}' WHERE id = ${maintId}
     `)
   }
   console.log(value, cidIdsQuery.message)
