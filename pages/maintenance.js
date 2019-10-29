@@ -2627,25 +2627,22 @@ export default class Maintenance extends React.Component {
 
                 </ModalBody>
               </Modal>
-              <Modal backdropClassName='modal-backdrop' animation backdrop size='md' open={openRescheduleModal} toggle={this.toggleRescheduleModal} style={{ width: '600px' }}>
+              <Modal backdropClassName='modal-backdrop' animation backdrop size='md' open={openRescheduleModal} toggle={this.toggleRescheduleModal} className='reschedule-modal' style={{ minWidth: '600px !important' }}>
                 <ModalHeader className='reschedule'>
-                  Reschedule Maintenance
+                  <span>
+                    Reschedule Maintenance
+                  </span>
+                  <Badge pill outline theme='dark'>
+                    {this.state.rescheduleData.length + 1}
+                  </Badge>
                 </ModalHeader>
                 <ModalBody className='modal-body reschedule'>
-                  <Container stlye={{ paddingTop: '0px !important' }} className='container-border'>
+                  <Container style={{ paddingTop: '0px !important' }} className='container-border'>
                     <Col>
-                      <Row>
-                        <FormGroup style={{ margin: '0px 15px', width: '100%', marginBottom: '10px !important' }}>
-                          <label htmlFor='resched-impact'>
-                            Impact
-                          </label>
-                          <FormInput id='resched-impact' name='resched-impact' type='text' value={this.state.reschedule.impact} onChange={this.handleRescheduleImpactChange} />
-                        </FormGroup>
-                      </Row>
                       <Row style={{ display: 'flex', flexWrap: 'nowrap' }}>
                         <FormGroup style={{ margin: '0 15px' }}>
                           <label>
-                            Start Date/Time (in GMT)
+                            Start Date/Time (local time)
                           </label>
                           <Flatpickr
                             data-enable-time
@@ -2657,7 +2654,7 @@ export default class Maintenance extends React.Component {
                         </FormGroup>
                         <FormGroup style={{ margin: '0 15px' }}>
                           <label>
-                            End Date/Time (in GMT)
+                            End Date/Time (local time)
                           </label>
                           <Flatpickr
                             data-enable-time
@@ -2666,6 +2663,14 @@ export default class Maintenance extends React.Component {
                             value={this.state.reschedule.endDateTime || null}
                             onChange={date => this.handleRescheduleEndDateTimeChange(date)}
                           />
+                        </FormGroup>
+                      </Row>
+                      <Row>
+                        <FormGroup style={{ margin: '0px 15px', width: '100%', marginBottom: '10px !important' }}>
+                          <label htmlFor='resched-impact'>
+                            Impact
+                          </label>
+                          <FormInput id='resched-impact' name='resched-impact' type='text' value={this.state.reschedule.impact} onChange={this.handleRescheduleImpactChange} />
                         </FormGroup>
                       </Row>
                     </Col>
@@ -2709,6 +2714,9 @@ export default class Maintenance extends React.Component {
             <style jsx>{`
                 :global(.modal-body.reschedule) {
                   background-color: var(--primary-bg);
+                }
+                :global(.reschedule-modal) {
+                  max-width: 600px;
                 }
                 :global(.modal-header.reschedule *) {
                   color: var(--font-color);
