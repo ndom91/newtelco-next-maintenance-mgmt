@@ -288,6 +288,7 @@ export default class Layout extends React.Component {
               }
               :global(::-webkit-scrollbar) {
                 width: 8px;
+                height: 8px;
                 background-color: transparent;
               }
               :global(::-webkit-scrollbar-thumb) {

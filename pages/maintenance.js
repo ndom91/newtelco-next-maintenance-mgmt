@@ -38,7 +38,6 @@ import { Tooltip } from 'react-tippy'
 
 import {
   faPlusCircle,
-  faCalendarAlt,
   faArrowLeft,
   faEnvelopeOpenText,
   faLanguage,
@@ -51,6 +50,10 @@ import {
   faMailBulk,
   faCheck
 } from '@fortawesome/free-solid-svg-icons'
+import {
+  faCalendarAlt,
+  faClock
+} from '@fortawesome/free-regular-svg-icons'
 import {
   Container,
   Row,
@@ -150,7 +153,7 @@ export default class Maintenance extends React.Component {
       reschedule: {
         startDateTime: null,
         endDateTime: null,
-        impact: null
+        impact: ''
       },
       rescheduleData: [],
       rescheduleToDelete: {
@@ -326,6 +329,7 @@ export default class Maintenance extends React.Component {
     this.toggleRescheduleSentBtn = this.toggleRescheduleSentBtn.bind(this)
     this.toggleConfirmDeleteRescheduleModal = this.toggleConfirmDeleteRescheduleModal.bind(this)
     this.handleDeleteReschedule = this.handleDeleteReschedule.bind(this)
+    this.handleToggleChange = this.handleToggleChange.bind(this)
   }
 
   componentDidMount () {
@@ -488,7 +492,19 @@ export default class Maintenance extends React.Component {
     return (
       <ButtonGroup>
         <Button onClick={() => this.toggleRescheduleSentBtn(row.data.rcounter)} style={{ padding: '0.7em' }} size='sm' outline>
-          <FontAwesomeIcon width='1.325em' icon={row.data.sent === 1 ? faCheck : faTimesCircle} />
+          <Tooltip
+            title='Change Sent Status'
+            position='top'
+            trigger='mouseenter'
+            delay='250'
+            distance='25'
+            interactiveBorder='15'
+            arrow
+            size='small'
+            theme='transparent'
+          >
+            <FontAwesomeIcon width='1.325em' icon={row.data.sent === 1 ? faCheck : faTimesCircle} />
+          </Tooltip>
         </Button>
       </ButtonGroup>
     )
@@ -666,7 +682,7 @@ export default class Maintenance extends React.Component {
               const freezeEntry = data.freezeQuery[0]
               const uniqueCids = uniqueKundenCids
               const frozenCids = uniqueCids.findIndex(el => el.kunde === freezeEntry.companyId)
-              cogoToast.error(`${uniqueKundenCids[frozenCids].name} has active Network Freeze at that time!`, {
+              cogoToast.error(`${uniqueKundenCids[frozenCids].name} has an active network freeze at that time`, {
                 position: 'top-right',
                 hideAfter: 5,
                 onClick: () => Router.push('/settings?tab=freeze')
@@ -677,9 +693,9 @@ export default class Maintenance extends React.Component {
               })
             })
             .catch(err => console.error(`Error - ${err}`))
-          if (this.gridApi) {
-            this.gridApi.refreshCells()
-          }
+          // if (this.gridApi) {
+          //   this.gridApi.refreshCells()
+          // }
         }, () => {
           this.setState({
             kundencids: uniqueKundenCids
@@ -1126,11 +1142,7 @@ export default class Maintenance extends React.Component {
       })
         .then(resp => resp.json())
         .then(data => {
-          if (data.status === 200) {
-            cogoToast.success('Impacted CIDs Saved', {
-              position: 'top-right'
-            })
-          } else {
+          if (!data.status === 200) {
             cogoToast.warn('Impacted CIDs Not Saved', {
               position: 'top-right'
             })
@@ -1150,7 +1162,7 @@ export default class Maintenance extends React.Component {
       })
       return
     }
-    fetch(`https://${host}/api/maintenances/save/toggle?maintId=${maintId}&element=${element}&value=${newValue}`, {
+    fetch(`https://${host}/api/maintenances/save/toggle?maintId=${maintId}&element=${element}&value=${newValue}&updatedby=${activeUser}`, {
       method: 'get',
       headers: {
         'Access-Control-Allow-Origin': '*',
@@ -1645,7 +1657,7 @@ export default class Maintenance extends React.Component {
           this.setState({
             rescheduleData: newRescheduleData,
             reschedule: {
-              impact: null,
+              impact: '',
               startDateTime: null,
               endDateTime: null
             }
@@ -1994,9 +2006,25 @@ export default class Maintenance extends React.Component {
               <CardHeader>
                 <ButtonToolbar style={{ justifyContent: 'space-between' }}>
                   <ButtonGroup size='md'>
-                    <Button onClick={() => Router.back()} outline>
+                    <Button onClick={() => Router.back()}>
                       <FontAwesomeIcon icon={faArrowLeft} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
                         Back
+                    </Button>
+                    <Button onClick={this.toggleReadModal} outline>
+                      <Tooltip
+                        title='Open Incoming Mail'
+                        position='bottom'
+                        trigger='mouseenter'
+                        delay='250'
+                        distance='25'
+                        interactiveBorder='15'
+                        arrow
+                        size='small'
+                        theme='transparent'
+                      >
+                        <FontAwesomeIcon icon={faEnvelopeOpenText} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
+                        Read
+                      </Tooltip>
                     </Button>
                   </ButtonGroup>
                   <span>
@@ -2008,24 +2036,72 @@ export default class Maintenance extends React.Component {
                   {this.state.width > 500
                     ? (
                       <ButtonGroup className='btn-group-2' size='md'>
-                        <Button onClick={this.toggleReadModal} outline>
-                          <FontAwesomeIcon icon={faEnvelopeOpenText} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
-                          Read
+                        <Button outline onClick={this.toggleRescheduleModal}>
+                          <Tooltip
+                            title='Create New Reschedule'
+                            position='bottom'
+                            trigger='mouseenter'
+                            delay='250'
+                            distance='25'
+                            interactiveBorder='15'
+                            arrow
+                            size='small'
+                            theme='transparent'
+                          >
+                            <FontAwesomeIcon icon={faClock} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
+                            Reschedule
+                          </Tooltip>
                         </Button>
                         <Button onClick={this.handleCalendarCreate} outline>
-                          <FontAwesomeIcon icon={faCalendarAlt} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
-                          Calendar
+                          <Tooltip
+                            title='Create Calendar Entry'
+                            position='bottom'
+                            trigger='mouseenter'
+                            delay='250'
+                            distance='25'
+                            interactiveBorder='15'
+                            arrow
+                            size='small'
+                            theme='transparent'
+                          >
+                            <FontAwesomeIcon icon={faCalendarAlt} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
+                            Calendar
+                          </Tooltip>
                         </Button>
                         {maintenance.id === 'NEW'
                           ? (
                             <Button className='create-btn' onClick={this.handleCreateOnClick}>
-                              <FontAwesomeIcon icon={faPlusCircle} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
-                            Create
+                              <Tooltip
+                                title='Create New Maintenance'
+                                position='bottom'
+                                trigger='mouseenter'
+                                delay='250'
+                                distance='25'
+                                interactiveBorder='15'
+                                arrow
+                                size='small'
+                                theme='transparent'
+                              >
+                                <FontAwesomeIcon icon={faPlusCircle} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
+                                Create
+                              </Tooltip>
                             </Button>
                           ) : (
                             <Button className='send-bulk' theme='primary' onClick={this.handleSendAll}>
-                              <FontAwesomeIcon icon={faMailBulk} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
-                            Send All
+                              <Tooltip
+                                title='Send All Notifications'
+                                position='bottom'
+                                trigger='mouseenter'
+                                delay='250'
+                                distance='25'
+                                interactiveBorder='15'
+                                arrow
+                                size='small'
+                                theme='transparent'
+                              >
+                                <FontAwesomeIcon icon={faMailBulk} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
+                                Send All
+                              </Tooltip>
                             </Button>
                           )}
                       </ButtonGroup>
@@ -2138,7 +2214,8 @@ export default class Maintenance extends React.Component {
                                         <Tooltip
                                           title='Use Protection Switch Text'
                                           position='top'
-                                          theme='dark'
+                                          theme='transparent'
+                                          size='small'
                                           trigger='mouseenter'
                                           delay='150'
                                           arrow
@@ -2151,7 +2228,8 @@ export default class Maintenance extends React.Component {
                                         <Tooltip
                                           title='Use Time Difference Text'
                                           position='top'
-                                          theme='dark'
+                                          theme='transparent'
+                                          size='small'
                                           trigger='mouseenter'
                                           delay='150'
                                           arrow
@@ -2214,13 +2292,6 @@ export default class Maintenance extends React.Component {
                                       <div style={{ marginTop: '10px' }}>Done</div>
                                     </label>
                                   </Badge>
-                                  <Button
-                                    outline
-                                    onClick={this.toggleRescheduleModal}
-                                    className='reschedule-btn'
-                                  >
-                                    Reschedule
-                                  </Button>
                                 </FormGroup>
                               </Col>
                             </Row>
@@ -2350,6 +2421,9 @@ export default class Maintenance extends React.Component {
                       <Button onClick={this.toggleReadModal} outline>
                         <FontAwesomeIcon icon={faEnvelopeOpenText} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
                           Read
+                      </Button>
+                      <Button outline onClick={this.toggleRescheduleModal}>
+                        Reschedule
                       </Button>
                       <Button onClick={this.handleCalendarCreate} outline>
                         <FontAwesomeIcon icon={faCalendarAlt} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
@@ -2680,7 +2754,7 @@ export default class Maintenance extends React.Component {
                 :global(.reschedule-btn) {
                   font-size: .85rem;
                   font-weight: 500;
-                  padding: .60rem;
+                  padding: .50rem;
                   border-width: 2px;
                   width: 105px;
                   min-height: 88px;
@@ -2721,6 +2795,9 @@ export default class Maintenance extends React.Component {
                 }
                 :global(.MuiInputBase-root) {
                   color: #495057;
+                }
+                :global(#impact::placeholder) {
+                  color: var(--border-color);
                 }
                 :global(.MuiInputBase-root:hover) {
                   border-color: #8fa4b8 !important;

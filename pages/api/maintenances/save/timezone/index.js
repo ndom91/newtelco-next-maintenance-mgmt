@@ -7,7 +7,7 @@ module.exports = async (req, res) => {
   const label = decodeURIComponent(req.query.timezoneLabel)
   const updatedBy = req.query.updatedby
   const timezoneQuery = await db.query(escape`
-    UPDATE maintenancedb SET timezone = ${value}, timezoneLabel = ${label}, updatedBy = '${updatedBy}' WHERE id = ${maintId}
+    UPDATE maintenancedb SET timezone = ${value}, timezoneLabel = ${label}, updatedBy = ${updatedBy} WHERE id = ${maintId}
   `)
   if (timezoneQuery.affectedRows >= 1) {
     res.status(200).json({ statusText: 'OK', status: 200 })

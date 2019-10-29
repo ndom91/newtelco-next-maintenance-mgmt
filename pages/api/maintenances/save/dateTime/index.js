@@ -9,11 +9,11 @@ module.exports = async (req, res) => {
   let cidIdsQuery
   if (element === 'start') {
     cidIdsQuery = await db.query(escape`
-      UPDATE maintenancedb SET startDateTime = ${value}, updatedBy = '${updatedBy}' WHERE id = ${maintId}
+      UPDATE maintenancedb SET startDateTime = ${value}, updatedBy = ${updatedBy} WHERE id = ${maintId}
     `)
   } else if (element === 'end') {
     cidIdsQuery = await db.query(escape`
-      UPDATE maintenancedb SET endDateTime = ${value}, updatedBy = '${updatedBy}' WHERE id = ${maintId}
+      UPDATE maintenancedb SET endDateTime = ${value}, updatedBy = ${updatedBy} WHERE id = ${maintId}
     `)
   }
   console.log(value, cidIdsQuery.message)
