@@ -70,6 +70,9 @@ import {
   FormGroup,
   FormTextarea,
   FormInput,
+  InputGroup,
+  InputGroupText,
+  InputGroupAddon,
   Modal,
   ModalHeader,
   ModalBody,
@@ -167,6 +170,8 @@ export default class Maintenance extends React.Component {
       translatedBody: '',
       notesText: props.jsonData.profile.notes || '',
       mailBodyText: '',
+      mailPreviewHeaderText: '',
+      mailPreviewSubjectTextPreview: '',
       lieferantcids: {},
       kundencids: [],
       windowInnerHeight: 0,
@@ -342,6 +347,7 @@ export default class Maintenance extends React.Component {
     this.handleDeleteReschedule = this.handleDeleteReschedule.bind(this)
     this.handleToggleChange = this.handleToggleChange.bind(this)
     this.handleRescheduleReasonChange = this.handleRescheduleReasonChange.bind(this)
+    this.mailSubjectText = this.mailSubjectText.bind(this)
   }
 
   componentDidMount () {
@@ -1595,6 +1601,7 @@ export default class Maintenance extends React.Component {
         openPreviewModal: !this.state.openPreviewModal
       })
     }
+    this.mailSubjectText()
   }
 
   toggleHelpModal () {
@@ -1977,6 +1984,19 @@ export default class Maintenance extends React.Component {
     Router.push(newLocation)
     // Router.pushRoute(`/maintenance?id=${selection.id}`)
     // this.setState({ selection })
+  }
+
+  mailSubjectText = () => {
+    let text = this.state.rescheduleData.length !== 0 ? ' [RESCHEDULED]' : ''
+    text += this.state.maintenance.emergency ? ' [EMERGENCY]' : ''
+    text += this.state.maintenance.cancelled ? ' [CANCELLED]' : ''
+    text += ' Planned Work Notification - NT-' + this.state.maintenance.id
+    if (this.state.rescheduleData.length !== 0) {
+      text += '-' + this.state.rescheduleData.length !== 0 && this.state.rescheduleData[this.state.rescheduleData.length - 1].rcounter
+    }
+    this.setState({
+      mailPreviewSubjectTextPreview: text
+    })
   }
 
   /// /////////////////////////////////////////////////////////
@@ -2483,7 +2503,7 @@ export default class Maintenance extends React.Component {
                     minWidth={700}
                     minHeight={590}
                     bounds='window'
-                    dragHandleClassName='modal-incoming-header-text'
+                    dragHandleClassName='modal-read-header'
                     onResize={(e, direction, ref, delta, position) => {
                       this.setState({
                         readHeight: ref.style.height,
@@ -2492,23 +2512,33 @@ export default class Maintenance extends React.Component {
                     }}
                   >
                     <div style={{ borderRadius: '15px', position: 'relative' }}>
-                      <ModalHeader style={{
-                        backgroundColor: 'var(--third-bg)',
-                        borderRadius: '0px'
-                      }}
+                      <ModalHeader 
+                        style={{
+                          backgroundColor: 'var(--fourth-bg)',
+                          borderRadius: '0px'
+                        }}
+                        className='modal-read-header'
                       >
                         <img className='mail-icon' src={this.state.readIconUrl} />
                         <div className='modal-incoming-header-text'>
-                          <h5 className='modal-incoming-from' style={{ marginBottom: '0px' }}>
-                            {this.state.maintenance.incomingFrom}
-                          </h5>
-                          <small className='modal-incoming-subject'>
-                            {this.state.maintenance.incomingSubject}
-                          </small>
-                          <br />
-                          <small className='modal-incoming-datetime'>
-                            {this.state.maintenance.incomingDate}
-                          </small>
+                          <InputGroup size='sm' className='mb-2'>
+                            <InputGroupAddon style={{ height: '31px' }} size='sm' type='prepend'>
+                              <InputGroupText size='sm'>From:</InputGroupText>
+                            </InputGroupAddon>
+                            <FormInput size='sm' disabled placeholder={this.state.maintenance.incomingFrom} />
+                          </InputGroup>
+                          <InputGroup size='sm' className='mb-2'>
+                            <InputGroupAddon style={{ height: '31px' }} size='sm' type='prepend'>
+                              <InputGroupText size='sm'>Subject:</InputGroupText>
+                            </InputGroupAddon>
+                            <FormInput size='sm' disabled placeholder={this.state.maintenance.incomingSubject} />
+                          </InputGroup>
+                          <InputGroup size='sm' className='mb-2'>
+                            <InputGroupAddon style={{ height: '31px' }} type='prepend'>
+                              <InputGroupText size='sm'>Date/Time:</InputGroupText>
+                            </InputGroupAddon>
+                            <FormInput size='sm' disabled placeholder={this.state.maintenance.incomingDate} />
+                          </InputGroup>
                           {Array.isArray(this.state.maintenance.incomingAttachments) && this.state.maintenance.incomingAttachments.length !== 0
                             ? this.state.maintenance.incomingAttachments.map((attachment, index) => {
                               return (
@@ -2604,28 +2634,36 @@ export default class Maintenance extends React.Component {
                 ) : (
                   null
                 )}
-              <Modal backdropClassName='modal-backdrop' animation backdrop size='lg' open={openPreviewModal} toggle={this.togglePreviewModal}>
+              <Modal className='modal-preview-send' backdropClassName='modal-backdrop' animation backdrop size='lg' open={openPreviewModal} toggle={this.togglePreviewModal}>
                 <ModalHeader>
                   <div className='modal-preview-text-wrapper'>
-                    <div className='modal-preview-to-text'>
-                      <b style={{ fontWeight: '900' }}>To:</b> {this.state.mailPreviewHeaderText}
-                    </div>
-                    <div className='modal-preview-to-text'>
-                      <b style={{ fontWeight: '900' }}>Cc:</b> service@newtelco.de
-                    </div>
-                    <div className='modal-preview-Subject-text'>
-                      <b style={{ fontWeight: '900' }}>
-                        Subject:
-                      </b>
-                      {this.state.rescheduleData.length !== 0 && ' [RESCHEDULED]'}
-                      {this.state.maintenance.emergency && ' [EMERGENCY]'}
-                      {this.state.maintenance.cancelled && ' [CANCELLED]'}
-                      {' ' + this.state.mailPreviewSubjectText}-{this.state.rescheduleData.length !== 0 && this.state.rescheduleData[this.state.rescheduleData.length - 1].rcounter}
-                    </div>
+                    <InputGroup size='sm' className='mb-2'>
+                      <InputGroupAddon style={{ height: '31px' }} size='sm' type='prepend'>
+                        <InputGroupText size='sm'>To:</InputGroupText>
+                      </InputGroupAddon>
+                      <FormInput size='sm' disabled placeholder={this.state.mailPreviewHeaderText.toLowerCase()} />
+                    </InputGroup>
+                    <InputGroup size='sm' className='mb-2'>
+                      <InputGroupAddon style={{ height: '31px' }} size='sm' type='prepend'>
+                        <InputGroupText size='sm'>Cc:</InputGroupText>
+                      </InputGroupAddon>
+                      <FormInput size='sm' disabled placeholder='service@newtelco.de' />
+                    </InputGroup>
+                    <InputGroup size='sm' className='mb-2'>
+                      <InputGroupAddon style={{ height: '31px' }} type='prepend'>
+                        <InputGroupText size='sm'>Subject:</InputGroupText>
+                      </InputGroupAddon>
+                      <FormInput size='sm' disabled placeholder={this.state.mailPreviewSubjectTextPreview} />
+                    </InputGroup>
                   </div>
-                  <Button id='send-mail-btn' style={{ padding: '0.9em 1.1em' }} onClick={() => this.sendMail(this.state.mailPreviewHeaderText, this.state.mailPreviewCustomerCid, this.state.mailPreviewSubjectText, this.state.mailBodyText, true)}>
-                    <FontAwesomeIcon width='1.5em' style={{ fontSize: '12px' }} className='modal-preview-send-icon' icon={faPaperPlane} />
-                  </Button>
+                  <ButtonGroup style={{ flexDirection: 'column' }}>
+                    <Button style={{ borderRadius: '5px 5px 0 0' }} onClick={this.togglePreviewModal}>
+                      <FontAwesomeIcon width='1.5em' style={{ fontSize: '12px' }} className='modal-preview-send-icon' icon={faTimesCircle} />
+                    </Button>
+                    <Button outline id='send-mail-btn' style={{ borderRadius: '0 0 5px 5px', padding: '0.9em 1.1em' }} onClick={() => this.sendMail(this.state.mailPreviewHeaderText, this.state.mailPreviewCustomerCid, this.state.mailPreviewSubjectText, this.state.mailBodyText, true)}>
+                      <FontAwesomeIcon width='1.5em' style={{ fontSize: '12px' }} className='modal-preview-send-icon' icon={faPaperPlane} />
+                    </Button>
+                  </ButtonGroup>
                 </ModalHeader>
                 <ModalBody>
                   <TinyEditor
@@ -2713,7 +2751,11 @@ export default class Maintenance extends React.Component {
                               },
                               {
                                 value: 'change_time',
-                                label: 'change in planned time'
+                                label: 'change in planned date/time'
+                              },
+                              {
+                                value: 'change_impact',
+                                label: 'change in impact duration'
                               }
                             ]}
                             placeholder='Please select a reason for reschedule'
@@ -2837,8 +2879,8 @@ export default class Maintenance extends React.Component {
                   padding: 15px;
                 }
                 .mail-icon {
-                  min-width: 96px;
-                  height: 96px;
+                  min-width: 110px;
+                  height: 110px;
                   border: 2px solid var(--light);
                   background: var(--white);
                   padding: 10px;
@@ -2864,6 +2906,38 @@ export default class Maintenance extends React.Component {
                 :global(.card-header h2) {
                   color: var(--font-color);
                   font-weight: 100 !important;
+                }
+                :global(.modal-incoming-header-text .input-group-prepend .input-group-text) {
+                  background-color: #272727;
+                }
+                :global(.modal-incoming-header-text input.form-control) {
+                  background-color: #373737;
+                }
+                :global(.modal-incoming-header-text input.form-control:hover) {
+                  cursor: move;
+                }
+                :global(.modal-incoming-header-text) {
+                  flex-grow: 1;
+                  margin-right: 20px;
+                  margin-top: 7px;
+                }
+                :global(.modal-read-header:hover) {
+                  cursor: move;
+                }
+                :global(.modal-preview-text-wrapper) {
+                  width: 89%;
+                }
+                :global(.modal-preview-text-wrapper input:hover) {
+                  cursor: default;
+                }
+                :global(.modal-preview-send .modal-header) {
+                  background-color: var(--secondary-bg);
+                }
+                :global(.modal-preview-send .modal-body) {
+                  background-color: var(--primary-bg);
+                }
+                :global(.modal-preview-send .input-group-prepend .input-group-text) {
+                  background-color: var(--primary-bg);
                 }
                 :global(.maint-select [class$='-placeholder']) {
                   color: var(--border-color) !important;
@@ -2918,6 +2992,9 @@ export default class Maintenance extends React.Component {
                 }
                 :global(.tox-toolbar) {
                   background: none !important;
+                }
+                :global(.tox-edit-area__iframe *) {
+                  color: #fff;
                 }
                 :global(.maintenance-subcontainer) {
                   border: 1px solid var(--border-color);
@@ -3059,9 +3136,6 @@ export default class Maintenance extends React.Component {
                   right:0;
                   top:0;
                   cursor:move;
-                }
-                .modal-incoming-header-text:hover {
-                  cursor: move;
                 }
                 .modal-incoming-header-text > * {
                   color: var(--white);
