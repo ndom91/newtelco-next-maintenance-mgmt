@@ -17,7 +17,7 @@ export default class MyApp extends App {
     if (Component.getInitialProps) {
       pageProps = await Component.getInitialProps(ctx)
     }
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined' && pageProps.session) {
       LogRocket.init('ui2vht/next-maintenance')
       // setupLogRocketReact(LogRocket)
       LogRocket.identify(pageProps.session.user.id, {
