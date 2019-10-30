@@ -8,6 +8,7 @@ import Toggle from 'react-toggle'
 import './style/maintenance.css'
 import cogoToast from 'cogo-toast'
 import Select from 'react-select'
+import CreatableSelect from 'react-select/creatable'
 import makeAnimated from 'react-select/animated'
 import Router from 'next/router'
 import { Helmet } from 'react-helmet'
@@ -153,7 +154,8 @@ export default class Maintenance extends React.Component {
       reschedule: {
         startDateTime: null,
         endDateTime: null,
-        impact: ''
+        impact: '',
+        reason: ''
       },
       rescheduleData: [],
       rescheduleToDelete: {
@@ -181,34 +183,43 @@ export default class Maintenance extends React.Component {
           {
             headerName: 'ID',
             field: 'rcounter',
-            width: 100,
+            width: 80,
             editable: false,
+            hide: true,
             sort: { direction: 'asc', priority: 0 }
-          }, {
-            headerName: 'Start',
-            field: 'startDateTime',
-            width: 210,
-            cellRenderer: 'startdateTime'
-          }, {
-            headerName: 'End',
-            field: 'endDateTime',
-            width: 210,
-            cellRenderer: 'enddateTime'
-          }, {
-            headerName: 'Impact',
-            field: 'impact',
-            width: 150
           }, {
             headerName: 'Sent',
             field: 'sent',
             cellRenderer: 'sentBtn',
-            width: 100,
+            width: 80,
+            sortable: false,
+            filter: false,
             cellStyle: {
               display: 'flex',
               justifyContent: 'center',
               alignItems: 'center',
               height: '100%'
             }
+          }, {
+            headerName: 'Start',
+            field: 'startDateTime',
+            width: 170,
+            cellRenderer: 'startdateTime'
+          }, {
+            headerName: 'End',
+            field: 'endDateTime',
+            width: 170,
+            cellRenderer: 'enddateTime'
+          }, {
+            headerName: 'Impact',
+            field: 'impact',
+            width: 140,
+            tooltipField: 'impact'
+          }, {
+            headerName: 'Reason',
+            field: 'reason',
+            width: 160,
+            tooltipField: 'reason'
           }
         ],
         rowSelection: 'single',
@@ -330,6 +341,7 @@ export default class Maintenance extends React.Component {
     this.toggleConfirmDeleteRescheduleModal = this.toggleConfirmDeleteRescheduleModal.bind(this)
     this.handleDeleteReschedule = this.handleDeleteReschedule.bind(this)
     this.handleToggleChange = this.handleToggleChange.bind(this)
+    this.handleRescheduleReasonChange = this.handleRescheduleReasonChange.bind(this)
   }
 
   componentDidMount () {
@@ -760,8 +772,9 @@ export default class Maintenance extends React.Component {
       const newStart = moment(this.state.rescheduleData[latest].startDateTime).format('YYYY-MM-DD HH:mm:ss')
       const newEnd = moment(this.state.rescheduleData[latest].endDateTime).format('YYYY-MM-DD HH:mm:ss')
       const newImpact = this.state.rescheduleData[latest].impact
+      const newReason = this.state.rescheduleData[latest].reason.toLowerCase()
       const rcounter = this.state.rescheduleData[latest].rcounter
-      maintenanceIntro = `We regret to inform you that the following maintenance has been rescheduled.\n\nThe new times are as follows:\n\n<table border="0" cellspacing="2" cellpadding="2" width="775px"><tr><td style='width: 205px;'>Maintenance ID:</td><td><b>NT-${id}-${rcounter}</b></td></tr><tr><td>New Start date and time:</td><td><b>${newStart} (${tzSuffixRAW})</b></td></tr><tr><td>New Finish date and time:</td><td><b>${newEnd} (${tzSuffixRAW})</b></td></tr><tr><td>New Impact:</td><td><b>${newImpact}</b></td></tr></table><br><hr><br><i><b>Original Mail:</b></i><br><br>Dear Colleagues,<br><br>We would like to inform you about planned work on the following CID(s):\n`
+      maintenanceIntro = `We regret to inform you that the planned works have been <b>rescheduled</b> on the following CID(s):\n\n<br><br><b>${customerCID}</b><br><br>The maintenance has been rescheduled due to ${newReason}.<br><br>The new details are as follows:<br><table border="0" cellspacing="2" cellpadding="2" width="775px"><tr><td style='width: 205px;'>Maintenance ID:</td><td><b>NT-${id}-${rcounter}</b></td></tr><tr><td>New Start date and time:</td><td><b>${newStart} (${tzSuffixRAW})</b></td></tr><tr><td>New Finish date and time:</td><td><b>${newEnd} (${tzSuffixRAW})</b></td></tr><tr><td>New Impact:</td><td><b>${newImpact}</b></td></tr></table>Thank you very much for your patience and cooperation.<br><hr><i><b>Original Mail:</b></i><br><br>Dear Colleagues,<br><br>We would like to inform you about planned work on the following CID(s):\n`
     }
 
     let body = `<body style="color:#666666;">${rescheduleText} Dear Colleagues,​​<p><span>${maintenanceIntro}<br><br> <b>${customerCID}</b> <br><br>The maintenance work is with the following details:</span></p><table border="0" cellspacing="2" cellpadding="2" width="775px"><tr><td style='width: 205px;'>Maintenance ID:</td><td><b>NT-${id}</b></td></tr><tr><td>Start date and time:</td><td><b>${utcStart} (${tzSuffixRAW})</b></td></tr><tr><td>Finish date and time:</td><td><b>${utcEnd} (${tzSuffixRAW})</b></td></tr>`
@@ -1633,13 +1646,24 @@ export default class Maintenance extends React.Component {
     })
   }
 
+  handleRescheduleReasonChange (reasonSelection) {
+    console.log('reasonSelection', reasonSelection)
+    this.setState({
+      reschedule: {
+        ...this.state.reschedule,
+        reason: reasonSelection
+      }
+    })
+  }
+
   handleRescheduleSave () {
     const newImpact = this.state.reschedule.impact
+    const newReason = this.state.reschedule.reason.label
     const newStartDateTime = this.state.reschedule.startDateTime
     const newEndDateTime = this.state.reschedule.endDateTime
 
     const host = window.location.host
-    fetch(`https://${host}/api/reschedule/save?mid=${this.state.maintenance.id}&impact=${encodeURIComponent(newImpact)}&sdt=${encodeURIComponent(newStartDateTime)}&edt=${encodeURIComponent(newEndDateTime)}&rcounter=${this.state.rescheduleData.length + 1}&user=${encodeURIComponent(this.props.session.user.email)}`, {
+    fetch(`https://${host}/api/reschedule/save?mid=${this.state.maintenance.id}&impact=${encodeURIComponent(newImpact)}&sdt=${encodeURIComponent(newStartDateTime)}&edt=${encodeURIComponent(newEndDateTime)}&rcounter=${this.state.rescheduleData.length + 1}&user=${encodeURIComponent(this.props.session.user.email)}&reason=${encodeURIComponent(newReason)}`, {
       method: 'get'
     })
       .then(resp => resp.json())
@@ -1653,18 +1677,17 @@ export default class Maintenance extends React.Component {
             position: 'top-right'
           })
           const newRescheduleData = this.state.rescheduleData
-          newRescheduleData.push({ rcounter: this.state.rescheduleData.length + 1, startDateTime: moment(newStartDateTime).format(), endDateTime: moment(newEndDateTime).format(), impact: newImpact, sent: 0 })
+          newRescheduleData.push({ rcounter: this.state.rescheduleData.length + 1, startDateTime: moment(newStartDateTime).format(), endDateTime: moment(newEndDateTime).format(), impact: newImpact, reason: newReason, sent: 0 })
           this.setState({
             rescheduleData: newRescheduleData,
             reschedule: {
               impact: '',
+              reason: '',
               startDateTime: null,
               endDateTime: null
             }
           })
-          // this.rescheduleGridApi.insertItemsAtIndex(0, { id: this.state.rescheduleData.length + 1, startDateTime: moment(newStartDateTime).format(), endDateTime: moment(newEndDateTime).format(), impact: newImpact })
           this.rescheduleGridApi.setRowData(newRescheduleData)
-          // this.rescheduleGridApi.refreshCells()
         }
       })
       .catch(err => console.error(`Error Saving Reschedule - ${err}`))
@@ -2668,9 +2691,33 @@ export default class Maintenance extends React.Component {
                       <Row>
                         <FormGroup style={{ margin: '0px 15px', width: '100%', marginBottom: '10px !important' }}>
                           <label htmlFor='resched-impact'>
-                            Impact
+                            New Impact
                           </label>
                           <FormInput id='resched-impact' name='resched-impact' type='text' value={this.state.reschedule.impact} onChange={this.handleRescheduleImpactChange} />
+                        </FormGroup>
+                      </Row>
+                      <Row>
+                        <FormGroup style={{ margin: '0px 15px', width: '100%', marginBottom: '10px !important' }}>
+                          <label htmlFor='resched-reason'>
+                            Reason for Reschedule
+                          </label>
+                          <CreatableSelect
+                            isClearable
+                            className='maint-select'
+                            value={this.state.reschedule.reason}
+                            onChange={this.handleRescheduleReasonChange}
+                            options={[
+                              {
+                                value: 'change_circuits',
+                                label: 'change in affected circuits'
+                              },
+                              {
+                                value: 'change_time',
+                                label: 'change in planned time'
+                              }
+                            ]}
+                            placeholder='Please select a reason for reschedule'
+                          />
                         </FormGroup>
                       </Row>
                     </Col>
@@ -2817,6 +2864,9 @@ export default class Maintenance extends React.Component {
                 :global(.card-header h2) {
                   color: var(--font-color);
                   font-weight: 100 !important;
+                }
+                :global(.maint-select [class$='-placeholder']) {
+                  color: var(--border-color) !important;
                 }
                 :global(.maint-select *) {
                   background-color: var(--input);
