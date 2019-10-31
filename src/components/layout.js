@@ -105,6 +105,19 @@ export default class Layout extends React.Component {
               </ModalHeader>
               <ModalBody className='keyboard-shortcut-body'>
                 <Container className='keyboard-shortcut-container'>
+                  {typeof window !== 'undefined' && window.location.pathname === '/settings'
+                    ? (
+                      <Row className='keyboard-row'>
+                        <Col>
+                          <Badge className='key-badge' outline theme='primary'>ALT</Badge> <span className='keyboard-plus'>+</span><Badge className='key-badge' outline theme='primary'>L</Badge>
+                        </Col>
+                        <Col>
+                          Delete Selected
+                        </Col>
+                      </Row>
+                    ) : (
+                      null
+                    )}
                   {typeof window !== 'undefined' && window.location.pathname === '/history'
                     ? (
                       <Row className='keyboard-row'>

@@ -145,6 +145,7 @@ export default class Maintenance extends React.Component {
         width: 673,
         height: 400
       },
+      attachmentHTMLContent: '',
       dateTimeWarning: false,
       openAttachmentModal: false,
       openProtectionSwitchToggle: false,
@@ -1875,6 +1876,15 @@ export default class Maintenance extends React.Component {
           openAttachmentModal: !this.state.openAttachmentModal,
           currentAttachment: id || null
         })
+      } else if (filetype === 'html') {
+        const htmlIndex = this.state.maintenance.incomingAttachments.findIndex(el => el.mime === 'text/html')
+        const file = this.state.maintenance.incomingAttachments[htmlIndex].data
+        let base64 = (file).replace(/_/g, '/')
+        base64 = base64.replace(/-/g, '+')
+        const base64Fixed = fixBase64(base64)
+        this.setState({
+          attachmentHTMLContent: atob(base64Fixed)
+        }) 
       } else {
         cogoToast.warn('Filetype not supported', {
           position: 'top-right'
@@ -2624,8 +2634,13 @@ export default class Maintenance extends React.Component {
                           )}
                         {this.state.filetype === 'pdf'
                           ? (
-                            // <PdfAttachment doc={this.state.pdfB64} />
                             <PDF file={this.state.pdfB64} scale={1.75} />
+                          ) : (
+                            null
+                          )}
+                        {this.state.filetype === 'html'
+                          ? (
+                            <ModalBody className='mail-body' dangerouslySetInnerHTML={this.state.attachmentHTMLContent} />
                           ) : (
                             null
                           )}
@@ -3103,10 +3118,11 @@ export default class Maintenance extends React.Component {
                   height: ${this.state.readHeight ? `calc(${this.state.readHeight} - 127px)` : '460px'};
                   background: var(--primary-bg);
                   color: var(--font-color);
-                  overflow-y: ${this.state.incomingMailIsHtml ? 'scroll' : 'hidden'};
+                  overflow-y: ${this.state.incomingMailIsHtml ? 'scroll' : 'scroll'};
                 }
                 :global(.mail-body > div:first-child) {
                   position: ${this.state.incomingMailIsHtml ? 'relative' : 'absolute'};
+                  color: var(--font-color);
                   top: 0;
                   left: 0;
                   height: ${this.state.incomingMailIsHtml ? '100vh' : '100%'};
