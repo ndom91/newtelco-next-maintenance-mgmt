@@ -403,9 +403,9 @@ export default class Maintenance extends React.Component {
         emergency: convertBool(emergency),
         done: convertBool(done),
         timezone: 'Europe/Amsterdam',
-        timezoneLabel: '(GMT+02:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna',
-        startDateTime: moment.tz(this.props.jsonData.profile.startDateTime, 'GMT').tz('Etc/GMT-2').format('YYYY-MM-DD HH:mm:ss'),
-        endDateTime: moment.tz(this.props.jsonData.profile.endDateTime, 'GMT').tz('Etc/GMT-2').format('YYYY-MM-DD HH:mm:ss')
+        timezoneLabel: '(GMT+01:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna',
+        startDateTime: moment.tz(this.props.jsonData.profile.startDateTime, 'GMT').tz('Etc/GMT-1').format('YYYY-MM-DD HH:mm:ss'),
+        endDateTime: moment.tz(this.props.jsonData.profile.endDateTime, 'GMT').tz('Etc/GMT-1').format('YYYY-MM-DD HH:mm:ss')
       }
 
       this.setState({
@@ -1992,7 +1992,7 @@ export default class Maintenance extends React.Component {
     text += this.state.maintenance.cancelled ? ' [CANCELLED]' : ''
     text += ' Planned Work Notification - NT-' + this.state.maintenance.id
     if (this.state.rescheduleData.length !== 0) {
-      text += '-' + this.state.rescheduleData.length !== 0 && this.state.rescheduleData[this.state.rescheduleData.length - 1].rcounter
+      text += this.state.rescheduleData.length !== 0 && '-' + this.state.rescheduleData[this.state.rescheduleData.length - 1].rcounter
     }
     this.setState({
       mailPreviewSubjectTextPreview: text
@@ -2360,7 +2360,8 @@ export default class Maintenance extends React.Component {
                                       toolbar:
                                           `undo redo | formatselect | bold italic backcolor | 
                                           alignleft aligncenter alignright alignjustify | 
-                                          bullist numlist outdent indent | removeformat | help`
+                                          bullist numlist outdent indent | removeformat | help`,
+                                      content_style: 'html { color: #828282 }'
                                     }}
                                     onChange={this.handleNotesChange}
                                   />
@@ -2634,7 +2635,7 @@ export default class Maintenance extends React.Component {
                 ) : (
                   null
                 )}
-              <Modal className='modal-preview-send' backdropClassName='modal-backdrop' animation backdrop size='lg' open={openPreviewModal} toggle={this.togglePreviewModal}>
+              <Modal className='modal-preview-send' backdropClassName='modal-backdrop modal-preview-send-backdrop' animation backdrop size='lg' open={openPreviewModal} toggle={this.togglePreviewModal}>
                 <ModalHeader>
                   <div className='modal-preview-text-wrapper'>
                     <InputGroup size='sm' className='mb-2'>
@@ -2657,11 +2658,11 @@ export default class Maintenance extends React.Component {
                     </InputGroup>
                   </div>
                   <ButtonGroup style={{ flexDirection: 'column' }}>
-                    <Button style={{ borderRadius: '5px 5px 0 0' }} onClick={this.togglePreviewModal}>
+                    <Button theme={this.state.night ? 'dark' : 'light'} style={{ borderRadius: '5px 5px 0 0' }} onClick={this.togglePreviewModal}>
                       <FontAwesomeIcon width='1.5em' style={{ fontSize: '12px' }} className='modal-preview-send-icon' icon={faTimesCircle} />
                     </Button>
-                    <Button outline id='send-mail-btn' style={{ borderRadius: '0 0 5px 5px', padding: '0.9em 1.1em' }} onClick={() => this.sendMail(this.state.mailPreviewHeaderText, this.state.mailPreviewCustomerCid, this.state.mailPreviewSubjectText, this.state.mailBodyText, true)}>
-                      <FontAwesomeIcon width='1.5em' style={{ fontSize: '12px' }} className='modal-preview-send-icon' icon={faPaperPlane} />
+                    <Button theme={this.state.night ? 'dark' : 'light'} outline id='send-mail-btn' style={{ borderRadius: '0 0 5px 5px', padding: '0.9em 1.1em' }} onClick={() => this.sendMail(this.state.mailPreviewHeaderText, this.state.mailPreviewCustomerCid, this.state.mailPreviewSubjectText, this.state.mailBodyText, true)}>
+                      <FontAwesomeIcon width='1.5em' style={{ fontSize: '12px' }} className='modal-preview-send-icon modal-preview-paperplane-icon' icon={faPaperPlane} />
                     </Button>
                   </ButtonGroup>
                 </ModalHeader>
@@ -2681,7 +2682,8 @@ export default class Maintenance extends React.Component {
                       toolbar:
                           `undo redo | formatselect | bold italic backcolor | 
                           alignleft aligncenter alignright alignjustify | 
-                          bullist numlist outdent indent | removeformat | help`
+                          bullist numlist outdent indent | removeformat | help`,
+                      content_style: 'html { color: #828282 }'
                     }}
                     onChange={this.handleEditorChange}
                   />
@@ -2781,14 +2783,14 @@ export default class Maintenance extends React.Component {
                   <Container className='container-border'>
                     <Row>
                       <Col>
-                        Are you sure you want to delete <b style={{ fontWeight: '900' }}> {this.state.rescheduleToDelete.id}</b>
+                        Are you sure you want to delete reschedule: <b style={{ fontWeight: '900' }}> {this.state.rescheduleToDelete.id}</b>
                       </Col>
                     </Row>
                   </Container>
                   <Row style={{ marginTop: '20px' }}>
                     <Col>
                       <ButtonGroup style={{ width: '100%' }}>
-                        <Button onClick={this.toggleConfirmDeleteRescheduleModal} outline theme='secondary'>
+                        <Button style={{ color: 'var(--inv-font-color)' }} onClick={this.toggleConfirmDeleteRescheduleModal} outline theme='secondary'>
                           Cancel
                         </Button>
                         <Button onClick={this.handleDeleteReschedule} theme='danger'>
@@ -2803,6 +2805,9 @@ export default class Maintenance extends React.Component {
             <style jsx>{`
                 :global(.modal-body.reschedule) {
                   background-color: var(--primary-bg);
+                }
+                :global(.modal-preview-send-backdrop) {
+                  opacity: 0.8 !important;
                 }
                 :global(.reschedule-modal) {
                   max-width: 600px;
@@ -2928,7 +2933,10 @@ export default class Maintenance extends React.Component {
                   width: 89%;
                 }
                 :global(.modal-preview-text-wrapper input:hover) {
-                  cursor: default;
+                  cursor: default !important;
+                }
+                :global(.modal-preview-text-wrapper input::placeholder) {
+                  color: var(--font-color);
                 }
                 :global(.modal-preview-send .modal-header) {
                   background-color: var(--secondary-bg);
@@ -2939,6 +2947,15 @@ export default class Maintenance extends React.Component {
                 :global(.modal-preview-send .input-group-prepend .input-group-text) {
                   background-color: var(--primary-bg);
                 }
+                :global(.modal-preview-send .input-group input.form-control) {
+                  cursor: default;
+                }
+                :global(.modal-preview-paperplane-icon) {
+                  color: var(--font-color);
+                }
+                :global(.modal-preview-paperplane-icon:hover) {
+                  color: #f8f9fa;
+                }
                 :global(.maint-select [class$='-placeholder']) {
                   color: var(--border-color) !important;
                 }
@@ -2946,7 +2963,11 @@ export default class Maintenance extends React.Component {
                   background-color: var(--input);
                   color: var(--font-color) !important;
                 }
-                :global(div[class$="-singleValue"]) {
+                :global(.maint-select div[class$="-multiValue"]) {
+                  background-color: var(--input);
+                  color: var(--font-color);
+                }
+                :global(.maint-select div[class$="-singleValue"]) {
                   background-color: var(--input);
                   color: var(--font-color);
                 }
@@ -2954,16 +2975,23 @@ export default class Maintenance extends React.Component {
                   border: none !important;
                 }
                 :global(.tox .tox-tbtn svg) {
-                  fill: var(--font-color);
+                  fill: var(--font-color) !important;
                 }
                 :global(.tox .tox-tbtn) {
-                  color: var(--font-color);
+                  color: var(--font-color) !important;
+                }
+                :global(.tox .tox-tbtn:hover:not(.tox-tbtn--disabled)) {
+                  background: var(--secondary-bg) !important;
+                  color: var(--inv-font-color) !important;
                 }
                 :global(.tox .tox-edit-area__iframe *) {
-                  color: var(--font-color);
+                  color: var(--font-color) !important;
+                }
+                :global(#tinymce) {
+                  color: var(--font-color) !important;
                 }
                 :global(.tox .tox-edit-area__iframe) {
-                  background-color: var(--primary-bg);
+                  background-color: var(--primary-bg) !important;
                 }
                 :global(.progress) {
                   background-color: var(--inv-font-color);
