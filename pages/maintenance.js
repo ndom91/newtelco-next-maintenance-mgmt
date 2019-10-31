@@ -146,6 +146,7 @@ export default class Maintenance extends React.Component {
         height: 400
       },
       attachmentHTMLContent: '',
+      currentAttachmentName: '',
       dateTimeWarning: false,
       openAttachmentModal: false,
       openProtectionSwitchToggle: false,
@@ -1153,6 +1154,30 @@ export default class Maintenance extends React.Component {
         }
       })
 
+      if (this.state.maintenance.receivedmail) {
+        const mailId = this.state.maintenance.receivedmail
+        if (!mailId.startsWith('NT-')) {
+          fetch(`https://api.${host}/inbox/markcomplete`, {
+            method: 'post',
+            body: JSON.stringify({ m: mailId }),
+            mode: 'cors',
+            headers: {
+              'Access-Control-Allow-Origin': '*',
+              'Content-Type': 'application/json'
+            }
+          })
+            .then(resp => resp.json())
+            .then(data => {
+              if (data.id === 500) {
+                cogoToast.warn('Error moving to Completed Label', {
+                  position: 'top-right'
+                })
+              }
+            })
+            .catch(err => console.error(`Error - ${err}`))
+        }
+      }
+
       fetch(`https://${host}/api/maintenances/save/impactedcids?cids=${impactedCIDs}&maintId=${this.state.maintenance.id}&updatedby=${activeUser}`, {
         method: 'get',
         headers: {
@@ -1832,8 +1857,9 @@ export default class Maintenance extends React.Component {
           break
       }
       if (filetype === 'excel') {
-        const pdfIndex = this.state.maintenance.incomingAttachments.findIndex(el => el.mime === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-        const file = this.state.maintenance.incomingAttachments[pdfIndex].data
+        const excelIndex = this.state.maintenance.incomingAttachments.findIndex(el => el.mime === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || el.mime === 'application/vnd.ms-excel')
+        const file = this.state.maintenance.incomingAttachments[excelIndex].data
+        const filename = this.state.maintenance.incomingAttachments[excelIndex].name
         let base64 = (file).replace(/_/g, '/')
         base64 = base64.replace(/-/g, '+')
         const base64Fixed = fixBase64(base64)
@@ -1854,6 +1880,7 @@ export default class Maintenance extends React.Component {
               cols: resp.cols,
               rows: resp.rows,
               openAttachmentModal: !this.state.openAttachmentModal,
+              currentAttachmentName: filename,
               currentAttachment: id || null
             })
           }
@@ -1861,6 +1888,7 @@ export default class Maintenance extends React.Component {
       } else if (filetype === 'pdf') {
         const pdfIndex = this.state.maintenance.incomingAttachments.findIndex(el => el.mime === 'application/pdf')
         const file = this.state.maintenance.incomingAttachments[pdfIndex].data
+        const filename = this.state.maintenance.incomingAttachments[pdfIndex].name
         let base64 = (file).replace(/_/g, '/')
         base64 = base64.replace(/-/g, '+')
         const base64Fixed = fixBase64(base64)
@@ -1874,17 +1902,22 @@ export default class Maintenance extends React.Component {
           pdfid: id,
           pdfB64: fileData,
           openAttachmentModal: !this.state.openAttachmentModal,
+          currentAttachmentName: filename,
           currentAttachment: id || null
         })
       } else if (filetype === 'html') {
         const htmlIndex = this.state.maintenance.incomingAttachments.findIndex(el => el.mime === 'text/html')
         const file = this.state.maintenance.incomingAttachments[htmlIndex].data
+        const filename = this.state.maintenance.incomingAttachments[htmlIndex].name
         let base64 = (file).replace(/_/g, '/')
         base64 = base64.replace(/-/g, '+')
-        const base64Fixed = fixBase64(base64)
         this.setState({
-          attachmentHTMLContent: atob(base64Fixed)
-        }) 
+          attachmentHTMLContent: atob(base64),
+          filetype: filetype,
+          currentAttachment: id || null,
+          currentAttachmentName: filename,
+          openAttachmentModal: !this.state.openAttachmentModal
+        })
       } else {
         cogoToast.warn('Filetype not supported', {
           position: 'top-right'
@@ -2499,7 +2532,7 @@ export default class Maintenance extends React.Component {
                       x: window.outerWidth / 2,
                       y: 25,
                       width: (window.outerWidth / 2) * 0.8,
-                      height: 600
+                      height: 610
                     }}
                     style={{
                       visibility: openReadModal ? 'visible' : 'hidden',
@@ -2550,17 +2583,6 @@ export default class Maintenance extends React.Component {
                             </InputGroupAddon>
                             <FormInput size='sm' disabled placeholder={this.state.maintenance.incomingDate} />
                           </InputGroup>
-                          {Array.isArray(this.state.maintenance.incomingAttachments) && this.state.maintenance.incomingAttachments.length !== 0
-                            ? this.state.maintenance.incomingAttachments.map((attachment, index) => {
-                              return (
-                                <Button pill size='sm' onClick={() => this.showAttachments(attachment.id, attachment.name)} theme='primary' style={{ marginLeft: '10px' }} key={index}>
-                                  {attachment.name}
-                                </Button>
-                              )
-                            })
-                            : (
-                              null
-                            )}
                         </div>
                         <ButtonGroup style={{ display: 'flex', flexDirection: 'column' }}>
                           <Button outline className='close-read-modal-btn' theme='light' style={{ borderRadius: '5px 5px 0 0', padding: '0.7em 0.9em' }} onClick={this.toggleReadModal}>
@@ -2573,6 +2595,19 @@ export default class Maintenance extends React.Component {
                             <FontAwesomeIcon width='1.8em' style={{ fontSize: '12px' }} className='translate-icon' icon={faLanguage} />
                           </Button>
                         </ButtonGroup>
+                        {Array.isArray(this.state.maintenance.incomingAttachments) && this.state.maintenance.incomingAttachments.length !== 0
+                          ? this.state.maintenance.incomingAttachments.map((attachment, index) => {
+                            return (
+                              <div style={{ flexGrow: '1', marginTop: '5px' }} key={index}>
+                                <Button pill size='sm' onClick={() => this.showAttachments(attachment.id, attachment.name)} theme='primary' style={{ marginLeft: '10px' }}>
+                                  {attachment.name}
+                                </Button>
+                              </div>
+                            )
+                          })
+                          : (
+                            null
+                          )}
                       </ModalHeader>
                       <ModalBody className='mail-body' dangerouslySetInnerHTML={{ __html: this.state.translated ? this.state.translatedBody : this.state.maintenance.incomingBody }} />
                     </div>
@@ -2587,12 +2622,13 @@ export default class Maintenance extends React.Component {
                       x: HALF_WIDTH,
                       y: 125,
                       width: this.state.filetype === 'pdf' ? '1100' : '520',
-                      height: this.state.filetype === 'pdf' ? '600' : '520'
+                      // height: this.state.filetype === 'pdf' ? '600' : '520'
+                      height: 'auto'
                     }}
                     style={{
                       visibility: this.state.openAttachmentModal ? 'visible' : 'hidden',
                       opacity: this.state.openAttachmentModal ? 1 : 0,
-                      background: '#var(--white)',
+                      backgroundColor: 'var(--primary-bg)',
                       overflow: 'hidden',
                       borderRadius: '15px',
                       height: 'auto',
@@ -2600,8 +2636,8 @@ export default class Maintenance extends React.Component {
                       width: this.state.filetype === 'pdf' ? '1100' : '400',
                       boxShadow: '0px 0px 20px 1px var(--dark)'
                     }}
-                    minWidth={500}
-                    minHeight={400}
+                    // minWidth={500}
+                    // minHeight={400}
                     bounds='window'
                     dragHandleClassName='modal-attachment-header-text'
                   >
@@ -2609,14 +2645,14 @@ export default class Maintenance extends React.Component {
                       <ModalHeader
                         className='modal-attachment-header-text'
                         style={{
-                          background: 'var(--secondary)',
+                          background: 'var(--fourth-bg)',
                           borderRadius: '0px',
                           color: 'var(--white)',
                           display: 'flex',
                           justifyContent: 'space-between'
                         }}
                       >
-                          Attachments
+                          {this.state.currentAttachmentName}
                         <Button outline className='close-attachment-modal-btn' theme='light' style={{ borderRadius: '5px', padding: '0.7em 0.9em' }} onClick={() => this.showAttachments(null)}>
                           <FontAwesomeIcon
                             className='close-attachment-modal-icon' width='1.5em' style={{ color: 'var(--light)', fontSize: '12px' }}
@@ -2624,7 +2660,7 @@ export default class Maintenance extends React.Component {
                           />
                         </Button>
                       </ModalHeader>
-                      <ModalBody style={this.state.filetype === 'pdf' ? { overflow: 'scroll', height: '450px' } : null}>
+                      <ModalBody style={this.state.filetype === 'pdf' ? { overflow: 'scroll', padding: '0', height: '450px' } : null}>
                         {this.state.filetype === 'excel'
                           // this.state.rows && this.state.cols
                           ? (
@@ -2634,13 +2670,15 @@ export default class Maintenance extends React.Component {
                           )}
                         {this.state.filetype === 'pdf'
                           ? (
-                            <PDF file={this.state.pdfB64} scale={1.75} />
+                            <div className='attachment-body'>
+                              <PDF file={this.state.pdfB64} scale={1.75} />
+                            </div>
                           ) : (
                             null
                           )}
                         {this.state.filetype === 'html'
                           ? (
-                            <ModalBody className='mail-body' dangerouslySetInnerHTML={this.state.attachmentHTMLContent} />
+                            <div className='attachment-body' dangerouslySetInnerHTML={{ __html: this.state.attachmentHTMLContent }} />
                           ) : (
                             null
                           )}
@@ -2927,6 +2965,10 @@ export default class Maintenance extends React.Component {
                   color: var(--font-color);
                   font-weight: 100 !important;
                 }
+                :global(.modal-attachment-header-text > .modal-title) {
+                  font-weight: 100 !important;
+                  font-family: Poppins, Roboto !important;
+                }
                 :global(.modal-incoming-header-text .input-group-prepend .input-group-text) {
                   background-color: #272727;
                 }
@@ -2940,6 +2982,9 @@ export default class Maintenance extends React.Component {
                   flex-grow: 1;
                   margin-right: 20px;
                   margin-top: 7px;
+                }
+                :global(.modal-read-header > .modal-title) {
+                  flex-wrap: wrap;
                 }
                 :global(.modal-read-header:hover) {
                   cursor: move;
@@ -3113,6 +3158,18 @@ export default class Maintenance extends React.Component {
                 :global(.modal-content) {
                   max-height: calc(${this.state.windowInnerHeight}px - 50px);
                 }
+                :global(.modal-attachment-header-text ~ .modal-body) {
+                  padding: 0px !important;
+                  margin: 2px !important;
+                }
+                :global(.attachment-body) {
+                  height: auto;
+                  padding: 30px;
+                  font-family: Poppins, Helvetica;
+                  background: var(--primary-bg);
+                  color: var(--font-color);
+                  overflow: ${this.state.incomingMailIsHtml ? 'scroll' : 'scroll'};
+                }
                 :global(.mail-body) {
                   font-family: Poppins, Helvetica;
                   height: ${this.state.readHeight ? `calc(${this.state.readHeight} - 127px)` : '460px'};
@@ -3120,9 +3177,11 @@ export default class Maintenance extends React.Component {
                   color: var(--font-color);
                   overflow-y: ${this.state.incomingMailIsHtml ? 'scroll' : 'scroll'};
                 }
+                :global(.mail-body > pre:first-child) {
+                  color: var(--font-color);
+                }
                 :global(.mail-body > div:first-child) {
                   position: ${this.state.incomingMailIsHtml ? 'relative' : 'absolute'};
-                  color: var(--font-color);
                   top: 0;
                   left: 0;
                   height: ${this.state.incomingMailIsHtml ? '100vh' : '100%'};
@@ -3183,6 +3242,10 @@ export default class Maintenance extends React.Component {
                 }
                 .modal-incoming-header-text > * {
                   color: var(--white);
+                }
+                :global(.modal-attachment-header-text ~ .modal-body) {
+                  background-color: var(--primary-bg);
+
                 }
                 :global(.modal-attachment-header-text:hover) {
                   cursor: move;
