@@ -2,6 +2,7 @@ import React from 'react'
 import App from 'next/app'
 import Head from 'next/head'
 import ErrorBoundary from '../src/components/errorboundary'
+import OfflineSupport from '../src/components/offlineSupport'
 import './style/app.css'
 import './style/theme.css'
 import 'bootstrap/dist/css/bootstrap.min.css'
@@ -51,6 +52,7 @@ export default class MyApp extends App {
           <meta name='msapplication-config' content='/static/images/favicon/browserconfig.xml' />
           <meta name='theme-color' content='#ffffff' />
         </Head>
+        <OfflineSupport />
         <Component {...pageProps} />
         <style jsx global>{`
           .navbar {

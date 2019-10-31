@@ -2349,15 +2349,16 @@ export default class Maintenance extends React.Component {
                                 <FormGroup className='form-group-toggle'>
                                   <Badge theme='light' outline>
                                     <label>
+                                      <div>Cancelled</div>
                                       <Toggle
                                         checked={maintenance.cancelled === 'false' ? false : !!maintenance.cancelled}
                                         onChange={(event) => this.handleToggleChange('cancelled', event)}
                                       />
-                                      <div style={{ marginTop: '10px' }}>Cancelled</div>
                                     </label>
                                   </Badge>
                                   <Badge theme='light' outline>
                                     <label>
+                                      <div>Emergency</div>
                                       <Toggle
                                         icons={{
                                           checked: <FontAwesomeIcon icon={faFirstAid} width='1em' style={{ color: 'var(--white)' }} />,
@@ -2366,16 +2367,15 @@ export default class Maintenance extends React.Component {
                                         checked={maintenance.emergency === 'false' ? false : !!maintenance.emergency}
                                         onChange={(event) => this.handleToggleChange('emergency', event)}
                                       />
-                                      <div style={{ marginTop: '10px' }}>Emergency</div>
                                     </label>
                                   </Badge>
                                   <Badge theme='secondary' outline>
                                     <label>
+                                      <div>Done</div>
                                       <Toggle
                                         checked={maintenance.done === 'false' ? false : !!maintenance.done}
                                         onChange={(event) => this.handleToggleChange('done', event)}
                                       />
-                                      <div style={{ marginTop: '10px' }}>Done</div>
                                     </label>
                                   </Badge>
                                 </FormGroup>
@@ -2595,19 +2595,19 @@ export default class Maintenance extends React.Component {
                             <FontAwesomeIcon width='1.8em' style={{ fontSize: '12px' }} className='translate-icon' icon={faLanguage} />
                           </Button>
                         </ButtonGroup>
-                        {Array.isArray(this.state.maintenance.incomingAttachments) && this.state.maintenance.incomingAttachments.length !== 0
-                          ? this.state.maintenance.incomingAttachments.map((attachment, index) => {
-                            return (
-                              <div style={{ flexGrow: '1', marginTop: '5px' }} key={index}>
-                                <Button pill size='sm' onClick={() => this.showAttachments(attachment.id, attachment.name)} theme='primary' style={{ marginLeft: '10px' }}>
+                        <div style={{ flexGrow: Array.isArray(this.state.maintenance.incomingAttachments) ? '1' : '0', marginTop: '5px' }}>
+                          {Array.isArray(this.state.maintenance.incomingAttachments) && this.state.maintenance.incomingAttachments.length !== 0
+                            ? this.state.maintenance.incomingAttachments.map((attachment, index) => {
+                              return (
+                                <Button pill size='sm' onClick={() => this.showAttachments(attachment.id, attachment.name)} theme='primary' style={{ marginLeft: '10px' }} key={index}>
                                   {attachment.name}
                                 </Button>
-                              </div>
-                            )
-                          })
-                          : (
-                            null
-                          )}
+                              )
+                            })
+                            : (
+                              null
+                            )}
+                        </div>
                       </ModalHeader>
                       <ModalBody className='mail-body' dangerouslySetInnerHTML={{ __html: this.state.translated ? this.state.translatedBody : this.state.maintenance.incomingBody }} />
                     </div>
@@ -2664,7 +2664,9 @@ export default class Maintenance extends React.Component {
                         {this.state.filetype === 'excel'
                           // this.state.rows && this.state.cols
                           ? (
-                            <OutTable data={this.state.rows} columns={this.state.cols} tableClassName='ExcelTable2007' tableHeaderRowClass='heading' />
+                            <div className='attachment-body'>
+                              <OutTable data={this.state.rows} columns={this.state.cols} tableClassName='ExcelTable2007' tableHeaderRowClass='heading' />
+                            </div>
                           ) : (
                             null
                           )}
@@ -3089,10 +3091,16 @@ export default class Maintenance extends React.Component {
                   border-radius: 0.325rem;
                   margin: 10px 0;
                 }
-                :global(.form-group-toggle > label) {
+                :global(.form-group-toggle label) {
                   display: flex;
-                  flex-direction: column;
+                  justify-content: space-evenly;
                   align-items: center;
+                  height: 30px;
+                }
+                :global(.form-group-toggle > .badge) {
+                  flex-grow: 1;
+                  margin-left: 5px;
+                  margin-right: 5px;
                 }
                 :global(.form-group-toggle) {
                   display: flex;
