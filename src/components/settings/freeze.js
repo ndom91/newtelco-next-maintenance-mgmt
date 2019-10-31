@@ -17,7 +17,6 @@ import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-material.css'
 import {
   CardTitle,
-  Badge,
   Button,
   ButtonGroup,
   Container,
@@ -27,7 +26,6 @@ import {
   ModalHeader,
   ModalBody,
   FormGroup,
-  FormInput,
   FormTextarea
 } from 'shards-react'
 

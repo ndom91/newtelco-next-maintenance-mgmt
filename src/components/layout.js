@@ -11,7 +11,8 @@ import {
   Modal,
   ModalHeader,
   ModalBody,
-  Badge
+  Badge,
+  Button
 } from 'shards-react'
 
 export default class Layout extends React.Component {
@@ -20,16 +21,59 @@ export default class Layout extends React.Component {
     const nightTrue = this.props.night === 'true'
     this.state = {
       openHelpModal: false,
+      openA2HSModal: false,
+      deferredPrompt: null,
       night: nightTrue || false
     }
     this.handleSignOutSubmit = this.handleSignOutSubmit.bind(this)
     this.toggleHelpModal = this.toggleHelpModal.bind(this)
+    this.toggleA2HSModal = this.toggleA2HSModal.bind(this)
+    this.addToHomescreen = this.addToHomescreen.bind(this)
   }
 
   componentDidMount () {
     const night = window.localStorage.getItem('theme')
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      // Prevent Chrome 67 and earlier from automatically showing the prompt
+      e.preventDefault()
+      // Stash the event so it can be triggered later.
+      this.setState({
+        openA2HSModal: !this.state.openA2HSModal,
+        deferredPrompt: e
+      })
+    })
+
     this.setState({
       night: night === 'dark'
+    })
+  }
+
+  toggleA2HSModal () {
+    this.setState({
+      openA2HSModal: !this.state.openA2HSModal
+    })
+  }
+
+  addToHomescreen () {
+    this.state.deferredPrompt.prompt()
+    // Wait for the user to respond to the prompt
+    this.state.deferredPrompt.userChoice.then((choiceResult) => {
+      console.log(choiceResult)
+      if (choiceResult.outcome === 'accepted') {
+        console.log('User accepted the A2HS prompt')
+      } else {
+        console.log('User dismissed the AA2HS prompt')
+        const a2hsDismisCount = window.localStorage.getItem('a2hs')
+        if (!a2hsDismisCount) {
+          window.localStorage.setItem('a2hs', 0)
+        }
+        window.localStorage.setItem('a2hs', a2hsDismisCount + 1)
+      }
+      this.setState({
+        deferredPrompt: null,
+        openA2HSModal: !this.state.openA2HSModal
+      })
     })
   }
 
@@ -66,7 +110,8 @@ export default class Layout extends React.Component {
 
   render () {
     const {
-      openHelpModal
+      openHelpModal,
+      openA2HSModal
     } = this.state
 
     const keyMap = {
@@ -99,6 +144,19 @@ export default class Layout extends React.Component {
                 {this.props.children}
               </Col>
             </Row>
+            <Modal className='a2hs-modal' backdropClassName='a2hs-modal-backdrop' animation backdrop size='md' open={openA2HSModal} toggle={this.toggleA2HSModal} style={{ marginTop: '75px' }}>
+              <ModalHeader className='keyboard-shortcut-header'>
+                Save Application
+              </ModalHeader>
+              <ModalBody className='keyboard-shortcut-body'>
+                <Container className='keyboard-shortcut-container'>
+                  Do you want to save this app to the homescreen?
+                  <Button style={{ width: '100%', marginTop: '20px' }} onClick={this.addToHomescreen} className='a2hs-btn'>
+                    Add to Homescreen
+                  </Button>
+                </Container>
+              </ModalBody>
+            </Modal>
             <Modal backdropClassName='modal-backdrop' animation backdrop size='md' open={openHelpModal} toggle={this.toggleHelpModal} style={{ marginTop: '75px' }}>
               <ModalHeader className='keyboard-shortcut-header'>
                 Keyboard Shortcuts
@@ -308,6 +366,16 @@ export default class Layout extends React.Component {
                 border-radius: 10px;
                 -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.2);
                 background-color: rgba(0,0,0,0.4);
+              }
+              :global(.a2hs-modal-backdrop) {
+                opacity: 0.9 !important;
+                background-color: #212529 !important;
+               }
+              :global(.a2hs-modal) {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 96%;
               }
               @media only screen and (min-width: 1024px) {
                 :global(div.toplevel-col) {

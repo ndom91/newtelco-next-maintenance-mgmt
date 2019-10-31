@@ -276,6 +276,8 @@ class Header extends React.Component {
             @media only screen and (max-width: 500px) {
               :global(#search-group) {
                 margin: 10px 0;
+                display: flex;
+                justify-content: space-between;
               }
               :global(.logout-btn) {
               }
@@ -283,14 +285,18 @@ class Header extends React.Component {
                 display: flex;
                 justify-content: flex-end;
               }
+              :global(#signout button) {
+                margin-bottom: 4px;
+              }
               :global(#signout) {
+                position: absolute;
+                top: 0;
+                right: 0;
                 text-align: center;
                 border: 2px solid #67B246;
                 padding: 4px;
                 width: 42px;
-                margin-left: 17px;
                 border-radius: 10px;
-                box-shadow: 0 0 10px 1px #67B246;
               }
               :global(#aa-search-input) {
                 padding-left: 40px !important;
@@ -299,7 +305,6 @@ class Header extends React.Component {
                 color: var(--font-color);
                 border: 2px solid #67B246;
                 cursor: text;
-                box-shadow: 0 0 5px 2px rgba(103, 178, 70, 0.54);
                 transition-delay: 0s !important;
               }
               :global(.input-group-text) {

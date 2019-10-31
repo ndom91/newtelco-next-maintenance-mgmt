@@ -49,8 +49,24 @@ export default class MyApp extends App {
           <link rel='icon' type='image/png' sizes='16x16' href='/static/images/favicon/favicon-16x16.png' />
           <link rel='mask-icon' href='/static/images/favicon/safari-pinned-tab.svg' color='#5bbad5' />
           <meta name='msapplication-TileColor' content='#603cba' />
-          <meta name='msapplication-config' content='/static/images/favicon/browserconfig.xml' />
           <meta name='theme-color' content='#ffffff' />
+          <meta name='application-name' content='Newtelco Maintenance' />
+          <meta name='apple-mobile-web-app-capable' content='yes' />
+          <meta name='apple-mobile-web-app-status-bar-style' content='default' />
+          <meta name='apple-mobile-web-app-title' content='Newtelco Maintenance' />
+          <meta name='description' content='Newtelco Maintenance Management' />
+          <meta name='format-detection' content='telephone=no' />
+          <meta name='mobile-web-app-capable' content='yes' />
+          <meta name='msapplication-TileColor' content='#2B5797' />
+          <meta name='msapplication-tap-highlight' content='no' />
+          <meta name='theme-color' content='#000000' />
+          <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no, user-scalable=no, viewport-fit=cover' />
+          <link rel='apple-touch-icon' sizes='180x180' href='/static/images/favicon/apple-touch-icon.png' />
+          <link rel='icon' type='image/png' sizes='32x32' href='/static/images/favicon/favicon-32x32.png' />
+          <link rel='icon' type='image/png' sizes='16x16' href='/static/images/favicon/favicon-16x16.png' />
+          <link rel='manifest' href='/manifest.json' />
+          <link rel='mask-icon' href='/static/icons/safari-pinned-tab.svg' color='#5bbad5' />
+          <link rel='shortcut icon' href='/static/images/favicon/favicon.ico' />
         </Head>
         <OfflineSupport />
         <Component {...pageProps} />

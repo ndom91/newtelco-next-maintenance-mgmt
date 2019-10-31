@@ -175,7 +175,7 @@ export default class Index extends React.Component {
                     )
                   }, this)}
                 </Row>
-                <Row style={{ width: '90vw', padding: '50px' }}>
+                <Row className='heatmap-row' style={{ width: '90vw', padding: '50px' }}>
                   <Col>
                     <div
                       style={{ width: '100%' }}
@@ -210,7 +210,7 @@ export default class Index extends React.Component {
               :global(.card-container) {
                 flex-wrap: wrap;
               }
-              :global(.card-container > div) {
+              :global(.card-container div.col) {
                 margin: 20px 0;
               }
               :global(.card-badge) {
@@ -230,6 +230,9 @@ export default class Index extends React.Component {
                 top: 50px !important;
                 left: 12% !important;
                 width: 76px !important;
+              }
+              :global(.heatmap-row) {
+                padding: 0px !important;
               }
             }
             :global(.break) {

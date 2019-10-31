@@ -3,17 +3,17 @@
   "name": "Newtelco Maintenance",
   "icons": [
     {
-      "src": "/images/icons/nt-128.png",
+      "src": "/static/images/favicon/mstile-150x150.png",
       "type": "image/png",
-      "sizes": "128x128"
+      "sizes": "150x150"
     },
     {
-      "src": "/images/icons/nt-256.png",
+      "src": "/static/images/favicon/android-chrome-192x192.png",
       "type": "image/png",
-      "sizes": "256x256"
+      "sizes": "192x192"
     },
     {
-      "src": "/images/icons/icons-512.png",
+      "src": "/static/images/favicon/android-chrome-512x512.png",
       "type": "image/png",
       "sizes": "512x512"
     }
