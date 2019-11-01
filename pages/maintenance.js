@@ -3044,6 +3044,9 @@ export default class Maintenance extends React.Component {
                 :global(.container) {
                   padding: 15px;
                 }
+                :global(.ag-theme-material .ag-row-selected) {
+                  background-color: #67b2461f !important;
+                }
                 .mail-icon {
                   min-width: 110px;
                   height: 110px;
