@@ -34,15 +34,20 @@ export default class Layout extends React.Component {
   componentDidMount () {
     const night = window.localStorage.getItem('theme')
 
-    window.addEventListener('beforeinstallprompt', (e) => {
-      // Prevent Chrome 67 and earlier from automatically showing the prompt
-      e.preventDefault()
-      // Stash the event so it can be triggered later.
-      this.setState({
-        openA2HSModal: !this.state.openA2HSModal,
-        deferredPrompt: e
+    if (window.outerWidth < 500) {
+      window.addEventListener('beforeinstallprompt', (e) => {
+        // Prevent Chrome 67 and earlier from automatically showing the prompt
+        e.preventDefault()
+        // Stash the event so it can be triggered later.
+        this.setState({
+          openA2HSModal: !this.state.openA2HSModal,
+          deferredPrompt: e
+        })
       })
-    })
+    }
+
+    var el = document.querySelector('html')
+    el.setAttribute('data-theme', night)
 
     this.setState({
       night: night === 'dark'
@@ -374,7 +379,7 @@ export default class Layout extends React.Component {
               :global(.a2hs-modal) {
                 position: absolute;
                 bottom: 0;
-                left: 0;
+                left: 50%;
                 width: 96%;
               }
               @media only screen and (min-width: 1024px) {
@@ -387,6 +392,9 @@ export default class Layout extends React.Component {
                 :global(div.toplevel-col) {
                   flex: 1;
                   margin: 0;
+                }
+                :global(.a2hs-modal) {
+                  left: 0;
                 }
               }
             `}
