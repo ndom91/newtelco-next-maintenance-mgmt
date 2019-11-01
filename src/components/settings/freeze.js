@@ -11,7 +11,8 @@ import Flatpickr from 'react-flatpickr'
 import moment from 'moment-timezone'
 import 'flatpickr/dist/themes/material_blue.css'
 import {
-  faPlusCircle
+  faPlusCircle,
+  faTrash
 } from '@fortawesome/free-solid-svg-icons'
 import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-material.css'
@@ -252,12 +253,12 @@ export default class Freeze extends React.Component {
           })
         }
         const newRowData = this.state.rowData
-        newRowData.push({ id: insertId, name: newCompany.label, startdatetime: newStartDateTime, enddatetime: newEndDateTime, notes: newNotes })
+        newRowData.push({ id: insertId, name: newCompany.label, companyId: newCompany.value, startDateTime: newStartDateTime, endDateTime: newEndDateTime, notes: newNotes })
         this.setState({
           rowData: newRowData,
           openFreezeAdd: !this.state.openFreezeAdd
         })
-        window.gridApi.refreshCells()
+        window.gridApi.setRowData(newRowData)
       })
       .catch(err => console.error(err))
   }
@@ -306,10 +307,16 @@ export default class Freeze extends React.Component {
         <HotKeys keyMap={keyMap} handlers={handlers}>
           <CardTitle>
             <span className='section-title'>Network Freezes</span>
-            <Button onClick={this.toggleFreezeAddModal} outline theme='primary'>
-              <FontAwesomeIcon width='1.125em' style={{ marginRight: '10px' }} icon={faPlusCircle} />
-              Add
-            </Button>
+            <ButtonGroup>
+              <Button onClick={this.toggleFreezeAddModal} outline theme='primary'>
+                <FontAwesomeIcon width='1.125em' style={{ marginRight: '10px' }} icon={faPlusCircle} />
+                Add
+              </Button>
+              <Button onClick={this.toggleFreezeDeleteModal} theme='primary'>
+                <FontAwesomeIcon width='1.125em' style={{ marginRight: '10px' }} icon={faTrash} />
+                Delete
+              </Button>
+            </ButtonGroup>
           </CardTitle>
           <div className='table-wrapper'>
             <div
@@ -326,6 +333,10 @@ export default class Freeze extends React.Component {
                 onCellEditingStopped={this.handleCellEdit}
                 rowData={this.state.rowData}
                 stopEditingWhenGridLosesFocus
+                deltaRowDataMode
+                getRowNodeId={(data) => {
+                  return data.id
+                }}
                 onFirstDataRendered={this.onFirstDataRendered.bind(this)}
               />
             </div>
@@ -344,6 +355,7 @@ export default class Freeze extends React.Component {
                       </label>
                       <Select
                         value={newCompany}
+                        className='company-select'
                         onChange={this.handleCompanyChange}
                         options={this.state.companySelections}
                         noOptionsMessage={() => 'No Companies Available'}
@@ -396,7 +408,7 @@ export default class Freeze extends React.Component {
             <ModalHeader className='modal-delete-header'>
               Confirm Delete
             </ModalHeader>
-            <ModalBody className='mail-body'>
+            <ModalBody className='modal-body'>
               <Container className='container-border'>
                 <Row>
                   <Col>
@@ -427,6 +439,7 @@ export default class Freeze extends React.Component {
               }
               :global(.modal-body) {
                 background-color: var(--primary-bg);
+                color: var(--font-color);
               }
               :global(.modal-header) {
                 background: var(--secondary-bg);
@@ -458,6 +471,36 @@ export default class Freeze extends React.Component {
                 border-radius: .375rem;
                 box-shadow: none;
                 transition: box-shadow 250ms cubic-bezier(.27,.01,.38,1.06),border 250ms cubic-bezier(.27,.01,.38,1.06);
+              }
+              :global(.company-select [class$='-placeholder']) {
+                color: var(--border-color) !important;
+              }
+              :global(.company-select *) {
+                background-color: var(--input);
+                color: var(--font-color) !important;
+              }
+              :global(.company-select div[class$="-multiValue"]) {
+                background-color: var(--input);
+                color: var(--font-color);
+              }
+              :global(.company-select div[class$="-singleValue"]) {
+                background-color: var(--input);
+                color: var(--font-color);
+              }
+              :global(.form-group textarea:focus) {
+                background-color: var(--primary-bg);
+                color: var(--font-color);
+              }
+              :global(.form-group textarea) {
+                background-color: var(--primary-bg);
+                color: var(--font-color);
+              }
+              :global(.form-group label) {
+                color: var(--font-color);
+              }
+              :global(.form-group input) {
+                background-color: var(--primary-bg);
+                color: var(--font-color);
               }
               :global(.flatpickr-months) {
                 background: #67B246 !important;

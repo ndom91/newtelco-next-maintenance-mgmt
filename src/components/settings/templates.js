@@ -13,7 +13,7 @@ import {
   CardHeader,
   Badge,
   Button,
-  Container,
+  Container
 } from 'shards-react'
 
 export default class Templates extends React.Component {
@@ -119,7 +119,8 @@ export default class Templates extends React.Component {
                   toolbar:
                     `undo redo | formatselect | bold italic backcolor | 
                     alignleft aligncenter alignright alignjustify | 
-                    bullist numlist outdent indent | removeformat | help`
+                    bullist numlist outdent indent | removeformat | help`,
+                  content_style: 'html { color: #828282 }'
                 }}
                 onChange={this.handleCalChange}
               />
@@ -152,9 +153,36 @@ export default class Templates extends React.Component {
               justify-content: space-between;
               align-items: center;
             }
-            :global(.ag-cell.ag-cell-inline-editing) {
-              padding: 10px !important;
-              height: inherit !important;
+            :global(.tox .tox-tbtn svg) {
+              fill: var(--font-color) !important;
+            }
+            :global(.tox .tox-tbtn) {
+              color: var(--font-color) !important;
+            }
+            :global(.tox .tox-tbtn:hover:not(.tox-tbtn--disabled)) {
+              background: var(--secondary-bg) !important;
+              color: var(--inv-font-color) !important;
+            }
+            :global(.tox .tox-edit-area__iframe *) {
+              color: var(--font-color) !important;
+            }
+            :global(#tinymce) {
+              color: var(--font-color) !important;
+            }
+            :global(.tox .tox-edit-area__iframe) {
+              background-color: var(--primary-bg) !important;
+            }
+            :global(.tox-toolbar__group) {
+              border-right: none !important;
+            }
+            :global(.tox-tinymce) {
+              border-radius: 5px !important;
+            }
+            :global(.tox-toolbar) {
+              background: none !important;
+            }
+            :global(.tox-edit-area__iframe *) {
+              color: #fff;
             }
           `}
         </style>

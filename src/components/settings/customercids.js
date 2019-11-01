@@ -13,7 +13,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
   faPlusCircle,
   faLock,
-  faLockOpen
+  faLockOpen,
+  faTrash
 } from '@fortawesome/free-solid-svg-icons'
 import {
   CardTitle,
@@ -56,7 +57,7 @@ export default class CustomerCIDs extends React.Component {
           {
             headerName: 'ID',
             field: 'id',
-            width: 200,
+            width: 60,
             editable: false
           },
           {
@@ -80,8 +81,14 @@ export default class CustomerCIDs extends React.Component {
           {
             headerName: 'Protected',
             field: 'protected',
-            width: 200,
-            cellRenderer: 'protectedIcon'
+            width: 80,
+            cellRenderer: 'protectedIcon',
+            cellStyle: {
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              height: '100%'
+            }
           }
         ],
         rowSelection: 'single',
@@ -254,17 +261,23 @@ export default class CustomerCIDs extends React.Component {
           })
         }
         const newRowData = this.state.rowData
+        const newProtectionValue = newProtection ? '1' : '0'
         newRowData.push({
           id: insertId,
           derenCID: newSupplierSelection.label,
           kundenCID: newNewtelcoCid,
           name: newCompanySelection.label,
-          protected: newProtection
+          protected: newProtectionValue || '0'
         })
         this.setState({
           rowData: newRowData,
-          openCustomerCidAdd: !this.state.openCustomerCidAdd
+          openCustomerCidAdd: !this.state.openCustomerCidAdd,
+          newCompanySelection: [],
+          newNewtelcoCid: '',
+          newProtection: '',
+          newSupplierSelection: []
         })
+        window.gridApi.setRowData(newRowData)
       })
       .catch(err => console.error(err))
   }
@@ -315,10 +328,16 @@ export default class CustomerCIDs extends React.Component {
         <HotKeys keyMap={keyMap} handlers={handlers}>
           <CardTitle>
             <span className='section-title'>Customer CIDs</span>
-            <Button onClick={this.toggleCustomerCidAdd} outline theme='primary'>
-              <FontAwesomeIcon width='1.125em' style={{ marginRight: '10px' }} icon={faPlusCircle} />
-              Add
-            </Button>
+            <ButtonGroup>
+              <Button onClick={this.toggleCustomerCidAdd} theme='primary'>
+                <FontAwesomeIcon width='1.125em' style={{ marginRight: '10px' }} icon={faPlusCircle} />
+                Add
+              </Button>
+              <Button onClick={this.toggleCustomerCidDeleteModal} outline theme='primary'>
+                <FontAwesomeIcon width='1.125em' style={{ marginRight: '10px' }} icon={faTrash} />
+                Delete
+              </Button>
+            </ButtonGroup>
           </CardTitle>
           <div className='table-wrapper'>
             <div
@@ -334,12 +353,16 @@ export default class CustomerCIDs extends React.Component {
                 rowData={this.state.rowData}
                 onCellEditingStopped={this.handleCellEdit}
                 animateRows
+                deltaRowDataMode
+                getRowNodeId={(data) => {
+                  return data.id
+                }}
                 stopEditingWhenGridLosesFocus
                 onFirstDataRendered={this.onFirstDataRendered.bind(this)}
               />
             </div>
           </div>
-          <Modal className='modal-body' animation backdrop backdropClassName='modal-backdrop' open={this.state.openCustomerCidAdd} size='md' toggle={this.toggleCustomerCidAdd}>
+          <Modal animation backdrop backdropClassName='modal-backdrop' open={this.state.openCustomerCidAdd} size='md' toggle={this.toggleCustomerCidAdd}>
             <ModalHeader>
               New Customer CID
             </ModalHeader>
@@ -359,6 +382,7 @@ export default class CustomerCIDs extends React.Component {
                       </label>
                       <Select
                         value={newCompanySelection}
+                        className='company-select'
                         onChange={this.handleCompanyChange}
                         options={this.state.companySelections}
                         noOptionsMessage={() => 'No Companies Available'}
@@ -371,6 +395,7 @@ export default class CustomerCIDs extends React.Component {
                       </label>
                       <Select
                         value={newSupplierSelection}
+                        className='company-select'
                         onChange={this.handleSupplierCidChange}
                         options={this.state.supplierSelections}
                         noOptionsMessage={() => 'No Supplier CIDs Available'}
@@ -407,7 +432,7 @@ export default class CustomerCIDs extends React.Component {
             <ModalHeader className='modal-delete-header'>
               Confirm Delete
             </ModalHeader>
-            <ModalBody className='mail-body'>
+            <ModalBody className='modal-body'>
               <Container className='container-border'>
                 <Row>
                   <Col>
@@ -438,6 +463,23 @@ export default class CustomerCIDs extends React.Component {
                 justify-content: space-between;
                 margin-top: 25px;
               }
+              :global(.container-border) {
+                border: 1px solid var(--light);
+                border-radius: 0.325rem;
+                margin: 10px 0;
+                padding: 1.5rem;
+              }
+              :global(.modal-body) {
+                background-color: var(--primary-bg);
+                color: var(--font-color);
+              }
+              :global(.modal-header) {
+                background: var(--secondary-bg);
+                color: var(--font-color);
+                display: flex;
+                justify-content: flex-start;
+                align-content: center;
+              }
               :global(.card-title) {
                 display: flex;
                 justify-content: space-between;
@@ -447,17 +489,39 @@ export default class CustomerCIDs extends React.Component {
                 padding: 10px !important;
                 height: inherit !important;
               }
-              :global(.container-border) {
-                border: 1px solid var(--light);
-                border-radius: 0.325rem;
-                margin: 10px 0;
-                padding: 1.5rem;
+              :global(.company-select [class$='-placeholder']) {
+                color: var(--border-color) !important;
               }
-              :global(.modal-header) {
-                background: var(--light);
-                display: flex;
-                justify-content: flex-start;
-                align-content: center;
+              :global(.company-select *) {
+                background-color: var(--input);
+                color: var(--font-color) !important;
+              }
+              :global(.company-select div[class$="-multiValue"]) {
+                background-color: var(--input);
+                color: var(--font-color);
+              }
+              :global(.company-select div[class$="-singleValue"]) {
+                background-color: var(--input);
+                color: var(--font-color);
+              }
+              :global(.form-group textarea:focus) {
+                background-color: var(--primary-bg);
+                color: var(--font-color);
+              }
+              :global(.form-group textarea) {
+                background-color: var(--primary-bg);
+                color: var(--font-color);
+              }
+              :global(.form-group label) {
+                color: var(--font-color);
+              }
+              :global(.form-group input:focus) {
+                background-color: var(--primary-bg);
+                color: var(--font-color);
+              }
+              :global(.form-group input) {
+                background-color: var(--primary-bg);
+                color: var(--font-color);
               }
             `}
           </style>

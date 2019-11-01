@@ -7,7 +7,8 @@ import 'ag-grid-community/dist/styles/ag-theme-material.css'
 import { HotKeys } from 'react-hotkeys'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
-  faPlusCircle
+  faPlusCircle,
+  faTrash
 } from '@fortawesome/free-solid-svg-icons'
 import {
   CardTitle,
@@ -50,24 +51,23 @@ export default class Companies extends React.Component {
           {
             headerName: 'ID',
             field: 'id',
-            width: 200,
+            width: 60,
             editable: false
           },
           {
             headerName: 'Domain',
             field: 'mailDomain',
-            width: 200
+            width: 100
           },
           {
             headerName: 'Company',
             field: 'name',
-            width: 200,
+            width: 100,
             sort: { direction: 'desc' }
           },
           {
             headerName: 'Recipient',
-            field: 'maintenanceRecipient',
-            width: 200
+            field: 'maintenanceRecipient'
           }
         ],
         rowSelection: 'single'
@@ -209,6 +209,7 @@ export default class Companies extends React.Component {
           rowData: newRowData,
           openCompanyModal: !this.state.openCompanyModal
         })
+        window.gridApi.setRowData(newRowData)
       })
       .catch(err => console.error(err))
   }
@@ -259,10 +260,16 @@ export default class Companies extends React.Component {
         <HotKeys keyMap={keyMap} handlers={handlers}>
           <CardTitle>
             <span className='section-title'>Companies</span>
-            <Button onClick={this.toggleCompanyAdd} outline theme='primary'>
-              <FontAwesomeIcon width='1.125em' style={{ marginRight: '10px' }} icon={faPlusCircle} />
-              Add
-            </Button>
+            <ButtonGroup>
+              <Button onClick={this.toggleCompanyAdd} outline theme='primary'>
+                <FontAwesomeIcon width='1.125em' style={{ marginRight: '10px' }} icon={faPlusCircle} />
+                Add
+              </Button>
+              <Button onClick={this.toggleCompanyDeleteModal} theme='primary'>
+                <FontAwesomeIcon width='1.125em' style={{ marginRight: '10px' }} icon={faTrash} />
+                Delete
+              </Button>
+            </ButtonGroup>
           </CardTitle>
           <div className='table-wrapper'>
             <div
@@ -279,11 +286,15 @@ export default class Companies extends React.Component {
                 onCellEditingStopped={this.handleCellEdit}
                 animateRows
                 stopEditingWhenGridLosesFocus
+                deltaRowDataMode
+                getRowNodeId={(data) => {
+                  return data.id
+                }}
                 onFirstDataRendered={this.onFirstDataRendered.bind(this)}
               />
             </div>
           </div>
-          <Modal className='modal-body' animation backdrop backdropClassName='modal-backdrop' open={this.state.openCompanyModal} size='md' toggle={this.toggleCompanyAdd}>
+          <Modal animation backdrop backdropClassName='modal-backdrop' open={this.state.openCompanyModal} size='md' toggle={this.toggleCompanyAdd}>
             <ModalHeader>
               New Company
             </ModalHeader>
@@ -305,7 +316,7 @@ export default class Companies extends React.Component {
                     </FormGroup>
                     <FormGroup>
                       <label style={{ display: 'flex', justifyContent: 'space-between' }} htmlFor='selectCompany'>
-                        Recipient <Badge outline theme='primary'>separate multiple via semicolon `;`</Badge>
+                        Recipient <Badge outline theme='primary'>separate multiple via semicolon <b style={{ fontWeight: '900' }}>(;)</b></Badge>
                       </label>
                       <FormInput id='updated-by' name='updated-by' type='text' value={newRecipient} onChange={this.handleRecipientChange} />
                     </FormGroup>
@@ -325,7 +336,7 @@ export default class Companies extends React.Component {
             <ModalHeader className='modal-delete-header'>
               Confirm Delete
             </ModalHeader>
-            <ModalBody className='mail-body'>
+            <ModalBody className='modal-body'>
               <Container className='container-border'>
                 <Row>
                   <Col>
@@ -354,20 +365,28 @@ export default class Companies extends React.Component {
               :global(.delete-modal) {
                 margin-top: 50px;
               }
-              :global(.modal-title) {
-                font-size: 42px;
-              }
-              :global(.modal-body) {
-                padding: 1rem;
-              }
               :global(.container-border) {
                 border: 1px solid var(--light);
                 border-radius: 0.325rem;
                 margin: 10px 0;
                 padding: 1.5rem;
               }
+              :global(.card-title) {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+              }
+              :global(.ag-cell.ag-cell-inline-editing) {
+                padding: 10px !important;
+                height: inherit !important;
+              }
+              :global(.modal-body) {
+                background-color: var(--primary-bg);
+                color: var(--font-color);
+              }
               :global(.modal-header) {
-                background: var(--light);
+                background: var(--secondary-bg);
+                color: var(--font-color);
                 display: flex;
                 justify-content: flex-start;
                 align-content: center;
@@ -380,6 +399,55 @@ export default class Companies extends React.Component {
               :global(.ag-cell.ag-cell-inline-editing) {
                 padding: 10px !important;
                 height: inherit !important;
+              }
+              :global(.flatpickr) {
+                height: auto;
+                width: 100%;
+                padding: .5rem 1rem;
+                font-size: .95rem;
+                line-height: 1.5;
+                color: #495057;
+                background-color: var(--white);
+                border: 1px solid #becad6;
+                font-weight: 300;
+                will-change: border-color,box-shadow;
+                border-radius: .375rem;
+                box-shadow: none;
+                transition: box-shadow 250ms cubic-bezier(.27,.01,.38,1.06),border 250ms cubic-bezier(.27,.01,.38,1.06);
+              }
+              :global(.company-select [class$='-placeholder']) {
+                color: var(--border-color) !important;
+              }
+              :global(.company-select *) {
+                background-color: var(--input);
+                color: var(--font-color) !important;
+              }
+              :global(.company-select div[class$="-multiValue"]) {
+                background-color: var(--input);
+                color: var(--font-color);
+              }
+              :global(.company-select div[class$="-singleValue"]) {
+                background-color: var(--input);
+                color: var(--font-color);
+              }
+              :global(.form-group textarea:focus) {
+                background-color: var(--primary-bg);
+                color: var(--font-color);
+              }
+              :global(.form-group textarea) {
+                background-color: var(--primary-bg);
+                color: var(--font-color);
+              }
+              :global(.form-group label) {
+                color: var(--font-color);
+              }
+              :global(.form-group input:focus) {
+                background-color: var(--primary-bg);
+                color: var(--font-color);
+              }
+              :global(.form-group input) {
+                background-color: var(--primary-bg);
+                color: var(--font-color);
               }
             `}
           </style>

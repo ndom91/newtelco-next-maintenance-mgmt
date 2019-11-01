@@ -49,7 +49,8 @@ import {
   faSearch,
   faHistory,
   faMailBulk,
-  faCheck
+  faCheck,
+  faCalendarCheck
 } from '@fortawesome/free-solid-svg-icons'
 import {
   faCalendarAlt,
@@ -139,7 +140,8 @@ export default class Maintenance extends React.Component {
         impact: '',
         location: '',
         reason: '',
-        mailId: 'NT'
+        mailId: 'NT',
+        calendarId: this.props.jsonData.profile.calendarId
       },
       attachmentModalSize: {
         width: 673,
@@ -350,6 +352,7 @@ export default class Maintenance extends React.Component {
     this.handleToggleChange = this.handleToggleChange.bind(this)
     this.handleRescheduleReasonChange = this.handleRescheduleReasonChange.bind(this)
     this.mailSubjectText = this.mailSubjectText.bind(this)
+    this.moveCalendarEntry = this.moveCalendarEntry.bind(this)
   }
 
   componentDidMount () {
@@ -526,6 +529,21 @@ export default class Maintenance extends React.Component {
             <FontAwesomeIcon width='1.325em' icon={row.data.sent === 1 ? faCheck : faTimesCircle} />
           </Tooltip>
         </Button>
+        <Button onClick={() => this.moveCalendarEntry(row.data.startDateTime, row.data.endDateTime, row.data.rcounter)} style={{ padding: '0.7em' }} size='sm' outline>
+          <Tooltip
+            title='Move Calendar Entry'
+            position='top'
+            trigger='mouseenter'
+            delay='250'
+            distance='25'
+            interactiveBorder='15'
+            arrow
+            size='small'
+            theme='transparent'
+          >
+            <FontAwesomeIcon width='1.325em' icon={faCalendarCheck} />
+          </Tooltip>
+        </Button>
       </ButtonGroup>
     )
   }
@@ -533,7 +551,7 @@ export default class Maintenance extends React.Component {
   sendMailBtns = (row) => {
     return (
       <ButtonGroup>
-        <Button onClick={() => this.prepareDirectSend(row.data.maintenanceRecipient, row.data.kundenCID)} style={{ padding: '0.7em' }} size='sm' outline>
+        <Button onClick={() => this.prepareDirectSend(row.data.maintenanceRecipient, row.data.kundenCID, row.data.frozen)} style={{ padding: '0.7em' }} size='sm' outline>
           <FontAwesomeIcon width='1.325em' icon={faPaperPlane} />
         </Button>
         <Button onClick={() => this.togglePreviewModal(row.data.maintenanceRecipient, row.data.kundenCID)} style={{ padding: '0.7em' }} size='sm' outline>
@@ -733,7 +751,13 @@ export default class Maintenance extends React.Component {
   /// /////////////////////////////////////////////////////////
 
   // prepare mail from direct-send button
-  prepareDirectSend (recipient, customerCID) {
+  prepareDirectSend (recipient, customerCID, frozen) {
+    if (frozen) {
+      cogoToast.error(`${recipient} has an active network freeze - no maintenance allowed!`, {
+        position: 'top-right'
+      })
+      return
+    }
     const HtmlBody = this.generateMail(customerCID)
     const subject = `Planned Work Notification - NT-${this.state.maintenance.id}`
     this.sendMail(recipient, customerCID, subject, HtmlBody, false)
@@ -812,6 +836,14 @@ export default class Maintenance extends React.Component {
 
   // send out the created mail
   sendMail (recipient, customerCid, subj, htmlBody, isFromPreview, isFromSendAll) {
+    const activeRowIndex = this.state.kundencids.findIndex(el => el.kundenCID === customerCid)
+    const kundenCidRow = this.state.kundencids[activeRowIndex]
+    if (kundenCidRow.frozen) {
+      cogoToast.error(`${kundenCidRow.name} has an active network freeze - no maintenance allowed!`, {
+        position: 'top-right'
+      })
+      return
+    }
     const host = window.location.host
     const body = htmlBody || this.state.mailBodyText
     let subject = subj || this.state.mailPreviewSubjectText
@@ -924,6 +956,61 @@ export default class Maintenance extends React.Component {
     }
   }
 
+  moveCalendarEntry (startDateTime, endDateTime, rcounter) {
+    const calId = this.state.maintenance.calendarId
+    const company = this.state.maintenance.name
+    const maintId = this.state.maintenance.id
+
+    let derenCid = ''
+    this.state.selectedLieferant.forEach(cid => {
+      derenCid = derenCid + cid.label + ' '
+    })
+    derenCid = derenCid.trim()
+
+    let cids = ''
+    this.state.kundencids.forEach(cid => {
+      cids = cids + cid.kundenCID + ' '
+    })
+    cids = cids.trim()
+
+    const host = window.location.host
+    if (calId) {
+      fetch(`https://api.${host}/calendar/reschedule`, {
+        method: 'post',
+        body: JSON.stringify({
+          company: company,
+          cids: cids,
+          supplierCID: derenCid,
+          maintId: maintId,
+          calId: calId,
+          startDateTime: startDateTime,
+          endDateTime: endDateTime,
+          rcounter: rcounter
+        }),
+        mode: 'cors',
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Content-Type': 'application/json'
+        }
+      })
+        .then(resp => resp.json())
+        .then(data => {
+          // const status = data.status
+          // console.log(data)
+          if (data.status === 200 && data.statusText === 'OK') {
+            cogoToast.success('Calendar Entry Rescheduled', {
+              position: 'top-right'
+            })
+          }
+        })
+        .catch(err => console.error(err))
+    } else {
+      cogoToast.error('Error - No Calendar Entry ID Saved', {
+        position: 'top-right'
+      })
+    }
+  }
+
   handleCalendarCreate () {
     const host = window.location.host
     const company = this.state.maintenance.name
@@ -973,6 +1060,25 @@ export default class Maintenance extends React.Component {
           cogoToast.success('Calendar Entry Created', {
             position: 'top-right'
           })
+          const htmlLink = data.event.data.htmlLink
+          const eventUrl = new URL(htmlLink)
+          const calId = eventUrl.searchParams.get('eid')
+
+          this.setState({
+            maintenance: {
+              ...this.state.maintenance,
+              calendarId: data.id
+            }
+          })
+
+          fetch(`https://${host}/api/maintenances/save/calendar?mid=${this.state.maintenance.id}&cid=${calId}`, {
+            method: 'get'
+          })
+            .then(resp => resp.json())
+            .then(data => {
+              // console.log(data)
+            })
+            .catch(err => console.error(err))
         } else if (statusText === 'failed') {
           cogoToast.warn(`Error creating Calendar Entry - ${data.statusText}`, {
             position: 'top-right'
@@ -2556,7 +2662,7 @@ export default class Maintenance extends React.Component {
                     }}
                   >
                     <div style={{ borderRadius: '15px', position: 'relative' }}>
-                      <ModalHeader 
+                      <ModalHeader
                         style={{
                           backgroundColor: 'var(--fourth-bg)',
                           borderRadius: '0px'
@@ -2652,7 +2758,7 @@ export default class Maintenance extends React.Component {
                           justifyContent: 'space-between'
                         }}
                       >
-                          {this.state.currentAttachmentName}
+                        {this.state.currentAttachmentName}
                         <Button outline className='close-attachment-modal-btn' theme='light' style={{ borderRadius: '5px', padding: '0.7em 0.9em' }} onClick={() => this.showAttachments(null)}>
                           <FontAwesomeIcon
                             className='close-attachment-modal-icon' width='1.5em' style={{ color: 'var(--light)', fontSize: '12px' }}
@@ -3041,6 +3147,10 @@ export default class Maintenance extends React.Component {
                 }
                 :global(.tox .tox-tbtn) {
                   color: var(--font-color) !important;
+                }
+                :global(.tox-menubar .tox-mbtn) {
+                  background: var(--secondary-bg) !important;
+                  color: var(--inv-font-color) !important;
                 }
                 :global(.tox .tox-tbtn:hover:not(.tox-tbtn--disabled)) {
                   background: var(--secondary-bg) !important;

@@ -6,13 +6,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Select from 'react-select'
 import { HotKeys } from 'react-hotkeys'
 import {
-  faPlusCircle
+  faPlusCircle,
+  faTrash
 } from '@fortawesome/free-solid-svg-icons'
 import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-material.css'
 import {
   CardTitle,
-  Badge,
   Button,
   ButtonGroup,
   Container,
@@ -51,7 +51,7 @@ export default class SupplierCIDs extends React.Component {
           {
             headerName: 'ID',
             field: 'id',
-            width: 80,
+            width: 60,
             editable: false
           },
           {
@@ -211,6 +211,7 @@ export default class SupplierCIDs extends React.Component {
           rowData: newRowData,
           openSupplierCidAdd: !this.state.openSupplierCidAdd
         })
+        window.gridApi.setRowData(newRowData)
       })
       .catch(err => console.error(err))
   }
@@ -257,10 +258,16 @@ export default class SupplierCIDs extends React.Component {
         <HotKeys keyMap={keyMap} handlers={handlers}>
           <CardTitle>
             <span className='section-title'>Newtelco CIDs</span>
-            <Button onClick={this.toggleSupplierCidAdd} outline theme='primary'>
-              <FontAwesomeIcon width='1.125em' style={{ marginRight: '10px' }} icon={faPlusCircle} />
-              Add
-            </Button>
+            <ButtonGroup>
+              <Button onClick={this.toggleSupplierCidAdd} outline theme='primary'>
+                <FontAwesomeIcon width='1.125em' style={{ marginRight: '10px' }} icon={faPlusCircle} />
+                Add
+              </Button>
+              <Button onClick={this.toggleSupplierCidDeleteModal} theme='primary'>
+                <FontAwesomeIcon width='1.125em' style={{ marginRight: '10px' }} icon={faTrash} />
+                Delete
+              </Button>
+            </ButtonGroup>
           </CardTitle>
           <div className='table-wrapper'>
             <div
@@ -277,11 +284,15 @@ export default class SupplierCIDs extends React.Component {
                 onCellEditingStopped={this.handleCellEdit}
                 rowData={this.state.rowData}
                 stopEditingWhenGridLosesFocus
+                deltaRowDataMode
+                getRowNodeId={(data) => {
+                  return data.id
+                }}
                 onFirstDataRendered={this.onFirstDataRendered.bind(this)}
               />
             </div>
           </div>
-          <Modal className='modal-body' animation backdrop backdropClassName='modal-backdrop' open={this.state.openSupplierCidAdd} size='md' toggle={this.toggleSupplierCidAdd}>
+          <Modal animation backdrop backdropClassName='modal-backdrop' open={this.state.openSupplierCidAdd} size='md' toggle={this.toggleSupplierCidAdd}>
             <ModalHeader>
               New Supplier CID
             </ModalHeader>
@@ -295,6 +306,7 @@ export default class SupplierCIDs extends React.Component {
                       </label>
                       <Select
                         value={newCompanySelection}
+                        className='company-select'
                         onChange={this.handleCompanyChange}
                         options={this.state.companySelections}
                         noOptionsMessage={() => 'No Companies Available'}
@@ -323,7 +335,7 @@ export default class SupplierCIDs extends React.Component {
             <ModalHeader className='modal-delete-header'>
               Confirm Delete
             </ModalHeader>
-            <ModalBody className='mail-body'>
+            <ModalBody className='modal-body'>
               <Container className='container-border'>
                 <Row>
                   <Col>
@@ -352,8 +364,13 @@ export default class SupplierCIDs extends React.Component {
                 margin: 10px 0;
                 padding: 1.5rem;
               }
+              :global(.modal-body) {
+                background-color: var(--primary-bg);
+                color: var(--font-color);
+              }
               :global(.modal-header) {
-                background: var(--light);
+                background: var(--secondary-bg);
+                color: var(--font-color);
                 display: flex;
                 justify-content: flex-start;
                 align-content: center;
@@ -366,6 +383,40 @@ export default class SupplierCIDs extends React.Component {
               :global(.ag-cell.ag-cell-inline-editing) {
                 padding: 10px !important;
                 height: inherit !important;
+              }
+              :global(.company-select [class$='-placeholder']) {
+                color: var(--border-color) !important;
+              }
+              :global(.company-select *) {
+                background-color: var(--input);
+                color: var(--font-color) !important;
+              }
+              :global(.company-select div[class$="-multiValue"]) {
+                background-color: var(--input);
+                color: var(--font-color);
+              }
+              :global(.company-select div[class$="-singleValue"]) {
+                background-color: var(--input);
+                color: var(--font-color);
+              }
+              :global(.form-group textarea:focus) {
+                background-color: var(--primary-bg);
+                color: var(--font-color);
+              }
+              :global(.form-group textarea) {
+                background-color: var(--primary-bg);
+                color: var(--font-color);
+              }
+              :global(.form-group label) {
+                color: var(--font-color);
+              }
+              :global(.form-group input:focus) {
+                background-color: var(--primary-bg);
+                color: var(--font-color);
+              }
+              :global(.form-group input) {
+                background-color: var(--primary-bg);
+                color: var(--font-color);
               }
             `}
           </style>
