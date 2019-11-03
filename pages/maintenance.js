@@ -3402,6 +3402,9 @@ export default class Maintenance extends React.Component {
                   color: var(--font-color);
                   background-color: var(--disabled-input);
                 }
+                :global(.btn-outline-primary) {
+                  height: 99%;
+                }
                 :global(.btn-outline-secondary) {
                   color: var(--font-color);
                 }

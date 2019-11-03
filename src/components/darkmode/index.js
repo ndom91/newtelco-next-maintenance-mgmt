@@ -2,7 +2,8 @@ import React from 'react'
 import { ThemeProvider } from 'styled-components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
-  faMoon
+  faMoon,
+  faSun
 } from '@fortawesome/free-solid-svg-icons'
 
 import * as S from './styles'
@@ -33,7 +34,12 @@ function DarkmodeSwitch ({ value, onChange }) {
             </S.Stars>
             <S.Circle style={value ? { backgroundColor: '#272727', border: '2px solid #fff', color: '#fff' } : { backgroundColor: '#797676', border: '2px solid #fff', color: '#fff' }}>
               {/* <S.Moon icon={faMoon} />  */}
-              <FontAwesomeIcon icon={faMoon} width='0.5em' />
+              {value
+                ? (
+                  <FontAwesomeIcon icon={faMoon} width='0.5em' />
+                ) : (
+                  <FontAwesomeIcon icon={faSun} width='0.8em' />
+                )}
             </S.Circle>
           </S.DayNightSwitch>
         </S.Wrapper>
