@@ -69,6 +69,7 @@ export default class Inbox extends React.Component {
 
   constructor (props) {
     super(props)
+
     this.state = {
       inboxMails: [],
       open: false,
@@ -336,14 +337,14 @@ export default class Inbox extends React.Component {
                     </InputGroup>
                   </div>
                   <ButtonGroup className='preview-btn-group'>
-                    <Button onClick={() => this.toggle(null)} outline theme='dark'>
+                    <Button onClick={() => this.toggle(null)} outline theme='light'>
                       <FontAwesomeIcon width='0.75em' className='translate-icon' icon={faTimesCircle} />
                     </Button>
-                    <Button id='translate-tooltip' theme='dark' onClick={this.handleTranslate.bind(this)}>
+                    <Button id='translate-tooltip' theme='light' onClick={this.handleTranslate.bind(this)}>
                       <Tooltip
                         title='Translate Mail (RU to EN)'
                         position='bottom'
-                        distance='30'
+                        distance='10'
                         theme='transparent'
                         size='small'
                         trigger='mouseenter'
@@ -414,18 +415,24 @@ export default class Inbox extends React.Component {
               margin-right: 10px;
               margin-bottom: 8px;
             }
-            :global(.preview-btn-group .btn) {
-              max-width: 50px;
-              max-height: 50px;
-              height: 40px;
-              padding: 0.75rem;
-              font-size: unset;
+            :global(.preview-btn-group) {
               margin-top: -9px;
             }
-            :global(.preview-btn-group .btn-outline-dark) {
+            :global(.preview-btn-group .btn) {
+              max-width: 40px;
+              max-height: 35px;
+              height: 35px;
+              width: 40px;
+              padding: 0.15rem;
+              font-size: unset;
+            }
+            :global(.preview-btn-group .btn-outline-light:hover) {
+              color: #212529;
+            }
+            :global(.preview-btn-group .btn-outline-light) {
               border-radius: 5px 5px 0 0 !important;
             }
-            :global(.preview-btn-group .btn-dark) {
+            :global(.preview-btn-group .btn-light) {
               border-radius: 0 0 5px 5px !important;
               padding: 0.25rem;
             }

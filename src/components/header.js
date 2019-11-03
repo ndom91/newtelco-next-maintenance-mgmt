@@ -10,8 +10,12 @@ import {
   faSearch,
   faAngleRight,
   faClock,
-  faEthernet
+  faEthernet,
+  faMapMarkerAlt
 } from '@fortawesome/free-solid-svg-icons'
+import {
+  faClock as faClockRegular
+} from '@fortawesome/free-regular-svg-icons'
 import {
   Navbar,
   NavbarToggler,
@@ -26,7 +30,13 @@ import {
   Collapse
 } from 'shards-react'
 
+const toCamelCase = (str) => {
+  return str.split(' ').map(function (word, index) {
+    return ' ' + word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+  }).join('')
+}
 class Header extends React.Component {
+
   constructor (props) {
     super(props)
 
@@ -41,26 +51,58 @@ class Header extends React.Component {
         displayKey: 'name',
         templates: {
           suggestion: (suggestion) => {
+            if (suggestion._highlightResult) {
+              Object.keys(suggestion._highlightResult).forEach(function (key, index) {
+                if (suggestion._highlightResult[key].matchLevel && suggestion._highlightResult[key].matchLevel !== 'none') {
+                  suggestion[key] = suggestion._highlightResult[key].value
+                }
+              })
+            }
             const newtelcoCID = suggestion.betroffeneCIDs || ''
             return (
               <span>
-                <div> <b style={{ fontWeight: '900' }}>{suggestion.id}</b> - {suggestion.name}</div>
-                <div style={{ fontSize: '80%' }}>
-                  <FontAwesomeIcon icon={faClock} className='search-list-icons' width='0.8em' style={{ color: 'secondary', margin: '3px 5px' }} />{suggestion.startDateTime} - {suggestion.endDateTime}
-                </div>
-                <div style={{ fontSize: '80%' }}>
-                  <FontAwesomeIcon icon={faEthernet} className='search-list-icons' width='0.8em' style={{ color: 'secondary', margin: '3px 5px' }} />
-                  {suggestion.derenCID}
-                  {suggestion.betroffeneCIDs
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span>
+                    <b style={{ fontSize: '90%', fontWeight: '900' }}><span dangerouslySetInnerHTML={{ __html: suggestion.id }} /></b> - <span style={{ fontSize: '90%' }} dangerouslySetInnerHTML={{ __html: suggestion.name }} />
+                  </span>
+                  {suggestion.location
                     ? (
-                      <>
-                        <FontAwesomeIcon icon={faAngleRight} className='search-icon' width='0.5em' style={{ color: 'secondary', margin: '3px 5px' }} />
-                        <span>{newtelcoCID.substr(0, 20)}</span>
-                      </>
+                      <span>
+                        <FontAwesomeIcon icon={faMapMarkerAlt} className='search-list-icons' width='0.6em' style={{ color: 'secondary', margin: '3px 5px' }} />
+                        <span style={{ fontSize: '70%' }} dangerouslySetInnerHTML={{ __html: toCamelCase(suggestion.location) }} />
+                      </span>
                     ) : (
                       null
                     )}
                 </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '80%' }}>
+                  <span>
+                    <FontAwesomeIcon icon={faClock} className='search-list-icons' width='0.8em' style={{ color: 'secondary', margin: '3px 5px 3px 0px' }} />
+                    <span dangerouslySetInnerHTML={{ __html: suggestion.startDateTime.substr(0, suggestion.startDateTime.length - 3) }} />
+                  </span>
+                  <span>
+                    <FontAwesomeIcon icon={faClockRegular} className='search-list-icons' width='0.8em' style={{ color: 'secondary', margin: '6px 3px' }} />
+                    <span dangerouslySetInnerHTML={{ __html: suggestion.endDateTime.substr(0, suggestion.endDateTime.length - 3) }} />
+                  </span>
+                </div>
+                {suggestion.derenCID
+                  ? (
+                    <div style={{ fontSize: '80%' }}>
+                      <FontAwesomeIcon icon={faEthernet} className='search-list-icons' width='0.8em' style={{ color: 'secondary', margin: '3px 5px 3px 0px' }} />
+                      <span dangerouslySetInnerHTML={{ __html: suggestion.derenCID }} />
+                      {suggestion.betroffeneCIDs
+                        ? (
+                          <>
+                            <FontAwesomeIcon icon={faAngleRight} className='search-icon' width='0.5em' style={{ color: 'secondary', margin: '3px 5px' }} />
+                            <span dangerouslySetInnerHTML={{ __html: newtelcoCID.substr(0, 20) }} />
+                          </>
+                        ) : (
+                          null
+                        )}
+                    </div>
+                  ) : (
+                    null
+                  )}
               </span>
             )
           }
@@ -370,6 +412,9 @@ class Header extends React.Component {
           }
           :global(.aa-dropdown-menu > div) {
             display: block;
+          }
+          :global(.aa-suggestion em) {
+            color: #67B246;
           }
           :global(.unread-badge) {
             position: absolute;
