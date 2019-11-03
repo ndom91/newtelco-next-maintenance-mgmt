@@ -10,10 +10,13 @@ import cogoToast from 'cogo-toast'
 import { CSSTransition, TransitionGroup } from 'react-transition-group'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import UnreadCount from '../src/components/unreadcount'
+import 'react-tippy/dist/tippy.css'
+import { Tooltip } from 'react-tippy'
 import {
   faPencilAlt,
   faEnvelopeOpenText,
   faTrashAlt,
+  faTimesCircle,
   faLanguage
 } from '@fortawesome/free-solid-svg-icons'
 import {
@@ -30,7 +33,10 @@ import {
   Modal,
   ModalBody,
   ModalHeader,
-  Tooltip
+  InputGroup,
+  InputGroupText,
+  InputGroupAddon,
+  FormInput
 } from 'shards-react'
 
 export default class Inbox extends React.Component {
@@ -77,7 +83,6 @@ export default class Inbox extends React.Component {
     }
 
     this.toggle = this.toggle.bind(this)
-    this.toggleTooltip = this.toggleTooltip.bind(this)
   }
 
   componentDidMount () {
@@ -128,12 +133,10 @@ export default class Inbox extends React.Component {
       // const htmlRegex3 = new RegExp('<meta .*>', 'gi')
 
       if (htmlRegex.test(mailBody)) {
-        console.log('html true')
         this.setState({
           incomingMailIsHtml: true
         })
       } else {
-        console.log('html false')
         mailBody = `<pre>${mailBody}</pre>`
         this.setState({
           incomingMailIsHtml: false
@@ -143,19 +146,14 @@ export default class Inbox extends React.Component {
         open: !this.state.open,
         modalSubject: inboxMails[activeMail].subject,
         modalFrom: inboxMails[activeMail].from,
-        modalBody: mailBody
+        modalBody: mailBody,
+        readIconUrl: inboxMails[activeMail].faviconUrl
       })
     } else {
       this.setState({
         open: !this.state.open
       })
     }
-  }
-
-  toggleTooltip () {
-    this.setState({
-      translateTooltipOpen: !this.state.translateTooltipOpen
-    })
   }
 
   handleTranslate () {
@@ -322,24 +320,43 @@ export default class Inbox extends React.Component {
               </ListGroup>
               <Modal className='mail-modal-body' animation backdrop backdropClassName='modal-backdrop' open={open} size='lg' toggle={this.toggle}>
                 <ModalHeader>
-                  <div className='modal-header-text'>
-                    <div className='modal-from-text'>{this.state.modalFrom}</div>
-                    <small className='modal-subject-text'>{this.state.modalSubject}</small>
+                  <img className='preview-mail-icon' alt='Company Logo' src={this.state.readIconUrl} />
+                  <div className='modal-preview-text-wrapper'>
+                    <InputGroup size='sm' className='mb-2'>
+                      <InputGroupAddon style={{ height: '31px' }} size='sm' type='prepend'>
+                        <InputGroupText size='sm'>From:</InputGroupText>
+                      </InputGroupAddon>
+                      <FormInput size='sm' disabled placeholder={this.state.modalFrom} />
+                    </InputGroup>
+                    <InputGroup size='sm' className='mb-2'>
+                      <InputGroupAddon style={{ height: '31px' }} size='sm' type='prepend'>
+                        <InputGroupText size='sm'>Subject:</InputGroupText>
+                      </InputGroupAddon>
+                      <FormInput size='sm' disabled placeholder={this.state.modalSubject} />
+                    </InputGroup>
                   </div>
-                  <Button id='translate-tooltip' style={{ padding: '1em' }} onClick={this.handleTranslate.bind(this)}>
-                    <FontAwesomeIcon width='1.5em' className='translate-icon' icon={faLanguage} />
-                  </Button>
+                  <ButtonGroup className='preview-btn-group'>
+                    <Button onClick={() => this.toggle(null)} outline theme='dark'>
+                      <FontAwesomeIcon width='0.75em' className='translate-icon' icon={faTimesCircle} />
+                    </Button>
+                    <Button id='translate-tooltip' theme='dark' onClick={this.handleTranslate.bind(this)}>
+                      <Tooltip
+                        title='Translate Mail (RU to EN)'
+                        position='bottom'
+                        distance='30'
+                        theme='transparent'
+                        size='small'
+                        trigger='mouseenter'
+                        delay='150'
+                        arrow
+                        animation='shift'
+                      >
+                        <FontAwesomeIcon width='0.75em' className='translate-icon' icon={faLanguage} />
+                      </Tooltip>
+                    </Button>
+                  </ButtonGroup>
                 </ModalHeader>
                 <ModalBody className='mail-body' dangerouslySetInnerHTML={{ __html: this.state.modalBody }} />
-                <Tooltip
-                  open={this.state.translateTooltipOpen}
-                  target='#translate-tooltip'
-                  toggle={this.toggleTooltip}
-                  placement='bottom'
-                  noArrow
-                >
-                    Translate
-                </Tooltip>
               </Modal>
             </CardBody>
             <Footer />
@@ -387,6 +404,50 @@ export default class Inbox extends React.Component {
                 max-width: 80%;
               }
             }
+            :global(.preview-mail-icon) {
+              min-width: 70px;
+              height: 70px;
+              border: 2px solid var(--light);
+              background: var(--white);
+              padding: 10px;
+              border-radius: 5px;
+              margin-right: 10px;
+              margin-bottom: 8px;
+            }
+            :global(.preview-btn-group .btn) {
+              max-width: 50px;
+              max-height: 50px;
+              height: 40px;
+              padding: 0.75rem;
+              font-size: unset;
+              margin-top: -9px;
+            }
+            :global(.preview-btn-group .btn-outline-dark) {
+              border-radius: 5px 5px 0 0 !important;
+            }
+            :global(.preview-btn-group .btn-dark) {
+              border-radius: 0 0 5px 5px !important;
+              padding: 0.25rem;
+            }
+            :global(.mail-modal-body .btn-group) {
+              flex-direction: column;
+            }
+            :global(.modal-preview-text-wrapper) {
+              width: 89%;
+              margin-right: 10px;
+            }
+            :global(.input-group-prepend .input-group-text) {
+              background-color: var(--secondary-bg);
+            }
+            :global(.form-control:disabled, .form-control[readonly]) {
+              background-color: var(--primary-bg);
+            }
+            :global(.modal-preview-text-wrapper input:hover) {
+              cursor: default !important;
+            }
+            :global(.modal-preview-text-wrapper input::placeholder) {
+              color: var(--font-color);
+            }
             :global(.inbox0-text) {
               font-family: Poppins, Helvetica;
               font-weight: 200 !important;
@@ -423,7 +484,6 @@ export default class Inbox extends React.Component {
             }
             :global(#translate-tooltip) {
               transition: all 200ms ease-in-out;
-              min-height: 60px;
             }
             :global(.mail-badge:hover) {
               min-height: 64px;
@@ -555,7 +615,7 @@ export default class Inbox extends React.Component {
               transition: all 150ms ease-in-out;
             }
             :global(.modal-backdrop.show) {
-              opacity: 0.5;
+              opacity: 0.8;
             }
             .modal-header-text {
               flex-grow: 1;

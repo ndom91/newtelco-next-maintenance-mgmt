@@ -2669,7 +2669,7 @@ export default class Maintenance extends React.Component {
                         }}
                         className='modal-read-header'
                       >
-                        <img className='mail-icon' src={this.state.readIconUrl} />
+                        <img className='mail-icon' alt='Company Logo' src={this.state.readIconUrl} />
                         <div className='modal-incoming-header-text'>
                           <InputGroup size='sm' className='mb-2'>
                             <InputGroupAddon style={{ height: '31px' }} size='sm' type='prepend'>
@@ -2964,6 +2964,17 @@ export default class Maintenance extends React.Component {
               </Modal>
             </Card>
             <style jsx>{`
+                :global(.delete-modal.modal-body) {
+                  background-color: var(--primary-bg);
+                  color: var(--font-color);
+                }
+                :global(.modal-delete-header) {
+                  background: var(--secondary-bg);
+                  color: var(--font-color);
+                  display: flex;
+                  justify-content: flex-start;
+                  align-content: center;
+                }
                 :global(.modal-body.reschedule) {
                   background-color: var(--primary-bg);
                 }
