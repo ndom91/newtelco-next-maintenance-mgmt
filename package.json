@@ -7,7 +7,9 @@
     "dev": "NODE_ENV=development PORT=4000 node index.js",
     "start": "NODE_ENV=production PORT=4000 node index.js",
     "build": "next build",
-    "export": "next export"
+    "export": "next export",
+    "snyk-protect": "snyk protect",
+    "prepare": "npm run snyk-protect"
   },
   "keywords": [],
   "author": "Nico Domino <ndomino@newtelco.de>",
@@ -80,7 +82,8 @@
     "shards-react": "^1.0.3",
     "shards-ui": "^3.0.0",
     "sql-template-strings": "^2.2.2",
-    "styled-components": "^4.4.0"
+    "styled-components": "^4.4.0",
+    "snyk": "^1.243.0"
   },
   "devDependencies": {
     "@zeit/next-sass": "^1.0.1",
@@ -108,5 +111,6 @@
       "out",
       ".next"
     ]
-  }
+  },
+  "snyk": true
 }
