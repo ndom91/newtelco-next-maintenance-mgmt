@@ -329,11 +329,11 @@ export default class CustomerCIDs extends React.Component {
           <CardTitle>
             <span className='section-title'>Customer CIDs</span>
             <ButtonGroup>
-              <Button onClick={this.toggleCustomerCidAdd} theme='primary'>
+              <Button onClick={this.toggleCustomerCidAdd} outline theme='primary'>
                 <FontAwesomeIcon width='1.125em' style={{ marginRight: '10px' }} icon={faPlusCircle} />
                 Add
               </Button>
-              <Button onClick={this.toggleCustomerCidDeleteModal} outline theme='primary'>
+              <Button onClick={this.toggleCustomerCidDeleteModal} theme='primary'>
                 <FontAwesomeIcon width='1.125em' style={{ marginRight: '10px' }} icon={faTrash} />
                 Delete
               </Button>
