@@ -17,7 +17,7 @@ import { Editor as TinyEditor } from '@tinymce/tinymce-react'
 import { format, isValid, formatDistance, parseISO, compareAsc } from 'date-fns'
 import moment from 'moment-timezone'
 import { Rnd } from 'react-rnd'
-// import UnreadCount from '../src/components/unreadcount'
+import { CSSTransition, TransitionGroup } from 'react-transition-group'
 import Flatpickr from 'react-flatpickr'
 import TimezoneSelector from '../src/components/timezone'
 import { getUnique, convertDateTime } from '../src/components/maintenance/helper'
@@ -50,7 +50,8 @@ import {
   faHistory,
   faMailBulk,
   faCheck,
-  faCalendarCheck
+  faCalendarCheck,
+  faLandmark
 } from '@fortawesome/free-solid-svg-icons'
 import {
   faCalendarAlt,
@@ -153,6 +154,7 @@ export default class Maintenance extends React.Component {
       openHelpModal: false,
       openRescheduleModal: false,
       openConfirmDeleteModal: false,
+      openMaintenanceChangelog: false,
       reschedule: {
         startDateTime: null,
         endDateTime: null,
@@ -349,6 +351,7 @@ export default class Maintenance extends React.Component {
     this.handleRescheduleReasonChange = this.handleRescheduleReasonChange.bind(this)
     this.mailSubjectText = this.mailSubjectText.bind(this)
     this.moveCalendarEntry = this.moveCalendarEntry.bind(this)
+    this.toggleHistoryView = this.toggleHistoryView.bind(this)
   }
 
   componentDidMount () {
@@ -1812,6 +1815,12 @@ export default class Maintenance extends React.Component {
     })
   }
 
+  toggleHistoryView () {
+    this.setState({
+      openMaintenanceChangelog: !this.state.openMaintenanceChangelog
+    })
+  }
+  
   /// /////////////////////////////////////////////////////////
   //
   //                    RESCHEDULE
@@ -2605,87 +2614,157 @@ export default class Maintenance extends React.Component {
                       </Row>
                     </Col>
                     <Col sm='12' lg='6'>
-                      <Row>
-                        <Col>
-                          <Container style={{ padding: '20px' }} className='maintenance-subcontainer'>
-                            <Row>
-                              <Col>
-                                <span style={{ color: 'var(--font-color)', fontWeight: '300 !important', fontSize: '1.5rem' }}>Customer CIDs</span>
-                              </Col>
-                            </Row>
-                            <Row>
-                              <Col>
-                                {this.state.kundencids.length !== 0
-                                  ? (
-                                    <Progress theme='primary' value={this.sentProgress()} />
-                                  ) : (
-                                    null
-                                  )}
-                              </Col>
-                            </Row>
-                            <Row>
-                              <Col style={{ width: '100%', height: '600px' }}>
-                                <div
-                                  className='ag-theme-material'
-                                  style={{
-                                    height: '100%',
-                                    width: '100%'
-                                  }}
-                                >
-                                  <AgGridReact
-                                    gridOptions={this.state.gridOptions}
-                                    rowData={this.state.kundencids}
-                                    onGridReady={params => this.gridApi = params.api}
-                                    pagination
-                                    deltaRowDataMode
-                                    getRowNodeId={(data) => {
-                                      return data.kundenCID
-                                    }}
-                                    onFirstDataRendered={this.onFirstDataRendered.bind(this)}
-                                  />
-                                </div>
-                              </Col>
-                            </Row>
-                          </Container>
-                          {this.state.rescheduleData.length !== 0
-                            ? (
-                              <Container style={{ padding: '20px' }} className='maintenance-subcontainer'>
-                                <Row>
-                                  <Col>
-                                    <span style={{ color: 'var(--font-color)', fontWeight: '300 !important', fontSize: '1.5rem' }}>Reschedule</span>
-                                  </Col>
-                                </Row>
-                                <Row>
-                                  <Col style={{ width: '100%', height: '600px' }}>
-                                    <div
-                                      className='ag-theme-material'
-                                      style={{
-                                        height: '100%',
-                                        width: '100%'
-                                      }}
-                                    >
-                                      <AgGridReact
-                                        gridOptions={this.state.rescheduleGridOptions}
-                                        rowData={this.state.rescheduleData}
-                                        onGridReady={this.handleRescheduleGridReady}
-                                        pagination
-                                        onCellEditingStopped={this.handleRescheduleCellEdit}
-                                        animateRows
-                                        deltaRowDataMode
-                                        getRowNodeId={(data) => {
-                                          return data.rcounter
-                                        }}
-                                        stopEditingWhenGridLosesFocus
-                                      />
-                                    </div>
-                                  </Col>
-                                </Row>
-                              </Container>
-                            ) : (
-                              null
-                            )}
-                        </Col>
-                      </Row>
+                      <TransitionGroup
+                        transitionName="slide"
+                        transitionEnterTimeout={500}
+                        transitionLeaveTimeout={500}
+                      >
+                        {this.state.openMaintenanceChangelog
+                          ? (
+                            <CSSTransition
+                              timeout={500}
+                              classNames="item"
+                            >
+                              <Row>
+                                <Col>
+                                  <Container style={{ padding: '20px' }} className='maintenance-subcontainer'>
+                                    <Row>
+                                      <Col>
+                                        <span style={{ color: 'var(--font-color)', fontWeight: '300 !important', fontSize: '1.5rem' }}>Maintenance History</span>
+                                      </Col>
+                                      <Col>
+                                        <Button style={{ float: 'right' }} onClick={this.toggleHistoryView} outline>
+                                          <Tooltip
+                                            title='View Customer CIDs'
+                                            position='top'
+                                            trigger='mouseenter'
+                                            delay='250'
+                                            distance='20'
+                                            interactiveBorder='15'
+                                            arrow
+                                            size='small'
+                                            theme='transparent'
+                                          >
+                                            <FontAwesomeIcon icon={faLandmark} width='1em' style={{ color: 'secondary' }} />
+                                          </Tooltip>
+                                        </Button>
+                                      </Col>
+                                    </Row>
+                                    <Row>
+                                      <Col>
+                                        HISTORY OF CHANGES
+                                      </Col>
+                                    </Row>
+                                  </Container>
+                                </Col>
+                              </Row>
+                            </CSSTransition>
+                          ) : (
+                            <CSSTransition
+                              timeout={500}
+                              classNames="item"
+                            >
+                              <Row>
+                                <Col>
+                                  <Container style={{ padding: '20px' }} className='maintenance-subcontainer'>
+                                    <Row style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                      <Col>
+                                        <span style={{ color: 'var(--font-color)', fontWeight: '300 !important', fontSize: '1.5rem' }}>Customer CIDs</span>
+                                      </Col>
+                                      <Col>
+                                        <Button style={{ float: 'right' }} onClick={this.toggleHistoryView} outline>
+                                          <Tooltip
+                                            title='View Maintenance Changelog'
+                                            position='top'
+                                            trigger='mouseenter'
+                                            delay='250'
+                                            distance='20'
+                                            interactiveBorder='15'
+                                            arrow
+                                            size='small'
+                                            theme='transparent'
+                                          >
+                                            <FontAwesomeIcon icon={faLandmark} width='1em' style={{ color: 'secondary' }} />
+                                          </Tooltip>
+                                        </Button>
+                                      </Col>
+                                    </Row>
+                                    <Row>
+                                      <Col>
+                                        {this.state.kundencids.length !== 0
+                                          ? (
+                                            <Progress theme='primary' value={this.sentProgress()} />
+                                          ) : (
+                                            null
+                                          )}
+                                      </Col>
+                                    </Row>
+                                    <Row>
+                                      <Col style={{ width: '100%', height: '600px' }}>
+                                        <div
+                                          className='ag-theme-material'
+                                          style={{
+                                            height: '100%',
+                                            width: '100%'
+                                          }}
+                                        >
+                                          <AgGridReact
+                                            gridOptions={this.state.gridOptions}
+                                            rowData={this.state.kundencids}
+                                            onGridReady={params => this.gridApi = params.api}
+                                            pagination
+                                            deltaRowDataMode
+                                            getRowNodeId={(data) => {
+                                              return data.kundenCID
+                                            }}
+                                            onFirstDataRendered={this.onFirstDataRendered.bind(this)}
+                                          />
+                                        </div>
+                                      </Col>
+                                    </Row>
+                                  </Container>
+                                  {this.state.rescheduleData.length !== 0
+                                    ? (
+                                      <Container style={{ padding: '20px' }} className='maintenance-subcontainer'>
+                                        <Row>
+                                          <Col>
+                                            <span style={{ color: 'var(--font-color)', fontWeight: '300 !important', fontSize: '1.5rem' }}>Reschedule</span>
+                                          </Col>
+                                        </Row>
+                                        <Row>
+                                          <Col style={{ width: '100%', height: '600px' }}>
+                                            <div
+                                              className='ag-theme-material'
+                                              style={{
+                                                height: '100%',
+                                                width: '100%'
+                                              }}
+                                            >
+                                              <AgGridReact
+                                                gridOptions={this.state.rescheduleGridOptions}
+                                                rowData={this.state.rescheduleData}
+                                                onGridReady={this.handleRescheduleGridReady}
+                                                pagination
+                                                onCellEditingStopped={this.handleRescheduleCellEdit}
+                                                animateRows
+                                                deltaRowDataMode
+                                                getRowNodeId={(data) => {
+                                                  return data.rcounter
+                                                }}
+                                                stopEditingWhenGridLosesFocus
+                                              />
+                                            </div>
+                                          </Col>
+                                        </Row>
+                                      </Container>
+                                    ) : (
+                                      null
+                                    )}
+                                </Col>
+                              </Row>
+                            </CSSTransition>
+                          )}
+                      </TransitionGroup>
                     </Col>
                   </Row>
                 </Container>
