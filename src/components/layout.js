@@ -210,7 +210,7 @@ export default class Layout extends React.Component {
                             <Badge className='key-badge' outline theme='primary'>ALT</Badge> <span className='keyboard-plus'>+</span><Badge className='key-badge' outline theme='primary'>L</Badge>
                           </Col>
                           <Col>
-                            Delete Selected Reschedule
+                            Delete Reschedule
                           </Col>
                         </Row>
                       </>
@@ -338,7 +338,7 @@ export default class Layout extends React.Component {
                 color: ${this.state.night ? '#fff' : ''};
               }
               :global(.ag-theme-material .ag-row-selected) {
-                background-color: ${this.state.night ? '#67B246' : '#eee'} !important;
+                background-color: ${this.state.night ? 'rgba(103, 178, 70, 0.1)' : '#eee'} !important;
               }
               :global(.ag-theme-material .ag-header-group-cell:not(.ag-column-resizing) + .ag-header-group-cell:hover, .ag-theme-material .ag-header-group-cell:not(.ag-column-resizing) + .ag-header-group-cell.ag-column-resizing, .ag-theme-material .ag-header-cell:not(.ag-column-resizing) + .ag-header-cell:hover, .ag-theme-material .ag-header-cell:not(.ag-column-resizing) + .ag-header-cell.ag-column-resizing, .ag-theme-material .ag-header-group-cell:first-of-type:hover, .ag-theme-material .ag-header-group-cell:first-of-type.ag-column-resizing, .ag-theme-material .ag-header-cell:first-of-type:hover, .ag-theme-material .ag-header-cell:first-of-type.ag-column-resizing) {
                 background-color: var(--bg-secondary);

@@ -693,51 +693,90 @@ export default class Maintenance extends React.Component {
         const kundencids = data.kundenCIDsResult
         kundencids.forEach(cid => {
           cid.sent = currentSentStatus
+          cid.frozen = false
         })
         const newKundenCids = this.state.kundencids
         kundencids.forEach(cid => {
           newKundenCids.push(cid)
         })
         const uniqueKundenCids = getUnique(newKundenCids, 'kundenCID')
-        const startDate = this.state.maintenance.startDateTime
-        const endDate = this.state.maintenance.endDateTime
+        // const startDate = this.state.maintenance.startDateTime
+        // const endDate = this.state.maintenance.endDateTime
+        this.setState({
+          kundencids: uniqueKundenCids
+        })
         uniqueKundenCids.forEach(cid => {
-          fetch(`https://${host}/api/maintenances/freeze?companyid=${cid.kunde}&startDate=${startDate}&endDate=${endDate}`, {
-            method: 'get'
+          this.checkFreezeStatus(cid)
+        })
+        // uniqueKundenCids.forEach(cid => {
+        //   fetch(`https://${host}/api/maintenances/freeze?companyid=${cid.kunde}&startDate=${startDate}&endDate=${endDate}`, {
+        //     method: 'get'
+        //   })
+        //     .then(resp => resp.json())
+        //     .then(data => {
+        //       if (data.freezeQuery.length === 0) {
+        //         this.setState({
+        //           kundencids: uniqueKundenCids
+        //         })
+        //         return
+        //       }
+        //       const freezeEntry = data.freezeQuery[0]
+        //       const uniqueCids = uniqueKundenCids
+        //       const frozenCids = uniqueCids.findIndex(el => el.kunde === freezeEntry.companyId)
+        //       cogoToast.error(`${uniqueKundenCids[frozenCids].name} has an active network freeze at that time`, {
+        //         position: 'top-right',
+        //         hideAfter: 5,
+        //         onClick: () => Router.push('/settings?tab=freeze')
+        //       })
+        //       uniqueKundenCids[frozenCids].frozen = true
+        //       this.setState({
+        //         kundencids: uniqueKundenCids
+        //       })
+        //     })
+        //     .catch(err => console.error(`Error - ${err}`))
+        //   // if (this.gridApi) {
+        //   //   this.gridApi.refreshCells()
+        //   // }
+        // }, () => {
+        // this.setState({
+        //   kundencids: uniqueKundenCids
+        // })
+        // if (this.gridApi) {
+        //   this.gridApi.refreshCells()
+        // }
+        // })
+      })
+      .catch(err => console.error(`Error - ${err}`))
+  }
+
+  async checkFreezeStatus (cid) {
+    const host = window.location.host
+    const startDate = this.state.maintenance.startDateTime
+    const endDate = this.state.maintenance.endDateTime
+
+    await fetch(`https://${host}/api/maintenances/freeze?companyid=${cid.kunde}&startDate=${startDate}&endDate=${endDate}`, {
+      method: 'get'
+    })
+      .then(resp => resp.json())
+      .then(data => {
+        if (data.freezeQuery.length !== 0) {
+          const freezeEntry = data.freezeQuery[0]
+          const uniqueKundenCids = this.state.kundencids
+          const uniqueCids = uniqueKundenCids
+          const frozenCids = uniqueCids.findIndex(el => el.kunde === freezeEntry.companyId)
+          cogoToast.error(`${uniqueKundenCids[frozenCids].name} has an active network freeze at that time`, {
+            position: 'top-right',
+            hideAfter: 5,
+            onClick: () => Router.push('/settings?tab=freeze')
           })
-            .then(resp => resp.json())
-            .then(data => {
-              if (data.freezeQuery.length === 0) {
-                this.setState({
-                  kundencids: uniqueKundenCids
-                })
-                return
-              }
-              const freezeEntry = data.freezeQuery[0]
-              const uniqueCids = uniqueKundenCids
-              const frozenCids = uniqueCids.findIndex(el => el.kunde === freezeEntry.companyId)
-              cogoToast.error(`${uniqueKundenCids[frozenCids].name} has an active network freeze at that time`, {
-                position: 'top-right',
-                hideAfter: 5,
-                onClick: () => Router.push('/settings?tab=freeze')
-              })
-              uniqueKundenCids[frozenCids].frozen = true
-              this.setState({
-                kundencids: uniqueKundenCids
-              })
-            })
-            .catch(err => console.error(`Error - ${err}`))
-          // if (this.gridApi) {
-          //   this.gridApi.refreshCells()
-          // }
-        }, () => {
+          uniqueKundenCids[frozenCids].frozen = true
           this.setState({
             kundencids: uniqueKundenCids
           })
           if (this.gridApi) {
             this.gridApi.refreshCells()
           }
-        })
+        }
       })
       .catch(err => console.error(`Error - ${err}`))
   }
@@ -749,7 +788,7 @@ export default class Maintenance extends React.Component {
   // prepare mail from direct-send button
   prepareDirectSend (recipient, customerCID, frozen) {
     if (frozen) {
-      cogoToast.error(`${recipient} has an active network freeze - no maintenance allowed!`, {
+      cogoToast.error(`${customerCID} has an active network freeze - no maintenance allowed!`, {
         position: 'top-right'
       })
       return
@@ -3138,9 +3177,6 @@ export default class Maintenance extends React.Component {
                 }
                 :global(.container) {
                   padding: 15px;
-                }
-                :global(.ag-theme-material .ag-row-selected) {
-                  background-color: #67b2461f !important;
                 }
                 .mail-icon {
                   min-width: 110px;
