@@ -77,14 +77,24 @@ class Header extends React.Component {
                       )}
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '80%' }}>
-                    <span>
-                      <FontAwesomeIcon icon={faClock} className='search-list-icons' width='0.8em' style={{ color: 'secondary', margin: '3px 5px 3px 0px' }} />
-                      <span dangerouslySetInnerHTML={{ __html: suggestion.startDateTime.substr(0, suggestion.startDateTime.length - 3) }} />
-                    </span>
-                    <span>
-                      <FontAwesomeIcon icon={faClockRegular} className='search-list-icons' width='0.8em' style={{ color: 'secondary', margin: '6px 3px' }} />
-                      <span dangerouslySetInnerHTML={{ __html: suggestion.endDateTime.substr(0, suggestion.endDateTime.length - 3) }} />
-                    </span>
+                    {suggestion.startDateTime
+                      ? (
+                        <span>
+                          <FontAwesomeIcon icon={faClock} className='search-list-icons' width='0.8em' style={{ color: 'secondary', margin: '3px 5px 3px 0px' }} />
+                          <span dangerouslySetInnerHTML={{ __html: suggestion.startDateTime.substr(0, suggestion.startDateTime.length - 3) }} />
+                        </span>
+                      ) : (
+                        null
+                      )}
+                    {suggestion.endDateTime
+                      ? (
+                        <span>
+                          <FontAwesomeIcon icon={faClockRegular} className='search-list-icons' width='0.8em' style={{ color: 'secondary', margin: '6px 3px' }} />
+                          <span dangerouslySetInnerHTML={{ __html: suggestion.endDateTime.substr(0, suggestion.endDateTime.length - 3) }} />
+                        </span>
+                      ) : (
+                        null
+                      )}
                   </div>
                   {suggestion.derenCID
                     ? (
