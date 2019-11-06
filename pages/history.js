@@ -92,8 +92,7 @@ export default class History extends React.Component {
             resizable: false,
             cellRenderer: 'editBtn',
             pinned: 'left'
-          },
-          {
+          }, {
             headerName: 'ID',
             field: 'id',
             width: 100,
@@ -104,12 +103,10 @@ export default class History extends React.Component {
             field: 'bearbeitetvon',
             cellRenderer: 'edittedby',
             width: 100
-            // tooltipField: 'bearbeitetvon'
           }, {
             headerName: 'Supplier',
             field: 'name',
             cellRenderer: 'supplier'
-            // width: 120
           }, {
             headerName: 'Their CID',
             field: 'derenCID',
@@ -137,6 +134,17 @@ export default class History extends React.Component {
             headerName: 'Updated',
             field: 'updatedAt',
             cellRenderer: 'updatedAt'
+          }, {
+            headerName: 'Rescheduled',
+            field: 'rescheduled',
+            width: 120,
+            pinned: 'right',
+            cellStyle: {
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              height: '100%'
+            }
           }, {
             headerName: 'Complete',
             field: 'done',
