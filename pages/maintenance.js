@@ -796,7 +796,6 @@ export default class Maintenance extends React.Component {
     }
 
     if (this.state.rescheduleData.length !== 0) {
-
       const latest = this.state.rescheduleData.length - 1
       const newStart = moment(this.state.rescheduleData[latest].startDateTime).format('YYYY-MM-DD HH:mm:ss')
       const newEnd = moment(this.state.rescheduleData[latest].endDateTime).format('YYYY-MM-DD HH:mm:ss')
@@ -819,18 +818,16 @@ export default class Maintenance extends React.Component {
             }
           }
         }
-
         reversedReschedules[Symbol.iterator] = function () {
           return this
         }
-        // oldReschedules.forEach(reschedule => {
         for (const i of reversedReschedules) {
           const newStart = moment(i.startDateTime).format('YYYY-MM-DD HH:mm:ss')
           const newEnd = moment(i.endDateTime).format('YYYY-MM-DD HH:mm:ss')
           const newImpact = i.impact
           const newReason = i.reason && i.reason.toLowerCase()
           const rcounter = i.rcounter
-          maintenanceIntro += `<br>This maintenance had been rescheduled due to ${newReason}.<br><br>The previous details were as follows:<br><table border="0" cellspacing="2" cellpadding="2" width="775px"><tr><td style='width: 205px;'>Maintenance ID:</td><td><b>NT-${id}-${rcounter}</b></td></tr><tr><td>New Start date and time:</td><td><b>${newStart} (${tzSuffixRAW})</b></td></tr><tr><td>New Finish date and time:</td><td><b>${newEnd} (${tzSuffixRAW})</b></td></tr><tr><td>New Impact:</td><td><b>${newImpact}</b></td></tr></table>`
+          maintenanceIntro += `<br>This maintenance had been rescheduled due to ${newReason}.<br><br>The previous details were as follows:<br><table border="0" cellspacing="2" cellpadding="2" width="775px"><tr><td style='width: 205px;'>Maintenance ID:</td><td><b>NT-${id}-${rcounter}</b></td></tr><tr><td>Previous Start date and time:</td><td><b>${newStart} (${tzSuffixRAW})</b></td></tr><tr><td>Previous Finish date and time:</td><td><b>${newEnd} (${tzSuffixRAW})</b></td></tr><tr><td>Previous Impact:</td><td><b>${newImpact}</b></td></tr></table>`
         }
       }
       maintenanceIntro += '<br><hr><i><b>Original Planned Works:</b></i><br><br>Dear Colleagues,<br><br>We would like to inform you about planned work on the following CID(s):\n'
