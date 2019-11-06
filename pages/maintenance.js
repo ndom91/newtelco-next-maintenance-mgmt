@@ -17,7 +17,7 @@ import { Editor as TinyEditor } from '@tinymce/tinymce-react'
 import { format, isValid, formatDistance, parseISO, compareAsc } from 'date-fns'
 import moment from 'moment-timezone'
 import { Rnd } from 'react-rnd'
-import UnreadCount from '../src/components/unreadcount'
+// import UnreadCount from '../src/components/unreadcount'
 import Flatpickr from 'react-flatpickr'
 import TimezoneSelector from '../src/components/timezone'
 import { getUnique, convertDateTime } from '../src/components/maintenance/helper'
@@ -94,10 +94,6 @@ export default class Maintenance extends React.Component {
     } else {
       display = count.count
     }
-    // let night
-    // if (typeof window !== 'undefined') {
-    //   night = window.localStorage.getItem('theme')
-    // }
     if (query.id === 'NEW') {
       return {
         jsonData: { profile: query },
@@ -112,7 +108,6 @@ export default class Maintenance extends React.Component {
       return {
         jsonData: json,
         unread: display,
-        // night: night === 'dark',
         session: await NextAuth.init({ req })
       }
     }
@@ -775,6 +770,7 @@ export default class Maintenance extends React.Component {
       timezone
     } = this.state.maintenance
 
+
     if (!id || !startDateTime || !endDateTime) {
       cogoToast.warn('Missing required fields', {
         position: 'top-right'
@@ -800,13 +796,44 @@ export default class Maintenance extends React.Component {
     }
 
     if (this.state.rescheduleData.length !== 0) {
+
       const latest = this.state.rescheduleData.length - 1
       const newStart = moment(this.state.rescheduleData[latest].startDateTime).format('YYYY-MM-DD HH:mm:ss')
       const newEnd = moment(this.state.rescheduleData[latest].endDateTime).format('YYYY-MM-DD HH:mm:ss')
       const newImpact = this.state.rescheduleData[latest].impact
       const newReason = this.state.rescheduleData[latest].reason.toLowerCase()
       const rcounter = this.state.rescheduleData[latest].rcounter
-      maintenanceIntro = `We regret to inform you that the planned works have been <b>rescheduled</b> on the following CID(s):\n\n<br><br><b>${customerCID}</b><br><br>The maintenance has been rescheduled due to ${newReason}.<br><br>The new details are as follows:<br><table border="0" cellspacing="2" cellpadding="2" width="775px"><tr><td style='width: 205px;'>Maintenance ID:</td><td><b>NT-${id}-${rcounter}</b></td></tr><tr><td>New Start date and time:</td><td><b>${newStart} (${tzSuffixRAW})</b></td></tr><tr><td>New Finish date and time:</td><td><b>${newEnd} (${tzSuffixRAW})</b></td></tr><tr><td>New Impact:</td><td><b>${newImpact}</b></td></tr></table>Thank you very much for your patience and cooperation.<br><hr><i><b>Original Mail:</b></i><br><br>Dear Colleagues,<br><br>We would like to inform you about planned work on the following CID(s):\n`
+      maintenanceIntro = `We regret to inform you that the planned works have been <b>rescheduled</b> on the following CID(s):\n\n<br><br><b>${customerCID}</b><br><br>The maintenance has been rescheduled due to ${newReason}.<br><br>The new details are as follows:<br><table border="0" cellspacing="2" cellpadding="2" width="775px"><tr><td style='width: 205px;'>Maintenance ID:</td><td><b>NT-${id}-${rcounter}</b></td></tr><tr><td>New Start date and time:</td><td><b>${newStart} (${tzSuffixRAW})</b></td></tr><tr><td>New Finish date and time:</td><td><b>${newEnd} (${tzSuffixRAW})</b></td></tr><tr><td>New Impact:</td><td><b>${newImpact}</b></td></tr></table>Thank you very much for your patience and cooperation.`
+
+      if (this.state.rescheduleData.length > 1) {
+        maintenanceIntro += '<br><hr><br><b>Previous Reschedules:</b><br>'
+        const oldReschedules = this.state.rescheduleData
+        oldReschedules.pop()
+        let index = oldReschedules.length
+        const reversedReschedules = {
+          next: function () {
+            index--
+            return {
+              done: index < 0,
+              value: oldReschedules[index]
+            }
+          }
+        }
+
+        reversedReschedules[Symbol.iterator] = function () {
+          return this
+        }
+        // oldReschedules.forEach(reschedule => {
+        for (const i of reversedReschedules) {
+          const newStart = moment(i.startDateTime).format('YYYY-MM-DD HH:mm:ss')
+          const newEnd = moment(i.endDateTime).format('YYYY-MM-DD HH:mm:ss')
+          const newImpact = i.impact
+          const newReason = i.reason && i.reason.toLowerCase()
+          const rcounter = i.rcounter
+          maintenanceIntro += `<br>This maintenance had been rescheduled due to ${newReason}.<br><br>The previous details were as follows:<br><table border="0" cellspacing="2" cellpadding="2" width="775px"><tr><td style='width: 205px;'>Maintenance ID:</td><td><b>NT-${id}-${rcounter}</b></td></tr><tr><td>New Start date and time:</td><td><b>${newStart} (${tzSuffixRAW})</b></td></tr><tr><td>New Finish date and time:</td><td><b>${newEnd} (${tzSuffixRAW})</b></td></tr><tr><td>New Impact:</td><td><b>${newImpact}</b></td></tr></table>`
+        }
+      }
+      maintenanceIntro += '<br><hr><i><b>Original Planned Works:</b></i><br><br>Dear Colleagues,<br><br>We would like to inform you about planned work on the following CID(s):\n'
     }
 
     let body = `<body style="color:#666666;">${rescheduleText} Dear Colleagues,​​<p><span>${maintenanceIntro}<br><br> <b>${customerCID}</b> <br><br>The maintenance work is with the following details:</span></p><table border="0" cellspacing="2" cellpadding="2" width="775px"><tr><td style='width: 205px;'>Maintenance ID:</td><td><b>NT-${id}</b></td></tr><tr><td>Start date and time:</td><td><b>${utcStart} (${tzSuffixRAW})</b></td></tr><tr><td>Finish date and time:</td><td><b>${utcEnd} (${tzSuffixRAW})</b></td></tr>`
@@ -2193,7 +2220,6 @@ export default class Maintenance extends React.Component {
             <Helmet>
               <title>{`Newtelco Maintenance - NT-${maintenance.id}`}</title>
             </Helmet>
-            {UnreadCount()}
             <Card style={{ maxWidth: '100%' }}>
               <CardHeader>
                 <ButtonToolbar style={{ justifyContent: 'space-between' }}>
