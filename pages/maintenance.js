@@ -342,6 +342,7 @@ export default class Maintenance extends React.Component {
     this.handleRescheduleSave = this.handleRescheduleSave.bind(this)
     this.handleRescheduleCellEdit = this.handleRescheduleCellEdit.bind(this)
     this.toggleRescheduleSentBtn = this.toggleRescheduleSentBtn.bind(this)
+    this.handleRescheduleTimezoneChange = this.handleRescheduleTimezoneChange.bind(this)
     this.toggleConfirmDeleteRescheduleModal = this.toggleConfirmDeleteRescheduleModal.bind(this)
     this.handleDeleteReschedule = this.handleDeleteReschedule.bind(this)
     this.handleToggleChange = this.handleToggleChange.bind(this)
@@ -1778,6 +1779,19 @@ export default class Maintenance extends React.Component {
   //
   /// /////////////////////////////////////////////////////////
 
+  handleRescheduleTimezoneChange (selection) {
+    const timezoneLabel = selection.label // 'Europe/Amsterdam'
+    const timezoneValue = selection.value // '(GMT+02:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna'
+
+    this.setState({
+      reschedule: {
+        ...this.state.reschedule,
+        timezone: timezoneValue,
+        timezoneLabel: timezoneLabel
+      }
+    })
+  }
+
   handleRescheduleStartDateTimeChange (date) {
     const startDate = moment(date[0]).format('YYYY-MM-DD HH:mm:ss')
 
@@ -1810,7 +1824,6 @@ export default class Maintenance extends React.Component {
   }
 
   handleRescheduleReasonChange (reasonSelection) {
-    console.log('reasonSelection', reasonSelection)
     this.setState({
       reschedule: {
         ...this.state.reschedule,
@@ -1822,8 +1835,9 @@ export default class Maintenance extends React.Component {
   handleRescheduleSave () {
     const newImpact = this.state.reschedule.impact
     const newReason = this.state.reschedule.reason.label
-    const newStartDateTime = this.state.reschedule.startDateTime
-    const newEndDateTime = this.state.reschedule.endDateTime
+    const timezone = this.state.reschedule.timezone
+    const newStartDateTime = moment.tz(this.state.reschedule.startDateTime, timezone).utc().format('YYYY-MM-DD HH:mm:ss')
+    const newEndDateTime = moment.tz(this.state.reschedule.endDateTime, timezone).utc().format('YYYY-MM-DD HH:mm:ss')
 
     const host = window.location.host
     fetch(`https://${host}/api/reschedule/save?mid=${this.state.maintenance.id}&impact=${encodeURIComponent(newImpact)}&sdt=${encodeURIComponent(newStartDateTime)}&edt=${encodeURIComponent(newEndDateTime)}&rcounter=${this.state.rescheduleData.length + 1}&user=${encodeURIComponent(this.props.session.user.email)}&reason=${encodeURIComponent(newReason)}`, {
@@ -1831,7 +1845,6 @@ export default class Maintenance extends React.Component {
     })
       .then(resp => resp.json())
       .then(data => {
-        console.log(data.insertRescheduleQuery)
         if (data.insertRescheduleQuery.affectedRows === 1) {
           this.setState({
             openRescheduleModal: !this.state.openRescheduleModal
@@ -1854,6 +1867,14 @@ export default class Maintenance extends React.Component {
         }
       })
       .catch(err => console.error(`Error Saving Reschedule - ${err}`))
+    fetch(`https://${host}/api/reschedule/increment?id=${this.state.maintenance.id}`, {
+      method: 'get'
+    })
+      .then(resp => resp.json())
+      .then(data => {
+        console.log(data.rescheduleInc)
+      })
+      .catch(err => console.error(`Error Incrementing Reschedule - ${err}`))
   }
 
   handleRescheduleCellEdit (params) {
@@ -2724,7 +2745,7 @@ export default class Maintenance extends React.Component {
                             <FontAwesomeIcon width='1.8em' style={{ fontSize: '12px' }} className='translate-icon' icon={faLanguage} />
                           </Button>
                         </ButtonGroup>
-                        <div style={{ flexGrow: Array.isArray(this.state.maintenance.incomingAttachments) ? '1' : '0', marginTop: '5px' }}>
+                        <div style={{ flexGrow: Array.isArray(this.state.maintenance.incomingAttachments) ? '1' : '0', width: '100%', marginTop: '5px' }}>
                           {Array.isArray(this.state.maintenance.incomingAttachments) && this.state.maintenance.incomingAttachments.length !== 0
                             ? this.state.maintenance.incomingAttachments.map((attachment, index) => {
                               return (
@@ -2751,7 +2772,6 @@ export default class Maintenance extends React.Component {
                       x: HALF_WIDTH,
                       y: 125,
                       width: this.state.filetype === 'pdf' ? '1100' : '520',
-                      // height: this.state.filetype === 'pdf' ? '600' : '520'
                       height: 'auto'
                     }}
                     style={{
@@ -2765,8 +2785,6 @@ export default class Maintenance extends React.Component {
                       width: this.state.filetype === 'pdf' ? '1100' : '400',
                       boxShadow: '0px 0px 20px 1px var(--dark)'
                     }}
-                    // minWidth={500}
-                    // minHeight={400}
                     bounds='window'
                     dragHandleClassName='modal-attachment-header-text'
                   >
@@ -2874,91 +2892,131 @@ export default class Maintenance extends React.Component {
 
                 </ModalBody>
               </Modal>
-              <Modal backdropClassName='modal-backdrop' animation backdrop size='md' open={openRescheduleModal} toggle={this.toggleRescheduleModal} className='reschedule-modal' style={{ minWidth: '600px !important' }}>
-                <ModalHeader className='reschedule'>
-                  <span>
-                    Reschedule Maintenance
-                  </span>
-                  <Badge pill outline theme='dark'>
-                    {this.state.rescheduleData.length + 1}
-                  </Badge>
-                </ModalHeader>
-                <ModalBody className='modal-body reschedule'>
-                  <Container style={{ paddingTop: '0px !important' }} className='container-border'>
-                    <Col>
-                      <Row style={{ display: 'flex', flexWrap: 'nowrap' }}>
-                        <FormGroup style={{ margin: '0 15px' }}>
-                          <label>
-                            Start Date/Time (local time)
-                          </label>
-                          <Flatpickr
-                            data-enable-time
-                            options={{ time_24hr: 'true', allow_input: 'true' }}
-                            className='flatpickr end-date-time'
-                            value={this.state.reschedule.startDateTime || null}
-                            onChange={date => this.handleRescheduleStartDateTimeChange(date)}
-                          />
-                        </FormGroup>
-                        <FormGroup style={{ margin: '0 15px' }}>
-                          <label>
-                            End Date/Time (local time)
-                          </label>
-                          <Flatpickr
-                            data-enable-time
-                            options={{ time_24hr: 'true', allow_input: 'true' }}
-                            className='flatpickr end-date-time'
-                            value={this.state.reschedule.endDateTime || null}
-                            onChange={date => this.handleRescheduleEndDateTimeChange(date)}
-                          />
-                        </FormGroup>
-                      </Row>
-                      <Row>
-                        <FormGroup style={{ margin: '0px 15px', width: '100%', marginBottom: '10px !important' }}>
-                          <label htmlFor='resched-impact'>
-                            New Impact
-                          </label>
-                          <FormInput id='resched-impact' name='resched-impact' type='text' value={this.state.reschedule.impact} onChange={this.handleRescheduleImpactChange} />
-                        </FormGroup>
-                      </Row>
-                      <Row>
-                        <FormGroup style={{ margin: '0px 15px', width: '100%', marginBottom: '10px !important' }}>
-                          <label htmlFor='resched-reason'>
-                            Reason for Reschedule
-                          </label>
-                          <CreatableSelect
-                            isClearable
-                            className='maint-select'
-                            value={this.state.reschedule.reason}
-                            onChange={this.handleRescheduleReasonChange}
-                            options={[
-                              {
-                                value: 'change_circuits',
-                                label: 'change in affected circuits'
-                              },
-                              {
-                                value: 'change_time',
-                                label: 'change in planned date/time'
-                              },
-                              {
-                                value: 'change_impact',
-                                label: 'change in impact duration'
-                              }
-                            ]}
-                            placeholder='Please select a reason for reschedule'
-                          />
-                        </FormGroup>
-                      </Row>
-                    </Col>
-                  </Container>
-                  <Row style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                    <Col>
-                      <Button onClick={this.handleRescheduleSave} style={{ width: '100%', marginTop: '15px' }} theme='primary'>
-                        Save
+              {typeof window !== 'undefined'
+                ? (
+                  <Rnd
+                    default={{
+                      x: HALF_WIDTH - (HALF_WIDTH / 1.5),
+                      y: 25,
+                      width: 600,
+                      height: 565
+                    }}
+                    style={{
+                      visibility: this.state.openRescheduleModal ? 'visible' : 'hidden',
+                      opacity: this.state.openRescheduleModal ? 1 : 0,
+                      backgroundColor: 'var(--primary-bg)',
+                      overflow: 'hidden',
+                      borderRadius: '15px',
+                      height: 'auto',
+                      zIndex: '101',
+                      boxShadow: '0px 0px 20px 1px var(--dark)'
+                    }}
+                    bounds='window'
+                    dragHandleClassName='reschedule-header'
+                  >
+                    <ModalHeader className='reschedule reschedule-header'>
+                      <span style={{ flexGrow: '1' }}>
+                        Reschedule Maintenance
+                      </span>
+                      <Badge pill outline theme='dark'>
+                        {this.state.rescheduleData.length + 1}
+                      </Badge>
+                      <Button outline className='close-attachment-modal-btn' theme='light' style={{ borderRadius: '5px', marginLeft: '15px', padding: '0.7em 0.9em' }} onClick={this.toggleRescheduleModal}>
+                        <FontAwesomeIcon
+                          className='close-attachment-modal-icon' width='1.5em' style={{ color: 'var(--light)', fontSize: '12px' }}
+                          icon={faTimesCircle}
+                        />
                       </Button>
-                    </Col>
-                  </Row>
-                </ModalBody>
-              </Modal>
+                    </ModalHeader>
+                    <ModalBody className='modal-body reschedule'>
+                      <Container style={{ paddingTop: '0px !important' }} className='container-border'>
+                        <Col>
+                          <Row style={{ display: 'flex', flexWrap: 'nowrap' }}>
+                            <FormGroup style={{ margin: '0 15px', width: '100%' }}>
+                              <label htmlFor='supplier'>Timezone</label>
+                              <TimezoneSelector
+                                className='maint-select'
+                                value={{ value: this.state.reschedule.timezone, label: this.state.reschedule.timezoneLabel }}
+                                onChange={this.handleRescheduleTimezoneChange}
+                              />
+                            </FormGroup>
+                          </Row>
+                          <Row style={{ display: 'flex', flexWrap: 'nowrap' }}>
+                            <FormGroup style={{ margin: '0 15px' }}>
+                              <label>
+                                Start Date/Time
+                              </label>
+                              <Flatpickr
+                                data-enable-time
+                                options={{ time_24hr: 'true', allow_input: 'true' }}
+                                className='flatpickr end-date-time'
+                                value={this.state.reschedule.startDateTime || null}
+                                onChange={date => this.handleRescheduleStartDateTimeChange(date)}
+                              />
+                            </FormGroup>
+                            <FormGroup style={{ margin: '0 15px' }}>
+                              <label>
+                                End Date/Time
+                              </label>
+                              <Flatpickr
+                                data-enable-time
+                                options={{ time_24hr: 'true', allow_input: 'true' }}
+                                className='flatpickr end-date-time'
+                                value={this.state.reschedule.endDateTime || null}
+                                onChange={date => this.handleRescheduleEndDateTimeChange(date)}
+                              />
+                            </FormGroup>
+                          </Row>
+                          <Row>
+                            <FormGroup style={{ margin: '0px 15px', width: '100%', marginBottom: '10px !important' }}>
+                              <label htmlFor='resched-impact'>
+                                New Impact
+                              </label>
+                              <FormInput id='resched-impact' name='resched-impact' type='text' value={this.state.reschedule.impact} onChange={this.handleRescheduleImpactChange} />
+                            </FormGroup>
+                          </Row>
+                          <Row>
+                            <FormGroup style={{ margin: '0px 15px', width: '100%', marginBottom: '10px !important' }}>
+                              <label htmlFor='resched-reason'>
+                                Reason for Reschedule
+                              </label>
+                              <CreatableSelect
+                                isClearable
+                                className='maint-select'
+                                value={this.state.reschedule.reason}
+                                onChange={this.handleRescheduleReasonChange}
+                                options={[
+                                  {
+                                    value: 'change_circuits',
+                                    label: 'change in affected circuits'
+                                  },
+                                  {
+                                    value: 'change_time',
+                                    label: 'change in planned date/time'
+                                  },
+                                  {
+                                    value: 'change_impact',
+                                    label: 'change in impact duration'
+                                  }
+                                ]}
+                                placeholder='Please select a reason for reschedule'
+                              />
+                            </FormGroup>
+                          </Row>
+                        </Col>
+                      </Container>
+                      <Row style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                        <Col>
+                          <Button onClick={this.handleRescheduleSave} style={{ width: '100%', marginTop: '15px' }} theme='primary'>
+                            Save
+                          </Button>
+                        </Col>
+                    </Row>
+                  </ModalBody>
+                  </Rnd>
+                ) : (
+                  null
+                )}
               <Modal className='delete-modal' animation backdrop backdropClassName='modal-backdrop' open={this.state.openConfirmDeleteModal} size='md' toggle={this.toggleConfirmDeleteRescheduleModal}>
                 <ModalHeader className='modal-delete-header'>
                   Confirm Delete Reschedule
@@ -3016,6 +3074,9 @@ export default class Maintenance extends React.Component {
                   display: flex;
                   justify-content: flex-start;
                   align-content: center;
+                }
+                :global(.reschedule-header:hover) {
+                  cursor: move;
                 }
                 :global(.container-border) {
                   border: 1px solid var(--border-color);
