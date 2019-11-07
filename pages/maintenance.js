@@ -110,7 +110,7 @@ export default class Maintenance extends React.Component {
         session: await NextAuth.init({ req })
       }
     } else {
-      const pageRequest = `https://${host}/api/maintenances/${query.id}`
+      const pageRequest = `https://${host}/api/maintenances/${query.id.replace(/[0-9]+/g, '')}`
       const res = await fetch(pageRequest)
       const json = await res.json()
       return {
@@ -2198,11 +2198,11 @@ export default class Maintenance extends React.Component {
     }
   }
 
-  handleSearchSelection = selection => {
-    const newLocation = `/maintenance?id=${selection.id}`
+  handleSearchSelect (selection) {
+    console.log('selection', selection)
+    const cleanId = selection.id.replace(/[0-9]+/g, '')
+    const newLocation = `/maintenance?id=${cleanId}`
     Router.push(newLocation)
-    // Router.pushRoute(`/maintenance?id=${selection.id}`)
-    // this.setState({ selection })
   }
 
   mailSubjectText = () => {
@@ -2258,7 +2258,7 @@ export default class Maintenance extends React.Component {
     if (this.props.session.user) {
       return (
         <HotKeys keyMap={keyMap} handlers={handlers}>
-          <Layout night={this.state.night.toString()} handleSearchSelection={this.handleSearchSelection} unread={this.props.unread} session={this.props.session}>
+          <Layout night={this.state.night.toString()} handleSearchSelection={this.handleSearchSelect} unread={this.props.unread} session={this.props.session}>
             <Helmet>
               <title>{`Newtelco Maintenance - NT-${maintenance.id}`}</title>
             </Helmet>
@@ -3349,8 +3349,6 @@ export default class Maintenance extends React.Component {
                 :global(.maint-select div[class$="-singleValue"]) {
                   background-color: var(--input);
                   color: var(--font-color);
-                  border: 1px solid var(--border-color);
-                  border-radius: 5px;
                 }
                 :global(.Mui-focused) {
                   border: none !important;
