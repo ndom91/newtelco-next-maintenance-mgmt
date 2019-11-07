@@ -17,7 +17,7 @@ import { Editor as TinyEditor } from '@tinymce/tinymce-react'
 import { format, isValid, formatDistance, parseISO, compareAsc } from 'date-fns'
 import moment from 'moment-timezone'
 import { Rnd } from 'react-rnd'
-import { CSSTransition, TransitionGroup } from 'react-transition-group'
+import { CSSTransition } from 'react-transition-group'
 import Flatpickr from 'react-flatpickr'
 import TimezoneSelector from '../src/components/timezone'
 import { getUnique, convertDateTime } from '../src/components/maintenance/helper'
@@ -29,6 +29,8 @@ import StartDateTime from '../src/components/ag-grid/startdatetime'
 import EndDateTime from '../src/components/ag-grid/enddatetime'
 import { AgGridReact } from 'ag-grid-react'
 import PDF from 'react-pdf-js-infinite'
+import root from 'react-shadow'
+import Timeline from 'react-time-line'
 
 import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-material.css'
@@ -812,7 +814,6 @@ export default class Maintenance extends React.Component {
       location,
       timezone
     } = this.state.maintenance
-
 
     if (!id || !startDateTime || !endDateTime) {
       cogoToast.warn('Missing required fields', {
@@ -1820,7 +1821,7 @@ export default class Maintenance extends React.Component {
       openMaintenanceChangelog: !this.state.openMaintenanceChangelog
     })
   }
-  
+
   /// /////////////////////////////////////////////////////////
   //
   //                    RESCHEDULE
@@ -2279,6 +2280,15 @@ export default class Maintenance extends React.Component {
       HALF_WIDTH = this.state.width !== 0 ? this.state.width / 2 : 500
     }
 
+    const maintHistory = [
+      {ts: "2019-10-29T12:22:46.587Z", text: 'fwaleska - changed start date time'},
+      {ts: "2019-10-29T12:21:46.587Z", text: 'fwaleska - saved done toggle'},
+      {ts: "2019-10-29T12:20:46.587Z", text: 'alissitsin - updated notes'},
+      {ts: "2019-11-01T12:22:46.587Z", text: 'alissitsin - sent mails'},
+      {ts: "2019-11-01T12:21:46.587Z", text: 'fwaleska - rescheduled #1'},
+      {ts: "2019-11-01T12:20:46.587Z", text: 'fwaleska - rescheduled #2'}
+    ]
+
     if (this.props.session.user) {
       return (
         <HotKeys keyMap={keyMap} handlers={handlers}>
@@ -2614,157 +2624,153 @@ export default class Maintenance extends React.Component {
                       </Row>
                     </Col>
                     <Col sm='12' lg='6'>
-                      <TransitionGroup
-                        transitionName="slide"
-                        transitionEnterTimeout={500}
-                        transitionLeaveTimeout={500}
-                      >
-                        {this.state.openMaintenanceChangelog
-                          ? (
-                            <CSSTransition
-                              timeout={500}
-                              classNames="item"
-                            >
-                              <Row>
-                                <Col>
-                                  <Container style={{ padding: '20px' }} className='maintenance-subcontainer'>
-                                    <Row>
-                                      <Col>
-                                        <span style={{ color: 'var(--font-color)', fontWeight: '300 !important', fontSize: '1.5rem' }}>Maintenance History</span>
-                                      </Col>
-                                      <Col>
-                                        <Button style={{ float: 'right' }} onClick={this.toggleHistoryView} outline>
-                                          <Tooltip
-                                            title='View Customer CIDs'
-                                            position='top'
-                                            trigger='mouseenter'
-                                            delay='250'
-                                            distance='20'
-                                            interactiveBorder='15'
-                                            arrow
-                                            size='small'
-                                            theme='transparent'
-                                          >
-                                            <FontAwesomeIcon icon={faLandmark} width='1em' style={{ color: 'secondary' }} />
-                                          </Tooltip>
-                                        </Button>
-                                      </Col>
-                                    </Row>
-                                    <Row>
-                                      <Col>
-                                        HISTORY OF CHANGES
-                                      </Col>
-                                    </Row>
-                                  </Container>
-                                </Col>
-                              </Row>
-                            </CSSTransition>
-                          ) : (
-                            <CSSTransition
-                              timeout={500}
-                              classNames="item"
-                            >
-                              <Row>
-                                <Col>
-                                  <Container style={{ padding: '20px' }} className='maintenance-subcontainer'>
-                                    <Row style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                      <Col>
-                                        <span style={{ color: 'var(--font-color)', fontWeight: '300 !important', fontSize: '1.5rem' }}>Customer CIDs</span>
-                                      </Col>
-                                      <Col>
-                                        <Button style={{ float: 'right' }} onClick={this.toggleHistoryView} outline>
-                                          <Tooltip
-                                            title='View Maintenance Changelog'
-                                            position='top'
-                                            trigger='mouseenter'
-                                            delay='250'
-                                            distance='20'
-                                            interactiveBorder='15'
-                                            arrow
-                                            size='small'
-                                            theme='transparent'
-                                          >
-                                            <FontAwesomeIcon icon={faLandmark} width='1em' style={{ color: 'secondary' }} />
-                                          </Tooltip>
-                                        </Button>
-                                      </Col>
-                                    </Row>
-                                    <Row>
-                                      <Col>
-                                        {this.state.kundencids.length !== 0
-                                          ? (
-                                            <Progress theme='primary' value={this.sentProgress()} />
-                                          ) : (
-                                            null
-                                          )}
-                                      </Col>
-                                    </Row>
-                                    <Row>
-                                      <Col style={{ width: '100%', height: '600px' }}>
-                                        <div
-                                          className='ag-theme-material'
-                                          style={{
-                                            height: '100%',
-                                            width: '100%'
-                                          }}
+                      {this.state.openMaintenanceChangelog
+                        ? (
+                          <CSSTransition
+                            timeout={500}
+                            classNames='flip-transition'
+                            in={this.state.openMaintenanceChangelog}
+                          >
+                            <Row>
+                              <Col>
+                                <Container style={{ padding: '20px' }} className='maintenance-subcontainer'>
+                                  <Row>
+                                    <Col>
+                                      <span style={{ color: 'var(--font-color)', fontWeight: '300 !important', fontSize: '1.5rem' }}>Maintenance History</span>
+                                    </Col>
+                                    <Col>
+                                      <Button style={{ float: 'right' }} onClick={this.toggleHistoryView} outline>
+                                        <Tooltip
+                                          title='View Customer CIDs'
+                                          position='top'
+                                          trigger='mouseenter'
+                                          delay='250'
+                                          distance='20'
+                                          interactiveBorder='15'
+                                          arrow
+                                          size='small'
+                                          theme='transparent'
                                         >
-                                          <AgGridReact
-                                            gridOptions={this.state.gridOptions}
-                                            rowData={this.state.kundencids}
-                                            onGridReady={params => this.gridApi = params.api}
-                                            pagination
-                                            deltaRowDataMode
-                                            getRowNodeId={(data) => {
-                                              return data.kundenCID
+                                          <FontAwesomeIcon icon={faLandmark} width='1em' style={{ color: 'secondary' }} />
+                                        </Tooltip>
+                                      </Button>
+                                    </Col>
+                                  </Row>
+                                  <Row>
+                                    <Col>
+                                      <Timeline items={maintHistory} />
+                                    </Col>
+                                  </Row>
+                                </Container>
+                              </Col>
+                            </Row>
+                          </CSSTransition>
+                        ) : (
+                          <CSSTransition
+                            timeout={500}
+                            classNames='flip-transition'
+                            in={this.state.openMaintenanceChangelog}
+                          >
+                            <Row>
+                              <Col>
+                                <Container style={{ padding: '20px' }} className='maintenance-subcontainer'>
+                                  <Row style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                    <Col>
+                                      <span style={{ color: 'var(--font-color)', fontWeight: '300 !important', fontSize: '1.5rem' }}>Customer CIDs</span>
+                                    </Col>
+                                    <Col>
+                                      <Button style={{ float: 'right' }} onClick={this.toggleHistoryView} outline>
+                                        <Tooltip
+                                          title='View Maintenance Changelog'
+                                          position='top'
+                                          trigger='mouseenter'
+                                          delay='250'
+                                          distance='20'
+                                          interactiveBorder='15'
+                                          arrow
+                                          size='small'
+                                          theme='transparent'
+                                        >
+                                          <FontAwesomeIcon icon={faLandmark} width='1em' style={{ color: 'secondary' }} />
+                                        </Tooltip>
+                                      </Button>
+                                    </Col>
+                                  </Row>
+                                  <Row>
+                                    <Col>
+                                      {this.state.kundencids.length !== 0
+                                        ? (
+                                          <Progress theme='primary' value={this.sentProgress()} />
+                                        ) : (
+                                          null
+                                        )}
+                                    </Col>
+                                  </Row>
+                                  <Row>
+                                    <Col style={{ width: '100%', height: '600px' }}>
+                                      <div
+                                        className='ag-theme-material'
+                                        style={{
+                                          height: '100%',
+                                          width: '100%'
+                                        }}
+                                      >
+                                        <AgGridReact
+                                          gridOptions={this.state.gridOptions}
+                                          rowData={this.state.kundencids}
+                                          onGridReady={params => this.gridApi = params.api}
+                                          pagination
+                                          deltaRowDataMode
+                                          getRowNodeId={(data) => {
+                                            return data.kundenCID
+                                          }}
+                                          onFirstDataRendered={this.onFirstDataRendered.bind(this)}
+                                        />
+                                      </div>
+                                    </Col>
+                                  </Row>
+                                </Container>
+                                {this.state.rescheduleData.length !== 0
+                                  ? (
+                                    <Container style={{ padding: '20px' }} className='maintenance-subcontainer'>
+                                      <Row>
+                                        <Col>
+                                          <span style={{ color: 'var(--font-color)', fontWeight: '300 !important', fontSize: '1.5rem' }}>Reschedule</span>
+                                        </Col>
+                                      </Row>
+                                      <Row>
+                                        <Col style={{ width: '100%', height: '600px' }}>
+                                          <div
+                                            className='ag-theme-material'
+                                            style={{
+                                              height: '100%',
+                                              width: '100%'
                                             }}
-                                            onFirstDataRendered={this.onFirstDataRendered.bind(this)}
-                                          />
-                                        </div>
-                                      </Col>
-                                    </Row>
-                                  </Container>
-                                  {this.state.rescheduleData.length !== 0
-                                    ? (
-                                      <Container style={{ padding: '20px' }} className='maintenance-subcontainer'>
-                                        <Row>
-                                          <Col>
-                                            <span style={{ color: 'var(--font-color)', fontWeight: '300 !important', fontSize: '1.5rem' }}>Reschedule</span>
-                                          </Col>
-                                        </Row>
-                                        <Row>
-                                          <Col style={{ width: '100%', height: '600px' }}>
-                                            <div
-                                              className='ag-theme-material'
-                                              style={{
-                                                height: '100%',
-                                                width: '100%'
+                                          >
+                                            <AgGridReact
+                                              gridOptions={this.state.rescheduleGridOptions}
+                                              rowData={this.state.rescheduleData}
+                                              onGridReady={this.handleRescheduleGridReady}
+                                              pagination
+                                              onCellEditingStopped={this.handleRescheduleCellEdit}
+                                              animateRows
+                                              deltaRowDataMode
+                                              getRowNodeId={(data) => {
+                                                return data.rcounter
                                               }}
-                                            >
-                                              <AgGridReact
-                                                gridOptions={this.state.rescheduleGridOptions}
-                                                rowData={this.state.rescheduleData}
-                                                onGridReady={this.handleRescheduleGridReady}
-                                                pagination
-                                                onCellEditingStopped={this.handleRescheduleCellEdit}
-                                                animateRows
-                                                deltaRowDataMode
-                                                getRowNodeId={(data) => {
-                                                  return data.rcounter
-                                                }}
-                                                stopEditingWhenGridLosesFocus
-                                              />
-                                            </div>
-                                          </Col>
-                                        </Row>
-                                      </Container>
-                                    ) : (
-                                      null
-                                    )}
-                                </Col>
-                              </Row>
-                            </CSSTransition>
-                          )}
-                      </TransitionGroup>
+                                              stopEditingWhenGridLosesFocus
+                                            />
+                                          </div>
+                                        </Col>
+                                      </Row>
+                                    </Container>
+                                  ) : (
+                                    null
+                                  )}
+                              </Col>
+                            </Row>
+                          </CSSTransition>
+                        )}
                     </Col>
                   </Row>
                 </Container>
@@ -2889,7 +2895,7 @@ export default class Maintenance extends React.Component {
                     default={{
                       x: HALF_WIDTH,
                       y: 125,
-                      width: this.state.filetype === 'pdf' ? '1100' : '520',
+                      width: 800,
                       height: 'auto'
                     }}
                     style={{
@@ -2898,9 +2904,7 @@ export default class Maintenance extends React.Component {
                       backgroundColor: 'var(--primary-bg)',
                       overflow: 'hidden',
                       borderRadius: '15px',
-                      height: 'auto',
                       zIndex: '101',
-                      width: this.state.filetype === 'pdf' ? '1100' : '400',
                       boxShadow: '0px 0px 20px 1px var(--dark)'
                     }}
                     bounds='window'
@@ -2929,7 +2933,7 @@ export default class Maintenance extends React.Component {
                         {this.state.filetype === 'excel'
                           // this.state.rows && this.state.cols
                           ? (
-                            <div className='attachment-body'>
+                            <div className='attachment-body pdf'>
                               <OutTable data={this.state.rows} columns={this.state.cols} tableClassName='ExcelTable2007' tableHeaderRowClass='heading' />
                             </div>
                           ) : (
@@ -2937,7 +2941,7 @@ export default class Maintenance extends React.Component {
                           )}
                         {this.state.filetype === 'pdf'
                           ? (
-                            <div className='attachment-body'>
+                            <div className='attachment-body excel'>
                               <PDF file={this.state.pdfB64} scale={1.75} />
                             </div>
                           ) : (
@@ -2945,7 +2949,9 @@ export default class Maintenance extends React.Component {
                           )}
                         {this.state.filetype === 'html'
                           ? (
-                            <div className='attachment-body' dangerouslySetInnerHTML={{ __html: this.state.attachmentHTMLContent }} />
+                            <root.div className='attachment-body html'>
+                              <div style={this.state.night ? { color: '#6c757d' } : {}} dangerouslySetInnerHTML={{ __html: this.state.attachmentHTMLContent }} />
+                            </root.div>
                           ) : (
                             null
                           )}
@@ -3129,8 +3135,8 @@ export default class Maintenance extends React.Component {
                             Save
                           </Button>
                         </Col>
-                    </Row>
-                  </ModalBody>
+                      </Row>
+                    </ModalBody>
                   </Rnd>
                 ) : (
                   null
@@ -3163,6 +3169,38 @@ export default class Maintenance extends React.Component {
               </Modal>
             </Card>
             <style jsx>{`
+                :global(.flip-transition-enter) {
+                  opacity: 0;
+                }
+                :global(.flip-transition-enter-active) {
+                  opacity: 1;
+                  transform: translateX(0);
+                  transition: opacity 300ms, transform 300ms;
+                }
+                :global(.flip-transition-exit) {
+                  opacity: 0;
+                }
+                :global(.flip-transition-exit-active) {
+                  opacity: 1;
+                  transform: translateX(0);
+                  transition: opacity 300ms, transform 300ms;
+                }
+                :global(.time-line-ctnr) {
+                  margin-top: 15px;
+                }
+                :global(.time-line-ctnr .time-line > li > .fa) {
+                  border-color: #67B246;
+                }
+                :global(.time-line-ctnr .time-line:before) {
+                  background: #67B246;
+                }
+                :global(.time-line-ctnr .time-line > li > .time-line-item .time-line-header) {
+                  background-color: var(--primary-bg);
+                  color: var(--font-color);
+                }
+                :global(.time-label span) {
+                  background-color: #67B246;
+                }
                 :global(.delete-modal.modal-body) {
                   background-color: var(--primary-bg);
                   color: var(--font-color);
@@ -3500,6 +3538,13 @@ export default class Maintenance extends React.Component {
                   background: var(--primary-bg);
                   color: var(--font-color);
                   overflow: ${this.state.incomingMailIsHtml ? 'scroll' : 'scroll'};
+                }
+                :global(.attachment-body.html) {
+                  max-height: 500px;
+                  overflow: scroll;
+                }
+                :global(.attachment-body.html *) {
+                  color: #6c757d;
                 }
                 :global(.mail-body) {
                   font-family: Poppins, Helvetica;
