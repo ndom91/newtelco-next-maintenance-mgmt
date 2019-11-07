@@ -712,51 +712,12 @@ export default class Maintenance extends React.Component {
           newKundenCids.push(cid)
         })
         const uniqueKundenCids = getUnique(newKundenCids, 'kundenCID')
-        // const startDate = this.state.maintenance.startDateTime
-        // const endDate = this.state.maintenance.endDateTime
         this.setState({
           kundencids: uniqueKundenCids
         })
         uniqueKundenCids.forEach(cid => {
           this.checkFreezeStatus(cid)
         })
-        // uniqueKundenCids.forEach(cid => {
-        //   fetch(`https://${host}/api/maintenances/freeze?companyid=${cid.kunde}&startDate=${startDate}&endDate=${endDate}`, {
-        //     method: 'get'
-        //   })
-        //     .then(resp => resp.json())
-        //     .then(data => {
-        //       if (data.freezeQuery.length === 0) {
-        //         this.setState({
-        //           kundencids: uniqueKundenCids
-        //         })
-        //         return
-        //       }
-        //       const freezeEntry = data.freezeQuery[0]
-        //       const uniqueCids = uniqueKundenCids
-        //       const frozenCids = uniqueCids.findIndex(el => el.kunde === freezeEntry.companyId)
-        //       cogoToast.error(`${uniqueKundenCids[frozenCids].name} has an active network freeze at that time`, {
-        //         position: 'top-right',
-        //         hideAfter: 5,
-        //         onClick: () => Router.push('/settings?tab=freeze')
-        //       })
-        //       uniqueKundenCids[frozenCids].frozen = true
-        //       this.setState({
-        //         kundencids: uniqueKundenCids
-        //       })
-        //     })
-        //     .catch(err => console.error(`Error - ${err}`))
-        //   // if (this.gridApi) {
-        //   //   this.gridApi.refreshCells()
-        //   // }
-        // }, () => {
-        // this.setState({
-        //   kundencids: uniqueKundenCids
-        // })
-        // if (this.gridApi) {
-        //   this.gridApi.refreshCells()
-        // }
-        // })
       })
       .catch(err => console.error(`Error - ${err}`))
   }
@@ -983,6 +944,17 @@ export default class Maintenance extends React.Component {
           if (this.gridApi) {
             this.gridApi.refreshCells()
           }
+          const maintId = this.state.maintenance.id
+          const user = this.props.session.user.email
+          const action = 'sent'
+          const field = kundenCidRow.name
+          fetch(`https://${host}/api/history?mid=${maintId}&user=${user}&field=${field}&action=${action}`, {
+            method: 'get'
+          })
+            .then(resp => resp.json())
+            .then(data => {
+            })
+            .catch(err => console.error(`Error updating Audit Log - ${err}`))
         } else {
           cogoToast.warn('Error Sending Mail', {
             position: 'top-right'
@@ -1070,8 +1042,6 @@ export default class Maintenance extends React.Component {
       })
         .then(resp => resp.json())
         .then(data => {
-          // const status = data.status
-          // console.log(data)
           if (data.status === 200 && data.statusText === 'OK') {
             cogoToast.success('Calendar Entry Rescheduled', {
               position: 'top-right'
@@ -1928,20 +1898,19 @@ export default class Maintenance extends React.Component {
     })
       .then(resp => resp.json())
       .then(data => {
-        console.log(data.rescheduleInc)
+        // console.log(data.rescheduleInc)
       })
       .catch(err => console.error(`Error Incrementing Reschedule - ${err}`))
   }
 
   handleRescheduleCellEdit (params) {
-    console.log(params)
     const rcounter = params.data.rcounter
     const newStartDateTime = moment(params.data.startDateTime).format('YYYY.MM.DD HH:mm:ss')
     const newEndDateTime = moment(params.data.endDateTime).format('YYYY.MM.DD HH:mm:ss')
     const newImpact = params.data.impact
 
     const host = window.location.host
-    fetch(`https://${host}/api/reschedule/edit?mid=${this.state.maintenance.id}&impact=${encodeURIComponent(newImpact)}&sdt=${encodeURIComponent(newStartDateTime)}&edt=${encodeURIComponent(newEndDateTime)}&rcounter=${rcounter}`, {
+    fetch(`https://${host}/api/reschedule/edit?mid=${this.state.maintenance.id}&impact=${encodeURIComponent(newImpact)}&sdt=${encodeURIComponent(newStartDateTime)}&edt=${encodeURIComponent(newEndDateTime)}&rcounter=${rcounter}&user=${encodeURIComponent(this.props.session.user.email)}`, {
       method: 'get'
     })
       .then(resp => resp.json())
@@ -1971,7 +1940,7 @@ export default class Maintenance extends React.Component {
       rescheduleData: newRescheduleData
     })
     const host = window.location.host
-    fetch(`https://${host}/api/reschedule/sent?mid=${this.state.maintenance.id}&rcounter=${rcounter}&sent=${newSentStatus}`, {
+    fetch(`https://${host}/api/reschedule/sent?mid=${this.state.maintenance.id}&rcounter=${rcounter}&sent=${newSentStatus}&user=${encodeURIComponent(this.props.session.user.email)}`, {
       method: 'get'
     })
       .then(resp => resp.json())
@@ -2002,7 +1971,7 @@ export default class Maintenance extends React.Component {
 
   handleDeleteReschedule () {
     const host = window.location.host
-    fetch(`https://${host}/api/reschedule/delete?mid=${this.state.maintenance.id}&rcounter=${this.state.rescheduleToDelete.rcounter}`, {
+    fetch(`https://${host}/api/reschedule/delete?mid=${this.state.maintenance.id}&rcounter=${this.state.rescheduleToDelete.rcounter}&user=${encodeURIComponent(this.props.session.user.email)}`, {
       method: 'get'
     })
       .then(resp => resp.json())

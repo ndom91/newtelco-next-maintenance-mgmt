@@ -12,5 +12,6 @@ module.exports = async (req, res) => {
   const insertRescheduleQuery = await db.query(escape`
     INSERT INTO reschedule (impact, sdt, edt, maintenanceid, rid, rcounter, reason, user) VALUES (${newImpact}, ${newStartDateTime}, ${newEndDateTime}, ${maintId}, ${rid}, ${req.query.rcounter}, ${reason}, ${user})
   `)
+  const updateHistory = await db.query(escape`INSERT INTO changelog (mid, user, action, field) VALUES (${maintId}, ${user}, 'create', 'reschedule - ${rid}');`)
   res.status(200).json({ insertRescheduleQuery })
 }

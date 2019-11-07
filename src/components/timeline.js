@@ -20,7 +20,6 @@ class Changelog extends React.Component {
       .then(data => {
         const currentHistory = this.state.maintHistory
         data.historyQuery.forEach(history => {
-          console.log(history, history.user)
           const user = history.user
           const action = history.action
           const field = history.field || ''
