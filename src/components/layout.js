@@ -18,12 +18,10 @@ import {
 export default class Layout extends React.Component {
   constructor (props) {
     super(props)
-    const nightTrue = this.props.night === 'true'
     this.state = {
       openHelpModal: false,
       openA2HSModal: false,
-      deferredPrompt: null,
-      night: nightTrue || false
+      deferredPrompt: null
     }
     this.handleSignOutSubmit = this.handleSignOutSubmit.bind(this)
     this.toggleHelpModal = this.toggleHelpModal.bind(this)

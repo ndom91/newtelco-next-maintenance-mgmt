@@ -2314,8 +2314,8 @@ export default class Maintenance extends React.Component {
                       </Tooltip>
                     </Button>
                   </ButtonGroup>
-                  <span>
-                    <Badge theme='secondary' style={{ fontSize: '2rem', marginRight: '20px' }} outline>
+                  <span className='maint-header-text-wrapper'>
+                    <Badge theme='secondary' style={{ fontSize: '2rem', marginRight: '20px', maxWidth: '140px' }} outline>
                       {maintenanceIdDisplay}
                     </Badge>
                     <h2 style={{ display: 'inline-block', marginBottom: '0px' }}>{maintenance.name}</h2>
@@ -2623,7 +2623,7 @@ export default class Maintenance extends React.Component {
                                     <Col>
                                       <span style={{ color: 'var(--font-color)', fontWeight: '300 !important', fontSize: '1.5rem' }}>Maintenance History</span>
                                     </Col>
-                                    <Col>
+                                    <Col style={{ flexGrow: '0' }}>
                                       <Button style={{ float: 'right' }} onClick={this.toggleHistoryView} outline>
                                         <Tooltip
                                           title='View Customer CIDs'
@@ -2663,7 +2663,7 @@ export default class Maintenance extends React.Component {
                                     <Col>
                                       <span style={{ color: 'var(--font-color)', fontWeight: '300 !important', fontSize: '1.5rem' }}>Customer CIDs</span>
                                     </Col>
-                                    <Col>
+                                    <Col style={{ flexGrow: '0' }}>
                                       <Button style={{ float: 'right' }} onClick={this.toggleHistoryView} outline>
                                         <Tooltip
                                           title='View Maintenance Changelog'
@@ -2769,16 +2769,25 @@ export default class Maintenance extends React.Component {
                           Read
                       </Button>
                       <Button outline onClick={this.toggleRescheduleModal}>
+                        <FontAwesomeIcon icon={faClock} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
                         Reschedule
                       </Button>
                       <Button onClick={this.handleCalendarCreate} outline>
                         <FontAwesomeIcon icon={faCalendarAlt} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
                           Calendar
                       </Button>
-                      <Button disabled={maintenance.id !== 'NEW'} className='create-btn' onClick={this.handleCreateOnClick}>
-                        <FontAwesomeIcon icon={faPlusCircle} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
-                          Create
-                      </Button>
+                      {maintenance.id === 'NEW'
+                        ? (
+                          <Button disabled={maintenance.id !== 'NEW'} className='create-btn' onClick={this.handleCreateOnClick}>
+                            <FontAwesomeIcon icon={faPlusCircle} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
+                              Create
+                          </Button>
+                        ) : (
+                          <Button className='send-bulk' theme='primary' onClick={this.handleSendAll}>
+                            <FontAwesomeIcon icon={faMailBulk} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
+                            Send All
+                          </Button>
+                        )}
                     </ButtonGroup>
                   </CardFooter>
                 ) : (
@@ -3706,14 +3715,54 @@ export default class Maintenance extends React.Component {
                   :global(html) {
                     max-width: ${this.state.width}px;
                   }
+                  :global(.maintenance-subcontainer .badge label) {
+                    font-size: 1.2em;
+                    flex-direction: column;
+                    margin: 0px;
+                    height: 50px;
+                  }
+                  :global(.maint-header-text-wrapper) {
+                    flex-direction: row !important;
+                    flex-wrap: nowrap;
+                  }
                   :global(div.btn-toolbar > .btn-group-md) {
-                    margin-right: 20px;
+                    width: 100%;
+                    margin-bottom: 10px;
                   }
                   :global(.btn-group-2) {
                     width: 100%;
                   }
+                  :global(.btn-toolbar .btn div) {
+                    max-height: 80px !important;
+                    display: flex !important;
+                    flex-direction: row;
+                    justify-content: space-around;
+                    align-items: center;
+                    width: 100%;
+                  }
+                  :global(.btn-toolbar .btn) {
+                    max-height: 80px !important;
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: space-around;
+                    align-items: center;
+                  }
+                  :global(.btn-toolbar .btn svg) {
+                    margin-right: 0px !important;
+                  }
+                  :global(.card-footer .btn svg) {
+                    margin-right: 0px !important;
+                  }
+                  :global(.card-footer .btn) {
+                    max-height: 53px !important;
+                    height: 53px;
+                    padding: .25rem 0.9rem;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: space-around;
+                    align-items: center;
+                  }
                   :global(div.btn-toolbar) {
-                    flex-wrap: no-wrap;
                   }
                   :global(div.btn-toolbar > span) {
                     display: flex;
@@ -3723,14 +3772,15 @@ export default class Maintenance extends React.Component {
                     flex-grow: 1;
                   }
                   :global(div.btn-toolbar > span > h2) {
-                    margin: 5px auto 0 auto;
+                    margin: 5px;
                     padding-right: 20px;
+                    max-width: 140px;
                   }
                   :global(.card-header h2) {
                     margin-top: 5px;
                   }
                   :global(.card-header) {
-                    height: 110px;
+                    height: 120px;
                   }
                   :global(.card-body) {
                     padding: 0px;

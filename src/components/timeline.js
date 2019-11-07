@@ -35,9 +35,17 @@ class Changelog extends React.Component {
   }
 
   render () {
-    return (
-      <Timeline items={this.state.maintHistory} />
-    )
+    if (this.state.maintHistory.length !== 0) {
+      return (
+        <Timeline items={this.state.maintHistory} />
+      )
+    } else {
+      return (
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '150px' }}>
+          <h4 style={{ fontWeight: '100 !important', marginTop: '20px', color: 'var(--font-color)' }}>No History Available</h4>
+        </div>
+      )
+    }
   }
 }
 

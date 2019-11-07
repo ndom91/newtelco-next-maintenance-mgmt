@@ -137,8 +137,7 @@ export default class History extends React.Component {
           }, {
             headerName: 'Rescheduled',
             field: 'rescheduled',
-            width: 120,
-            pinned: 'right',
+            width: 150,
             cellStyle: {
               display: 'flex',
               justifyContent: 'center',
@@ -148,7 +147,7 @@ export default class History extends React.Component {
           }, {
             headerName: 'Complete',
             field: 'done',
-            width: 140,
+            width: 100,
             pinned: 'right',
             cellRenderer: 'complete'
           }
