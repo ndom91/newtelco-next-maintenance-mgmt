@@ -2385,10 +2385,6 @@ export default class Maintenance extends React.Component {
                                   <FormInput tabIndex='-1' readOnly id='edited-by-input' name='edited-by' type='text' value={maintenance.bearbeitetvon} onChange={this.handleCreatedByChange} />
                                 </FormGroup>
                                 <FormGroup>
-                                  <label htmlFor='updated-by'>Last Updated By</label>
-                                  <FormInput readOnly id='updated-by' name='updated-by' type='text' value={maintenance.updatedBy || ''} onChange={this.handleUpdatedByChange} />
-                                </FormGroup>
-                                <FormGroup>
                                   <label htmlFor='supplier'>Timezone</label>
                                   <TimezoneSelector
                                     className='maint-select'
@@ -2413,10 +2409,6 @@ export default class Maintenance extends React.Component {
                                 <FormGroup>
                                   <label htmlFor='maileingang'>Mail Arrived</label>
                                   <FormInput tabIndex='-1' readOnly id='maileingang-input' name='maileingang' type='text' value={convertDateTime(maintenance.maileingang)} />
-                                </FormGroup>
-                                <FormGroup>
-                                  <label htmlFor='updated-at'>Updated At</label>
-                                  <FormInput tabIndex='-1' readOnly id='updated-at' name='updated-at' type='text' value={convertDateTime(maintenance.updatedAt)} onChange={this.handleUpdatedAtChange} />
                                 </FormGroup>
                                 <FormGroup>
                                   <label htmlFor='supplier'>Supplier</label>
@@ -3351,10 +3343,14 @@ export default class Maintenance extends React.Component {
                 :global(.maint-select div[class$="-multiValue"]) {
                   background-color: var(--input);
                   color: var(--font-color);
+                  border: 1px solid var(--border-color);
+                  border-radius: 5px;
                 }
                 :global(.maint-select div[class$="-singleValue"]) {
                   background-color: var(--input);
                   color: var(--font-color);
+                  border: 1px solid var(--border-color);
+                  border-radius: 5px;
                 }
                 :global(.Mui-focused) {
                   border: none !important;
