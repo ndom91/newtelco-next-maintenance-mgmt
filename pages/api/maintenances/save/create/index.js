@@ -3,7 +3,6 @@ const escape = require('sql-template-strings')
 
 module.exports = async (req, res) => {
   const bearbeitetvon = req.query.bearbeitetvon
-  // const incomingDate = req.query.incomingDate
   const lieferant = req.query.lieferant
   const mailId = req.query.mailId
   const updatedAt = req.query.updatedAt

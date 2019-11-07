@@ -1146,7 +1146,7 @@ export default class Maintenance extends React.Component {
             }
           })
 
-          fetch(`https://${host}/api/maintenances/save/calendar?mid=${this.state.maintenance.id}&cid=${calId}`, {
+          fetch(`https://${host}/api/maintenances/save/calendar?mid=${this.state.maintenance.id}&cid=${calId}&updatedby=${this.props.session.user.email}`, {
             method: 'get'
           })
             .then(resp => resp.json())
