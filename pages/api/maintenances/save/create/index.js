@@ -14,7 +14,8 @@ module.exports = async (req, res) => {
   const newId = getLastInsertedID[0]
 
   if (insertQuery.affectedRows >= 1) {
-    res.status(200).json({ statusText: 'OK', status: 200, newId: newId })
+    const updateHistory = await db.query(escape`INSERT INTO changelog (mid, user, action) VALUES (${newId['LAST_INSERT_ID()']}, ${bearbeitetvon}, 'create');`)
+    res.status(200).json({ statusText: 'OK', status: 200, newId: newId, update: updateHistory })
   } else {
     res.status(200).json({ statusText: 'FAIL', status: 500, err: 'Save Failed' })
   }

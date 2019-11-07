@@ -30,7 +30,7 @@ import EndDateTime from '../src/components/ag-grid/enddatetime'
 import { AgGridReact } from 'ag-grid-react'
 import PDF from 'react-pdf-js-infinite'
 import root from 'react-shadow'
-import Timeline from 'react-time-line'
+import dynamic from 'next/dynamic'
 
 import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-material.css'
@@ -84,6 +84,11 @@ import {
 } from 'shards-react'
 
 const animatedComponents = makeAnimated()
+
+const Changelog = dynamic(
+  () => import('../src/components/timeline'),
+  { ssr: false }
+)
 
 export default class Maintenance extends React.Component {
   static async getInitialProps ({ req, query }) {
@@ -480,16 +485,18 @@ export default class Maintenance extends React.Component {
       })
     }
 
-    fetch(`https://${host}/api/reschedule?id=${this.props.jsonData.profile.id}`, {
-      method: 'get'
-    })
-      .then(resp => resp.json())
-      .then(data => {
-        this.setState({
-          rescheduleData: data.reschedules
-        })
+    if (this.props.jsonData.profile.id !== 'NEW') {
+      fetch(`https://${host}/api/reschedule?id=${this.props.jsonData.profile.id}`, {
+        method: 'get'
       })
-      .catch(err => console.error(`Error Loading Reschedules - ${err}`))
+        .then(resp => resp.json())
+        .then(data => {
+          this.setState({
+            rescheduleData: data.reschedules
+          })
+        })
+        .catch(err => console.error(`Error Loading Reschedules - ${err}`))
+    }
   }
 
   handleRescheduleGridReady (params) {
@@ -2252,8 +2259,7 @@ export default class Maintenance extends React.Component {
     const {
       maintenance,
       openReadModal,
-      openPreviewModal,
-      openRescheduleModal
+      openPreviewModal
     } = this.state
 
     let maintenanceIdDisplay
@@ -2279,15 +2285,6 @@ export default class Maintenance extends React.Component {
     if (typeof window !== 'undefined') {
       HALF_WIDTH = this.state.width !== 0 ? this.state.width / 2 : 500
     }
-
-    const maintHistory = [
-      {ts: "2019-10-29T12:22:46.587Z", text: 'fwaleska - changed start date time'},
-      {ts: "2019-10-29T12:21:46.587Z", text: 'fwaleska - saved done toggle'},
-      {ts: "2019-10-29T12:20:46.587Z", text: 'alissitsin - updated notes'},
-      {ts: "2019-11-01T12:22:46.587Z", text: 'alissitsin - sent mails'},
-      {ts: "2019-11-01T12:21:46.587Z", text: 'fwaleska - rescheduled #1'},
-      {ts: "2019-11-01T12:20:46.587Z", text: 'fwaleska - rescheduled #2'}
-    ]
 
     if (this.props.session.user) {
       return (
@@ -2420,7 +2417,7 @@ export default class Maintenance extends React.Component {
                                 </FormGroup>
                                 <FormGroup>
                                   <label htmlFor='updated-by'>Last Updated By</label>
-                                  <FormInput readOnly id='updated-by' name='updated-by' type='text' value={maintenance.updatedBy} onChange={this.handleUpdatedByChange} />
+                                  <FormInput readOnly id='updated-by' name='updated-by' type='text' value={maintenance.updatedBy || ''} onChange={this.handleUpdatedByChange} />
                                 </FormGroup>
                                 <FormGroup>
                                   <label htmlFor='supplier'>Timezone</label>
@@ -2658,7 +2655,7 @@ export default class Maintenance extends React.Component {
                                   </Row>
                                   <Row>
                                     <Col>
-                                      <Timeline items={maintHistory} />
+                                      <Changelog maintid={this.state.maintenance.id} />
                                     </Col>
                                   </Row>
                                 </Container>
@@ -3175,7 +3172,7 @@ export default class Maintenance extends React.Component {
                 :global(.flip-transition-enter-active) {
                   opacity: 1;
                   transform: translateX(0);
-                  transition: opacity 300ms, transform 300ms;
+                  transition: opacity 500ms, transform 300ms;
                 }
                 :global(.flip-transition-exit) {
                   opacity: 0;
@@ -3183,7 +3180,7 @@ export default class Maintenance extends React.Component {
                 :global(.flip-transition-exit-active) {
                   opacity: 1;
                   transform: translateX(0);
-                  transition: opacity 300ms, transform 300ms;
+                  transition: opacity 500ms, transform 300ms;
                 }
                 :global(.time-line-ctnr) {
                   margin-top: 15px;
@@ -3199,7 +3196,7 @@ export default class Maintenance extends React.Component {
                   color: var(--font-color);
                 }
                 :global(.time-label span) {
-                  background-color: #67B246;
+                  background-color: #67B246 !important;
                 }
                 :global(.delete-modal.modal-body) {
                   background-color: var(--primary-bg);
