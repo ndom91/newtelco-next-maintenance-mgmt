@@ -31,6 +31,7 @@ import { AgGridReact } from 'ag-grid-react'
 import PDF from 'react-pdf-js-infinite'
 import root from 'react-shadow'
 import dynamic from 'next/dynamic'
+import Popup from 'reactjs-popup'
 
 import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-material.css'
@@ -90,6 +91,12 @@ const Changelog = dynamic(
   { ssr: false }
 )
 
+const PopupDownload = (popupDownload) => (
+  <Popup trigger={popupDownload} position="right center">
+    <div>Popup content here !!</div>
+  </Popup>
+)
+
 export default class Maintenance extends React.Component {
   static async getInitialProps ({ req, query }) {
     const host = req ? req.headers['x-forwarded-host'] : location.host
@@ -110,7 +117,7 @@ export default class Maintenance extends React.Component {
         session: await NextAuth.init({ req })
       }
     } else {
-      const pageRequest = `https://${host}/api/maintenances/${query.id.replace(/[0-9]+/g, '')}`
+      const pageRequest = `https://${host}/api/maintenances/${query.id}`
       const res = await fetch(pageRequest)
       const json = await res.json()
       return {
@@ -162,6 +169,7 @@ export default class Maintenance extends React.Component {
       openRescheduleModal: false,
       openConfirmDeleteModal: false,
       openMaintenanceChangelog: false,
+      openDownloadPopup: false,
       reschedule: {
         startDateTime: null,
         endDateTime: null,
@@ -2015,6 +2023,14 @@ export default class Maintenance extends React.Component {
       }
       return view
     }
+    function downloadFile (base64, filename, mimeType) {
+      const linkSource = `${mimeType};base64,${base64}`
+      const downloadLink = document.createElement('a')
+
+      downloadLink.href = linkSource
+      downloadLink.download = filename
+      downloadLink.click()
+    }
     if (id !== null) {
       let filetype = ''
       const fileExt = filename.match(/\.[0-9a-z]+$/i)
@@ -2095,9 +2111,20 @@ export default class Maintenance extends React.Component {
           openAttachmentModal: !this.state.openAttachmentModal
         })
       } else {
-        cogoToast.warn('Filetype not supported', {
-          position: 'top-right'
+        const fileIndex = this.state.maintenance.incomingAttachments.findIndex(el => el.id === id)
+        const file = this.state.maintenance.incomingAttachments[fileIndex]
+        const mime = file.mime
+        const rawData = file.data
+        let base64 = (rawData).replace(/_/g, '/')
+        base64 = base64.replace(/-/g, '+')
+        const base64Fixed = fixBase64(base64)
+        this.setState({
+          openDownloadPopup: !this.state.openDownloadPopup
         })
+        // downloadFile(base64Fixed, filename, mime)
+        // cogoToast.warn('Filetype not supported', {
+        //   position: 'top-right'
+        // })
       }
     } else {
       this.setState({
@@ -2840,7 +2867,16 @@ export default class Maintenance extends React.Component {
                               null
                             )}
                         </div>
-                      </ModalHeader>
+                        <Popup
+                          open={this.state.openDownloadPopup}
+                          position='bottom center'
+                          className='popup-download'
+                          arrow
+                          closeOnDocumentClick
+                          >
+                          <span>Would you like to download?</span>
+                      </Popup>
+                    </ModalHeader>
                       <ModalBody className='mail-body' dangerouslySetInnerHTML={{ __html: this.state.translated ? this.state.translatedBody : this.state.maintenance.incomingBody }} />
                     </div>
                   </Rnd>

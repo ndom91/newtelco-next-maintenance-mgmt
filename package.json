@@ -78,6 +78,7 @@
     "react-tooltip": "^3.11.1",
     "react-transition-group": "^4.3.0",
     "react-useanimations": "^1.2.10",
+    "reactjs-popup": "^1.5.0",
     "serverless-mysql": "^1.5.1",
     "shards-react": "^1.0.3",
     "shards-ui": "^3.0.0",
