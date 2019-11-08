@@ -92,7 +92,7 @@ const Changelog = dynamic(
 )
 
 const PopupDownload = (popupDownload) => (
-  <Popup trigger={popupDownload} position="right center">
+  <Popup trigger={popupDownload} position='right center'>
     <div>Popup content here !!</div>
   </Popup>
 )
@@ -954,7 +954,7 @@ export default class Maintenance extends React.Component {
           }
           const maintId = this.state.maintenance.id
           const user = this.props.session.user.email
-          const action = 'sent'
+          const action = 'sent to'
           const field = kundenCidRow.name
           fetch(`https://${host}/api/history?mid=${maintId}&user=${user}&field=${field}&action=${action}`, {
             method: 'get'
@@ -2289,7 +2289,7 @@ export default class Maintenance extends React.Component {
             <Helmet>
               <title>{`Newtelco Maintenance - NT-${maintenance.id}`}</title>
             </Helmet>
-            <Card style={{ maxWidth: '100%' }}>
+            <Card className='top-card-wrapper' style={{ maxWidth: '100%' }}>
               <CardHeader>
                 <ButtonToolbar style={{ justifyContent: 'space-between' }}>
                   <ButtonGroup size='md'>
@@ -2318,7 +2318,7 @@ export default class Maintenance extends React.Component {
                     <Badge theme='secondary' style={{ fontSize: '2rem', marginRight: '20px', maxWidth: '140px' }} outline>
                       {maintenanceIdDisplay}
                     </Badge>
-                    <h2 style={{ display: 'inline-block', marginBottom: '0px' }}>{maintenance.name}</h2>
+                    <h2 style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', display: 'inline-block', marginBottom: '0px' }}>{maintenance.name}</h2>
                   </span>
                   {this.state.width > 500
                     ? (
@@ -2642,7 +2642,7 @@ export default class Maintenance extends React.Component {
                                     </Col>
                                   </Row>
                                   <Row>
-                                    <Col>
+                                    <Col className='changelog-wrapper'>
                                       <Changelog maintid={this.state.maintenance.id} />
                                     </Col>
                                   </Row>
@@ -2882,10 +2882,10 @@ export default class Maintenance extends React.Component {
                           className='popup-download'
                           arrow
                           closeOnDocumentClick
-                          >
+                        >
                           <span>Would you like to download?</span>
-                      </Popup>
-                    </ModalHeader>
+                        </Popup>
+                      </ModalHeader>
                       <ModalBody className='mail-body' dangerouslySetInnerHTML={{ __html: this.state.translated ? this.state.translatedBody : this.state.maintenance.incomingBody }} />
                     </div>
                   </Rnd>
@@ -3192,14 +3192,14 @@ export default class Maintenance extends React.Component {
                   margin-top: 15px;
                 }
                 :global(.time-line-ctnr .time-line > li > .fa) {
-                  border-color: #67B246;
+                  border-color: #67B246 !important;
                 }
                 :global(.time-line-ctnr .time-line:before) {
-                  background: #67B246;
+                  background: #67B246 !important;
                 }
                 :global(.time-line-ctnr .time-line > li > .time-line-item .time-line-header) {
-                  background-color: var(--primary-bg);
-                  color: var(--font-color);
+                  background-color: var(--primary-bg) !important;
+                  color: var(--font-color) !important;
                 }
                 :global(.time-label span) {
                   background-color: #67B246 !important;
@@ -3715,6 +3715,18 @@ export default class Maintenance extends React.Component {
                   :global(html) {
                     max-width: ${this.state.width}px;
                   }
+                  :global(.navbar) {
+                    position: fixed;
+                    z-index: 1000;
+                    width: 100%;
+                  }
+                  :global(.changelog-wrapper) {
+                    max-height: 600px;
+                    overflow-y: scroll;
+                  }
+                  :global(.top-card-wrapper) {
+                    margin-top: 60px;
+                  }
                   :global(.maintenance-subcontainer .badge label) {
                     font-size: 1.2em;
                     flex-direction: column;
@@ -3774,7 +3786,8 @@ export default class Maintenance extends React.Component {
                   :global(div.btn-toolbar > span > h2) {
                     margin: 5px;
                     padding-right: 20px;
-                    max-width: 140px;
+                    font-size: 1.5em;
+                    max-width: 170px;
                   }
                   :global(.card-header h2) {
                     margin-top: 5px;

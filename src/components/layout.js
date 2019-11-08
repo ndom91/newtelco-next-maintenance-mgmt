@@ -31,16 +31,16 @@ export default class Layout extends React.Component {
 
   componentDidMount () {
     const night = window.localStorage.getItem('theme')
+    const installAsk = window.localStorage.getItem('askA2HS') || 0
 
-    if (window.outerWidth < 500) {
+    if (window.outerWidth < 500 && installAsk < 3) {
       window.addEventListener('beforeinstallprompt', (e) => {
-        // Prevent Chrome 67 and earlier from automatically showing the prompt
         e.preventDefault()
-        // Stash the event so it can be triggered later.
         this.setState({
           openA2HSModal: !this.state.openA2HSModal,
           deferredPrompt: e
         })
+        window.localStorage.setItem('askA2HS', parseInt(installAsk) + 1)
       })
     }
 
@@ -142,7 +142,7 @@ export default class Layout extends React.Component {
           <Header night={this.state.night} toggleNight={this.onToggleNight} handleSearchSelection={this.props.handleSearchSelection} unread={this.props.unread} session={this.props.session} />
           <Container fluid>
             <Row style={{ height: '20px' }} />
-            <Row>
+            <Row className='top-level-row'>
               <Col className='toplevel-col' sm='12' lg='12'>
                 {this.props.children}
               </Col>
@@ -379,6 +379,16 @@ export default class Layout extends React.Component {
                 bottom: 0;
                 left: 50%;
                 width: 96%;
+              }
+              @media only screen and (max-width: 500px) {
+                :global(.navbar) {
+                  position: fixed;
+                  z-index: 1000;
+                  width: 100%;
+                }
+                :global(.top-card-wrapper) {
+                  margin-top: 60px;
+                }
               }
               @media only screen and (min-width: 1024px) {
                 :global(div.toplevel-col) {

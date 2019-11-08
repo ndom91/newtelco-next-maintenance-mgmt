@@ -138,7 +138,7 @@ export default class Index extends React.Component {
         <Layout night={this.props.night} handleSearchSelection={this.handleSearchSelection} unread={this.props.unread} session={this.props.session}>
           {UnreadCount()}
           <Card style={{ maxWidth: '100%' }}>
-            <CardHeader><h2>Newtelco Maintenance</h2></CardHeader>
+            <CardHeader><h2 className='title-text'>Newtelco Maintenance</h2></CardHeader>
             <CardBody>
               <Container className='card-container'>
                 <Row>
@@ -233,6 +233,9 @@ export default class Index extends React.Component {
               }
               :global(.heatmap-row) {
                 padding: 0px !important;
+              }
+              :global(.title-text) {
+                font-size: 2.2rem !important;
               }
             }
             :global(.break) {

@@ -68,8 +68,20 @@ export default class History extends React.Component {
     }
   }
 
+
   constructor (props) {
     super(props)
+    const pinned = dir => {
+      if (typeof window !== 'undefined' && window.outerWidth < '500') {
+        return 'none'
+      } else {
+        if (dir === 'left') {
+          return 'left'
+        } else {
+          return 'right'
+        }
+      }
+    }
     this.state = {
       openNewModal: false,
       openConfirmDeleteModal: false,
@@ -91,12 +103,12 @@ export default class History extends React.Component {
             filter: false,
             resizable: false,
             cellRenderer: 'editBtn',
-            pinned: 'left'
+            pinned: pinned('left')
           }, {
             headerName: 'ID',
             field: 'id',
             width: 100,
-            pinned: 'left',
+            pinned: pinned('left'),
             sort: { direction: 'asc', priority: 0 }
           }, {
             headerName: 'By',
@@ -124,7 +136,6 @@ export default class History extends React.Component {
           }, {
             headerName: 'Newtelco CIDs',
             field: 'betroffeneCIDs',
-            // width: 0,
             tooltipField: 'betroffeneCIDs'
           }, {
             headerName: 'Mail Arrived',
@@ -148,7 +159,7 @@ export default class History extends React.Component {
             headerName: 'Complete',
             field: 'done',
             width: 100,
-            pinned: 'right',
+            pinned: pinned('right'),
             cellRenderer: 'complete'
           }
         ],
