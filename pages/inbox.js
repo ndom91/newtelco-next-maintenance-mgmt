@@ -254,7 +254,7 @@ export default class Inbox extends React.Component {
                               {this.state.windowInnerWidth > 500
                                 ? (
                                   <Badge outline theme='light' className='mail-badge'>
-                                    <img className='mail-icon' src={mail.faviconUrl} />
+                                    <img alt='Icon' className='mail-icon' src={mail.faviconUrl} />
                                     <FontAwesomeIcon onClick={() => this.toggle(mail.id)} width='1.325em' className='mail-open-icon' icon={faEnvelopeOpenText} />
                                   </Badge>
                                 ) : (
@@ -273,7 +273,7 @@ export default class Inbox extends React.Component {
                                 {this.state.windowInnerWidth < 500
                                   ? (
                                     <Badge outline theme='light' className='mail-badge'>
-                                      <img className='mail-icon' src={mail.faviconUrl} />
+                                      <img alt='Icon' className='mail-icon' src={mail.faviconUrl} />
                                       <FontAwesomeIcon onClick={() => this.toggle(mail.id)} width='1.525em' className='mail-open-icon' icon={faEnvelopeOpenText} />
                                     </Badge>
                                   ) : (
@@ -313,7 +313,7 @@ export default class Inbox extends React.Component {
 
                   {!Array.isArray(inboxMails) && (
                     <div className='inbox0-wrapper'>
-                      <img src='/static/images/inbox0.svg' alt='Inbox 0' style={{ width: '400px' }} />
+                      <img src='/static/images/inbox0.svg' alt='Inbox' style={{ width: '400px' }} />
                       <h4 className='inbox0-text'>Congrats, nothing to do!</h4>
                     </div>
                   )}
@@ -321,7 +321,7 @@ export default class Inbox extends React.Component {
               </ListGroup>
               <Modal className='mail-modal-body' animation backdrop backdropClassName='modal-backdrop' open={open} size='lg' toggle={this.toggle}>
                 <ModalHeader>
-                  <img className='preview-mail-icon' alt='Company Logo' src={this.state.readIconUrl} />
+                  <img className='preview-mail-icon' alt='Logo' src={this.state.readIconUrl} />
                   <div className='modal-preview-text-wrapper'>
                     <InputGroup size='sm' className='mb-2'>
                       <InputGroupAddon style={{ height: '31px' }} size='sm' type='prepend'>
