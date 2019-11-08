@@ -31,7 +31,9 @@ import { AgGridReact } from 'ag-grid-react'
 import PDF from 'react-pdf-js-infinite'
 import root from 'react-shadow'
 import dynamic from 'next/dynamic'
-import Popup from 'reactjs-popup'
+import Popover from 'react-popover'
+import { saveAs } from 'file-saver'
+
 
 import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-material.css'
@@ -89,12 +91,6 @@ const animatedComponents = makeAnimated()
 const Changelog = dynamic(
   () => import('../src/components/timeline'),
   { ssr: false }
-)
-
-const PopupDownload = (popupDownload) => (
-  <Popup trigger={popupDownload} position='right center'>
-    <div>Popup content here !!</div>
-  </Popup>
 )
 
 export default class Maintenance extends React.Component {
@@ -170,6 +166,7 @@ export default class Maintenance extends React.Component {
       openConfirmDeleteModal: false,
       openMaintenanceChangelog: false,
       openDownloadPopup: false,
+      attachmentPopoverBody: null,
       reschedule: {
         startDateTime: null,
         endDateTime: null,
@@ -367,6 +364,7 @@ export default class Maintenance extends React.Component {
     this.mailSubjectText = this.mailSubjectText.bind(this)
     this.moveCalendarEntry = this.moveCalendarEntry.bind(this)
     this.toggleHistoryView = this.toggleHistoryView.bind(this)
+    this.toggleDownloadPopover = this.toggleDownloadPopover.bind(this)
   }
 
   componentDidMount () {
@@ -1977,6 +1975,12 @@ export default class Maintenance extends React.Component {
     }
   }
 
+  toggleDownloadPopover () {
+    this.setState({
+      openedDownloadPopupId: null
+    })
+  }
+
   handleDeleteReschedule () {
     const host = window.location.host
     fetch(`https://${host}/api/reschedule/delete?mid=${this.state.maintenance.id}&rcounter=${this.state.rescheduleToDelete.rcounter}&user=${encodeURIComponent(this.props.session.user.email)}`, {
@@ -2017,19 +2021,25 @@ export default class Maintenance extends React.Component {
       var buffer = new ArrayBuffer(len)
       var view = new Uint8Array(buffer)
 
-      // save unicode of binary data into 8-bit Array
       for (var i = 0; i < len; i++) {
         view[i] = binary.charCodeAt(i)
       }
       return view
     }
+    function base64ToArrayBuffer (data) {
+      var binaryString = window.atob(data)
+      var binaryLen = binaryString.length
+      var bytes = new Uint8Array(binaryLen)
+      for (var i = 0; i < binaryLen; i++) {
+        var ascii = binaryString.charCodeAt(i)
+        bytes[i] = ascii
+      }
+      return bytes
+    }
     function downloadFile (base64, filename, mimeType) {
-      const linkSource = `${mimeType};base64,${base64}`
-      const downloadLink = document.createElement('a')
-
-      downloadLink.href = linkSource
-      downloadLink.download = filename
-      downloadLink.click()
+      const base64Fixed = fixBase64(base64)
+      const fileData = new Blob([base64Fixed], { type: mimeType })
+      saveAs(fileData, filename)
     }
     if (id !== null) {
       let filetype = ''
@@ -2049,10 +2059,12 @@ export default class Maintenance extends React.Component {
           break
       }
       if (filetype === 'excel') {
-        const excelIndex = this.state.maintenance.incomingAttachments.findIndex(el => el.mime === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || el.mime === 'application/vnd.ms-excel')
-        const file = this.state.maintenance.incomingAttachments[excelIndex].data
-        const filename = this.state.maintenance.incomingAttachments[excelIndex].name
-        let base64 = (file).replace(/_/g, '/')
+        const excelIndex = this.state.maintenance.incomingAttachments.findIndex(el => el.id === id)
+        const file = this.state.maintenance.incomingAttachments[excelIndex]
+        const filedata = file.data
+        const mime = file.mime
+        const filename = file.name
+        let base64 = (filedata).replace(/_/g, '/')
         base64 = base64.replace(/-/g, '+')
         const base64Fixed = fixBase64(base64)
         var fileData = new Blob([base64Fixed], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;' })
@@ -2071,17 +2083,26 @@ export default class Maintenance extends React.Component {
               filetype: filetype,
               cols: resp.cols,
               rows: resp.rows,
-              openAttachmentModal: !this.state.openAttachmentModal,
               currentAttachmentName: filename,
-              currentAttachment: id || null
+              currentAttachment: id || null,
+              openedDownloadPopupId: id,
+              attachmentPopoverBody:
+              <span>
+                <ButtonGroup>
+                  <Button onClick={() => this.setState({ openAttachmentModal: !this.state.openAttachmentModal, openedDownloadPopupId: null })} outline size='sm'>Preview</Button>
+                  <Button onClick={() => downloadFile(base64, filename, mime)} size='sm'>Download</Button>
+                </ButtonGroup>
+              </span>
             })
           }
         })
       } else if (filetype === 'pdf') {
-        const pdfIndex = this.state.maintenance.incomingAttachments.findIndex(el => el.mime === 'application/pdf')
-        const file = this.state.maintenance.incomingAttachments[pdfIndex].data
-        const filename = this.state.maintenance.incomingAttachments[pdfIndex].name
-        let base64 = (file).replace(/_/g, '/')
+        const pdfIndex = this.state.maintenance.incomingAttachments.findIndex(el => el.id === id)
+        const file = this.state.maintenance.incomingAttachments[pdfIndex]
+        const filedata = file.data
+        const mime = file.mime
+        const filename = file.name
+        let base64 = (filedata).replace(/_/g, '/')
         base64 = base64.replace(/-/g, '+')
         const base64Fixed = fixBase64(base64)
         const fileData = new Blob([base64Fixed], { type: 'application/pdf' })
@@ -2093,22 +2114,39 @@ export default class Maintenance extends React.Component {
           filetype: filetype,
           pdfid: id,
           pdfB64: fileData,
-          openAttachmentModal: !this.state.openAttachmentModal,
           currentAttachmentName: filename,
-          currentAttachment: id || null
+          currentAttachment: id || null,
+          openedDownloadPopupId: id,
+          attachmentPopoverBody:
+          <span>
+            <ButtonGroup>
+              <Button onClick={() => this.setState({ openAttachmentModal: !this.state.openAttachmentModal, openedDownloadPopupId: null })} outline size='sm'>Preview</Button>
+              <Button onClick={() => downloadFile(base64, filename, mime)} size='sm'>Download</Button>
+            </ButtonGroup>
+          </span>
         })
       } else if (filetype === 'html') {
-        const htmlIndex = this.state.maintenance.incomingAttachments.findIndex(el => el.mime === 'text/html')
-        const file = this.state.maintenance.incomingAttachments[htmlIndex].data
-        const filename = this.state.maintenance.incomingAttachments[htmlIndex].name
-        let base64 = (file).replace(/_/g, '/')
+        const fileIndex = this.state.maintenance.incomingAttachments.findIndex(el => el.id === id)
+        const file = this.state.maintenance.incomingAttachments[fileIndex]
+        const filedata = file.data
+        const filename = file.name
+        const mime = file.mime
+        let base64 = (filedata).replace(/_/g, '/')
         base64 = base64.replace(/-/g, '+')
+        // const base64Fixed = fixBase64(base64)
         this.setState({
           attachmentHTMLContent: atob(base64),
           filetype: filetype,
           currentAttachment: id || null,
           currentAttachmentName: filename,
-          openAttachmentModal: !this.state.openAttachmentModal
+          openedDownloadPopupId: id,
+          attachmentPopoverBody:
+          <span>
+            <ButtonGroup>
+              <Button onClick={() => this.setState({ openAttachmentModal: !this.state.openAttachmentModal, openedDownloadPopupId: null })} outline size='sm'>Preview</Button>
+              <Button onClick={() => downloadFile(base64, filename, mime)} size='sm'>Download</Button>
+            </ButtonGroup>
+          </span>
         })
       } else {
         const fileIndex = this.state.maintenance.incomingAttachments.findIndex(el => el.id === id)
@@ -2117,14 +2155,31 @@ export default class Maintenance extends React.Component {
         const rawData = file.data
         let base64 = (rawData).replace(/_/g, '/')
         base64 = base64.replace(/-/g, '+')
-        const base64Fixed = fixBase64(base64)
+        // const base64Fixed = fixBase64(base64)
         this.setState({
-          openDownloadPopup: !this.state.openDownloadPopup
+          attachmentPopoverBody:
+          <span>
+            <ButtonGroup>
+              <Button outline disabled size='sm'>
+                <Tooltip
+                  title='Preview not available for this filetype'
+                  position='bottom'
+                  trigger='mouseenter'
+                  delay='250'
+                  distance='25'
+                  interactiveBorder='15'
+                  arrow
+                  size='small'
+                  theme='transparent'
+                >
+                  Preview
+                </Tooltip>
+              </Button>
+              <Button onClick={() => downloadFile(base64, filename, mime)} size='sm'>Download</Button>
+            </ButtonGroup>
+          </span>,
+          openedDownloadPopupId: id
         })
-        // downloadFile(base64Fixed, filename, mime)
-        // cogoToast.warn('Filetype not supported', {
-        //   position: 'top-right'
-        // })
       }
     } else {
       this.setState({
@@ -2608,7 +2663,7 @@ export default class Maintenance extends React.Component {
                         </Col>
                       </Row>
                     </Col>
-                    <Col sm='12' lg='6'>
+                    <Col sm='12' lg='6' className='flip-container'>
                       {this.state.openMaintenanceChangelog
                         ? (
                           <CSSTransition
@@ -2867,24 +2922,24 @@ export default class Maintenance extends React.Component {
                           {Array.isArray(this.state.maintenance.incomingAttachments) && this.state.maintenance.incomingAttachments.length !== 0
                             ? this.state.maintenance.incomingAttachments.map((attachment, index) => {
                               return (
-                                <Button pill size='sm' onClick={() => this.showAttachments(attachment.id, attachment.name)} theme='primary' style={{ marginLeft: '10px' }} key={index}>
-                                  {attachment.name}
-                                </Button>
+                                <Popover
+                                  isOpen={this.state.openedDownloadPopupId === attachment.id}
+                                  onOuterAction={() => this.toggleDownloadPopover(false)}
+                                  body={this.state.attachmentPopoverBody}
+                                  key={index}
+                                  tipSize={12}
+                                  preferPlace='below'
+                                >
+                                  <Button pill size='sm' onClick={() => this.showAttachments(attachment.id, attachment.name)} theme='primary' style={{ marginLeft: '10px' }} >
+                                    {attachment.name}
+                                  </Button>
+                                </Popover>
                               )
                             })
                             : (
                               null
                             )}
                         </div>
-                        <Popup
-                          open={this.state.openDownloadPopup}
-                          position='bottom center'
-                          className='popup-download'
-                          arrow
-                          closeOnDocumentClick
-                        >
-                          <span>Would you like to download?</span>
-                        </Popup>
                       </ModalHeader>
                       <ModalBody className='mail-body' dangerouslySetInnerHTML={{ __html: this.state.translated ? this.state.translatedBody : this.state.maintenance.incomingBody }} />
                     </div>
@@ -3174,19 +3229,23 @@ export default class Maintenance extends React.Component {
             <style jsx>{`
                 :global(.flip-transition-enter) {
                   opacity: 0;
+                  transform: rotateY( 180deg );
                 }
                 :global(.flip-transition-enter-active) {
                   opacity: 1;
                   transform: translateX(0);
-                  transition: opacity 500ms, transform 300ms;
+                  transform: rotateY( 360deg );
+                  transition: opacity 0.9s, transform 0.9s;
                 }
                 :global(.flip-transition-exit) {
                   opacity: 0;
+                  transform: rotateY( 180deg );
                 }
                 :global(.flip-transition-exit-active) {
                   opacity: 1;
                   transform: translateX(0);
-                  transition: opacity 500ms, transform 300ms;
+                  transform: rotateY( 360deg );
+                  transition: opacity 0.9s, transform 0.9s;
                 }
                 :global(.time-line-ctnr) {
                   margin-top: 15px;
@@ -3200,6 +3259,10 @@ export default class Maintenance extends React.Component {
                 :global(.time-line-ctnr .time-line > li > .time-line-item .time-line-header) {
                   background-color: var(--primary-bg) !important;
                   color: var(--font-color) !important;
+                  border-bottom: none !important;
+                }
+                :global(.time-line-ctnr .time-line > li > .time-line-item) {
+                  box-shadow: none !important;
                 }
                 :global(.time-label span) {
                   background-color: #67B246 !important;
@@ -3486,7 +3549,7 @@ export default class Maintenance extends React.Component {
                   box-shadow: unset;
                 }
                 :global(.form-group-toggle > .badge-outline-secondary) {
-                  border: ${this.state.night ? '2px solid #fff' : ''};
+                  border: ${this.state.night ? '1px solid #fff' : ''};
                 }
                 :global(.badge-outline-secondary > label) {
                   color: var(--font-color);
@@ -3652,7 +3715,7 @@ export default class Maintenance extends React.Component {
                   background-color: var(--disabled-input);
                 }
                 :global(.btn-outline-primary) {
-                  height: 99%;
+                  height: 97%;
                 }
                 :global(.btn-outline-secondary) {
                   color: var(--font-color);
@@ -3710,6 +3773,36 @@ export default class Maintenance extends React.Component {
                   box-shadow: 0 0 5px 1px #dc3545;
                   background-color: #dc35451f;
                   width: 100%;
+                }
+                :global(.changelog-wrapper) {
+                  max-height: 1020px;
+                  margin-top: 10px;
+                  overflow-y: scroll;
+                }
+                :global(.maintenance-subcontainer .badge label) {
+                  flex-direction: column;
+                  justify-content: space-between;
+                  height: 40px;
+                }
+                :global(.Popover-body) {
+                  display: flex;
+                  justify-content: center;
+                  align-items: center;
+                  padding: 10px;
+                  width: 200px;
+                  transform: translateY(-6px);
+                }
+                :global(.Popover-tip) {
+                  transform: translateX(132px) translateY(-7px) !important;
+                  fill: #fff;
+                }
+                :global(.Popover) {
+                  z-index: 2000;
+                  background-color: var(--primary-bg);
+                  border: 1px solid var(--border-color);
+                  color: var(--font-color);
+                  border-radius: 15px;
+                  box-shadow: 0 0 15px 1px var(--third-bg);
                 }
                 @media only screen and (max-width: 500px) {
                   :global(html) {

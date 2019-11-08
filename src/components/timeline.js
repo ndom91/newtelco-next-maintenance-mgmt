@@ -6,7 +6,8 @@ class Changelog extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      maintHistory: []
+      maintHistory: [],
+      fetching: true
     }
   }
 
@@ -27,22 +28,59 @@ class Changelog extends React.Component {
           currentHistory.push({ ts: datetime, text: `${user} - ${action} ${field}` })
         })
         this.setState({
-          maintHistory: currentHistory
+          maintHistory: currentHistory,
+          fetching: false
         })
       })
       .catch(err => console.error(err))
-    // fetch changelog for maintId
   }
 
   render () {
-    if (this.state.maintHistory.length !== 0) {
+    const {
+      fetching,
+      maintHistory
+    } = this.state
+
+    if (maintHistory.length !== 0) {
       return (
-        <Timeline items={this.state.maintHistory} />
+        <>
+          <Timeline items={maintHistory} />
+        </>
       )
     } else {
       return (
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '150px' }}>
-          <h4 style={{ fontWeight: '100 !important', marginTop: '20px', color: 'var(--font-color)' }}>No History Available</h4>
+          {fetching
+            ? (
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around', flexDirection: 'column' }}>
+                <div className='pulsate' />
+                <div>Loading</div>
+              </div>
+            ) : (
+              <h4 style={{ fontWeight: '100 !important', marginTop: '20px', color: 'var(--font-color)' }}>No History Available</h4>
+            )}
+          <style jsx>{`
+            .pulsate {
+              animation: pulsate 1s ease-out;
+              animation-iteration-count: infinite; 
+              opacity: 0.0;
+
+              border: 3px solid #999;
+              border-radius: 30px;
+              height: 18px;
+              width: 18px;
+              position: relative;
+              display: inline-block;
+              margin-top: 20px;
+              text-align: center;
+            }
+            @keyframes pulsate {
+              0% {-webkit-transform: scale(0.1, 0.1); opacity: 0.0;}
+              50% {opacity: 1.0;}
+              100% {-webkit-transform: scale(1.2, 1.2); opacity: 0.0;}
+            }
+          `}
+          </style>
         </div>
       )
     }
