@@ -527,9 +527,9 @@ export default class Maintenance extends React.Component {
   sentBtn = (row) => {
     return (
       <ButtonGroup>
-        <Button onClick={() => this.toggleRescheduleSentBtn(row.data.rcounter)} style={{ padding: '0.7em' }} size='sm' outline>
+        <Button onClick={() => this.toggleRescheduleSentBtn(row.data.rcounter)} style={{ padding: '0.75em' }} size='sm' outline>
           <Tooltip
-            title='Change Sent Status'
+            title='Toggle Sent Status'
             position='top'
             trigger='mouseenter'
             delay='250'
@@ -1112,8 +1112,8 @@ export default class Maintenance extends React.Component {
           })
           const htmlLink = data.event.data.htmlLink
           const eventUrl = new URL(htmlLink)
-          // const calId = eventUrl.searchParams.get('eid')
-          const calId = data.event.data.id
+          const calId = eventUrl.searchParams.get('eid')
+          // const calId = data.event.data.id
 
           this.setState({
             maintenance: {
@@ -3715,7 +3715,7 @@ export default class Maintenance extends React.Component {
                   background-color: var(--disabled-input);
                 }
                 :global(.btn-outline-primary) {
-                  height: 97%;
+                  height: 95% !important;
                 }
                 :global(.btn-outline-secondary) {
                   color: var(--font-color);
