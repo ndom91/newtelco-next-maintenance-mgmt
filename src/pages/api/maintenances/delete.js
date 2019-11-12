@@ -1,4 +1,4 @@
-const db = require('../../../lib/db')
+const db = require('../../../../lib/db')
 
 module.exports = async (req, res) => {
   const maintId = req.query.maintId

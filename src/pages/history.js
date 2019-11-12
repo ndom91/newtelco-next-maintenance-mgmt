@@ -1,6 +1,6 @@
 import React from 'react'
 import './style/history.css'
-import Layout from '../src/components/layout'
+import Layout from '../components/layout'
 import { AgGridReact } from 'ag-grid-react'
 import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-material.css'
@@ -11,18 +11,18 @@ import Link from 'next/link'
 import moment from 'moment-timezone'
 import Router from 'next/router'
 import { NextAuth } from 'next-auth/client'
-import RequireLogin from '../src/components/require-login'
-import Footer from '../src/components/footer'
-import EditBtn from '../src/components/ag-grid/edit-btn'
-import StartDateTime from '../src/components/ag-grid/startdatetime'
-import EndDateTime from '../src/components/ag-grid/enddatetime'
-import MailArrived from '../src/components/ag-grid/mailarrived'
-import UpdatedAt from '../src/components/ag-grid/updatedat'
-import Supplier from '../src/components/ag-grid/supplier'
-import CompleteIcon from '../src/components/ag-grid/complete'
-import EdittedBy from '../src/components/ag-grid/edittedby'
+import RequireLogin from '../components/require-login'
+import Footer from '../components/footer'
+import EditBtn from '../components/ag-grid/edit-btn'
+import StartDateTime from '../components/ag-grid/startdatetime'
+import EndDateTime from '../components/ag-grid/enddatetime'
+import MailArrived from '../components/ag-grid/mailarrived'
+import UpdatedAt from '../components/ag-grid/updatedat'
+import Supplier from '../components/ag-grid/supplier'
+import CompleteIcon from '../components/ag-grid/complete'
+import EdittedBy from '../components/ag-grid/edittedby'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import UnreadCount from '../src/components/unreadcount'
+import UnreadCount from '../components/unreadcount'
 import UseAnimations from 'react-useanimations'
 import { HotKeys } from 'react-hotkeys'
 import {
@@ -67,7 +67,6 @@ export default class History extends React.Component {
       session: await NextAuth.init({ req })
     }
   }
-
 
   constructor (props) {
     super(props)

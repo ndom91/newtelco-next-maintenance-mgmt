@@ -116,9 +116,6 @@ const nextConfig = {
       }
     }]
   },
-  experimental: {
-    publicDirectory: true
-  },
   exportPathMap: function () {
     return {
       '/': { page: '/' }
