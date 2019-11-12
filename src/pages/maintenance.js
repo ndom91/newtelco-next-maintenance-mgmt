@@ -1112,12 +1112,13 @@ export default class Maintenance extends React.Component {
           })
           const htmlLink = data.event.data.htmlLink
           const eventUrl = new URL(htmlLink)
-          const calId = eventUrl.searchParams.get('eid')
+          // const calId = eventUrl.searchParams.get('eid')
+          const calId = data.event.data.id
 
           this.setState({
             maintenance: {
               ...this.state.maintenance,
-              calendarId: data.id
+              calendarId: calId
             }
           })
 
