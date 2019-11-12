@@ -3164,6 +3164,7 @@ export default class Maintenance extends React.Component {
                               </label>
                               <CreatableSelect
                                 isClearable
+                                menuPlacement='top'
                                 className='maint-select'
                                 value={this.state.reschedule.reason}
                                 onChange={this.handleRescheduleReasonChange}
@@ -3179,6 +3180,10 @@ export default class Maintenance extends React.Component {
                                   {
                                     value: 'change_impact',
                                     label: 'change in impact duration'
+                                  },
+                                  {
+                                    value: 'change_technical',
+                                    label: 'change due to technical reasons'
                                   }
                                 ]}
                                 placeholder='Please select a reason for reschedule'
@@ -3440,6 +3445,9 @@ export default class Maintenance extends React.Component {
                 }
                 :global(.modal-preview-paperplane-icon:hover) {
                   color: #f8f9fa;
+                }
+                :global(.maint-select [class$='-menu']) {
+                  z-index: 2000;
                 }
                 :global(.maint-select [class$='-placeholder']) {
                   color: var(--border-color) !important;
