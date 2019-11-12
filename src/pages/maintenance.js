@@ -34,7 +34,6 @@ import dynamic from 'next/dynamic'
 import Popover from 'react-popover'
 import { saveAs } from 'file-saver'
 
-
 import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-material.css'
 
@@ -89,7 +88,7 @@ import {
 const animatedComponents = makeAnimated()
 
 const Changelog = dynamic(
-  () => import('../src/components/timeline'),
+  () => import('../components/timeline'),
   { ssr: false }
 )
 
