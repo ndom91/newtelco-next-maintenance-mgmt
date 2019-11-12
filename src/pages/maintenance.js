@@ -3793,8 +3793,8 @@ export default class Maintenance extends React.Component {
                   transform: translateY(-6px);
                 }
                 :global(.Popover-tip) {
-                  transform: translateX(132px) translateY(-7px) !important;
-                  fill: #fff;
+                  transform: translateX(95px) translateY(-7px) !important;
+                  fill: var(--primary-bg);
                 }
                 :global(.Popover) {
                   z-index: 2000;

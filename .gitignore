@@ -9,3 +9,4 @@ ecosystem.config.js.og
 ecosystem.config.js
 public/precache*
 public/sw.js
+db_backup
