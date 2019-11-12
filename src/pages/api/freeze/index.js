@@ -16,6 +16,5 @@ module.exports = async (req, res) => {
     `)
   const { freezeCount } = count[0]
   const freezesCount = Math.ceil(freezeCount / limit)
-  // console.log(db)
   res.status(200).json({ freezeQuery, freezesCount, page })
 }

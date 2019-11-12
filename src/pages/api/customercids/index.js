@@ -16,6 +16,5 @@ module.exports = async (req, res) => {
     `)
   const { cidsCount } = count[0]
   const cidCount = Math.ceil(cidsCount / limit)
-  // console.log(db)
   res.status(200).json({ customercids, cidCount, page })
 }

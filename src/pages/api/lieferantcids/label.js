@@ -17,7 +17,6 @@ module.exports = async (req, res) => {
   lieferantCIDsResult.forEach(cid => {
     respArray.push(cid)
   })
-  // console.log(respArray)
   const count = await db.query(escape`
       SELECT COUNT(*)
       AS lieferantCIDCount
