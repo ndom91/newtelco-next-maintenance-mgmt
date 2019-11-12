@@ -1,6 +1,6 @@
 {
   "name": "next-maintenance",
-  "version": "0.5.0",
+  "version": "1.0.0",
   "description": "NextJS Rewrite of MaintenanceDB",
   "main": "index.js",
   "scripts": {

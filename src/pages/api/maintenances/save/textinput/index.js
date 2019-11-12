@@ -6,7 +6,7 @@ module.exports = async (req, res) => {
   const maintId = req.query.maintId
   const value = req.query.value
   const updatedBy = req.query.updatedby
-  const cidIdsQuery = await db.query(`UPDATE maintenancedb SET ${element} = '${value}', updatedBy = '${updatedBy}' WHERE id = ${maintId}`)
+  const cidIdsQuery = await db.query(escape`UPDATE maintenancedb SET ${element} = ${value}, updatedBy = ${updatedBy} WHERE id = ${maintId}`)
   console.log(cidIdsQuery)
   if (cidIdsQuery.affectedRows >= 1) {
     const updateHistory = await db.query(escape`INSERT INTO changelog (mid, user, action, field) VALUES (${maintId}, ${updatedBy}, 'changed', ${element});`)
