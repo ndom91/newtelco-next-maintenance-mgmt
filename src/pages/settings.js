@@ -120,7 +120,7 @@ class Settings extends React.Component {
       return (
         <Layout night={this.props.night} unread={this.props.unread} handleSearchSelection={this.handleSearchSelection} session={this.props.session}>
           {UnreadCount()}
-          <Card style={{ maxWidth: '100%' }}>
+          <Card className='top-card-wrapper' style={{ maxWidth: '100%' }}>
             <CardHeader>
               <h2>Settings</h2>
               <Nav pills>

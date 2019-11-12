@@ -137,7 +137,7 @@ export default class Index extends React.Component {
       return (
         <Layout night={this.props.night} handleSearchSelection={this.handleSearchSelection} unread={this.props.unread} session={this.props.session}>
           {UnreadCount()}
-          <Card style={{ maxWidth: '100%' }}>
+          <Card className='top-card-wrapper' style={{ maxWidth: '100%' }}>
             <CardHeader><h2 className='title-text'>Newtelco Maintenance</h2></CardHeader>
             <CardBody>
               <Container className='card-container'>

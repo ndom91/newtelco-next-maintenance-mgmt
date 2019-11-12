@@ -381,6 +381,9 @@ export default class Layout extends React.Component {
                 width: 96%;
               }
               @media only screen and (max-width: 500px) {
+                :global(.top-card-wrapper) {
+                  margin-top: 60px;
+                }
                 :global(.navbar) {
                   position: fixed;
                   z-index: 1000;
@@ -388,6 +391,12 @@ export default class Layout extends React.Component {
                 }
                 :global(.top-card-wrapper) {
                   margin-top: 60px;
+                }
+                :global(.card-header) {
+                  padding: 1rem;
+                }
+                :global(.card-header .btn) {
+                  padding: .50rem 0.75rem;
                 }
               }
               @media only screen and (min-width: 1024px) {

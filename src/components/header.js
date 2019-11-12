@@ -175,21 +175,21 @@ class Header extends React.Component {
   }
 
   handleSearchFocus = () => {
-    this.removeClass('.nav-search', 'blur')
-    this.addClass('.nav-search', 'delay')
+    // this.removeClass('.nav-search', 'blur')
+    // this.addClass('.nav-search', 'delay')
     this.setState({
       hideResults: false
     })
   }
 
   handleSearchBlur = () => {
-    setTimeout(() => {
-      this.addClass('.nav-search', 'blur')
-      this.removeClass('.nav-search', 'delay')
+    // setTimeout(() => {
+      // this.addClass('.nav-search', 'blur')
+      // this.removeClass('.nav-search', 'delay')
       this.setState({
         hideResults: true
       })
-    }, 1000)
+    // }, 1000)
   }
 
   onToggleNight = () => {
@@ -285,7 +285,7 @@ class Header extends React.Component {
             </NavItem>
           </Nav>
           <Nav style={{ justifyContent: 'flex-end' }} navbar className='ml-auto'>
-            <InputGroup id='search-group' style={{ width: '100%', alignItems: 'center' }} size='sm' seamless>
+            <InputGroup id='search-group' size='sm' seamless>
               <InputGroupAddon type='prepend'>
                 <InputGroupText className='input-group-search'>
                   <FontAwesomeIcon icon={faSearch} className='search-icon' width='1em' style={{ color: 'secondary' }} />
@@ -356,7 +356,7 @@ class Header extends React.Component {
               }
               :global(#aa-search-input) {
                 padding-left: 40px !important;
-                width: 310px !important;
+                width: 110% !important;
                 background-color: var(--primary-bg);
                 color: var(--font-color);
                 border: 2px solid #67B246;
@@ -386,9 +386,40 @@ class Header extends React.Component {
           :global(.nt-header-logo:hover) {
             filter: drop-shadow( 0 0 10px rgba(103, 178, 70, 1));
           }
+          :global(#search-group) {
+            justify-content: space-between;
+          }
           :global(.search-list-icons) {
             margin: 0px;
             margin-right: 3px;
+          }
+          :global(.aa-input-container) {
+            transition: all 0.35s linear;
+            padding: 5px 0;
+            width: 230px;
+            height: 30px;
+            position: relative;
+            left: 10px;
+            float: left;
+            line-height: 22px;
+          }
+          :global(.aa-input-container input) {
+            position: absolute;
+            width: 0px;
+            float: Left;
+            margin-left: 210px;
+            -webkit-transition: all 0.7s ease-in-out;
+            -moz-transition: all 0.7s ease-in-out;
+            -o-transition: all 0.7s ease-in-out;
+            transition: all 0.7s ease-in-out;
+            height: 30px;
+            line-height: 18px;
+            padding: 0 2px 0 2px;
+            border-radius:1px;
+          }
+          :global(.aa-input-container:focus input, .aa-input-container:focus-within input) {
+            width: 200px;
+            margin-left: 0px;
           }
           :global(.algolia-react-autocomplete) {
             width: auto;
@@ -402,7 +433,12 @@ class Header extends React.Component {
             left: 0px;
             top: 45px;
             border-radius: 5px 5px 0 0;
+            overflow: hidden;
+            height: 60vh;
+            max-width: 0;
             width: 310px;
+            transition: max-width 1s;
+            max-width: ${this.state.hideResults ? '10px' : '310px'};
           }
           :global(.aa-suggestion:hover) {
             box-shadow: 0 0 10px 1px #67B246;
@@ -461,11 +497,9 @@ class Header extends React.Component {
           :global(.nav-search::placeholder) {
             color: transparent;
           }
-          :global(.delay) {
-            transition-delay: 1s !important;
-          }
           :global(.nav-search) {
-            transition: width 0.3s 0s ease;
+            transition: max-width 1s;
+            max-width: ${this.state.hideResults ? '10px' : '310px'};
           }
           :global(.nav-search.blur) {
             height: 42px;
@@ -478,14 +512,8 @@ class Header extends React.Component {
             overflow: hidden;
             background: transparent;
             border: 0px;
-
-            transition: width 1s 1s ease;
-            transition-delay: 1s !important;
-
-            -webkit-backface-visibility: hidden;
           }
           :global(.nav-search:hover) {
-            transition-delay: 0s !important;
             cursor: pointer;
           }
           :global(.nav-search:focus) {
@@ -496,7 +524,6 @@ class Header extends React.Component {
             border: 2px solid #67B246;
             cursor: text;
             box-shadow: 0 0 5px 2px rgba(103, 178, 70, 0.54);
-            transition-delay: 0s !important;
           }
           .menu-label {
             font-family: Poppins, Helvetica;

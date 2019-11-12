@@ -1112,8 +1112,8 @@ export default class Maintenance extends React.Component {
           })
           const htmlLink = data.event.data.htmlLink
           const eventUrl = new URL(htmlLink)
-          const calId = eventUrl.searchParams.get('eid')
-          // const calId = data.event.data.id
+          // const calId = eventUrl.searchParams.get('eid')
+          const calId = data.event.data.id
 
           this.setState({
             maintenance: {
@@ -2540,7 +2540,7 @@ export default class Maintenance extends React.Component {
                           <Container className='maintenance-subcontainer'>
                             <Row>
                               <Col>
-                                <Row>
+                                <Row className='impact-row'>
                                   <Col>
                                     <FormGroup>
                                       <div className='impact-title-group'>
@@ -2819,10 +2819,6 @@ export default class Maintenance extends React.Component {
                 ? (
                   <CardFooter className='card-footer'>
                     <ButtonGroup className='btn-group-2' size='md'>
-                      <Button onClick={this.toggleReadModal} outline>
-                        <FontAwesomeIcon icon={faEnvelopeOpenText} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
-                          Read
-                      </Button>
                       <Button outline onClick={this.toggleRescheduleModal}>
                         <FontAwesomeIcon icon={faClock} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
                         Reschedule
@@ -3592,7 +3588,6 @@ export default class Maintenance extends React.Component {
                   padding: 5px;
                 }
                 :global(button.btn-primary) {
-                  max-height: 45px;
                 }
                 input {
                   display: block;
@@ -3722,8 +3717,8 @@ export default class Maintenance extends React.Component {
                   color: var(--font-color);
                   background-color: var(--disabled-input);
                 }
-                :global(.btn-outline-primary) {
-                  height: 95% !important;
+                :global(.card-header .btn) {
+                  height: 47px !important;
                 }
                 :global(.btn-outline-secondary) {
                   color: var(--font-color);
@@ -3790,7 +3785,8 @@ export default class Maintenance extends React.Component {
                 :global(.maintenance-subcontainer .badge label) {
                   flex-direction: column;
                   justify-content: space-between;
-                  height: 40px;
+                  height: 50px;
+                  margin: 10px !important;
                 }
                 :global(.Popover-body) {
                   display: flex;
@@ -3812,9 +3808,28 @@ export default class Maintenance extends React.Component {
                   border-radius: 15px;
                   box-shadow: 0 0 15px 1px var(--third-bg);
                 }
+                :global(.form-group-toggle.form-group > .badge) {
+                  display: flex;
+                  flex-direction: column;
+                  justify-content: center;
+                  min-height: 80px;
+                }
                 @media only screen and (max-width: 500px) {
                   :global(html) {
                     max-width: ${this.state.width}px;
+                  }
+                  :global(.col) {
+                    padding: 0 5px;
+                  }
+                  :global(.card-footer) {
+                    padding: 0.75rem;
+                  }
+                  :global(.card-footer .btn) {
+                    padding: 0.5rem 0.25rem !important;
+                    height: 50px !important;
+                  }
+                  :global(.impact-row) {
+                    padding: 10px;
                   }
                   :global(.navbar) {
                     position: fixed;
@@ -3879,10 +3894,15 @@ export default class Maintenance extends React.Component {
                   }
                   :global(div.btn-toolbar > span) {
                     display: flex;
-                    justify-content: center;
+                    justify-content: space-around;
                     flex-wrap: wrap;
                     flex-direction: column;
                     flex-grow: 1;
+                    margin-top: 2%;
+                  }
+                  :global(div.btn-toolbar > span > .badge.badge-outline-secondary) {
+                    font-size: 1.8rem !important;
+                    margin-right: 0 !important;
                   }
                   :global(div.btn-toolbar > span > h2) {
                     margin: 5px;

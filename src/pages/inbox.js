@@ -236,7 +236,7 @@ export default class Inbox extends React.Component {
       return (
         <Layout night={this.props.night} handleSearchSelection={this.handleSearchSelection} unread={this.props.unread} session={this.props.session}>
           {UnreadCount()}
-          <Card style={{ maxWidth: '100%' }}>
+          <Card className='top-card-wrapper' style={{ maxWidth: '100%' }}>
             <CardHeader><h2>Inbox</h2></CardHeader>
             <CardBody>
               <ListGroup>
@@ -402,7 +402,7 @@ export default class Inbox extends React.Component {
                 font-size: 20px;
               }
               .mail-info {
-                max-width: 80%;
+                max-width: 70%;
               }
             }
             :global(.preview-mail-icon) {

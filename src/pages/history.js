@@ -321,7 +321,7 @@ export default class History extends React.Component {
         <HotKeys keyMap={keyMap} handlers={handlers}>
           <Layout night={this.props.night} handleSearchSelection={this.handleSearchSelection} unread={this.props.unread} session={this.props.session}>
             {UnreadCount()}
-            <Card style={{ maxWidth: '100%' }}>
+            <Card className='top-card-wrapper' style={{ maxWidth: '100%' }}>
               <CardHeader>
                 <ButtonToolbar style={{ justifyContent: 'space-between' }}>
                   <h2 style={{ marginBottom: '0px' }}>History</h2>
