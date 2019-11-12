@@ -58,7 +58,7 @@
     "nodemailer-direct-transport": "^3.3.2",
     "nodemailer-smtp-transport": "^2.7.4",
     "passport-google-oauth": "^2.0.0",
-    "react": "^16.10.0",
+    "react": "^16.11.0",
     "react-algoliasearch": "^2.1.3",
     "react-autocomplete": "^1.8.1",
     "react-calendar-heatmap": "^1.8.1",
