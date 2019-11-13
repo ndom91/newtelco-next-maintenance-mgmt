@@ -46,8 +46,12 @@ export default class Index extends React.Component {
         Router.push('/auth')
       }
     }
+    let mail = { count: 0 }
+    if (json !== 'No unread emails') {
+      mail.count = json.count
+    }
     return {
-      jsonData: json,
+      jsonData: mail,
       night: query.night,
       session: await NextAuth.init({ req })
     }

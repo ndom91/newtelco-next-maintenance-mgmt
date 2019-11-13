@@ -11,7 +11,7 @@ import * as S from './styles'
 function DarkmodeSwitch ({ value, onChange }) {
   return (
     <ThemeProvider theme={{ clicked: value }}>
-      <div>
+      <div style={{ display: 'flex', alignItems: 'flex-end' }}>
         <S.Wrapper
           onClick={onChange}
           role='button'

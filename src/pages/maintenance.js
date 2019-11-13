@@ -1110,8 +1110,8 @@ export default class Maintenance extends React.Component {
           cogoToast.success('Calendar Entry Created', {
             position: 'top-right'
           })
-          const htmlLink = data.event.data.htmlLink
-          const eventUrl = new URL(htmlLink)
+          // const htmlLink = data.event.data.htmlLink
+          // const eventUrl = new URL(htmlLink)
           // const calId = eventUrl.searchParams.get('eid')
           const calId = data.event.data.id
 

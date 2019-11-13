@@ -24,6 +24,7 @@ import {
   NavItem,
   NavLink,
   Badge,
+  Button,
   InputGroup,
   InputGroupAddon,
   InputGroupText,
@@ -174,23 +175,41 @@ class Header extends React.Component {
     })
   }
 
-  handleSearchFocus = () => {
-    // this.removeClass('.nav-search', 'blur')
-    // this.addClass('.nav-search', 'delay')
-    this.setState({
-      hideResults: false
-    })
+  toggleSearchBar = () => {
+    // const element = document.getElementById('aa-search-input')
+    // element.classList.toggle('open')
+    const input = document.getElementById('aa-search-input')
+    const searchBtn = document.getElementById('search-btn')
+    const searchResults = document.querySelector('.aa-dropdown-menus')
+    console.log('sR', searchResults)
+    searchBtn.classList.toggle('close')
+    input.classList.toggle('square')
+    // this.addClass('.aa-dropdown-menus', 'visible')
+    input.value = ''
   }
 
-  handleSearchBlur = () => {
-    // setTimeout(() => {
-      // this.addClass('.nav-search', 'blur')
-      // this.removeClass('.nav-search', 'delay')
-      this.setState({
-        hideResults: true
-      })
-    // }, 1000)
+  selectSearchInput = () => {
+    const input = document.getElementById('aa-search-input')
+    input.select()
   }
+
+  // handleSearchFocus = () => {
+  // this.removeClass('.nav-search', 'blur')
+  // this.addClass('.nav-search', 'delay')
+  //   this.setState({
+  //     hideResults: false
+  //   })
+  // }
+
+  // handleSearchBlur = () => {
+  // setTimeout(() => {
+  // this.addClass('.nav-search', 'blur')
+  // this.removeClass('.nav-search', 'delay')
+  // this.setState({
+  //   hideResults: true
+  // })
+  // }, 1000)
+  // }
 
   onToggleNight = () => {
     this.setState({
@@ -285,47 +304,50 @@ class Header extends React.Component {
             </NavItem>
           </Nav>
           <Nav style={{ justifyContent: 'flex-end' }} navbar className='ml-auto'>
-            <InputGroup id='search-group' size='sm' seamless>
-              <InputGroupAddon type='prepend'>
-                <InputGroupText className='input-group-search'>
-                  <FontAwesomeIcon icon={faSearch} className='search-icon' width='1em' style={{ color: 'secondary' }} />
-                </InputGroupText>
-              </InputGroupAddon>
-              <Autocomplete
-                indexes={this.indexes}
-                onSelectionChange={this.props.handleSearchSelection}
-              >
-                <input
-                  key='input'
-                  type='search'
-                  id='aa-search-input'
-                  className='aa-input-search nav-search blur'
-                  placeholder='Search...'
-                  name='search'
-                  autoComplete='off'
-                  onFocus={this.handleSearchFocus}
-                  onBlur={this.handleSearchBlur}
-                />
-                <svg className='aa-input-icon' viewBox='654 -372 1664 1664'>
-                  <path d='M1806,332c0-123.3-43.8-228.8-131.5-316.5C1586.8-72.2,1481.3-116,1358-116s-228.8,43.8-316.5,131.5  C953.8,103.2,910,208.7,910,332s43.8,228.8,131.5,316.5C1129.2,736.2,1234.7,780,1358,780s228.8-43.8,316.5-131.5  C1762.2,560.8,1806,455.3,1806,332z M2318,1164c0,34.7-12.7,64.7-38,90s-55.3,38-90,38c-36,0-66-12.7-90-38l-343-342  c-119.3,82.7-252.3,124-399,124c-95.3,0-186.5-18.5-273.5-55.5s-162-87-225-150s-113-138-150-225S654,427.3,654,332  s18.5-186.5,55.5-273.5s87-162,150-225s138-113,225-150S1262.7-372,1358-372s186.5,18.5,273.5,55.5s162,87,225,150s113,138,150,225  S2062,236.7,2062,332c0,146.7-41.3,279.7-124,399l343,343C2305.7,1098.7,2318,1128.7,2318,1164z' />
-                </svg>
-              </Autocomplete>
-              <NavItem>
-                <NavLink>
-                  <form id='signout' method='post' action='/auth/signout' onSubmit={this.handleSignOutSubmit}>
-                    <input name='_csrf' type='hidden' value={this.props.session.csrfToken} />
-                    <div className='logout-btn-wrapper'>
-                      <button className='logout-btn' type='submit'>
-                        <FontAwesomeIcon width='1.125em' className='menu-icon logout' icon={faPowerOff} />
-                      </button>
-                    </div>
-                  </form>
-                </NavLink>
-              </NavItem>
-              <NavItem>
-                <DarkmodeSwitch value={this.props.night} onChange={this.props.toggleNight} />
-              </NavItem>
-            </InputGroup>
+            <div>
+              <InputGroup id='search-group' size='sm' seamless>
+                <Autocomplete
+                  indexes={this.indexes}
+                  onSelectionChange={this.props.handleSearchSelection}
+                >
+                  <input
+                    key='input'
+                    type='search'
+                    id='aa-search-input'
+                    className='aa-input-search nav-search blur'
+                    placeholder='Search...'
+                    name='search'
+                    autoComplete='off'
+                    onClick={this.selectSearchInput}
+                    // onFocus={this.handleSearchFocus}
+                    // onBlur={this.handleSearchBlur}
+                  />
+                  <svg className='aa-input-icon' viewBox='654 -372 1664 1664'>
+                    <path d='M1806,332c0-123.3-43.8-228.8-131.5-316.5C1586.8-72.2,1481.3-116,1358-116s-228.8,43.8-316.5,131.5  C953.8,103.2,910,208.7,910,332s43.8,228.8,131.5,316.5C1129.2,736.2,1234.7,780,1358,780s228.8-43.8,316.5-131.5  C1762.2,560.8,1806,455.3,1806,332z M2318,1164c0,34.7-12.7,64.7-38,90s-55.3,38-90,38c-36,0-66-12.7-90-38l-343-342  c-119.3,82.7-252.3,124-399,124c-95.3,0-186.5-18.5-273.5-55.5s-162-87-225-150s-113-138-150-225S654,427.3,654,332  s18.5-186.5,55.5-273.5s87-162,150-225s138-113,225-150S1262.7-372,1358-372s186.5,18.5,273.5,55.5s162,87,225,150s113,138,150,225  S2062,236.7,2062,332c0,146.7-41.3,279.7-124,399l343,343C2305.7,1098.7,2318,1128.7,2318,1164z' />
+                  </svg>
+                </Autocomplete>
+                <Button id='search-btn' className='search-btn' outline onClick={this.toggleSearchBar}>
+                  {/* <FontAwesomeIcon icon={faSearch} className='search-icon' width='1em' style={{ color: 'secondary' }} /> */}
+                </Button>
+              </InputGroup>
+              <InputGroup>
+                <NavItem>
+                  <NavLink>
+                    <form id='signout' method='post' action='/auth/signout' onSubmit={this.handleSignOutSubmit}>
+                      <input name='_csrf' type='hidden' value={this.props.session.csrfToken} />
+                      <div className='logout-btn-wrapper'>
+                        <button className='logout-btn' type='submit'>
+                          <FontAwesomeIcon width='1.525em' className='menu-icon logout' icon={faPowerOff} />
+                        </button>
+                      </div>
+                    </form>
+                  </NavLink>
+                </NavItem>
+                <NavItem style={{ display: 'flex', alignItems: 'center' }}>
+                  <DarkmodeSwitch value={this.props.night} onChange={this.props.toggleNight} />
+                </NavItem>
+              </InputGroup>
+            </div>
           </Nav>
         </Collapse>
         <style jsx>{`
@@ -380,6 +402,203 @@ class Header extends React.Component {
                 font-size: 135%;
               }
             }
+            :global(#search-group) {
+              position: absolute;
+              height: 50px;
+              width: 300px;
+              margin-left: 170px;
+              top: 75%;
+              left: 90%;
+              transform: translate(-50%, -50%);
+            }
+            :global(.nav-search) {
+              /* box-sizing: border-box;
+              width: 25px;
+              height: 25px;
+              padding: 0 !important;
+              border: 4px solid #ffffff;
+              border-radius: 50%;
+              background: none;
+              color: #fff;
+              font-size: 16px;
+              font-weight: 400;
+              font-family: Roboto;
+              outline: 0;
+              transition: width 0.4s ease-in-out, border-radius 0.8s ease-in-out,
+                padding 0.2s;
+              transition-delay: 0.4s;
+              /* transform: translate(-10%, 0%); 
+              position: absolute;
+              left: -25px;
+              top: 10px;*/
+              box-sizing: border-box;
+              width: 30px;
+              height: 30px;
+              padding: 0px;
+              border: 4px solid #ffffff;
+              border-radius: 50%;
+              background: none;
+              color: #fff;
+              font-size: 16px;
+              font-weight: 400;
+              font-family: Roboto;
+              outline: 0;
+              transition: width 0.4s ease-in-out, border-radius 0.8s ease-in-out,
+                padding 0.2s;
+              transition-delay: 0.4s;
+              transform: translate(-100%, -20%);
+            }
+
+            :global(.search-btn) {
+              /* background: none;
+              position: absolute;
+              top: 20px;
+              left: 10px;
+              height: 50px;
+              width: 50px;
+              border-radius: 100%;
+              outline: 0;
+              border: 0;
+              color: inherit;
+              cursor: pointer;
+              transition: 0.2s ease-in-out;
+              transform: translate(-100%, -50%); */
+              background: none;
+              position: absolute;
+              top: 0px;
+              left: 0;
+              height: 50px;
+              width: 50px;
+              padding: 0;
+              border-radius: 100%;
+              outline: 0;
+              border: 0;
+              color: inherit;
+              cursor: pointer;
+              transition: 0.2s ease-in-out;
+              transform: translate(-100%, -50%);
+            }
+
+            :global(.search-btn:before) {
+              /* content: "";
+              position: absolute;
+              width: 10px;
+              height: 4px;
+              background-color: #fff;
+              transform: rotate(45deg);
+              margin-top: 12px;
+              margin-left: 7px;
+              transition: 0.2s ease-in-out; */
+              content: "";
+              position: absolute;
+              width: 18px;
+              height: 4px;
+              background-color: #fff;
+              transform: rotate(45deg);
+              margin-top: 22px;
+              margin-left: 16px;
+              transition: 0.2s ease-in-out;
+            }
+
+            :global(.close) {
+              /* transition: 0.4s ease-in-out;
+              transition-delay: 0.4s;
+              position: absolute;
+              top: 25px;
+              left: -5px; */
+              transition: 0.4s ease-in-out;
+              transition-delay: 0.4s;
+            }
+
+            :global(.close:before) {
+              /* content: "";
+              position: absolute;
+              width: 27px;
+              height: 4px;
+              margin-top: -1px;
+              margin-left: -13px;
+              background-color: #fff;
+              transform: rotate(45deg);
+              transition: 0.2s ease-in-out;
+              transform: rotate(-45deg);
+              /*transform: translate(1080%,100%) rotate(-45deg);
+              transition-delay: translate(0.5s); */
+              content: "";
+              position: absolute;
+              width: 27px;
+              height: 4px;
+              margin-top: 6px;
+              margin-left: -13px;
+              background-color: #fff;
+              transform: rotate(45deg);
+              transition: 0.2s ease-in-out;
+            }
+
+            :global(.close:after) {
+              /* content: "";
+              position: absolute;
+              width: 27px;
+              height: 4px;
+              background-color: #fff;
+              margin-top: -1px;
+              margin-left: -13px;
+              cursor: pointer;
+              transform: rotate(45deg);
+              /* transform: translate(1080%,100%) rotate(45deg);
+              transition-delay: translate(0.5s); */
+              content: "";
+              position: absolute;
+              width: 27px;
+              height: 4px;
+              background-color: #fff;
+              margin-top: 6px;
+              margin-left: -13px;
+              cursor: pointer;
+              transform: rotate(-45deg);
+            }
+
+            :global(.square) {
+              /* box-sizing: border-box;
+              padding: 0 40px 0 10px !important;
+              width: 300px;
+              height: 50px;
+              border: 4px solid #ffffff;
+              border-radius: 0;
+              background: none;
+              color: #fff;
+              font-family: Roboto;
+              font-size: 16px;
+              font-weight: 400;
+              outline: 0;
+              transition: width 0.4s ease-in-out, border-radius 0.4s ease-in-out,
+                padding 0.2s;
+              transition-delay: 0.4s, 0s, 0.4s;
+              position: absolute;
+              /* left: -305px; 
+              transform: translateX(-280px);
+              top: 0px;
+              /* transform: translate(0%, 0%) !important; */
+              box-sizing: border-box;
+              padding: 0 40px 0 10px;
+              width: 300px;
+              height: 50px;
+              border: 4px solid #ffffff;
+              border-radius: 0;
+              background: none;
+              color: #fff;
+              font-family: Roboto;
+              font-size: 16px;
+              font-weight: 400;
+              outline: 0;
+              transition: width 0.4s ease-in-out, border-radius 0.4s ease-in-out,
+                padding 0.2s;
+              transition-delay: 0.4s, 0s, 0.4s;
+              transform: translate(-100%, -35%);
+            }
+            :global(.visible) {
+              visibility: visible !important;
+              display: inline-block !important;
+            }
           :global(.nt-header-logo) {
             transition: all 350ms ease-in-out;
           }
@@ -393,21 +612,32 @@ class Header extends React.Component {
             margin: 0px;
             margin-right: 3px;
           }
+          :global(.search-btn, .search-btn:hover, .search-btn:active, .search-btn:focus) {
+            border: none;
+            font-size: 1.1rem;
+            box-shadow: none !important;
+            color: var(--white);
+            background-color: transparent !important;
+          }
           :global(.aa-input-container) {
-            transition: all 0.35s linear;
+            /* transition: all 0.35s linear;
             padding: 5px 0;
-            width: 230px;
+            width: 40px;
             height: 30px;
             position: relative;
             left: 10px;
             float: left;
             line-height: 22px;
+            pointer-events: none; */
+          }
+          :global(.aa-input-container input.collapsed) {
+            /* width: 0px; */
           }
           :global(.aa-input-container input) {
-            position: absolute;
-            width: 0px;
-            float: Left;
-            margin-left: 210px;
+            /* position: absolute;
+            width: 220px;
+            margin-left: 0px;
+            left: -30px;
             -webkit-transition: all 0.7s ease-in-out;
             -moz-transition: all 0.7s ease-in-out;
             -o-transition: all 0.7s ease-in-out;
@@ -415,14 +645,15 @@ class Header extends React.Component {
             height: 30px;
             line-height: 18px;
             padding: 0 2px 0 2px;
-            border-radius:1px;
+            border-radius:1px; */
           }
           :global(.aa-input-container:focus input, .aa-input-container:focus-within input) {
-            width: 200px;
-            margin-left: 0px;
+            /* width: 200px;
+            margin-left: 0px; */
           }
           :global(.algolia-react-autocomplete) {
             width: auto;
+            pointer-events: none;
           }
           :global(.aa-dropdown-menus) {
             visibility: ${this.state.hideResults ? 'hidden' : 'visible'};
@@ -435,10 +666,8 @@ class Header extends React.Component {
             border-radius: 5px 5px 0 0;
             overflow: hidden;
             height: 60vh;
-            max-width: 0;
             width: 310px;
             transition: max-width 1s;
-            max-width: ${this.state.hideResults ? '10px' : '310px'};
           }
           :global(.aa-suggestion:hover) {
             box-shadow: 0 0 10px 1px #67B246;
@@ -482,13 +711,13 @@ class Header extends React.Component {
             opacity: 0.5;
           }
           :global(.nav-link) {
-            text-decoration: none !important;
+            /* text-decoration: none !important; */
           }
           :global(.input-group-prepend) {
-            pointer-events: none !important;
+            /* pointer-events: none !important; */
           }
           :global(.input-group-search) {
-            pointer-events: none !important;
+            /* pointer-events: none !important; */
             font-size: 18px !important;
           }
           :global(.search-icon) {
@@ -498,11 +727,11 @@ class Header extends React.Component {
             color: transparent;
           }
           :global(.nav-search) {
-            transition: max-width 1s;
-            max-width: ${this.state.hideResults ? '10px' : '310px'};
+            /* transition: max-width 1s;
+            max-width: ${this.state.hideResults ? '10px' : '310px'}; */
           }
           :global(.nav-search.blur) {
-            height: 42px;
+            /* height: 42px;
             outline: none;
             border-radius: 7px;
             color: rgba(0,0,0,0);
@@ -511,19 +740,19 @@ class Header extends React.Component {
             width: 45px !important;
             overflow: hidden;
             background: transparent;
-            border: 0px;
+            border: 0px; */
           }
           :global(.nav-search:hover) {
             cursor: pointer;
           }
-          :global(.nav-search:focus) {
-            padding-left: 40px !important;
+          :global(.nav-search:focus, .nav-search.open) {
+            /* padding-left: 40px !important;
             width: 310px !important;
             background-color: var(--primary-bg);
             color: var(--font-color);
             border: 2px solid #67B246;
             cursor: text;
-            box-shadow: 0 0 5px 2px rgba(103, 178, 70, 0.54);
+            box-shadow: 0 0 5px 2px rgba(103, 178, 70, 0.54); */
           }
           .menu-label {
             font-family: Poppins, Helvetica;
@@ -541,7 +770,6 @@ class Header extends React.Component {
           .logout-btn {
             cursor: pointer;
             background: none;
-            margin-bottom: 6px;
             border: none;
             color: var(--white);
             outline: none;
