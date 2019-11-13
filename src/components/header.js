@@ -1,4 +1,5 @@
 import React from 'react'
+import Router from 'next/router'
 import Link from 'next/link'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import DarkmodeSwitch from './darkmode'
@@ -7,7 +8,6 @@ import Autocomplete from 'algolia-react-autocomplete'
 import 'algolia-react-autocomplete/build/css/index.css'
 import {
   faPowerOff,
-  faSearch,
   faAngleRight,
   faClock,
   faEthernet,
@@ -26,8 +26,6 @@ import {
   Badge,
   Button,
   InputGroup,
-  InputGroupAddon,
-  InputGroupText,
   Collapse
 } from 'shards-react'
 
@@ -176,40 +174,30 @@ class Header extends React.Component {
   }
 
   toggleSearchBar = () => {
-    // const element = document.getElementById('aa-search-input')
-    // element.classList.toggle('open')
     const input = document.getElementById('aa-search-input')
     const searchBtn = document.getElementById('search-btn')
-    const searchResults = document.querySelector('.aa-dropdown-menus')
-    console.log('sR', searchResults)
     searchBtn.classList.toggle('close')
+    if (input.classList.contains('square')) {
+      this.removeClass('.aa-dropdown-menus', 'visible')
+    }
     input.classList.toggle('square')
-    // this.addClass('.aa-dropdown-menus', 'visible')
     input.value = ''
+  }
+
+  handleSearchFocus = () => {
+    this.addClass('.aa-dropdown-menus', 'visible')
+  }
+
+  handleSearchSelection = selection => {
+    this.removeClass('.aa-dropdown-menus', 'visible')
+    const newLocation = `/maintenance?id=${selection.id}`
+    Router.push(newLocation)
   }
 
   selectSearchInput = () => {
     const input = document.getElementById('aa-search-input')
     input.select()
   }
-
-  // handleSearchFocus = () => {
-  // this.removeClass('.nav-search', 'blur')
-  // this.addClass('.nav-search', 'delay')
-  //   this.setState({
-  //     hideResults: false
-  //   })
-  // }
-
-  // handleSearchBlur = () => {
-  // setTimeout(() => {
-  // this.addClass('.nav-search', 'blur')
-  // this.removeClass('.nav-search', 'delay')
-  // this.setState({
-  //   hideResults: true
-  // })
-  // }, 1000)
-  // }
 
   onToggleNight = () => {
     this.setState({
@@ -308,30 +296,28 @@ class Header extends React.Component {
               <InputGroup id='search-group' size='sm' seamless>
                 <Autocomplete
                   indexes={this.indexes}
-                  onSelectionChange={this.props.handleSearchSelection}
+                  onSelectionChange={this.handleSearchSelection}
                 >
                   <input
                     key='input'
                     type='search'
                     id='aa-search-input'
-                    className='aa-input-search nav-search blur'
+                    className='aa-input-search nav-search'
                     placeholder='Search...'
                     name='search'
                     autoComplete='off'
                     onClick={this.selectSearchInput}
-                    // onFocus={this.handleSearchFocus}
-                    // onBlur={this.handleSearchBlur}
+                    onFocus={this.handleSearchFocus}
+                    onBlur={this.handleSearchBlur}
                   />
                   <svg className='aa-input-icon' viewBox='654 -372 1664 1664'>
                     <path d='M1806,332c0-123.3-43.8-228.8-131.5-316.5C1586.8-72.2,1481.3-116,1358-116s-228.8,43.8-316.5,131.5  C953.8,103.2,910,208.7,910,332s43.8,228.8,131.5,316.5C1129.2,736.2,1234.7,780,1358,780s228.8-43.8,316.5-131.5  C1762.2,560.8,1806,455.3,1806,332z M2318,1164c0,34.7-12.7,64.7-38,90s-55.3,38-90,38c-36,0-66-12.7-90-38l-343-342  c-119.3,82.7-252.3,124-399,124c-95.3,0-186.5-18.5-273.5-55.5s-162-87-225-150s-113-138-150-225S654,427.3,654,332  s18.5-186.5,55.5-273.5s87-162,150-225s138-113,225-150S1262.7-372,1358-372s186.5,18.5,273.5,55.5s162,87,225,150s113,138,150,225  S2062,236.7,2062,332c0,146.7-41.3,279.7-124,399l343,343C2305.7,1098.7,2318,1128.7,2318,1164z' />
                   </svg>
                 </Autocomplete>
-                <Button id='search-btn' className='search-btn' outline onClick={this.toggleSearchBar}>
-                  {/* <FontAwesomeIcon icon={faSearch} className='search-icon' width='1em' style={{ color: 'secondary' }} /> */}
-                </Button>
+                <Button id='search-btn' className='search-btn' outline onClick={this.toggleSearchBar} />
               </InputGroup>
               <InputGroup>
-                <NavItem>
+                {/* <NavItem>
                   <NavLink>
                     <form id='signout' method='post' action='/auth/signout' onSubmit={this.handleSignOutSubmit}>
                       <input name='_csrf' type='hidden' value={this.props.session.csrfToken} />
@@ -342,7 +328,7 @@ class Header extends React.Component {
                       </div>
                     </form>
                   </NavLink>
-                </NavItem>
+                </NavItem> */}
                 <NavItem style={{ display: 'flex', alignItems: 'center' }}>
                   <DarkmodeSwitch value={this.props.night} onChange={this.props.toggleNight} />
                 </NavItem>
@@ -403,37 +389,20 @@ class Header extends React.Component {
               }
             }
             :global(#search-group) {
+              z-index: 9999;
+              justify-content: space-between;
               position: absolute;
               height: 50px;
               width: 300px;
               margin-left: 170px;
-              top: 75%;
-              left: 90%;
+              top: 78%;
+              left: 92%;
               transform: translate(-50%, -50%);
             }
             :global(.nav-search) {
-              /* box-sizing: border-box;
+              box-sizing: border-box;
               width: 25px;
               height: 25px;
-              padding: 0 !important;
-              border: 4px solid #ffffff;
-              border-radius: 50%;
-              background: none;
-              color: #fff;
-              font-size: 16px;
-              font-weight: 400;
-              font-family: Roboto;
-              outline: 0;
-              transition: width 0.4s ease-in-out, border-radius 0.8s ease-in-out,
-                padding 0.2s;
-              transition-delay: 0.4s;
-              /* transform: translate(-10%, 0%); 
-              position: absolute;
-              left: -25px;
-              top: 10px;*/
-              box-sizing: border-box;
-              width: 30px;
-              height: 30px;
               padding: 0px;
               border: 4px solid #ffffff;
               border-radius: 50%;
@@ -446,23 +415,10 @@ class Header extends React.Component {
               transition: width 0.4s ease-in-out, border-radius 0.8s ease-in-out,
                 padding 0.2s;
               transition-delay: 0.4s;
-              transform: translate(-100%, -20%);
+              transform: translate(-100%, -30%);
             }
 
             :global(.search-btn) {
-              /* background: none;
-              position: absolute;
-              top: 20px;
-              left: 10px;
-              height: 50px;
-              width: 50px;
-              border-radius: 100%;
-              outline: 0;
-              border: 0;
-              color: inherit;
-              cursor: pointer;
-              transition: 0.2s ease-in-out;
-              transform: translate(-100%, -50%); */
               background: none;
               position: absolute;
               top: 0px;
@@ -480,49 +436,23 @@ class Header extends React.Component {
             }
 
             :global(.search-btn:before) {
-              /* content: "";
-              position: absolute;
-              width: 10px;
-              height: 4px;
-              background-color: #fff;
-              transform: rotate(45deg);
-              margin-top: 12px;
-              margin-left: 7px;
-              transition: 0.2s ease-in-out; */
               content: "";
               position: absolute;
-              width: 18px;
+              width: 14px;
               height: 4px;
               background-color: #fff;
               transform: rotate(45deg);
-              margin-top: 22px;
-              margin-left: 16px;
+              margin-top: 14px;
+              margin-left: 17px;
               transition: 0.2s ease-in-out;
             }
 
             :global(.close) {
-              /* transition: 0.4s ease-in-out;
-              transition-delay: 0.4s;
-              position: absolute;
-              top: 25px;
-              left: -5px; */
               transition: 0.4s ease-in-out;
               transition-delay: 0.4s;
             }
 
             :global(.close:before) {
-              /* content: "";
-              position: absolute;
-              width: 27px;
-              height: 4px;
-              margin-top: -1px;
-              margin-left: -13px;
-              background-color: #fff;
-              transform: rotate(45deg);
-              transition: 0.2s ease-in-out;
-              transform: rotate(-45deg);
-              /*transform: translate(1080%,100%) rotate(-45deg);
-              transition-delay: translate(0.5s); */
               content: "";
               position: absolute;
               width: 27px;
@@ -535,17 +465,6 @@ class Header extends React.Component {
             }
 
             :global(.close:after) {
-              /* content: "";
-              position: absolute;
-              width: 27px;
-              height: 4px;
-              background-color: #fff;
-              margin-top: -1px;
-              margin-left: -13px;
-              cursor: pointer;
-              transform: rotate(45deg);
-              /* transform: translate(1080%,100%) rotate(45deg);
-              transition-delay: translate(0.5s); */
               content: "";
               position: absolute;
               width: 27px;
@@ -558,26 +477,6 @@ class Header extends React.Component {
             }
 
             :global(.square) {
-              /* box-sizing: border-box;
-              padding: 0 40px 0 10px !important;
-              width: 300px;
-              height: 50px;
-              border: 4px solid #ffffff;
-              border-radius: 0;
-              background: none;
-              color: #fff;
-              font-family: Roboto;
-              font-size: 16px;
-              font-weight: 400;
-              outline: 0;
-              transition: width 0.4s ease-in-out, border-radius 0.4s ease-in-out,
-                padding 0.2s;
-              transition-delay: 0.4s, 0s, 0.4s;
-              position: absolute;
-              /* left: -305px; 
-              transform: translateX(-280px);
-              top: 0px;
-              /* transform: translate(0%, 0%) !important; */
               box-sizing: border-box;
               padding: 0 40px 0 10px;
               width: 300px;
@@ -605,9 +504,6 @@ class Header extends React.Component {
           :global(.nt-header-logo:hover) {
             filter: drop-shadow( 0 0 10px rgba(103, 178, 70, 1));
           }
-          :global(#search-group) {
-            justify-content: space-between;
-          }
           :global(.search-list-icons) {
             margin: 0px;
             margin-right: 3px;
@@ -619,53 +515,22 @@ class Header extends React.Component {
             color: var(--white);
             background-color: transparent !important;
           }
-          :global(.aa-input-container) {
-            /* transition: all 0.35s linear;
-            padding: 5px 0;
-            width: 40px;
-            height: 30px;
-            position: relative;
-            left: 10px;
-            float: left;
-            line-height: 22px;
-            pointer-events: none; */
-          }
-          :global(.aa-input-container input.collapsed) {
-            /* width: 0px; */
-          }
-          :global(.aa-input-container input) {
-            /* position: absolute;
-            width: 220px;
-            margin-left: 0px;
-            left: -30px;
-            -webkit-transition: all 0.7s ease-in-out;
-            -moz-transition: all 0.7s ease-in-out;
-            -o-transition: all 0.7s ease-in-out;
-            transition: all 0.7s ease-in-out;
-            height: 30px;
-            line-height: 18px;
-            padding: 0 2px 0 2px;
-            border-radius:1px; */
-          }
-          :global(.aa-input-container:focus input, .aa-input-container:focus-within input) {
-            /* width: 200px;
-            margin-left: 0px; */
-          }
           :global(.algolia-react-autocomplete) {
             width: auto;
-            pointer-events: none;
           }
           :global(.aa-dropdown-menus) {
             visibility: ${this.state.hideResults ? 'hidden' : 'visible'};
+            z-index: 99999;
           }
           :global(.aa-dropdown-menu) {
             margin-top: 0px;
-            position: absolute;
+            display: block;
             left: 0px;
             top: 45px;
             border-radius: 5px 5px 0 0;
             overflow: hidden;
-            height: 60vh;
+            height: auto;
+            max-height: 500px;
             width: 310px;
             transition: max-width 1s;
           }
@@ -679,6 +544,8 @@ class Header extends React.Component {
           }
           :global(.aa-suggestions) {
             position: absolute;
+            display: block;
+            height: fit-content;
             background: #ececec;
             z-index: 100;
             max-height: 500px;
@@ -686,11 +553,13 @@ class Header extends React.Component {
             box-shadow: 8px 0 8px -8px, 0 8px 8px -8px, -8px 0 8px -8px;
             box-shadow: 0px 11px 28px 4px rgba(50, 50, 50, 0.95);
             box-shadow: 0px 10px 35px 2px rgba(0, 0, 0, 0.75);
-            top: 0px;
+            top: 32px;
+            right: 304px;
             border-radius: 5px;
           }
           :global(.aa-suggestions-category) {
             visibility: hidden;
+            display: none !important;
           }
           :global(.aa-suggestions-results) {
             color: #67B246;
@@ -710,14 +579,7 @@ class Header extends React.Component {
             background-color: var(--third-bg);
             opacity: 0.5;
           }
-          :global(.nav-link) {
-            /* text-decoration: none !important; */
-          }
-          :global(.input-group-prepend) {
-            /* pointer-events: none !important; */
-          }
           :global(.input-group-search) {
-            /* pointer-events: none !important; */
             font-size: 18px !important;
           }
           :global(.search-icon) {
@@ -726,33 +588,8 @@ class Header extends React.Component {
           :global(.nav-search::placeholder) {
             color: transparent;
           }
-          :global(.nav-search) {
-            /* transition: max-width 1s;
-            max-width: ${this.state.hideResults ? '10px' : '310px'}; */
-          }
-          :global(.nav-search.blur) {
-            /* height: 42px;
-            outline: none;
-            border-radius: 7px;
-            color: rgba(0,0,0,0);
-            padding-left: 0px !important;
-            padding-right: 0px !important;
-            width: 45px !important;
-            overflow: hidden;
-            background: transparent;
-            border: 0px; */
-          }
           :global(.nav-search:hover) {
             cursor: pointer;
-          }
-          :global(.nav-search:focus, .nav-search.open) {
-            /* padding-left: 40px !important;
-            width: 310px !important;
-            background-color: var(--primary-bg);
-            color: var(--font-color);
-            border: 2px solid #67B246;
-            cursor: text;
-            box-shadow: 0 0 5px 2px rgba(103, 178, 70, 0.54); */
           }
           .menu-label {
             font-family: Poppins, Helvetica;
