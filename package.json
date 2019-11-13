@@ -7,6 +7,7 @@
     "dev": "NODE_ENV=development PORT=4000 node index.js",
     "start": "NODE_ENV=production PORT=4000 node index.js",
     "build": "next build",
+    "analyze": "cross-env ANALYZE=true next build",
     "export": "next export"
   },
   "keywords": [],
