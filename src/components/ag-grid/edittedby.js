@@ -2,25 +2,31 @@ import React, { Component } from 'react'
 
 export default class EdittedBy extends Component {
   render () {
-    if (this.props.node.data.bearbeitetvon === 'fwaleska') {
+    let username
+    if (this.props.node && this.props.node.data.bearbeitetvon) {
+      username = this.props.node.data.bearbeitetvon
+    } else if (this.props.username) {
+      username = this.props.username
+    }
+    if (username === 'fwaleska') {
       return (
         <span className='user-pic-wrapper'>
           <img className='user-pic' style={{ border: '2px solid #67B246', borderRadius: '50%' }} src='/static/images/avatars/FWA.png' width='32px' height='32px' />
         </span>
       )
-    } else if (this.props.node.data.bearbeitetvon === 'alissitsin') {
+    } else if (username === 'alissitsin') {
       return (
         <span>
           <img className='user-pic' style={{ border: '2px solid #67B246', borderRadius: '50%' }} src='/static/images/avatars/ALI.png' width='32px' height='32px' />
         </span>
       )
-    } else if (this.props.node.data.bearbeitetvon === 'ndomino') {
+    } else if (username === 'ndomino') {
       return (
         <span>
           <img className='user-pic' style={{ border: '2px solid #67B246', borderRadius: '50%' }} src='/static/images/avatars/NDO.png' width='32px' height='32px' />
         </span>
       )
-    } else if (this.props.node.data.bearbeitetvon === 'sstergiou') {
+    } else if (username === 'sstergiou') {
       return (
         <span>
           <img className='user-pic' style={{ border: '2px solid #67B246', borderRadius: '50%' }} src='/static/images/avatars/SST.png' width='32px' height='32px' />

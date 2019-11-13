@@ -20,10 +20,12 @@ import MailArrived from '../components/ag-grid/mailarrived'
 import UpdatedAt from '../components/ag-grid/updatedat'
 import Supplier from '../components/ag-grid/supplier'
 import CompleteIcon from '../components/ag-grid/complete'
+import { CSSTransition } from 'react-transition-group'
 import EdittedBy from '../components/ag-grid/edittedby'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import UnreadCount from '../components/unreadcount'
 import UseAnimations from 'react-useanimations'
+import MaintCard from '../components/historycard'
 import { HotKeys } from 'react-hotkeys'
 import {
   Card,
@@ -41,7 +43,8 @@ import {
   Row
 } from 'shards-react'
 import {
-  faPlusCircle
+  faPlusCircle,
+  faTable
 } from '@fortawesome/free-solid-svg-icons'
 
 // { maintenances, page, pageCount }
@@ -70,6 +73,10 @@ export default class History extends React.Component {
 
   constructor (props) {
     super(props)
+    let tableView = true
+    if (typeof window !== 'undefined') {
+      tableView = window.localStorage.getItem('tableView')
+    }
     const pinned = dir => {
       if (typeof window !== 'undefined' && window.outerWidth < '500') {
         return 'none'
@@ -86,7 +93,9 @@ export default class History extends React.Component {
       openConfirmDeleteModal: false,
       newMaintenanceCompany: '',
       newCompMailDomain: '',
+      openTableView: tableView == true,
       newMaintCompanies: [],
+      rowData: [],
       gridOptions: {
         defaultColDef: {
           resizable: true,
@@ -257,6 +266,15 @@ export default class History extends React.Component {
       })
   }
 
+  toggleView = () => {
+    if (this.state.openTableView === true || this.state.openTableView === false) {
+      window.localStorage.setItem('tableView', !this.state.openTableView)
+    }
+    this.setState({
+      openTableView: !this.state.openTableView
+    })
+  }
+
   handleNewCompanySelect (selectedOption) {
     this.setState({
       newCompMailDomain: selectedOption.value
@@ -316,6 +334,19 @@ export default class History extends React.Component {
     const handlers = {
       DELETE_MAINT: this.deleteMaint
     }
+
+    const {
+      openTableView,
+      openNewModal,
+      openConfirmDeleteModal,
+      maintIdtoDelete,
+      gridOptions,
+      rowData,
+      newMaintCompanies,
+      newMaintenanceCompany,
+      newCompMailDomain
+    } = this.state
+
     if (this.props.session.user) {
       return (
         <HotKeys keyMap={keyMap} handlers={handlers}>
@@ -332,6 +363,10 @@ export default class History extends React.Component {
                         Export
                       </span>
                     </Button>
+                    <Button onClick={this.toggleView} theme='dark'>
+                      <FontAwesomeIcon icon={faTable} width='1.5em' style={{ marginRight: '10px', color: 'secondary' }} />
+                      View
+                    </Button>
                     <Button onClick={this.toggleNewModal} theme='dark'>
                       <FontAwesomeIcon icon={faPlusCircle} width='1.5em' style={{ marginRight: '10px', color: 'secondary' }} />
                       New
@@ -339,26 +374,49 @@ export default class History extends React.Component {
                   </ButtonGroup>
                 </ButtonToolbar>
               </CardHeader>
-              <CardBody>
-                <div className='table-wrapper'>
-                  <div
-                    className={`ag-theme-material ${this.props.night === 'true' ? 'darkmode-aggrid' : ''}`}
-                    style={{
-                      height: '700px',
-                      width: '100%'
-                    }}
+              {openTableView
+                ? (
+                  <CSSTransition
+                    timeout={500}
+                    classNames='flip-transition'
+                    in={this.state.openTableView}
                   >
-                    <AgGridReact
-                      gridOptions={this.state.gridOptions}
-                      rowData={this.state.rowData}
-                      onGridReady={this.handleGridReady}
-                      animateRows
-                      pagination
-                      onFirstDataRendered={this.onFirstDataRendered.bind(this)}
-                    />
-                  </div>
-                </div>
-              </CardBody>
+                    <CardBody>
+                      <div className='table-wrapper'>
+                        <div
+                          className={`ag-theme-material ${this.props.night === 'true' ? 'darkmode-aggrid' : ''}`}
+                          style={{
+                            height: '700px',
+                            width: '100%'
+                          }}
+                        >
+                          <AgGridReact
+                            gridOptions={gridOptions}
+                            rowData={rowData}
+                            onGridReady={this.handleGridReady}
+                            animateRows
+                            pagination
+                            onFirstDataRendered={this.onFirstDataRendered.bind(this)}
+                          />
+                        </div>
+                      </div>
+                    </CardBody>
+                  </CSSTransition>
+                ) : (
+                  <CSSTransition
+                    timeout={500}
+                    classNames='flip-transition'
+                    in={this.state.openMaintenanceChangelog}
+                  >
+                    <CardBody>
+                      {rowData.map(maint => {
+                        if (maint.id >= 27 && maint.id <= 37) {
+                          return <MaintCard maint={maint} key={maint.id} />
+                        }
+                      })}
+                    </CardBody>
+                  </CSSTransition>
+                )}
               <Footer />
             </Card>
             <style jsx>{`
@@ -368,7 +426,7 @@ export default class History extends React.Component {
               }
             `}
             </style>
-            <Modal className='mail-modal-body' animation backdrop backdropClassName='modal-backdrop' open={this.state.openNewModal} size='md' toggle={this.toggleNewModal}>
+            <Modal className='mail-modal-body' animation backdrop backdropClassName='modal-backdrop' open={openNewModal} size='md' toggle={this.toggleNewModal}>
               <ModalHeader className='modal-delete-header'>
                 New Maintenance
               </ModalHeader>
@@ -381,9 +439,9 @@ export default class History extends React.Component {
                           Company
                         </label>
                         <Select
-                          value={this.state.newMaintenanceCompany || undefined}
+                          value={newMaintenanceCompany || undefined}
                           onChange={this.handleNewCompanySelect}
-                          options={this.state.newMaintCompanies}
+                          options={newMaintCompanies}
                           placeholder='Please select a Company'
                         />
                       </FormGroup>
@@ -398,7 +456,7 @@ export default class History extends React.Component {
                         query: {
                           id: 'NEW',
                           mailId: 'NT',
-                          name: this.state.newCompMailDomain
+                          name: newCompMailDomain
                         }
                       }}
                       as='/maintenance/new'
@@ -411,7 +469,7 @@ export default class History extends React.Component {
                 </Row>
               </ModalBody>
             </Modal>
-            <Modal className='delete-modal' animation backdrop backdropClassName='modal-backdrop' open={this.state.openConfirmDeleteModal} size='md' toggle={this.toggleConfirmDeleteModal}>
+            <Modal className='delete-modal' animation backdrop backdropClassName='modal-backdrop' open={openConfirmDeleteModal} size='md' toggle={this.toggleConfirmDeleteModal}>
               <ModalHeader className='modal-delete-header'>
                 Confirm Delete
               </ModalHeader>
@@ -419,7 +477,7 @@ export default class History extends React.Component {
                 <Container className='container-interior'>
                   <Row>
                     <Col>
-                      Are you sure you want to delete maintenance <b style={{ fontWeight: '900' }}> {this.state.maintIdtoDelete}</b>
+                      Are you sure you want to delete maintenance <b style={{ fontWeight: '900' }}> {maintIdtoDelete}</b>
                     </Col>
                   </Row>
                 </Container>
@@ -442,6 +500,7 @@ export default class History extends React.Component {
                   background: var(--white);
                   color: var(--dark);
                   box-shadow: 0 0 5px 1px var(--secondary);
+                  border-color: #fff;
                 }
                 :global(.delete-modal) {
                   margin-top: 50px;
@@ -477,7 +536,7 @@ export default class History extends React.Component {
                 }
                 :global(.btn-dark:hover) {
                   box-shadow: ${this.props.night === 'true' ? '0 0 5px 1px var(--secondary)' : ''};
-                  border: ${this.props.night === 'true' ? '1px solid #fff' : ''};
+                  border: ${this.props.night === 'true' ? '1px solid #fff' : '1px solid #16181b'};
                 }
                 :global(.ag-horizontal-right-spacer::-webkit-scrollbar) {
                   width: 0px;
@@ -492,6 +551,22 @@ export default class History extends React.Component {
                 :global(::-webkit-scrollbar) {
                   height: 8px;
                   background: rgba(0,0,0,0.2);
+                }
+                :global(.flip-transition-enter) {
+                  opacity: 0;
+                }
+                :global(.flip-transition-enter-active) {
+                  opacity: 1;
+                  transform: translateX(0);
+                  transition: opacity 0.9s, transform 0.9s;
+                }
+                :global(.flip-transition-exit) {
+                  opacity: 0;
+                }
+                :global(.flip-transition-exit-active) {
+                  opacity: 1;
+                  transform: translateX(0);
+                  transition: opacity 0.9s, transform 0.9s;
                 }
             `}
             </style>

@@ -177,11 +177,11 @@ class Header extends React.Component {
     const input = document.getElementById('aa-search-input')
     const searchBtn = document.getElementById('search-btn')
     searchBtn.classList.toggle('close')
+    input.value = ''
     if (input.classList.contains('square')) {
       this.removeClass('.aa-dropdown-menus', 'visible')
     }
     input.classList.toggle('square')
-    input.value = ''
   }
 
   handleSearchFocus = () => {
@@ -316,19 +316,7 @@ class Header extends React.Component {
                 </Autocomplete>
                 <Button id='search-btn' className='search-btn' outline onClick={this.toggleSearchBar} />
               </InputGroup>
-              <InputGroup>
-                {/* <NavItem>
-                  <NavLink>
-                    <form id='signout' method='post' action='/auth/signout' onSubmit={this.handleSignOutSubmit}>
-                      <input name='_csrf' type='hidden' value={this.props.session.csrfToken} />
-                      <div className='logout-btn-wrapper'>
-                        <button className='logout-btn' type='submit'>
-                          <FontAwesomeIcon width='1.525em' className='menu-icon logout' icon={faPowerOff} />
-                        </button>
-                      </div>
-                    </form>
-                  </NavLink>
-                </NavItem> */}
+              <InputGroup style={{ zIndex: '99999' }}>
                 <NavItem style={{ display: 'flex', alignItems: 'center' }}>
                   <DarkmodeSwitch value={this.props.night} onChange={this.props.toggleNight} />
                 </NavItem>
@@ -396,7 +384,7 @@ class Header extends React.Component {
               width: 300px;
               margin-left: 170px;
               top: 78%;
-              left: 92%;
+              right: -20rem;
               transform: translate(-50%, -50%);
             }
             :global(.nav-search) {
@@ -482,14 +470,14 @@ class Header extends React.Component {
               width: 300px;
               height: 50px;
               border: 4px solid #ffffff;
-              border-radius: 0;
+              border-radius: 10px;
               background: none;
               color: #fff;
               font-family: Roboto;
               font-size: 16px;
               font-weight: 400;
               outline: 0;
-              transition: width 0.4s ease-in-out, border-radius 0.4s ease-in-out,
+              transition: width 0.4s ease-in-out, border-radius 0.1s ease-in-out,
                 padding 0.2s;
               transition-delay: 0.4s, 0s, 0.4s;
               transform: translate(-100%, -35%);
@@ -554,8 +542,8 @@ class Header extends React.Component {
             box-shadow: 0px 11px 28px 4px rgba(50, 50, 50, 0.95);
             box-shadow: 0px 10px 35px 2px rgba(0, 0, 0, 0.75);
             top: 32px;
-            right: 304px;
-            border-radius: 5px;
+            right: 317px;
+            border-radius: 0 0 5px 5px;
           }
           :global(.aa-suggestions-category) {
             visibility: hidden;
@@ -566,6 +554,8 @@ class Header extends React.Component {
           }
           :global(.aa-dropdown-menu > div) {
             display: block;
+            width: 92%;
+            vertical-align: top;
           }
           :global(.aa-suggestion em) {
             color: #67B246;
