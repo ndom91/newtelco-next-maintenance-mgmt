@@ -46,18 +46,8 @@ export default class Index extends React.Component {
         Router.push('/auth')
       }
     }
-    const pageRequest2 = `https://api.${host}/inbox/count`
-    const res2 = await fetch(pageRequest2)
-    const count = await res2.json()
-    let display
-    if (count === 'No unread emails') {
-      display = 0
-    } else {
-      display = count.count
-    }
     return {
       jsonData: json,
-      unread: display,
       night: query.night,
       session: await NextAuth.init({ req })
     }
@@ -104,9 +94,6 @@ export default class Index extends React.Component {
   componentDidMount () {
     Fonts()
 
-    // Keep Inbox Count uptodate
-    // this.checkUnreadCount()
-    // this.unreadInterval = setTimeout(() => this.checkUnreadCount, 60 * 1000)
     people.forEach(person => {
       this.fetchPersonStats(person)
     })
@@ -135,7 +122,7 @@ export default class Index extends React.Component {
   render () {
     if (this.props.session.user) {
       return (
-        <Layout night={this.props.night} handleSearchSelection={this.handleSearchSelection} unread={this.props.unread} session={this.props.session}>
+        <Layout night={this.props.night} handleSearchSelection={this.handleSearchSelection} unread={this.props.jsonData.count} session={this.props.session}>
           {UnreadCount()}
           <Card className='top-card-wrapper' style={{ maxWidth: '100%' }}>
             <CardHeader><h2 className='title-text'>Newtelco Maintenance</h2></CardHeader>
@@ -145,7 +132,7 @@ export default class Index extends React.Component {
                   <Col>
                     <Card className='card-inboxUnread'>
                       <Link href='/inbox' passHref>
-                        <Badge className='card-badge'>{this.props.unread}</Badge>
+                        <Badge className='card-badge'>{this.props.jsonData.count}</Badge>
                       </Link>
                       <Link href='/inbox' passHref>
                         <CardBody className='card-unread-body'>

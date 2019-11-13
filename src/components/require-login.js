@@ -26,7 +26,7 @@ export default class RequireLogin extends React.Component {
         </div>
         <style jsx>{`
           .card-outline {
-            border: 1px solid rgba(244,10,10,0.3);
+            border: 3px solid rgba(244,10,10,0.3);
             box-shadow: 0 0 10px 1px rgba(244,10,10,0.3);
           }
           .require-login-wrapper {

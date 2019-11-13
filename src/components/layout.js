@@ -30,7 +30,8 @@ export default class Layout extends React.Component {
   }
 
   componentDidMount () {
-    const night = window.localStorage.getItem('theme')
+    let night = window.localStorage.getItem('theme')
+    const mqnight = window.matchMedia('(prefers-color-scheme: dark)').matches
     const installAsk = window.localStorage.getItem('askA2HS') || 0
 
     if (window.outerWidth < 500 && installAsk < 3) {
@@ -42,6 +43,10 @@ export default class Layout extends React.Component {
         })
         window.localStorage.setItem('askA2HS', parseInt(installAsk) + 1)
       })
+    }
+
+    if (night === undefined && mqnight) {
+      night = 'dark'
     }
 
     var el = document.querySelector('html')

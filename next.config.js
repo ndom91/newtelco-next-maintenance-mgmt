@@ -1,4 +1,5 @@
 const { parsed: localEnv } = require('dotenv').config({ path: './.env' })
+const dev = process.env.NODE_ENV !== 'production'
 const webpack = require('webpack')
 const withCSS = require('@zeit/next-css')
 require('dotenv').config()
@@ -25,17 +26,28 @@ const nextConfig = {
   target: 'server',
   compress: false,
   pwa: {
+    disable: dev,
     dest: 'public',
     register: true,
     scope: '/',
     sw: 'sw.js',
     clientsClaim: true,
     skipWaiting: true,
-    modifyUrlPrefix: {
+    modifyURLPrefix: {
       '.next': '/_next'
     },
     runtimeCaching: [{
       urlPattern: /api/i,
+      handler: 'NetworkFirst',
+      options: {
+        cacheName: 'next-api',
+        expiration: {
+          maxEntries: 16,
+          maxAgeSeconds: 60
+        }
+      }
+    }, {
+      urlPattern: /^https:\/\/api\.maintenance.newtelco.de\/.*/i,
       handler: 'NetworkFirst',
       options: {
         cacheName: 'api',
@@ -124,8 +136,8 @@ const nextConfig = {
   webpack (config, { isServer, buildId, dev }) {
     config.plugins.push(new webpack.EnvironmentPlugin(localEnv))
     HACK_removeMinimizeOptionFromCssLoaders(config)
-    // Read the .env file
     config.stats = { warningsFilter: warn => warn.indexOf('Conflicting order between:') > -1 }
+    // eslint-disable-next-line
     new Dotenv({
       path: path.join(__dirname, '.env'),
       systemvars: true
