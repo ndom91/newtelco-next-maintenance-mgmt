@@ -24,8 +24,8 @@ import { CSSTransition } from 'react-transition-group'
 import EdittedBy from '../components/ag-grid/edittedby'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import UnreadCount from '../components/unreadcount'
+import InfiniteHistory from '../components/infinitehistory'
 import UseAnimations from 'react-useanimations'
-import MaintCard from '../components/historycard'
 import { HotKeys } from 'react-hotkeys'
 import {
   Card,
@@ -344,7 +344,7 @@ export default class History extends React.Component {
       rowData,
       newMaintCompanies,
       newMaintenanceCompany,
-      newCompMailDomain
+      newCompMailDomain,
     } = this.state
 
     if (this.props.session.user) {
@@ -406,14 +406,10 @@ export default class History extends React.Component {
                   <CSSTransition
                     timeout={500}
                     classNames='flip-transition'
-                    in={this.state.openMaintenanceChangelog}
+                    in={this.state.openTableView}
                   >
                     <CardBody>
-                      {rowData.map(maint => {
-                        if (maint.id >= 27 && maint.id <= 37) {
-                          return <MaintCard maint={maint} key={maint.id} />
-                        }
-                      })}
+                      <InfiniteHistory length={this.state.rowData.length} />
                     </CardBody>
                   </CSSTransition>
                 )}

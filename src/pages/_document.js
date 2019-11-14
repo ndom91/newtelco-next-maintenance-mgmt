@@ -9,7 +9,7 @@ class MyDocument extends Document {
     return (
       <Html data-theme=''>
         <Head />
-        <body>
+        <body id='scrolltarget'>
           <Main />
           <NextScript />
         </body>

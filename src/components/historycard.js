@@ -35,10 +35,9 @@ class MaintCard extends React.Component {
       <li className='maint-wrapper'>
         <Card className='maint-card'>
           <CardHeader className='maint-card-header'>
-            <Badge theme='secondary' style={{ fontSize: '1rem', marginRight: '5px' }} outline>
+            <Badge theme='secondary' style={{ fontSize: '2rem' }} outline>
               {maintenanceIdDisplay}
             </Badge>
-            {this.props.maint.name}
             <Link href={`/maintenance?id=${this.props.maint.id}`} passHref>
               <Button className='maint-card-edit-btn'>
                 <FontAwesomeIcon icon={faPencilAlt} width='1.2em' />
@@ -46,7 +45,9 @@ class MaintCard extends React.Component {
             </Link>
           </CardHeader>
           <CardBody>
-            <CardTitle>Lorem Ipsum</CardTitle> 
+            <CardTitle>
+              {this.props.maint.name}
+            </CardTitle>
             <div className='maint-card-date-wrapper'>
               <span>
                 {moment(this.props.maint.startDateTime).format('DD.MM.YYYY HH:mm:ss')}
@@ -72,6 +73,7 @@ class MaintCard extends React.Component {
           }
           :global(.maint-card) {
             transition: all 250ms ease-in-out;
+            border: ${this.props.maint.done === 'true' ? '2px solid #67b246' : null }
           }
           :global(.maint-card:hover) {
             box-shadow: 0 5px 10px 1px rgba(0,0,0,0.4);
@@ -84,7 +86,7 @@ class MaintCard extends React.Component {
           }
           :global(.maint-card-header) {
             display: flex;
-            justify-content: space-between;
+            justify-content: space-around;
             align-items: center;
             padding: 1.09375rem 1.175rem;
           }
