@@ -32,7 +32,7 @@ class MaintCard extends React.Component {
     } = this.state
 
     return (
-      <li>
+      <li className='maint-wrapper'>
         <Card className='maint-card'>
           <CardHeader className='maint-card-header'>
             <Badge theme='secondary' style={{ fontSize: '1rem', marginRight: '5px' }} outline>
@@ -47,25 +47,27 @@ class MaintCard extends React.Component {
           </CardHeader>
           <CardBody>
             <CardTitle>Lorem Ipsum</CardTitle> 
-            <span>
-              {moment(this.props.maint.startDateTime).format('DD.MM.YYYY HH:mm:ss')}
-            </span>
-            <span>
-              <i>to</i>
-            </span>
-            <span>
-              {moment(this.props.maint.endDateTime).format('DD.MM.YYYY HH:mm:ss')}
-            </span>
+            <div className='maint-card-date-wrapper'>
+              <span>
+                {moment(this.props.maint.startDateTime).format('DD.MM.YYYY HH:mm:ss')}
+              </span>
+              <span>
+                <i>to</i>
+              </span>
+              <span>
+                {moment(this.props.maint.endDateTime).format('DD.MM.YYYY HH:mm:ss')}
+              </span>
+            </div>
           </CardBody>
           <CardFooter className='maint-card-footer'>
             <EdittedBy username={this.props.maint.bearbeitetvon} />
           </CardFooter>
         </Card>
         <style jsx>{`
-          :global(li) {
+          :global(.maint-wrapper) {
             display: inline-block;
             list-style: none;
-            max-width: 280px;
+            width: 280px;
             margin: 5px 10px;
           }
           :global(.maint-card) {
@@ -74,6 +76,11 @@ class MaintCard extends React.Component {
           :global(.maint-card:hover) {
             box-shadow: 0 5px 10px 1px rgba(0,0,0,0.4);
             transform: translateY(-5px);
+          }
+          :global(.maint-card-date-wrapper) {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
           }
           :global(.maint-card-header) {
             display: flex;

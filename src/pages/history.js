@@ -93,7 +93,7 @@ export default class History extends React.Component {
       openConfirmDeleteModal: false,
       newMaintenanceCompany: '',
       newCompMailDomain: '',
-      openTableView: tableView == true,
+      openTableView: tableView,
       newMaintCompanies: [],
       rowData: [],
       gridOptions: {
