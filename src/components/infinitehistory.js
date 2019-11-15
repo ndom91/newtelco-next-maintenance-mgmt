@@ -27,7 +27,6 @@ class InfiniteHistory extends React.Component {
     fetch(pageRequest)
       .then(res => res.json())
       .then(data => {
-        console.log(data)
         this.setState({
           items: data.maintenances,
           count: this.state.count + 15
@@ -58,10 +57,20 @@ class InfiniteHistory extends React.Component {
             </p>
           }
         >
-          {items.map(maint => {
-            return <MaintCard maint={maint} key={maint.id} />
-          })}
+          <div className='infinite-scroll-item-wrapper'>
+            {items.map(maint => {
+              return <MaintCard maint={maint} key={maint.id} />
+            })}
+          </div>
         </InfiniteScroll>
+        <style jsx>{`
+          :global(.infinite-scroll-item-wrapper) {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+          }
+        `}
+        </style>
       </div>
     )
   }

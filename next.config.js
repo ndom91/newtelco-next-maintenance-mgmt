@@ -47,6 +47,16 @@ const nextConfig = {
         }
       }
     }, {
+      urlPattern: /\.(?:jpg|jpeg|gif|png|svg|ico|webp)$/i,
+      handler: 'StaleWhileRevalidate',
+      options: {
+        cacheName: 'static-image-assets',
+        expiration: {
+          maxEntries: 64,
+          maxAgeSeconds: 24 * 60 * 60 // 24 hours
+        }
+      }
+    }, {
       urlPattern: /^https:\/\/api\.maintenance.newtelco.de\/.*/i,
       handler: 'NetworkFirst',
       options: {
@@ -84,16 +94,6 @@ const nextConfig = {
         expiration: {
           maxEntries: 4,
           maxAgeSeconds: 7 * 24 * 60 * 60 // 7 days
-        }
-      }
-    }, {
-      urlPattern: /\.(?:jpg|jpeg|gif|png|svg|ico|webp)$/i,
-      handler: 'StaleWhileRevalidate',
-      options: {
-        cacheName: 'static-image-assets',
-        expiration: {
-          maxEntries: 64,
-          maxAgeSeconds: 24 * 60 * 60 // 24 hours
         }
       }
     }, {
