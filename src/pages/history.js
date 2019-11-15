@@ -73,9 +73,16 @@ export default class History extends React.Component {
 
   constructor (props) {
     super(props)
-    let tableView = true
+    let tableViewBool
     if (typeof window !== 'undefined') {
-      tableView = window.localStorage.getItem('tableView')
+      tableViewBool = window.localStorage.getItem('tableView')
+      if (tableViewBool === 'undefined') {
+        tableViewBool = true
+      } else {
+        if (typeof tableViewBool === 'string') {
+          tableViewBool = tableViewBool === 'true'
+        }
+      }
     }
     const pinned = dir => {
       if (typeof window !== 'undefined' && window.outerWidth < '500') {
@@ -93,7 +100,7 @@ export default class History extends React.Component {
       openConfirmDeleteModal: false,
       newMaintenanceCompany: '',
       newCompMailDomain: '',
-      openTableView: tableView,
+      openTableView: tableViewBool,
       newMaintCompanies: [],
       rowData: [],
       gridOptions: {
@@ -268,7 +275,13 @@ export default class History extends React.Component {
 
   toggleView = () => {
     if (this.state.openTableView === true || this.state.openTableView === false) {
-      window.localStorage.setItem('tableView', !this.state.openTableView)
+      let tableViewBool
+      if (typeof this.state.openTableView === 'string') {
+        tableViewBool = this.state.openTableView === 'true'
+      } else {
+        tableViewBool = this.state.openTableView
+      }
+      window.localStorage.setItem('tableView', !tableViewBool)
     }
     this.setState({
       openTableView: !this.state.openTableView
@@ -344,7 +357,7 @@ export default class History extends React.Component {
       rowData,
       newMaintCompanies,
       newMaintenanceCompany,
-      newCompMailDomain,
+      newCompMailDomain
     } = this.state
 
     if (this.props.session.user) {

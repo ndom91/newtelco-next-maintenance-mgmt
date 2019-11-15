@@ -17,7 +17,7 @@ class InfiniteHistory extends React.Component {
     this.fetchData()
   }
 
-  fetchData = (data) => {
+  fetchData = () => {
     if (this.state.items.length >= this.props.length) {
       this.setState({ hasMore: false })
       return
@@ -43,23 +43,26 @@ class InfiniteHistory extends React.Component {
     } = this.state
 
     return (
-      <InfiniteScroll
-        dataLength={this.state.items.length}
-        next={this.fetchData}
-        hasMore={hasMore}
-        scrollThreshold='90%'
-        scrollableTarget='scrolltarget'
-        loader={<h4 style={{ color: 'var(--font-color)' }}>Loading...</h4>}
-        endMessage={
-          <p style={{ textAlign: 'center' }}>
-            <b>No More Maintenances Available</b>
-          </p>
-        }
-      >
-        {items.map(maint => {
-          return <MaintCard maint={maint} key={maint.id} />
-        })}
-      </InfiniteScroll>
+      <div id='scrollablediv'>
+        <InfiniteScroll
+          dataLength={this.state.items.length}
+          next={this.fetchData}
+          hasMore={hasMore}
+          // scrollThreshold='900px'
+          // scrollableTarget='scrolltarget'
+          // scrollableTarget='scrollablediv'
+          loader={<h4 style={{ textAlign: 'center', color: 'var(--font-color)' }}>Loading...</h4>}
+          endMessage={
+            <p style={{ textAlign: 'center' }}>
+              <b>No More Maintenances Available</b>
+            </p>
+          }
+        >
+          {items.map(maint => {
+            return <MaintCard maint={maint} key={maint.id} />
+          })}
+        </InfiniteScroll>
+      </div>
     )
   }
 }

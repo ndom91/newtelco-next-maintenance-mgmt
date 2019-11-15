@@ -73,7 +73,10 @@ class MaintCard extends React.Component {
           }
           :global(.maint-card) {
             transition: all 250ms ease-in-out;
-            border: ${this.props.maint.done === 'true' ? '2px solid #67b246' : null }
+            box-shadow: none;
+            border-radius: 1rem;
+            overflow: hidden;
+            border: ${this.props.maint.done === 'true' ? '1px solid #67b246' : null};
           }
           :global(.maint-card:hover) {
             box-shadow: 0 5px 10px 1px rgba(0,0,0,0.4);
