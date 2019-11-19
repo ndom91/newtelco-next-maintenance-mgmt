@@ -1,4 +1,7 @@
 const { parsed: localEnv } = require('dotenv').config({ path: './.env' })
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true'
+})
 const dev = process.env.NODE_ENV !== 'production'
 const webpack = require('webpack')
 const withCSS = require('@zeit/next-css')
@@ -25,6 +28,9 @@ function HACK_removeMinimizeOptionFromCssLoaders (config) {
 const nextConfig = {
   target: 'server',
   compress: false,
+  experimental: {
+    modern: true
+  },
   pwa: {
     disable: dev,
     dest: 'public',
@@ -146,4 +152,4 @@ const nextConfig = {
   }
 }
 
-module.exports = withPWA(withCSS(nextConfig))
+module.exports = withBundleAnalyzer(withPWA(withCSS(nextConfig)))

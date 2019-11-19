@@ -23,6 +23,7 @@ import TimezoneSelector from '../components/timezone'
 import { getUnique, convertDateTime } from '../components/maintenance/helper'
 import { HotKeys } from 'react-hotkeys'
 import { OutTable, ExcelRenderer } from 'react-excel-renderer'
+// import { OutTable } from 'react-excel-renderer'
 import ProtectedIcon from '../components/ag-grid/protected'
 import SentIcon from '../components/ag-grid/sent'
 import StartDateTime from '../components/ag-grid/startdatetime'
@@ -91,6 +92,11 @@ const Changelog = dynamic(
   () => import('../components/timeline'),
   { ssr: false }
 )
+
+// import { OutTable, ExcelRenderer } from 'react-excel-renderer'
+// const ExcelRenderer = dynamic({
+//   loader: () => import('../components/ExcelRenderer')
+// })
 
 export default class Maintenance extends React.Component {
   static async getInitialProps ({ req, query }) {
@@ -2068,6 +2074,15 @@ export default class Maintenance extends React.Component {
         base64 = base64.replace(/-/g, '+')
         const base64Fixed = fixBase64(base64)
         var fileData = new Blob([base64Fixed], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;' })
+
+        // const dynamicExcelRenderer = dynamic(() => {
+        //   import('react-excel-renderer').then(m => m.ExcelRenderer)
+        // })
+
+        // console.log(typeof dynamicExcelRenderer, dynamicExcelRenderer)
+        // , {
+        //   ssr: false
+        // })
 
         ExcelRenderer(fileData, (err, resp) => {
           if (err) {

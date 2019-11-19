@@ -225,22 +225,22 @@ export default class History extends React.Component {
   }
 
   componentDidMount () {
+    if (this.state.openTableView) {
+      window.gridApi.refreshCells()
+    }
     this.setState({ rowData: this.props.jsonData.maintenances })
   }
 
   handleGridReady = params => {
     window.gridApi = params.api
     this.gridColumnApi = params.columnApi
-    // params.columnApi.sizeColumnsToFit()
   }
 
   onFirstDataRendered (params) {
     params.columnApi.autoSizeColumns()
-    // params.columnApi.sizeColumnsToFit()
   }
 
   handleGridExport () {
-    // console.log(data)
     if (window.gridApi) {
       const params = {
         allColumns: true,
@@ -335,8 +335,6 @@ export default class History extends React.Component {
   handleSearchSelection = selection => {
     const newLocation = `/maintenance?id=${selection.id}`
     Router.push(newLocation)
-    // Router.pushRoute(`/maintenance?id=${selection.id}`)
-    // this.setState({ selection })
   }
 
   render () {
@@ -428,13 +426,6 @@ export default class History extends React.Component {
                 )}
               <Footer />
             </Card>
-            <style jsx>{`
-              :global(.export-btn) {
-                display: flex;
-                align-items: center;
-              }
-            `}
-            </style>
             <Modal className='mail-modal-body' animation backdrop backdropClassName='modal-backdrop' open={openNewModal} size='md' toggle={this.toggleNewModal}>
               <ModalHeader className='modal-delete-header'>
                 New Maintenance
@@ -505,6 +496,10 @@ export default class History extends React.Component {
               </ModalBody>
             </Modal>
             <style jsx>{`
+                :global(.export-btn) {
+                  display: flex;
+                  align-items: center;
+                }
                 :global(.export-btn:hover) {
                   background: var(--white);
                   color: var(--dark);
