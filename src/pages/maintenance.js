@@ -750,7 +750,7 @@ export default class Maintenance extends React.Component {
           const frozenCids = uniqueCids.findIndex(el => el.kunde === freezeEntry.companyId)
           cogoToast.error(`${uniqueKundenCids[frozenCids].name} has an active network freeze at that time`, {
             position: 'top-right',
-            hideAfter: 5,
+            hideAfter: 1000,
             onClick: () => Router.push('/settings?tab=freeze')
           })
           uniqueKundenCids[frozenCids].frozen = true
@@ -3932,6 +3932,12 @@ export default class Maintenance extends React.Component {
                   }
                   :global(.card-body) {
                     padding: 0px;
+                  }
+                  :global(.ct-toast) {
+                    z-index: 9999 !important;
+                  }
+                  :global(#search-btn) {
+                    z-index: 1;
                   }
                 }
               `}
