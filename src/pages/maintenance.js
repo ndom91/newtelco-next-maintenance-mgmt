@@ -785,7 +785,8 @@ export default class Maintenance extends React.Component {
       impact,
       reason,
       location,
-      timezone
+      timezone,
+      impactPlaceholder
     } = this.state.maintenance
 
     if (!id || !startDateTime || !endDateTime) {
@@ -852,13 +853,11 @@ export default class Maintenance extends React.Component {
 
     let body = `<body style="color:#666666;">${rescheduleText} Dear Colleagues,​​<p><span>${maintenanceIntro}<br><br> <b>${customerCID}</b> <br><br>The maintenance work is with the following details:</span></p><table border="0" cellspacing="2" cellpadding="2" width="775px"><tr><td style='width: 205px;'>Maintenance ID:</td><td><b>NT-${id}</b></td></tr><tr><td>Start date and time:</td><td><b>${utcStart} (${tzSuffixRAW})</b></td></tr><tr><td>Finish date and time:</td><td><b>${utcEnd} (${tzSuffixRAW})</b></td></tr>`
 
-    if (impact || protection) {
+    if (impact || protection || impactPlaceholder) {
       if (protection === 1 || protection === '1' || protection === true || protection === 'true') {
         body = body + '<tr><td>Impact:</td><td>50ms Protection Switch</td></tr>'
       } else if (protection === 0 || protection === '0' || protection === false || protection === 'false') {
-        body = body + '<tr><td>Impact:</td><td>' + this.state.maintenance.impact + '</td></tr>'
-      } else {
-        body = body + '<tr><td>Impact:</td><td>' + impact + '</td></tr>'
+        body = body + '<tr><td>Impact:</td><td>' + impact || impactPlaceholder + '</td></tr>'
       }
     }
 
