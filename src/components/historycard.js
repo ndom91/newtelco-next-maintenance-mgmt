@@ -65,12 +65,17 @@ class MaintCard extends React.Component {
           <CardBody>
             <img className='maint-icon-bg' src={iconUrl} alt='Logo' />
             <CardTitle>
-              {this.props.maint.name}
+              <span>
+                {this.props.maint.name}
+              </span>
             </CardTitle>
+            <span title={this.props.maint.betroffeneCIDs} className='card-cid-wrapper'>
+              {this.props.maint.betroffeneCIDs}
+            </span>
             <div className='maint-card-date-wrapper'>
               <CardCalendar date={this.props.maint.startDateTime} />
               <span style={{ display: 'flex', alignItems: 'center' }}>
-                <FontAwesomeIcon icon={faChevronRight} width='0.8em' />
+                <FontAwesomeIcon icon={faChevronRight} style={{ color: '#6d6d6d30' }} width='0.8em' />
               </span>
               <CardCalendar date={this.props.maint.endDateTime} />
             </div>
@@ -172,7 +177,7 @@ class MaintCard extends React.Component {
           :global(.maint-card-date-wrapper) {
             display: flex;
             width: 100%;
-            margin-top: 40px;
+            margin-top: 20px;
             justify-content: space-between;
           }
           :global(.maint-card-header) {
@@ -195,7 +200,17 @@ class MaintCard extends React.Component {
             display: flex;
             justify-content: center;
             align-items: center;
-            opacity: 0.3;
+            opacity: 0.2;
+          }
+          :global(.card-cid-wrapper) {
+            font-size: 0.9rem;
+            max-width: 230px;
+            max-height: 16px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            display: inline-block;
+            margin-top: 15px;
           }
           :global(.maint-card-reschedule-badge > div) {
             position: relative;

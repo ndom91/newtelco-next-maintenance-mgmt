@@ -225,7 +225,7 @@ export default class History extends React.Component {
   }
 
   componentDidMount () {
-    if (this.state.openTableView) {
+    if (this.state.openTableView && window.gridApi) {
       window.gridApi.refreshCells()
     }
     this.setState({ rowData: this.props.jsonData.maintenances })

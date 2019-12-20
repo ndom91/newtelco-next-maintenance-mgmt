@@ -750,7 +750,7 @@ export default class Maintenance extends React.Component {
           const frozenCids = uniqueCids.findIndex(el => el.kunde === freezeEntry.companyId)
           cogoToast.error(`${uniqueKundenCids[frozenCids].name} has an active network freeze at that time`, {
             position: 'top-right',
-            hideAfter: 1000,
+            hideAfter: 5,
             onClick: () => Router.push('/settings?tab=freeze')
           })
           uniqueKundenCids[frozenCids].frozen = true
@@ -3828,6 +3828,9 @@ export default class Maintenance extends React.Component {
                   justify-content: center;
                   min-height: 80px;
                 }
+                :global(#ct-container) {
+                  z-index: 10001 !important;
+                }
                 @media only screen and (max-width: 500px) {
                   :global(html) {
                     max-width: ${this.state.width}px;
@@ -3932,12 +3935,6 @@ export default class Maintenance extends React.Component {
                   }
                   :global(.card-body) {
                     padding: 0px;
-                  }
-                  :global(.ct-toast) {
-                    z-index: 9999 !important;
-                  }
-                  :global(#search-btn) {
-                    z-index: 1;
                   }
                 }
               `}

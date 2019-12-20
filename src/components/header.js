@@ -316,7 +316,7 @@ class Header extends React.Component {
                 </Autocomplete>
                 <Button id='search-btn' className='search-btn' outline onClick={this.toggleSearchBar} />
               </InputGroup>
-              <InputGroup style={{ zIndex: '99999' }}>
+              <InputGroup style={{ zIndex: '10000' }}>
                 <NavItem style={{ display: 'flex', alignItems: 'center' }}>
                   <DarkmodeSwitch value={this.props.night} onChange={this.props.toggleNight} />
                 </NavItem>
