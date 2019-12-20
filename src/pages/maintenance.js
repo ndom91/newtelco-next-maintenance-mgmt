@@ -573,7 +573,7 @@ export default class Maintenance extends React.Component {
         <Button onClick={() => this.prepareDirectSend(row.data.maintenanceRecipient, row.data.kundenCID, row.data.frozen)} style={{ padding: '0.7em' }} size='sm' outline>
           <FontAwesomeIcon width='1.325em' icon={faPaperPlane} />
         </Button>
-        <Button onClick={() => this.togglePreviewModal(row.data.maintenanceRecipient, row.data.kundenCID)} style={{ padding: '0.7em' }} size='sm' outline>
+        <Button onClick={() => this.togglePreviewModal(row.data.maintenanceRecipient, row.data.kundenCID, row.data.protected)} style={{ padding: '0.7em' }} size='sm' outline>
           <FontAwesomeIcon width='1.325em' icon={faSearch} />
         </Button>
       </ButtonGroup>
@@ -858,12 +858,12 @@ export default class Maintenance extends React.Component {
     }
 
     let body = `<body style="color:#666666;">${rescheduleText} Dear Colleagues,​​<p><span>${maintenanceIntro}<br><br> <b>${customerCID}</b> <br><br>The maintenance work is with the following details:</span></p><table border="0" cellspacing="2" cellpadding="2" width="775px"><tr><td style='width: 205px;'>Maintenance ID:</td><td><b>NT-${id}</b></td></tr><tr><td>Start date and time:</td><td><b>${utcStart} (${tzSuffixRAW})</b></td></tr><tr><td>Finish date and time:</td><td><b>${utcEnd} (${tzSuffixRAW})</b></td></tr>`
-
     if (impact || protection || impactPlaceholder) {
       if (protection === 1 || protection === '1' || protection === true || protection === 'true') {
         body = body + '<tr><td>Impact:</td><td>50ms Protection Switch</td></tr>'
       } else if (protection === 0 || protection === '0' || protection === false || protection === 'false') {
-        body = body + '<tr><td>Impact:</td><td>' + impact || impactPlaceholder + '</td></tr>'
+        const impactText = impact || impactPlaceholder
+        body = body + '<tr><td>Impact:</td><td>' + impactText + '</td></tr>'
       }
     }
 
@@ -1774,9 +1774,9 @@ export default class Maintenance extends React.Component {
   }
 
   // open / close send preview modal
-  togglePreviewModal = (recipient, customerCID) => {
+  togglePreviewModal = (recipient, customerCID, protection) => {
     if (recipient && customerCID) {
-      const HtmlBody = this.generateMail(customerCID)
+      const HtmlBody = this.generateMail(customerCID, protection)
       HtmlBody && this.setState({
         openPreviewModal: !this.state.openPreviewModal,
         mailBodyText: HtmlBody,
