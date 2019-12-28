@@ -381,10 +381,10 @@ class Header extends React.Component {
               justify-content: space-between;
               position: absolute;
               height: 50px;
-              width: 300px;
+              width: 100px;
               margin-left: 170px;
               top: 78%;
-              right: -20rem;
+              right: 0rem;
               transform: translate(-50%, -50%);
             }
             :global(.nav-search) {

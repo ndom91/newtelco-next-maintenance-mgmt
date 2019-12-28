@@ -80,7 +80,8 @@ export default class Inbox extends React.Component {
       translated: false,
       translateTooltipOpen: false,
       windowInnerHeight: 0,
-      windowInnerWidth: 0
+      windowInnerWidth: 0,
+      unread: 0
     }
 
     this.toggle = this.toggle.bind(this)
@@ -90,7 +91,8 @@ export default class Inbox extends React.Component {
     this.setState({
       inboxMails: this.props.jsonData,
       windowInnerHeight: window.innerHeight,
-      windowInnerWidth: window.innerWidth
+      windowInnerWidth: window.innerWidth,
+      unread: this.props.unread
     })
     const host = window.location.host
     if (Array.isArray(this.props.jsonData)) {
@@ -208,11 +210,15 @@ export default class Inbox extends React.Component {
           cogoToast.success('Message Deleted!', {
             position: 'top-right'
           })
+          const newUnread = this.state.unread - 1
           const array = [...this.state.inboxMails]
           const index = this.state.inboxMails.findIndex(el => el.id === data.id)
           if (index !== -1) {
             array.splice(index, 1)
-            this.setState({ inboxMails: array })
+            this.setState({
+              inboxMails: array,
+              unread: newUnread
+            })
           }
         }
       })
@@ -230,11 +236,12 @@ export default class Inbox extends React.Component {
     if (this.props.session.user) {
       const {
         inboxMails,
-        open
+        open,
+        unread
       } = this.state
 
       return (
-        <Layout night={this.props.night} handleSearchSelection={this.handleSearchSelection} unread={this.props.unread} session={this.props.session}>
+        <Layout night={this.props.night} handleSearchSelection={this.handleSearchSelection} unread={unread} session={this.props.session}>
           {UnreadCount()}
           <Card className='top-card-wrapper' style={{ maxWidth: '100%' }}>
             <CardHeader><h2>Inbox</h2></CardHeader>

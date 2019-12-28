@@ -74,6 +74,9 @@ export default class MyApp extends App {
           .row {
             background: none;
           }
+          :global(#ct-container) {
+            z-index: 10001 !important;
+          }
           :global(.darkmode) {
             background-color: #121212 !important;
             color: var(--light) !important;

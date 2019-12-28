@@ -76,12 +76,8 @@ export default class History extends React.Component {
     let tableViewBool
     if (typeof window !== 'undefined') {
       tableViewBool = window.localStorage.getItem('tableView')
-      if (tableViewBool === 'undefined') {
+      if (tableViewBool === null) {
         tableViewBool = true
-      } else {
-        if (typeof tableViewBool === 'string') {
-          tableViewBool = tableViewBool === 'true'
-        }
       }
     }
     const pinned = dir => {
@@ -217,7 +213,7 @@ export default class History extends React.Component {
         }
       }
     }
-    this.toggleNewModal = this.toggleNewModal.bind(this)
+    this.handleToggleNewModal = this.handleToggleNewModal.bind(this)
     this.handleNewCompanySelect = this.handleNewCompanySelect.bind(this)
     this.handleGridReady = this.handleGridReady.bind(this)
     this.handleDelete = this.handleDelete.bind(this)
@@ -227,8 +223,11 @@ export default class History extends React.Component {
   componentDidMount () {
     if (this.state.openTableView && window.gridApi) {
       window.gridApi.refreshCells()
+      window.gridApi.redrawRows()
     }
-    this.setState({ rowData: this.props.jsonData.maintenances })
+    this.setState({
+      rowData: this.props.jsonData.maintenances
+    })
   }
 
   handleGridReady = params => {
@@ -238,6 +237,7 @@ export default class History extends React.Component {
 
   onFirstDataRendered (params) {
     params.columnApi.autoSizeColumns()
+    params.api.redrawRows()
   }
 
   handleGridExport () {
@@ -249,15 +249,9 @@ export default class History extends React.Component {
       }
       window.gridApi.exportDataAsCsv(params)
     }
-
-    // this.state.gridOptions.api.exportDataAsCsv(params)
   }
 
-  handleRowDoubleClick (event) {
-    // this.gridApi.getDisplayedRowAtIndex(event.rowIndex).setSelected(true)
-  }
-
-  toggleNewModal () {
+  handleToggleNewModal () {
     this.setState({
       openNewModal: !this.state.openNewModal
     })
@@ -273,7 +267,7 @@ export default class History extends React.Component {
       })
   }
 
-  toggleView = () => {
+  handleToggleView = () => {
     if (this.state.openTableView === true || this.state.openTableView === false) {
       let tableViewBool
       if (typeof this.state.openTableView === 'string') {
@@ -332,7 +326,7 @@ export default class History extends React.Component {
     }
   }
 
-  handleSearchSelection = selection => {
+  onSearchSelection = selection => {
     const newLocation = `/maintenance?id=${selection.id}`
     Router.push(newLocation)
   }
@@ -361,7 +355,7 @@ export default class History extends React.Component {
     if (this.props.session.user) {
       return (
         <HotKeys keyMap={keyMap} handlers={handlers}>
-          <Layout night={this.props.night} handleSearchSelection={this.handleSearchSelection} unread={this.props.unread} session={this.props.session}>
+          <Layout night={this.props.night} handleSearchSelection={this.onSearchSelection} unread={this.props.unread} session={this.props.session}>
             {UnreadCount()}
             <Card className='top-card-wrapper' style={{ maxWidth: '100%' }}>
               <CardHeader>
@@ -374,11 +368,11 @@ export default class History extends React.Component {
                         Export
                       </span>
                     </Button>
-                    <Button onClick={this.toggleView} theme='dark'>
+                    <Button onClick={this.handleToggleView} theme='dark'>
                       <FontAwesomeIcon icon={faTable} width='1.5em' style={{ marginRight: '10px', color: 'secondary' }} />
                       View
                     </Button>
-                    <Button onClick={this.toggleNewModal} theme='dark'>
+                    <Button onClick={this.handleToggleNewModal} theme='dark'>
                       <FontAwesomeIcon icon={faPlusCircle} width='1.5em' style={{ marginRight: '10px', color: 'secondary' }} />
                       New
                     </Button>
@@ -426,7 +420,7 @@ export default class History extends React.Component {
                 )}
               <Footer />
             </Card>
-            <Modal className='mail-modal-body' animation backdrop backdropClassName='modal-backdrop' open={openNewModal} size='md' toggle={this.toggleNewModal}>
+            <Modal className='mail-modal-body' animation backdrop backdropClassName='modal-backdrop' open={openNewModal} size='md' toggle={this.handleToggleNewModal}>
               <ModalHeader className='modal-delete-header'>
                 New Maintenance
               </ModalHeader>
@@ -469,7 +463,7 @@ export default class History extends React.Component {
                 </Row>
               </ModalBody>
             </Modal>
-            <Modal className='delete-modal' animation backdrop backdropClassName='modal-backdrop' open={openConfirmDeleteModal} size='md' toggle={this.toggleConfirmDeleteModal}>
+            <Modal className='delete-modal' animation backdrop backdropClassName='modal-backdrop' open={openConfirmDeleteModal} size='md' toggle={this.deleteMaint}>
               <ModalHeader className='modal-delete-header'>
                 Confirm Delete
               </ModalHeader>
@@ -484,7 +478,7 @@ export default class History extends React.Component {
                 <Row style={{ marginTop: '20px' }}>
                   <Col>
                     <ButtonGroup style={{ width: '100%' }}>
-                      <Button onClick={this.toggleConfirmDeleteModal} outline theme='secondary'>
+                      <Button onClick={this.deleteMaint} outline theme='secondary'>
                         Cancel
                       </Button>
                       <Button onClick={this.handleDelete} theme='danger'>

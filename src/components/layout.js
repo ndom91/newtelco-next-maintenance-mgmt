@@ -47,6 +47,8 @@ export default class Layout extends React.Component {
 
     if (night === undefined && mqnight) {
       night = 'dark'
+    } else {
+      night = 'light'
     }
 
     var el = document.querySelector('html')

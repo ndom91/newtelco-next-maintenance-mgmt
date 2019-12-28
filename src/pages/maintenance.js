@@ -3828,9 +3828,6 @@ export default class Maintenance extends React.Component {
                   justify-content: center;
                   min-height: 80px;
                 }
-                :global(#ct-container) {
-                  z-index: 10001 !important;
-                }
                 @media only screen and (max-width: 500px) {
                   :global(html) {
                     max-width: ${this.state.width}px;
