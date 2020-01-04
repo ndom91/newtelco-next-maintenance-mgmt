@@ -1,8 +1,4 @@
 import React from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import {
-  faHeart
-} from '@fortawesome/free-solid-svg-icons'
 import {
   CardFooter
 } from 'shards-react'
@@ -12,16 +8,14 @@ export default class Footer extends React.Component {
     return (
       <>
         <CardFooter className='footer-wrapper'>
-          <FontAwesomeIcon
-            icon={faHeart}
-            width='1em'
+          <img
             style={{
-              marginRight: '10px',
-              color: 'secondary',
-              opacity: '0.6'
+              opacity: '0.5'
             }}
+            width='32'
+            src='/static/images/icons/ndo-120.png'
+            alt='ndomino'
           />
-        ndomino
         </CardFooter>
         <style jsx>{`
           :global(.footer-wrapper) {

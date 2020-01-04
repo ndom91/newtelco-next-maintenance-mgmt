@@ -7,7 +7,6 @@ import algoliasearch from 'algoliasearch'
 import Autocomplete from 'algolia-react-autocomplete'
 import 'algolia-react-autocomplete/build/css/index.css'
 import {
-  faPowerOff,
   faAngleRight,
   faClock,
   faEthernet,

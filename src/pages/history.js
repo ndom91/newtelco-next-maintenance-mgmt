@@ -384,7 +384,7 @@ export default class History extends React.Component {
                   <CSSTransition
                     timeout={500}
                     classNames='flip-transition'
-                    in={this.state.openTableView}
+                    in={this.state.openTableView === 'true'}
                   >
                     <CardBody>
                       <div className='table-wrapper'>
