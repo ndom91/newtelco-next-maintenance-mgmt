@@ -225,11 +225,9 @@ export default class Inbox extends React.Component {
       .catch(err => console.error(`Error - ${err}`))
   }
 
-  handleSearchSelection = selection => {
+  onSearchSelection = selection => {
     const newLocation = `/maintenance?id=${selection.id}`
     Router.push(newLocation)
-    // Router.pushRoute(`/maintenance?id=${selection.id}`)
-    // this.setState({ selection })
   }
 
   render () {
@@ -241,7 +239,7 @@ export default class Inbox extends React.Component {
       } = this.state
 
       return (
-        <Layout night={this.props.night} handleSearchSelection={this.handleSearchSelection} unread={unread} session={this.props.session}>
+        <Layout night={this.props.night} handleSearchSelection={this.onSearchSelection} unread={unread} session={this.props.session}>
           {UnreadCount()}
           <Card className='top-card-wrapper' style={{ maxWidth: '100%' }}>
             <CardHeader><h2>Inbox</h2></CardHeader>

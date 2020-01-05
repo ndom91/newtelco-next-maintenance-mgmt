@@ -219,7 +219,6 @@ class Header extends React.Component {
         <NavbarToggler onClick={this.toggleNavbar} />
 
         <Collapse open={this.state.collapseOpen} navbar>
-
           <Nav navbar>
             <NavItem>
               <Link

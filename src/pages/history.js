@@ -44,7 +44,8 @@ import {
 } from 'shards-react'
 import {
   faPlusCircle,
-  faTable
+  faTable,
+  faTrashAlt
 } from '@fortawesome/free-solid-svg-icons'
 
 // { maintenances, page, pageCount }
@@ -318,11 +319,17 @@ export default class History extends React.Component {
   deleteMaint () {
     if (window.gridApi) {
       const row = window.gridApi.getSelectedRows()
-      const maintId = row[0].id
-      this.setState({
-        openConfirmDeleteModal: !this.state.openConfirmDeleteModal,
-        maintIdtoDelete: maintId
-      })
+      if (row[0]) {
+        const maintId = row[0].id
+        this.setState({
+          openConfirmDeleteModal: !this.state.openConfirmDeleteModal,
+          maintIdtoDelete: maintId
+        })
+      } else {
+        cogoToast.warn(`Please select a maintenance`, {
+          position: 'top-right'
+        })
+      }
     }
   }
 
@@ -362,19 +369,23 @@ export default class History extends React.Component {
                 <ButtonToolbar style={{ justifyContent: 'space-between' }}>
                   <h2 style={{ marginBottom: '0px' }}>History</h2>
                   <ButtonGroup size='md'>
-                    <Button outline theme='dark' className='export-btn' onClick={this.handleGridExport}>
-                      <UseAnimations animationKey='download' size={22} style={{ display: 'inline-block', fill: 'rgb(0,0,0)' }} />
-                      <span style={{ marginLeft: '5px' }}>
-                        Export
-                      </span>
+                    <Button onClick={this.handleToggleNewModal} theme='dark'>
+                      <FontAwesomeIcon icon={faPlusCircle} width='1.5em' style={{ marginRight: '10px', color: 'secondary' }} />
+                      New
                     </Button>
                     <Button onClick={this.handleToggleView} theme='dark'>
                       <FontAwesomeIcon icon={faTable} width='1.5em' style={{ marginRight: '10px', color: 'secondary' }} />
                       View
                     </Button>
-                    <Button onClick={this.handleToggleNewModal} theme='dark'>
-                      <FontAwesomeIcon icon={faPlusCircle} width='1.5em' style={{ marginRight: '10px', color: 'secondary' }} />
-                      New
+                    <Button onClick={this.deleteMaint} theme='dark'>
+                      <FontAwesomeIcon icon={faTrashAlt} width='1.5em' style={{ marginRight: '10px', color: 'secondary' }} />
+                      Delete
+                    </Button>
+                    <Button outline theme='dark' className='export-btn' onClick={this.handleGridExport}>
+                      <UseAnimations animationKey='download' size={22} style={{ display: 'inline-block', fill: 'rgb(0,0,0)' }} />
+                      <span style={{ marginLeft: '5px' }}>
+                        Export
+                      </span>
                     </Button>
                   </ButtonGroup>
                 </ButtonToolbar>

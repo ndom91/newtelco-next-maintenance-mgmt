@@ -74,7 +74,6 @@ class Settings extends React.Component {
       tab
     } = this.props.router.query
 
-    console.log(tab)
     const active = {
       companies: tab === 'companies',
       customercids: tab === 'customercids',
@@ -94,7 +93,7 @@ class Settings extends React.Component {
     }
   }
 
-  handleSearchSelection = selection => {
+  onSearchSelection = selection => {
     const newLocation = `/maintenance?id=${selection.id}`
     Router.push(newLocation)
     // Router.pushRoute(`/maintenance?id=${selection.id}`)
@@ -118,7 +117,7 @@ class Settings extends React.Component {
 
     if (this.props.session.user) {
       return (
-        <Layout night={this.props.night} unread={this.props.unread} handleSearchSelection={this.handleSearchSelection} session={this.props.session}>
+        <Layout night={this.props.night} unread={this.props.unread} handleSearchSelection={this.onSearchSelection} session={this.props.session}>
           {UnreadCount()}
           <Card className='top-card-wrapper' style={{ maxWidth: '100%' }}>
             <CardHeader>
