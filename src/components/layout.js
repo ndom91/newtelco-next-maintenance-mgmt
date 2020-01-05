@@ -157,11 +157,11 @@ export default class Layout extends React.PureComponent {
               timeout={TIMEOUT}
               classNames='morph'
             > */}
-              <Row className='top-level-row'>
-                <Col className='toplevel-col' sm='12' lg='12'>
-                  {this.props.children}
-                </Col>
-              </Row>
+            <Row className='top-level-row'>
+              <Col className='toplevel-col' sm='12' lg='12'>
+                {this.props.children}
+              </Col>
+            </Row>
             {/* </MorphTransition> */}
             <Modal className='a2hs-modal' backdropClassName='a2hs-modal-backdrop' animation backdrop size='md' open={openA2HSModal} toggle={this.toggleA2HSModal} style={{ marginTop: '75px' }}>
               <ModalHeader className='keyboard-shortcut-header'>

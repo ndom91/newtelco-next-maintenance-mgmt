@@ -9,7 +9,6 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import './style/shards.min.css'
 const LogRocket = require('logrocket')
 const Sentry = require('@sentry/browser')
-
 export default class MyApp extends App {
   static async getInitialProps ({ Component, ctx }) {
     let pageProps = {}

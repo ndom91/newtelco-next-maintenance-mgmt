@@ -23,8 +23,6 @@ import {
   Col
 } from 'shards-react'
 
-const people = ['fwaleska', 'alissitsin', 'sstergiou']
-
 export default class Index extends React.Component {
   static async getInitialProps ({ res, req, query }) {
     const host = req ? req.headers['x-forwarded-host'] : location.host
@@ -46,7 +44,7 @@ export default class Index extends React.Component {
         Router.push('/auth')
       }
     }
-    let mail = { count: 0 }
+    const mail = { count: 0 }
     if (json !== 'No unread emails') {
       mail.count = json.count
     }
@@ -61,18 +59,7 @@ export default class Index extends React.Component {
     super(props)
 
     this.state = {
-      alissitsin: {
-        total: 0,
-        weeks: []
-      },
-      fwaleska: {
-        total: 0,
-        weeks: []
-      },
-      sstergiou: {
-        total: 0,
-        weeks: []
-      },
+      people: [],
       heatmapData: []
     }
   }
@@ -85,11 +72,14 @@ export default class Index extends React.Component {
       .then(resp => resp.json())
       .then(data => {
         const keyArray = data.weekCountResults.map(item => item.yValue)
+        const peoplePersons = this.state.people
+        peoplePersons.push({
+          name: person,
+          weeks: keyArray,
+          total: data.totalCount.maints
+        })
         this.setState({
-          [person]: {
-            total: data.totalCount.maints,
-            weeks: keyArray
-          }
+          people: peoplePersons
         })
       })
       .catch(err => console.error(`Error - ${err}`))
@@ -98,10 +88,27 @@ export default class Index extends React.Component {
   componentDidMount () {
     Fonts()
 
-    people.forEach(person => {
-      this.fetchPersonStats(person)
-    })
     const host = window.location.host
+    fetch(`https://${host}/api/homepage/people`)
+      .then(resp => resp.json())
+      .then(data => {
+        data.peopleQuery.forEach(person => {
+          this.fetchPersonStats(person.name)
+        })
+        const peopleCopy = this.state.people
+        // console.log('pC', peopleCopy)
+        // console.log(Array.isArray(peopleCopy))
+        const sortedPeople = peopleCopy.sort((a, b) => {
+          // console.log(a.total - b.total)
+          return a.total - b.total
+        })
+        // console.log('sP', sortedPeople)
+        this.setState({
+          people: sortedPeople
+        })
+      })
+      .catch(err => console.error(`Error - ${err}`))
+
     fetch(`https://${host}/api/maintenances/heatmap`, {
       method: 'get'
     })
@@ -124,6 +131,11 @@ export default class Index extends React.Component {
   }
 
   render () {
+    const {
+      people,
+      heatmapData
+    } = this.state
+
     if (this.props.session.user) {
       return (
         <Layout night={this.props.night} handleSearchSelection={this.handleSearchSelection} unread={this.props.jsonData.count} session={this.props.session}>
@@ -135,32 +147,33 @@ export default class Index extends React.Component {
                 <Row>
                   <Col>
                     <Card className='card-inboxUnread'>
+                      <p className='card-body-text person-text unread-text'>Unread</p>
                       <Link href='/inbox' passHref>
                         <Badge className='card-badge'>{this.props.jsonData.count}</Badge>
                       </Link>
-                      <Link href='/inbox' passHref>
-                        <CardBody className='card-unread-body'>
-                          <UseAnimations animationKey='activity' size={34} className='card-inbox-activity' />
-                          <p className='card-body-text'>Unread</p>
-                        </CardBody>
-                      </Link>
                     </Card>
                   </Col>
-                  {people.map(person => {
+                  {people.map((person, index) => {
                     return (
-                      <Col key={person}>
+                      <Col className='person-wrapper' key={person.name}>
                         <Card className='card-stats'>
+                          <p className='card-body-text person-text'>{person.name}</p>
                           <Badge className='card-person-badge' outline>
                             <span>
-                              {eval(`this.state.${person}.total`)}
+                              {people && people[index].total}
                             </span>
-                            <Sparklines data={eval(`this.state.${person}.weeks`)} limit={10} width={100} height={40} margin={1}>
-                              <SparklinesLine style={{ strokeWidth: 2, stroke: 'rgba(53, 146, 59, 0.5)', fill: '#67B246', fillOpacity: '0.1' }} />
+                            <Sparklines
+                              data={people && people[index].weeks} 
+                              limit={10} 
+                              margin={1} 
+                              style={{
+                                position: 'absolute',
+                                bottom: '0'
+                              }}
+                            >
+                              <SparklinesLine style={{ strokeWidth: 5, stroke: 'rgba(53, 146, 59, 0.5)', fill: '#67B246', fillOpacity: '0.2' }} />
                             </Sparklines>
                           </Badge>
-                          <CardBody className='card-person-body'>
-                            <p className='card-body-text'>{person.charAt(0).toUpperCase() + person.charAt(1).toUpperCase() + person.slice(2)}</p>
-                          </CardBody>
                         </Card>
                       </Col>
                     )
@@ -174,7 +187,7 @@ export default class Index extends React.Component {
                       <CalendarHeatmap
                         startDate={new Date('2019-01-01')}
                         endDate={new Date()}
-                        values={this.state.heatmapData}
+                        values={heatmapData}
                         showWeekdayLabels
                         classForValue={value => {
                           if (!value) {
@@ -229,6 +242,9 @@ export default class Index extends React.Component {
                 font-size: 2.2rem !important;
               }
             }
+            :global(.person-wrapper) {
+              margin: 10px;
+            }
             :global(.break) {
               flex-basis: 100%;
               height: 0;
@@ -255,6 +271,7 @@ export default class Index extends React.Component {
               font-size: 196px;
               cursor: pointer;
               color: var(--inv-font-color);
+              border-radius: 0.325rem;
             }
             :global(.card-unread-body) {
               cursor: pointer;
@@ -264,6 +281,7 @@ export default class Index extends React.Component {
             :global(.card-person-badge) {
               padding: 40px;
               font-size: 128px;
+              border-radius: 0.325rem;
             }
             :global(.card-container) {
               display: flex;
@@ -271,7 +289,7 @@ export default class Index extends React.Component {
               flex-wrap: wrap;
             }
             :global(.card-stats) {
-              border-radius: 0.625em;
+              border-radius: 0.325em;
             }
             :global(.card-inboxUnread) {
               max-width: 350px;
@@ -287,8 +305,46 @@ export default class Index extends React.Component {
               justify-content: center;
               padding: 1.275rem !important;
             }
-            :global(.card-body-text) {
-              margin-bottom: 0px !important;
+            :global(.card-body-text.person-text) {
+              display: block;
+              position: absolute;
+              top: 8px;
+              right: -37px;
+              width: 130px;
+              height: 40px;
+              line-height: 40px;
+              text-align: center;
+              opacity: 1.0;
+              transform: rotate(45deg);
+              font-size: 18px;
+              font-weight: 700;
+              color: #fff;
+              background-color: #67B246;
+              z-index: 500;
+              border-radius: 5px 5px 0 0;
+              box-shadow: 0 3px 10px -5px rgba(0, 0, 0, 1);
+            }
+            :global(.card-body-text.person-text::before) {
+              content: "";
+              position: absolute; left: 0px; top: 100%;
+              z-index: -1;
+              border-left: 3px solid #529223;
+              border-right: 3px solid transparent;
+              border-bottom: 3px solid transparent;
+              border-top: 3px solid #529223;
+            }
+            :global(.card-body-text.person-text::after) {
+              content: "";
+              position: absolute; right: 0px; top: 100%;
+              z-index: -1;
+              border-left: 3px solid transparent;
+              border-right: 3px solid #529223;
+              border-bottom: 3px solid transparent;
+              border-top: 3px solid #529223;
+            }
+            :global(.card-body-text.person-text.unread-text) {
+              background: #fff;
+              color: #67B246;
             }
             :global(.card-inbox-activity) {
               position: absolute; 
