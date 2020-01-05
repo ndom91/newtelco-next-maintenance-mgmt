@@ -39,7 +39,7 @@ import {
   FormInput
 } from 'shards-react'
 
-export default class Inbox extends React.Component {
+export default class Inbox extends React.PureComponent {
   static async getInitialProps ({ req, query }) {
     const host = req ? req.headers['x-forwarded-host'] : location.host
     const pageRequest = `https://api.${host}/inbox`

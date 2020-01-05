@@ -9,7 +9,6 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import './style/shards.min.css'
 const LogRocket = require('logrocket')
 const Sentry = require('@sentry/browser')
-import { PageTransition } from 'next-page-transitions'
 
 export default class MyApp extends App {
   static async getInitialProps ({ Component, ctx }) {
@@ -64,24 +63,8 @@ export default class MyApp extends App {
           <link rel='shortcut icon' id='favicon' href='/static/images/favicon/favicon.ico' />
         </Head>
         <OfflineSupport />
-        <PageTransition timeout={300} classNames='page-transition'>
-          <Component {...pageProps} key={router.route} />
-        </PageTransition>
+        <Component {...pageProps} key={router.route} />
         <style jsx global>{`
-          .page-transition-enter {
-            opacity: 0;
-          }
-          .page-transition-enter-active {
-            opacity: 1;
-            transition: opacity 300ms;
-          }
-          .page-transition-exit {
-            opacity: 1;
-          }
-          .page-transition-exit-active {
-            opacity: 0;
-            transition: opacity 300ms;
-          }
           .navbar {
             padding: 0 1.5rem;
           }

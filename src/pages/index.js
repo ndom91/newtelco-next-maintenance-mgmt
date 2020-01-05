@@ -159,7 +159,7 @@ export default class Index extends React.Component {
                             </Sparklines>
                           </Badge>
                           <CardBody className='card-person-body'>
-                            <p className='card-body-text'>{person}</p>
+                            <p className='card-body-text'>{person.charAt(0).toUpperCase() + person.charAt(1).toUpperCase() + person.slice(2)}</p>
                           </CardBody>
                         </Card>
                       </Col>

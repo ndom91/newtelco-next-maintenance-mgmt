@@ -55,6 +55,7 @@
     "next-offline": "^5.0.0-beta.7",
     "next-page-transitions": "^1.0.0-beta.2",
     "next-pwa": "^1.1.1",
+    "nextjs-morph-page": "^2.0.3",
     "nodemailer": "^6.3.0",
     "nodemailer-direct-transport": "^3.3.2",
     "nodemailer-smtp-transport": "^2.7.4",

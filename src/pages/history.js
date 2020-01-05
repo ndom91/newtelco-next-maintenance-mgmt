@@ -326,11 +326,17 @@ export default class History extends React.Component {
           maintIdtoDelete: maintId
         })
       } else {
-        cogoToast.warn(`Please select a maintenance`, {
+        cogoToast.warn('Please select a maintenance', {
           position: 'top-right'
         })
       }
     }
+  }
+
+  toggleConfirmDelete = () => {
+    this.setState({
+      openConfirmDeleteModal: !this.state.openConfirmDeleteModal,
+    })
   }
 
   onSearchSelection = selection => {
@@ -489,7 +495,7 @@ export default class History extends React.Component {
                 <Row style={{ marginTop: '20px' }}>
                   <Col>
                     <ButtonGroup style={{ width: '100%' }}>
-                      <Button onClick={this.deleteMaint} outline theme='secondary'>
+                      <Button onClick={this.toggleConfirmDelete} outline theme='secondary'>
                         Cancel
                       </Button>
                       <Button onClick={this.handleDelete} theme='danger'>

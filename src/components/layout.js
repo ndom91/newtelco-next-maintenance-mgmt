@@ -4,6 +4,7 @@ import Head from 'next/head'
 import Router from 'next/router'
 import { NextAuth } from 'next-auth/client'
 import { HotKeys } from 'react-hotkeys'
+import MorphTransition from 'nextjs-morph-page'
 import {
   Container,
   Row,
@@ -15,7 +16,9 @@ import {
   Button
 } from 'shards-react'
 
-export default class Layout extends React.Component {
+const TIMEOUT = 300
+
+export default class Layout extends React.PureComponent {
   constructor (props) {
     super(props)
     this.state = {
@@ -146,14 +149,20 @@ export default class Layout extends React.Component {
           <Head>
             <link rel='stylesheet' type='text/css' src={this.state.night ? '/static/css/darkmode.css' : ''} />
           </Head>
-          <Header night={this.state.night} toggleNight={this.onToggleNight} handleSearchSelection={this.props.handleSearchSelection} unread={this.props.unread} session={this.props.session} />
+          <Header data-morph-ms='800' id='header-wrapper' night={this.state.night} toggleNight={this.onToggleNight} handleSearchSelection={this.props.handleSearchSelection} unread={this.props.unread} session={this.props.session} />
           <Container fluid>
             <Row style={{ height: '20px' }} />
-            <Row className='top-level-row'>
-              <Col className='toplevel-col' sm='12' lg='12'>
-                {this.props.children}
-              </Col>
-            </Row>
+            {/* <MorphTransition
+              skipInitialTransition
+              timeout={TIMEOUT}
+              classNames='morph'
+            > */}
+              <Row className='top-level-row'>
+                <Col className='toplevel-col' sm='12' lg='12'>
+                  {this.props.children}
+                </Col>
+              </Row>
+            {/* </MorphTransition> */}
             <Modal className='a2hs-modal' backdropClassName='a2hs-modal-backdrop' animation backdrop size='md' open={openA2HSModal} toggle={this.toggleA2HSModal} style={{ marginTop: '75px' }}>
               <ModalHeader className='keyboard-shortcut-header'>
                 Save Application
@@ -258,6 +267,22 @@ export default class Layout extends React.Component {
               </ModalBody>
             </Modal>
             <style jsx>{`
+              :global(.morph.enter) {
+                opacity: 0;
+                transform: translate3d(0, 20px, 0);
+              }
+              :global(.morph.enter.active) {
+                opacity: 1;
+                transform: translate3d(0, 0, 0);
+                transition: opacity ${TIMEOUT}ms, transform ${TIMEOUT}ms;
+              }
+              :global(.morph.exit) {
+                opacity: 0;
+              }
+              :global(.morph.exit.active) {
+                opacity: 0;
+                transition: opacity ${TIMEOUT}ms;
+              }
               :global(html) {
                 background-color: var(--secondary-bg);
                 color: var(--light);
