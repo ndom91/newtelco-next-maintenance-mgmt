@@ -32,6 +32,12 @@ export default class EdittedBy extends Component {
           <img className='user-pic' style={{ border: '2px solid #67B246', borderRadius: '50%' }} src='/static/images/avatars/NCH.png' width='32px' height='32px' />
         </span>
       )
+    } else if (username === 'kmoeller') {
+      return (
+        <span>
+          <img className='user-pic' style={{ border: '2px solid #67B246', borderRadius: '50%' }} src='/static/images/avatars/KMO.png' width='32px' height='32px' />
+        </span>
+      )
     } else if (username === 'sstergiou') {
       return (
         <span>
