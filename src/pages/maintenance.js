@@ -791,9 +791,12 @@ export default class Maintenance extends React.Component {
       impact,
       reason,
       location,
-      timezone,
-      impactPlaceholder
+      timezone
     } = this.state.maintenance
+
+    const {
+      impactPlaceholder
+    } = this.state
 
     if (!id || !startDateTime || !endDateTime) {
       cogoToast.warn('Missing required fields', {
