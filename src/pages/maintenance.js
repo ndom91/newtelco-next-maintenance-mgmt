@@ -868,6 +868,9 @@ export default class Maintenance extends React.Component {
       } else if (protection === 0 || protection === '0' || protection === false || protection === 'false') {
         const impactText = impact || impactPlaceholder
         body = body + '<tr><td>Impact:</td><td>' + impactText + '</td></tr>'
+      } else {
+        const impactText = impact || impactPlaceholder
+        body = body + '<tr><td>Impact:</td><td>' + impactText + '</td></tr>'
       }
     }
 
@@ -2105,7 +2108,7 @@ export default class Maintenance extends React.Component {
               currentAttachment: id || null,
               openedDownloadPopupId: id,
               attachmentPopoverBody:
-              <span>
+  <span>
                 <ButtonGroup>
                   <Button onClick={() => this.setState({ openAttachmentModal: !this.state.openAttachmentModal, openedDownloadPopupId: null })} outline size='sm'>Preview</Button>
                   <Button onClick={() => downloadFile(base64, filename, mime)} size='sm'>Download</Button>
@@ -2136,7 +2139,7 @@ export default class Maintenance extends React.Component {
           currentAttachment: id || null,
           openedDownloadPopupId: id,
           attachmentPopoverBody:
-          <span>
+  <span>
             <ButtonGroup>
               <Button onClick={() => this.setState({ openAttachmentModal: !this.state.openAttachmentModal, openedDownloadPopupId: null })} outline size='sm'>Preview</Button>
               <Button onClick={() => downloadFile(base64, filename, mime)} size='sm'>Download</Button>
@@ -2159,7 +2162,7 @@ export default class Maintenance extends React.Component {
           currentAttachmentName: filename,
           openedDownloadPopupId: id,
           attachmentPopoverBody:
-          <span>
+  <span>
             <ButtonGroup>
               <Button onClick={() => this.setState({ openAttachmentModal: !this.state.openAttachmentModal, openedDownloadPopupId: null })} outline size='sm'>Preview</Button>
               <Button onClick={() => downloadFile(base64, filename, mime)} size='sm'>Download</Button>
@@ -2176,7 +2179,7 @@ export default class Maintenance extends React.Component {
         // const base64Fixed = fixBase64(base64)
         this.setState({
           attachmentPopoverBody:
-          <span>
+  <span>
             <ButtonGroup>
               <Button outline disabled size='sm'>
                 <Tooltip
@@ -2944,7 +2947,7 @@ export default class Maintenance extends React.Component {
                                   tipSize={12}
                                   preferPlace='below'
                                 >
-                                  <Button pill size='sm' onClick={() => this.showAttachments(attachment.id, attachment.name)} theme='primary' style={{ marginLeft: '10px' }} >
+                                  <Button pill size='sm' onClick={() => this.showAttachments(attachment.id, attachment.name)} theme='primary' style={{ marginLeft: '10px' }}>
                                     {attachment.name}
                                   </Button>
                                 </Popover>

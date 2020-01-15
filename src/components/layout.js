@@ -4,7 +4,7 @@ import Head from 'next/head'
 import Router from 'next/router'
 import { NextAuth } from 'next-auth/client'
 import { HotKeys } from 'react-hotkeys'
-import MorphTransition from 'nextjs-morph-page'
+// import MorphTransition from 'nextjs-morph-page'
 import {
   Container,
   Row,
