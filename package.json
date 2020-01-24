@@ -79,6 +79,7 @@
     "shards-react": "^1.0.3",
     "shards-ui": "^3.0.0",
     "sql-template-strings": "^2.2.2",
+    "sqlstring": "^2.3.1",
     "styled-components": "^4.4.1",
     "webpack": "^4.41.2"
   },

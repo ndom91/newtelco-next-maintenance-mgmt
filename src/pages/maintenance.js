@@ -158,6 +158,10 @@ export default class Maintenance extends React.Component {
         width: 673,
         height: 400
       },
+      frozenState: {
+        recipient: '',
+        cid: ''
+      },
       attachmentHTMLContent: '',
       currentAttachmentName: '',
       dateTimeWarning: false,
@@ -169,6 +173,7 @@ export default class Maintenance extends React.Component {
       openHelpModal: false,
       openRescheduleModal: false,
       openConfirmDeleteModal: false,
+      openConfirmFreezeModal: false,
       openMaintenanceChangelog: false,
       openDownloadPopup: false,
       attachmentPopoverBody: null,
@@ -370,6 +375,7 @@ export default class Maintenance extends React.Component {
     this.moveCalendarEntry = this.moveCalendarEntry.bind(this)
     this.toggleHistoryView = this.toggleHistoryView.bind(this)
     this.toggleDownloadPopover = this.toggleDownloadPopover.bind(this)
+    this.toggleConfirmFreezeModal = this.toggleConfirmFreezeModal.bind(this)
   }
 
   componentDidMount () {
@@ -570,7 +576,7 @@ export default class Maintenance extends React.Component {
   sendMailBtns = (row) => {
     return (
       <ButtonGroup>
-        <Button onClick={() => this.prepareDirectSend(row.data.maintenanceRecipient, row.data.kundenCID, row.data.frozen)} style={{ padding: '0.7em' }} size='sm' outline>
+        <Button onClick={() => this.prepareDirectSend(row.data.maintenanceRecipient, row.data.kundenCID, row.data.frozen, row.data.name)} style={{ padding: '0.7em' }} size='sm' outline>
           <FontAwesomeIcon width='1.325em' icon={faPaperPlane} />
         </Button>
         <Button onClick={() => this.togglePreviewModal(row.data.maintenanceRecipient, row.data.kundenCID, row.data.protected)} style={{ padding: '0.7em' }} size='sm' outline>
@@ -770,11 +776,16 @@ export default class Maintenance extends React.Component {
   /// /////////////////////////////////////////////////////////
 
   // prepare mail from direct-send button
-  prepareDirectSend (recipient, customerCID, frozen) {
+  prepareDirectSend (recipient, customerCID, frozen, companyName) {
     if (frozen) {
-      cogoToast.error(`${customerCID} has an active network freeze - no maintenance allowed!`, {
-        position: 'top-right'
+      this.setState({
+        frozenCompany: companyName || '',
+        frozenState: {
+          recipient: recipient,
+          cid: customerCID
+        }
       })
+      this.toggleConfirmFreezeModal()
       return
     }
     const HtmlBody = this.generateMail(customerCID)
@@ -894,10 +905,21 @@ export default class Maintenance extends React.Component {
   sendMail (recipient, customerCid, subj, htmlBody, isFromPreview, isFromSendAll) {
     const activeRowIndex = this.state.kundencids.findIndex(el => el.kundenCID === customerCid)
     const kundenCidRow = this.state.kundencids[activeRowIndex]
+    // if (kundenCidRow.sent != 0) { // eslint-disable
+    //   return
+    // }
     if (kundenCidRow.frozen) {
-      cogoToast.error(`${kundenCidRow.name} has an active network freeze - no maintenance allowed!`, {
-        position: 'top-right'
+      this.setState({
+        frozenCompany: kundenCidRow.name || '',
+        frozenState: {
+          recipient: recipient,
+          cid: customerCid
+        }
       })
+      this.toggleConfirmFreezeModal()
+      // cogoToast.error(`${kundenCidRow.name} has an active network freeze - no maintenance allowed!`, {
+      //   position: 'top-right'
+      // })
       return
     }
     const host = window.location.host
@@ -1405,7 +1427,7 @@ export default class Maintenance extends React.Component {
     this.setState({
       maintenance: {
         ...this.state.maintenance,
-        reason: event.target.value
+        reason: encodeURIComponent(event.target.value)
       }
     })
   }
@@ -1817,6 +1839,12 @@ export default class Maintenance extends React.Component {
   toggleHistoryView () {
     this.setState({
       openMaintenanceChangelog: !this.state.openMaintenanceChangelog
+    })
+  }
+
+  toggleConfirmFreezeModal () {
+    this.setState({
+      openConfirmFreezeModal: !this.state.openConfirmFreezeModal
     })
   }
 
@@ -2610,7 +2638,7 @@ export default class Maintenance extends React.Component {
                                 </Row>
                                 <FormGroup>
                                   <label htmlFor='reason'>Reason</label>
-                                  <FormTextarea id='reason' name='reason' onBlur={() => this.handleTextInputBlur('reason')} onChange={this.handleReasonChange} type='text' value={maintenance.reason || ''} />
+                                  <FormTextarea id='reason' name='reason' onBlur={() => this.handleTextInputBlur('reason')} onChange={this.handleReasonChange} type='text' value={decodeURIComponent(maintenance.reason) || ''} />
                                 </FormGroup>
                               </Col>
                             </Row>
@@ -3224,32 +3252,62 @@ export default class Maintenance extends React.Component {
                 ) : (
                   null
                 )}
-              <Modal className='delete-modal' animation backdrop backdropClassName='modal-backdrop' open={this.state.openConfirmDeleteModal} size='md' toggle={this.toggleConfirmDeleteRescheduleModal}>
-                <ModalHeader className='modal-delete-header'>
-                  Confirm Delete Reschedule
-                </ModalHeader>
-                <ModalBody>
-                  <Container className='container-border'>
-                    <Row>
+              {this.state.openConfirmDeleteModal && (
+                <Modal className='delete-modal' animation backdrop backdropClassName='modal-backdrop' open={this.state.openConfirmDeleteModal} size='md' toggle={this.toggleConfirmDeleteRescheduleModal}>
+                  <ModalHeader className='modal-delete-header'>
+                    Confirm Delete Reschedule
+                  </ModalHeader>
+                  <ModalBody>
+                    <Container className='container-border'>
+                      <Row>
+                        <Col>
+                          Are you sure you want to delete reschedule: <b style={{ fontWeight: '900' }}> {this.state.rescheduleToDelete.id}</b>
+                        </Col>
+                      </Row>
+                    </Container>
+                    <Row style={{ marginTop: '20px' }}>
                       <Col>
-                        Are you sure you want to delete reschedule: <b style={{ fontWeight: '900' }}> {this.state.rescheduleToDelete.id}</b>
+                        <ButtonGroup style={{ width: '100%' }}>
+                          <Button style={{ color: 'var(font-color)' }} onClick={this.toggleConfirmDeleteRescheduleModal} outline theme='secondary'>
+                            Cancel
+                          </Button>
+                          <Button onClick={this.handleDeleteReschedule} theme='danger'>
+                            Confirm
+                          </Button>
+                        </ButtonGroup>
                       </Col>
                     </Row>
-                  </Container>
-                  <Row style={{ marginTop: '20px' }}>
-                    <Col>
-                      <ButtonGroup style={{ width: '100%' }}>
-                        <Button style={{ color: 'var(--inv-font-color)' }} onClick={this.toggleConfirmDeleteRescheduleModal} outline theme='secondary'>
-                          Cancel
-                        </Button>
-                        <Button onClick={this.handleDeleteReschedule} theme='danger'>
-                          Confirm
-                        </Button>
-                      </ButtonGroup>
-                    </Col>
-                  </Row>
-                </ModalBody>
-              </Modal>
+                  </ModalBody>
+                </Modal>
+              )}
+              {this.state.openConfirmFreezeModal && (
+                <Modal className='confirm-freeze-modal' animation backdrop backdropClassName='modal-backdrop' open={this.state.openConfirmFreezeModal} size='md' toggle={this.toggleConfirmFreezeModal}>
+                  <ModalHeader className='modal-delete-header'>
+                    Confirm Freeze Send
+                  </ModalHeader>
+                  <ModalBody>
+                    <Container className='container-border'>
+                      <Row>
+                        <Col>
+                          There is a network freeze for <b>{this.state.frozenCompany || ''}</b>. Are you sure you want to send this mail?
+                        </Col>
+                      </Row>
+                    </Container>
+                    <Row style={{ marginTop: '20px' }}>
+                      <Col>
+                        <ButtonGroup style={{ width: '100%' }}>
+                          <Button style={{ color: 'var(font-color)' }} onClick={this.toggleConfirmFreezeModal} outline theme='secondary'>
+                            Cancel
+                          </Button>
+                          <Button onClick={() => this.prepareDirectSend(this.state.frozenState.recipient, this.state.frozenState.cid, false)} theme='danger'>
+                            Confirm
+                          </Button>
+                        </ButtonGroup>
+                      </Col>
+                    </Row>
+                  </ModalBody>
+                </Modal>
+              )}
             </Card>
             <style jsx>{`
                 :global(.flip-transition-enter) {
