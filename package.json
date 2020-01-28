@@ -79,6 +79,7 @@
     "shards-react": "^1.0.3",
     "shards-ui": "^3.0.0",
     "sql-template-strings": "^2.2.2",
+    "sqlstring": "^2.3.1",
     "styled-components": "^4.4.1",
     "webpack": "^4.41.2"
   },
@@ -89,10 +90,15 @@
     "ag-grid-react": "^21.2.2",
     "babel-eslint": "^10.0.3",
     "dotenv": "^8.1.0",
-    "standard": "^14.3.1",
+    "standardx": "^5.0.0",
     "webpack-bundle-analyzer": "^3.6.0",
     "webpack-cli": "^3.3.10",
     "webpack-pwa-manifest": "^4.1.1"
+  },
+  "eslintConfig": {
+    "rules": {
+      "react/jsx-handler-names": "off"
+    }
   },
   "standard": {
     "parser": "babel-eslint",
