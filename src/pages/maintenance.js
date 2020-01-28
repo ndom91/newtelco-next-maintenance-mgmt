@@ -4,23 +4,24 @@ import fetch from 'isomorphic-unfetch'
 import Footer from '../components/footer'
 import RequireLogin from '../components/require-login'
 import { NextAuth } from 'next-auth/client'
-import Toggle from 'react-toggle'
+// import Toggle from 'react-toggle'
 import './style/maintenance.css'
 import cogoToast from 'cogo-toast'
-import Select from 'react-select'
+// import Select from 'react-select'
 import CreatableSelect from 'react-select/creatable'
-import makeAnimated from 'react-select/animated'
+// import makeAnimated from 'react-select/animated'
 import Router from 'next/router'
 import { Helmet } from 'react-helmet'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Editor as TinyEditor } from '@tinymce/tinymce-react'
 import { format, isValid, formatDistance, parseISO, compareAsc } from 'date-fns'
 import moment from 'moment-timezone'
 import { Rnd } from 'react-rnd'
 import { CSSTransition } from 'react-transition-group'
 import Flatpickr from 'react-flatpickr'
+import 'flatpickr/dist/themes/material_blue.css'
 import TimezoneSelector from '../components/timezone'
-import { getUnique, convertDateTime } from '../components/maintenance/helper'
+import { getUnique } from '../components/maintenance/helper'
+// import { getUnique, convertDateTime } from '../components/maintenance/helper'
 import { HotKeys } from 'react-hotkeys'
 import { OutTable, ExcelRenderer } from 'react-excel-renderer'
 // import { OutTable } from 'react-excel-renderer'
@@ -38,10 +39,11 @@ import { saveAs } from 'file-saver'
 import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-material.css'
 
-import 'flatpickr/dist/themes/material_blue.css'
 import 'react-tippy/dist/tippy.css'
 import { Tooltip } from 'react-tippy'
+import InputForm from '../components/maintenance/form.js'
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
   faPlusCircle,
   faArrowLeft,
@@ -86,7 +88,7 @@ import {
   Progress
 } from 'shards-react'
 
-const animatedComponents = makeAnimated()
+// const animatedComponents = makeAnimated()
 
 const Changelog = dynamic(
   () => import('../components/timeline'),
@@ -2069,16 +2071,6 @@ export default class Maintenance extends React.Component {
       }
       return view
     }
-    function base64ToArrayBuffer (data) {
-      var binaryString = window.atob(data)
-      var binaryLen = binaryString.length
-      var bytes = new Uint8Array(binaryLen)
-      for (var i = 0; i < binaryLen; i++) {
-        var ascii = binaryString.charCodeAt(i)
-        bytes[i] = ascii
-      }
-      return bytes
-    }
     function downloadFile (base64, filename, mimeType) {
       const base64Fixed = fixBase64(base64)
       const fileData = new Blob([base64Fixed], { type: mimeType })
@@ -2112,15 +2104,6 @@ export default class Maintenance extends React.Component {
         const base64Fixed = fixBase64(base64)
         var fileData = new Blob([base64Fixed], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;' })
 
-        // const dynamicExcelRenderer = dynamic(() => {
-        //   import('react-excel-renderer').then(m => m.ExcelRenderer)
-        // })
-
-        // console.log(typeof dynamicExcelRenderer, dynamicExcelRenderer)
-        // , {
-        //   ssr: false
-        // })
-
         ExcelRenderer(fileData, (err, resp) => {
           if (err) {
             console.log(err)
@@ -2139,7 +2122,7 @@ export default class Maintenance extends React.Component {
               currentAttachment: id || null,
               openedDownloadPopupId: id,
               attachmentPopoverBody:
-  <span>
+              <span>
                 <ButtonGroup>
                   <Button onClick={() => this.setState({ openAttachmentModal: !this.state.openAttachmentModal, openedDownloadPopupId: null })} outline size='sm'>Preview</Button>
                   <Button onClick={() => downloadFile(base64, filename, mime)} size='sm'>Download</Button>
@@ -2170,7 +2153,7 @@ export default class Maintenance extends React.Component {
           currentAttachment: id || null,
           openedDownloadPopupId: id,
           attachmentPopoverBody:
-  <span>
+          <span>
             <ButtonGroup>
               <Button onClick={() => this.setState({ openAttachmentModal: !this.state.openAttachmentModal, openedDownloadPopupId: null })} outline size='sm'>Preview</Button>
               <Button onClick={() => downloadFile(base64, filename, mime)} size='sm'>Download</Button>
@@ -2185,15 +2168,14 @@ export default class Maintenance extends React.Component {
         const mime = file.mime
         let base64 = (filedata).replace(/_/g, '/')
         base64 = base64.replace(/-/g, '+')
-        // const base64Fixed = fixBase64(base64)
         this.setState({
-          attachmentHTMLContent: atob(base64),
+          attachmentHTMLContent: window.atob(base64),
           filetype: filetype,
           currentAttachment: id || null,
           currentAttachmentName: filename,
           openedDownloadPopupId: id,
           attachmentPopoverBody:
-  <span>
+          <span>
             <ButtonGroup>
               <Button onClick={() => this.setState({ openAttachmentModal: !this.state.openAttachmentModal, openedDownloadPopupId: null })} outline size='sm'>Preview</Button>
               <Button onClick={() => downloadFile(base64, filename, mime)} size='sm'>Download</Button>
@@ -2207,10 +2189,9 @@ export default class Maintenance extends React.Component {
         const rawData = file.data
         let base64 = (rawData).replace(/_/g, '/')
         base64 = base64.replace(/-/g, '+')
-        // const base64Fixed = fixBase64(base64)
         this.setState({
           attachmentPopoverBody:
-  <span>
+          <span>
             <ButtonGroup>
               <Button outline disabled size='sm'>
                 <Tooltip
@@ -2361,8 +2342,14 @@ export default class Maintenance extends React.Component {
   render () {
     const {
       maintenance,
+      dateTimeWarning,
+      suppliers,
+      lieferantcids,
       openReadModal,
-      openPreviewModal
+      selectedLieferant,
+      impactPlaceholder,
+      openPreviewModal,
+      notesText
     } = this.state
 
     let maintenanceIdDisplay
@@ -2508,213 +2495,34 @@ export default class Maintenance extends React.Component {
                 <Container fluid>
                   <Row style={{ height: '20px' }} />
                   <Row>
-                    <Col sm='12' lg='6'>
-                      <Row>
-                        <Col>
-                          <Container className='maintenance-subcontainer'>
-                            <Row>
-                              <Col style={{ width: '30vw' }}>
-                                <FormGroup>
-                                  <label htmlFor='edited-by'>Created By</label>
-                                  <FormInput tabIndex='-1' readOnly id='edited-by-input' name='edited-by' type='text' value={maintenance.bearbeitetvon} onChange={this.handleCreatedByChange} />
-                                </FormGroup>
-                                <FormGroup>
-                                  <label htmlFor='supplier'>Timezone</label>
-                                  <TimezoneSelector
-                                    className='maint-select'
-                                    value={{ value: this.state.maintenance.timezone, label: this.state.maintenance.timezoneLabel }}
-                                    onChange={this.handleTimezoneChange}
-                                    onBlur={this.handleTimezoneBlur}
-                                  />
-                                </FormGroup>
-                                <FormGroup>
-                                  <label htmlFor='start-datetime'>Start Date/Time</label>
-                                  <Flatpickr
-                                    data-enable-time
-                                    options={{ time_24hr: 'true', allow_input: 'true' }}
-                                    className='flatpickr end-date-time'
-                                    value={maintenance.startDateTime || null}
-                                    onChange={date => this.handleStartDateChange(date)}
-                                    onClose={() => this.handleDateTimeBlur('start')}
-                                  />
-                                </FormGroup>
-                              </Col>
-                              <Col style={{ width: '30vw' }}>
-                                <FormGroup>
-                                  <label htmlFor='maileingang'>Mail Arrived</label>
-                                  <FormInput tabIndex='-1' readOnly id='maileingang-input' name='maileingang' type='text' value={convertDateTime(maintenance.maileingang)} />
-                                </FormGroup>
-                                <FormGroup>
-                                  <label htmlFor='supplier'>Supplier</label>
-                                  <Select
-                                    className='maint-select'
-                                    value={{ label: this.state.maintenance.name, value: this.state.maintenance.lieferant }}
-                                    onChange={this.handleSupplierChange}
-                                    options={this.state.suppliers}
-                                    noOptionsMessage={() => 'No Suppliers'}
-                                    placeholder='Please select a Supplier'
-                                    onBlur={this.handleSupplierBlur}
-                                  />
-                                </FormGroup>
-                                <FormGroup>
-                                  <label htmlFor='end-datetime'>End Date/Time</label>
-                                  <Flatpickr
-                                    data-enable-time
-                                    options={{ time_24hr: 'true', allow_input: 'true' }}
-                                    className='flatpickr end-date-time'
-                                    style={this.state.dateTimeWarning ? { border: '2px solid #dc3545', boxShadow: '0 0 10px 1px #dc3545' } : null}
-                                    value={maintenance.endDateTime || null}
-                                    onChange={date => this.handleEndDateChange(date)}
-                                    onClose={() => this.handleDateTimeBlur('end')}
-                                  />
-                                </FormGroup>
-                              </Col>
-                            </Row>
-                            <Row>
-                              <Col>
-                                <FormGroup>
-                                  <label htmlFor='their-cid'>{maintenance.name} CID</label>
-                                  <Select
-                                    className='maint-select'
-                                    value={this.state.selectedLieferant || undefined}
-                                    onChange={this.handleSelectLieferantChange}
-                                    options={this.state.lieferantcids}
-                                    components={animatedComponents}
-                                    isMulti
-                                    noOptionsMessage={() => 'No CIDs for this Supplier'}
-                                    placeholder='Please select a CID'
-                                    onBlur={this.handleCIDBlur}
-                                  />
-                                </FormGroup>
-                              </Col>
-                            </Row>
-                          </Container>
-                          <Container className='maintenance-subcontainer'>
-                            <Row>
-                              <Col>
-                                <Row className='impact-row'>
-                                  <Col>
-                                    <FormGroup>
-                                      <div className='impact-title-group'>
-                                        <label style={{ flexGrow: '1', margin: '10px' }} htmlFor='impact'>Impact</label>
-                                        <Tooltip
-                                          title='Use Protection Switch Text'
-                                          position='top'
-                                          theme='transparent'
-                                          size='small'
-                                          trigger='mouseenter'
-                                          delay='150'
-                                          arrow
-                                          animation='shift'
-                                        >
-                                          <Button id='protectionswitchtext' style={{ padding: '0.35em', marginRight: '10px', marginTop: '10px' }} onClick={this.handleProtectionSwitch} outline theme='secondary'>
-                                            <FontAwesomeIcon width='16px' icon={faRandom} />
-                                          </Button>
-                                        </Tooltip>
-                                        <Tooltip
-                                          title='Use Time Difference Text'
-                                          position='top'
-                                          theme='transparent'
-                                          size='small'
-                                          trigger='mouseenter'
-                                          delay='150'
-                                          arrow
-                                          animation='shift'
-                                        >
-                                          <Button id='impactplaceholdertext' style={{ padding: '0.35em', marginTop: '10px' }} onClick={this.useImpactPlaceholder} outline theme='secondary'>
-                                            <FontAwesomeIcon width='16px' icon={faHistory} />
-                                          </Button>
-                                        </Tooltip>
-                                      </div>
-                                      <FormInput onBlur={() => this.handleTextInputBlur('impact')} id='impact' name='impact' type='text' onChange={this.handleImpactChange} placeholder={this.state.impactPlaceholder} value={maintenance.impact || ''} />
-                                    </FormGroup>
-                                  </Col>
-                                  <Col>
-                                    <FormGroup>
-                                      <label htmlFor='location'>Location</label>
-                                      <FormInput onBlur={() => this.handleTextInputBlur('location')} id='location' name='location' type='text' onChange={this.handleLocationChange} value={maintenance.location || ''} />
-                                    </FormGroup>
-                                  </Col>
-                                </Row>
-                                <FormGroup>
-                                  <label htmlFor='reason'>Reason</label>
-                                  <FormTextarea id='reason' name='reason' onBlur={() => this.handleTextInputBlur('reason')} onChange={this.handleReasonChange} type='text' value={maintenance.reason && decodeURIComponent(maintenance.reason)} />
-                                </FormGroup>
-                              </Col>
-                            </Row>
-                          </Container>
-                          <Container style={{ paddingTop: '20px' }} className='maintenance-subcontainer'>
-                            <Row>
-                              <Col>
-                                <FormGroup className='form-group-toggle'>
-                                  <Badge theme='light' outline>
-                                    <label>
-                                      <div>Cancelled</div>
-                                      <Toggle
-                                        checked={maintenance.cancelled === 'false' ? false : !!maintenance.cancelled}
-                                        onChange={(event) => this.handleToggleChange('cancelled', event)}
-                                      />
-                                    </label>
-                                  </Badge>
-                                  <Badge theme='light' outline>
-                                    <label>
-                                      <div>Emergency</div>
-                                      <Toggle
-                                        icons={{
-                                          checked: <FontAwesomeIcon icon={faFirstAid} width='1em' style={{ color: 'var(--white)' }} />,
-                                          unchecked: null
-                                        }}
-                                        checked={maintenance.emergency === 'false' ? false : !!maintenance.emergency}
-                                        onChange={(event) => this.handleToggleChange('emergency', event)}
-                                      />
-                                    </label>
-                                  </Badge>
-                                  <Badge theme='secondary' outline>
-                                    <label>
-                                      <div>Done</div>
-                                      <Toggle
-                                        checked={maintenance.done === 'false' ? false : !!maintenance.done}
-                                        onChange={(event) => this.handleToggleChange('done', event)}
-                                      />
-                                    </label>
-                                  </Badge>
-                                </FormGroup>
-                              </Col>
-                            </Row>
-                          </Container>
-                          <Container className='maintenance-subcontainer'>
-                            <Row>
-                              <Col>
-                                <FormGroup>
-                                  <label htmlFor='notes'>Notes</label>
-                                  <TinyEditor
-                                    initialValue={this.state.notesText}
-                                    apiKey='ttv2x1is9joc0fi7v6f6rzi0u98w2mpehx53mnc1277omr7s'
-                                    onBlur={this.handleNotesBlur}
-                                    init={{
-                                      height: 300,
-                                      menubar: false,
-                                      statusbar: false,
-                                      plugins: [
-                                        'advlist autolink lists link image print preview anchor',
-                                        'searchreplace code',
-                                        'insertdatetime table paste code help wordcount'
-                                      ],
-                                      toolbar:
-                                          `undo redo | formatselect | bold italic backcolor | 
-                                          alignleft aligncenter alignright alignjustify | 
-                                          bullist numlist outdent indent | removeformat | help`,
-                                      content_style: 'html { color: #828282 }'
-                                    }}
-                                    onChange={this.handleNotesChange}
-                                  />
-                                </FormGroup>
-                              </Col>
-                            </Row>
-                          </Container>
-                        </Col>
-                      </Row>
-                    </Col>
+                    <InputForm
+                      maintenance={maintenance}
+                      suppliers={suppliers}
+                      lieferantcids={lieferantcids}
+                      notesText={notesText}
+                      dateTimeWarning={dateTimeWarning}
+                      selectedLieferant={selectedLieferant}
+                      impactPlaceholder={impactPlaceholder}
+                      handleCreatedByChange={this.handleCreatedByChange}
+                      handleTimezoneBlur={this.handleTimezoneBlur}
+                      handleTimezoneChange={this.handleTimezoneChange}
+                      handleStartDateChange={this.handleStartDateChange}
+                      handleDateTimeBlur={this.handleDateTimeBlur}
+                      handleSupplierChange={this.handleSupplierChange}
+                      handleSupplierBlur={this.handleSupplierBlur}
+                      handleEndDateChange={this.handleEndDateChange}
+                      handleDateTimeBlur={this.handleDateTimeBlur}
+                      handleSelectLieferantChange={this.handleSelectLieferantChange}
+                      handleCIdBlur={this.handleCIDBlur}
+                      handleProtectionSwitch={this.handleProtectionSwitch}
+                      useImpactPlaceholder={this.useImpactPlaceholder}
+                      handleTextInputBlur={this.handleTextInputBlur}
+                      handleImpactChange={this.handleImpactChange}
+                      handleLocationChange={this.handleLocationChange}
+                      handleReasonChange={this.handleReasonChange}
+                      handleToggleChange={this.handleToggleChange}
+                      handleNotesBlur={this.handleNotesBlur}
+                    />
                     <Col sm='12' lg='6' className='flip-container'>
                       {this.state.openMaintenanceChangelog
                         ? (
