@@ -1256,6 +1256,7 @@ export default class Maintenance extends React.Component {
   }
 
   handleStartDateChange (date) {
+    console.log(date)
     const startDate = moment(date[0]).format('YYYY-MM-DD HH:mm:ss')
 
     this.setState({
@@ -1277,6 +1278,7 @@ export default class Maintenance extends React.Component {
   }
 
   handleEndDateChange (date) {
+    console.log(date)
     const endDate = moment(date[0]).format('YYYY-MM-DD HH:mm:ss')
 
     this.setState({
