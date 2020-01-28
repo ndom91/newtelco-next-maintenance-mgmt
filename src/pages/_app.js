@@ -22,7 +22,7 @@ export default class MyApp extends App {
         name: pageProps.session.user.name,
         email: pageProps.session.user.email
       })
-      Sentry.init({ dsn: 'https://1fcc943d52554b79bb93c7a383ba0fee@sentry.newtelco.dev//3' })
+      Sentry.init({ dsn: 'https://627b5da84c4944f4acc2118b47dad88e@sentry.ndo.dev/3' })
       LogRocket.getSessionURL(sessionURL => {
         Sentry.configureScope(scope => {
           scope.setExtra('sessionURL', sessionURL)
