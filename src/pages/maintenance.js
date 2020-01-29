@@ -888,7 +888,11 @@ export default class Maintenance extends React.Component {
     }
 
     if (reason) {
-      body = body + '<tr><td>Reason:</td><td>' + reason + '</td></tr>'
+      if reason.includes('%20') {
+        body = body + '<tr><td>Reason:</td><td>' + decodeURIComponent(reason) + '</td></tr>'
+      } else {
+        body = body + '<tr><td>Reason:</td><td>' + reason + '</td></tr>'
+      }
     }
 
     body = body + '</table><p>We sincerely regret any inconvenience that may be caused by this and hope for further mutually advantageous cooperation.</p><p>If you have any questions feel free to contact us at maintenance@newtelco.de.</p></div>​​</body>​​<footer>​<style>.sig{font-family:Century Gothic, sans-serif;font-size:9pt;color:#636266!important;}b.i{color:#4ca702;}.gray{color:#636266 !important;}a{text-decoration:none;color:#636266 !important;}</style><div class="sig"><div>Best regards <b class="i">|</b> Mit freundlichen Grüßen</div><br><div><b>Newtelco Maintenance Team</b></div><br><div>NewTelco GmbH <b class="i">|</b> Moenchhofsstr. 24 <b class="i">|</b> 60326 Frankfurt a.M. <b class="i">|</b> DE <br>www.newtelco.com <b class="i">|</b> 24/7 NOC  49 69 75 00 27 30 ​​<b class="i">|</b> <a style="color:#" href="mailto:service@newtelco.de">service@newtelco.de</a><br><br><div><img alt="sig" src="https://home.newtelco.de/sig.png" height="29" width="516"></div></div>​</footer>'
@@ -2620,7 +2624,7 @@ export default class Maintenance extends React.Component {
                                 </Row>
                                 <FormGroup>
                                   <label htmlFor='reason'>Reason</label>
-                                  <FormTextarea id='reason' name='reason' onBlur={() => this.handleTextInputBlur('reason')} onChange={this.handleReasonChange} type='text' value={decodeURIComponent(maintenance.reason) || ''} />
+                                  <FormTextarea id='reason' name='reason' onBlur={() => this.handleTextInputBlur('reason')} onChange={this.handleReasonChange} type='text' value={maintenance.reason && decodeURIComponent(maintenance.reason) || ''} />
                                 </FormGroup>
                               </Col>
                             </Row>
