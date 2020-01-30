@@ -56,7 +56,8 @@ import {
   faMailBulk,
   faCheck,
   faCalendarCheck,
-  faLandmark
+  faLandmark,
+  faQuestionCircle
 } from '@fortawesome/free-solid-svg-icons'
 import {
   faCalendarAlt,
@@ -147,7 +148,8 @@ export default class Maintenance extends React.Component {
         location: '',
         reason: '',
         mailId: 'NT',
-        calendarId: this.props.jsonData.profile.calendarId
+        calendarId: this.props.jsonData.profile.calendarId,
+        maintNote: ''
       },
       attachmentModalSize: {
         width: 673,
@@ -337,6 +339,7 @@ export default class Maintenance extends React.Component {
     this.handleTextInputBlur = this.handleTextInputBlur.bind(this)
     this.handleImpactChange = this.handleImpactChange.bind(this)
     this.handleReasonChange = this.handleReasonChange.bind(this)
+    this.handleMaintNoteChange = this.handleMaintNoteChange.bind(this)
     this.handleLocationChange = this.handleLocationChange.bind(this)
     this.handleCreateOnClick = this.handleCreateOnClick.bind(this)
     this.handleNotesBlur = this.handleNotesBlur.bind(this)
@@ -1429,6 +1432,15 @@ export default class Maintenance extends React.Component {
       maintenance: {
         ...this.state.maintenance,
         reason: encodeURIComponent(event.target.value)
+      }
+    })
+  }
+
+  handleMaintNoteChange (event) {
+    this.setState({
+      maintenance: {
+        ...this.state.maintenance,
+        maintNote: encodeURIComponent(event.target.value)
       }
     })
   }
@@ -2624,7 +2636,31 @@ export default class Maintenance extends React.Component {
                                 </Row>
                                 <FormGroup>
                                   <label htmlFor='reason'>Reason</label>
-                                  <FormTextarea id='reason' name='reason' onBlur={() => this.handleTextInputBlur('reason')} onChange={this.handleReasonChange} type='text' value={maintenance.reason && decodeURIComponent(maintenance.reason) || ''} />
+                                  <FormTextarea id='reason' name='reason' onBlur={() => this.handleTextInputBlur('reason')} onChange={this.handleReasonChange} type='text' value={maintenance.reason && decodeURIComponent(maintenance.reason)} />
+                                </FormGroup>
+                                <FormGroup>
+                                  <span
+                                    style={{
+                                      display: 'flex',
+                                      justifyContent: 'space-between'
+                                    }}
+                                  >
+                                    <label htmlFor='reason'>Note</label>
+                                    <Tooltip
+                                      title='This note will be included in the mail'
+                                      position='top'
+                                      trigger='mouseenter'
+                                      delay='250'
+                                      distance='20'
+                                      interactiveBorder='15'
+                                      arrow
+                                      size='small'
+                                      theme='transparent'
+                                    >
+                                      <FontAwesomeIcon width='16px' icon={faQuestionCircle} />
+                                    </Tooltip>
+                                  </span>
+                                  <FormTextarea id='maintNote' name='maintNote' onBlur={() => this.handleTextInputBlur('maintNote')} onChange={this.handleMaintNoteChange} type='text' value={maintenance.maintNote && decodeURIComponent(maintenance.maintNote)} />
                                 </FormGroup>
                               </Col>
                             </Row>
