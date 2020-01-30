@@ -2651,10 +2651,11 @@ export default class Maintenance extends React.Component {
                                   <span
                                     style={{
                                       display: 'flex',
-                                      justifyContent: 'space-between'
+                                      justifyContent: 'flex-start',
+                                      alignItems: 'center'
                                     }}
                                   >
-                                    <label htmlFor='reason'>Note</label>
+                                    <label htmlFor='maintNote'>Note</label>
                                     <Tooltip
                                       title='This note will be included in the mail'
                                       position='top'
