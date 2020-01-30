@@ -899,12 +899,12 @@ export default class Maintenance extends React.Component {
       }
     }
 
-    let maintNoteBody
+    let maintNoteBody = ''
     if (maintNote) {
       if (maintNote.includes('%20')) {
-        maintNoteBody = '<br><p>' + decodeURIComponent(maintNote) + '</p>'
+        maintNoteBody = '<p>' + decodeURIComponent(maintNote) + '</p>'
       } else {
-        maintNoteBody = '<br><p>' + maintNote + '</p>'
+        maintNoteBody = '<p>' + maintNote + '</p>'
       }
     }
 
