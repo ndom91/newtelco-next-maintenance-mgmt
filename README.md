@@ -56,15 +56,14 @@ It is currently setup so that the host is dynamic, you can reverse proxy it out 
 
 ### Screenshots
 
+<img src="https://imgur.com/0TCYfJE.png" width="512" alt="screenshot 1">
 
-![screenshot 1](https://imgur.com/NN1F2OM.png)
+<img src="https://imgur.com/x1UW9Ox.png" width="512" alt="screenshot 2">
 
-![screenshot 2](https://imgur.com/pCtKK5R.png)
+<img src="https://imgur.com/SK2DOuD.png" width="512" alt="screenshot 3">
 
-![screenshot 3](https://imgur.com/v1E8xo1.png)
+<img src="https://imgur.com/3QymwYQ.png" width="512" alt="screenshot 4">
 
-![screenshot 4](https://imgur.com/3QymwYQ.png)
-
-![screenshot 5](https://imgur.com/wz4LOzy.png)
+<img src="https://imgur.com/wz4LOzy.png" width="512" alt="screenshot 5">
 
 **Internal Application used by NewTelco GmbH**
