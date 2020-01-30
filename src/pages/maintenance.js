@@ -800,7 +800,8 @@ export default class Maintenance extends React.Component {
       impact,
       reason,
       location,
-      timezone
+      timezone,
+      maintNote
     } = this.state.maintenance
 
     const {
@@ -895,6 +896,14 @@ export default class Maintenance extends React.Component {
         body = body + '<tr><td>Reason:</td><td>' + decodeURIComponent(reason) + '</td></tr>'
       } else {
         body = body + '<tr><td>Reason:</td><td>' + reason + '</td></tr>'
+      }
+    }
+
+    if (maintNote) {
+      if (maintNote.includes('%20')) {
+        body = body + '<br><p>' + decodeURIComponent(maintNote) + '</p>'
+      } else {
+        body = body + '<br><p>' + maintNote + '</p>'
       }
     }
 
