@@ -45,7 +45,7 @@
     "nedb": "^1.8.0",
     "next": "^9.1.2",
     "next-auth": "^1.12.1",
-    "next-offline": "^5.0.0-beta.7",
+    "next-offline": "^5.0.0",
     "next-pwa": "^1.1.1",
     "nextjs-morph-page": "^2.0.3",
     "nodemailer": "^6.3.0",
