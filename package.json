@@ -27,7 +27,7 @@
     "algolia-react-autocomplete": "^1.0.5",
     "algoliasearch": "^3.35.1",
     "bootstrap": "^4.3.1",
-    "cogo-toast": "^4.1.1",
+    "cogo-toast": "^4.2.1",
     "connect-mongo": "^3.0.0",
     "cross-env": "^6.0.3",
     "date-fns": "^2.4.1",
