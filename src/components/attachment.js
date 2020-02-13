@@ -205,6 +205,11 @@ export default class Attachment extends React.Component {
       currentAttachmentName
     } = this.state
 
+    let HALF_WIDTH = 500
+    if (typeof window !== 'undefined') {
+      HALF_WIDTH = this.state.width !== 0 ? this.state.width / 2 : 500
+    }
+
     return (
       typeof window !== 'undefined' && (
         <Rnd
