@@ -2,6 +2,7 @@ import React from 'react'
 import Layout from '../components/layout'
 import fetch from 'isomorphic-unfetch'
 import Footer from '../components/footer'
+import Attachment from '../components/attachment'
 import RequireLogin from '../components/require-login'
 import { NextAuth } from 'next-auth/client'
 import Toggle from 'react-toggle'
@@ -23,7 +24,6 @@ import TimezoneSelector from '../components/timezone'
 import { getUnique, convertDateTime } from '../components/maintenance/helper'
 import { HotKeys } from 'react-hotkeys'
 import { OutTable, ExcelRenderer } from 'react-excel-renderer'
-// import { OutTable } from 'react-excel-renderer'
 import ProtectedIcon from '../components/ag-grid/protected'
 import SentIcon from '../components/ag-grid/sent'
 import StartDateTime from '../components/ag-grid/startdatetime'
@@ -327,53 +327,6 @@ export default class Maintenance extends React.Component {
         }
       }
     }
-    this.toggleReadModal = this.toggleReadModal.bind(this)
-    this.togglePreviewModal = this.togglePreviewModal.bind(this)
-    this.handleNotesChange = this.handleNotesChange.bind(this)
-    this.handleMailPreviewChange = this.handleMailPreviewChange.bind(this)
-    this.sendMail = this.sendMail.bind(this)
-    this.handleEditorChange = this.handleEditorChange.bind(this)
-    this.handleCalendarCreate = this.handleCalendarCreate.bind(this)
-    this.handleCIDBlur = this.handleCIDBlur.bind(this)
-    this.handleDateTimeBlur = this.handleDateTimeBlur.bind(this)
-    this.handleTextInputBlur = this.handleTextInputBlur.bind(this)
-    this.handleImpactChange = this.handleImpactChange.bind(this)
-    this.handleReasonChange = this.handleReasonChange.bind(this)
-    this.handleMaintNoteChange = this.handleMaintNoteChange.bind(this)
-    this.handleLocationChange = this.handleLocationChange.bind(this)
-    this.handleCreateOnClick = this.handleCreateOnClick.bind(this)
-    this.handleNotesBlur = this.handleNotesBlur.bind(this)
-    this.handleTimezoneChange = this.handleTimezoneChange.bind(this)
-    this.handleTimezoneBlur = this.handleTimezoneBlur.bind(this)
-    this.handleProtectionSwitch = this.handleProtectionSwitch.bind(this)
-    this.useImpactPlaceholder = this.useImpactPlaceholder.bind(this)
-    this.handleUpdatedByChange = this.handleUpdatedByChange.bind(this)
-    this.handleUpdatedAtChange = this.handleUpdatedAtChange.bind(this)
-    this.handleSupplierBlur = this.handleSupplierBlur.bind(this)
-    this.handleSupplierChange = this.handleSupplierChange.bind(this)
-    this.prepareDirectSend = this.prepareDirectSend.bind(this)
-    this.toggleHelpModal = this.toggleHelpModal.bind(this)
-    this.onGridReady = this.onGridReady.bind(this)
-    this.showAttachments = this.showAttachments.bind(this)
-    this.handleSendAll = this.handleSendAll.bind(this)
-    this.toggleRescheduleModal = this.toggleRescheduleModal.bind(this)
-    this.handleRescheduleGridReady = this.handleRescheduleGridReady.bind(this)
-    this.handleRescheduleEndDateTimeChange = this.handleRescheduleEndDateTimeChange.bind(this)
-    this.handleRescheduleImpactChange = this.handleRescheduleImpactChange.bind(this)
-    this.handleRescheduleStartDateTimeChange = this.handleRescheduleStartDateTimeChange.bind(this)
-    this.handleRescheduleSave = this.handleRescheduleSave.bind(this)
-    this.handleRescheduleCellEdit = this.handleRescheduleCellEdit.bind(this)
-    this.toggleRescheduleSentBtn = this.toggleRescheduleSentBtn.bind(this)
-    this.handleRescheduleTimezoneChange = this.handleRescheduleTimezoneChange.bind(this)
-    this.toggleConfirmDeleteRescheduleModal = this.toggleConfirmDeleteRescheduleModal.bind(this)
-    this.handleDeleteReschedule = this.handleDeleteReschedule.bind(this)
-    this.handleToggleChange = this.handleToggleChange.bind(this)
-    this.handleRescheduleReasonChange = this.handleRescheduleReasonChange.bind(this)
-    this.mailSubjectText = this.mailSubjectText.bind(this)
-    this.moveCalendarEntry = this.moveCalendarEntry.bind(this)
-    this.toggleHistoryView = this.toggleHistoryView.bind(this)
-    this.toggleDownloadPopover = this.toggleDownloadPopover.bind(this)
-    this.toggleConfirmFreezeModal = this.toggleConfirmFreezeModal.bind(this)
   }
 
   componentDidMount () {
@@ -514,7 +467,7 @@ export default class Maintenance extends React.Component {
     }
   }
 
-  handleRescheduleGridReady (params) {
+  handleRescheduleGridReady = (params) => {
     this.rescheduleGridApi = params.api
     params.api.setRowData(this.state.rescheduleData)
   }
@@ -584,7 +537,7 @@ export default class Maintenance extends React.Component {
     )
   }
 
-  onGridReady (params) {
+  onGridReady = (params) => {
     this.gridApi = params.gridApi
     params.api.setRowData(this.state.kundencids)
   }
@@ -726,9 +679,7 @@ export default class Maintenance extends React.Component {
         kundencids.forEach(cid => {
           newKundenCids.push(cid)
         })
-        console.log('1', kundencids)
         const uniqueKundenCids = getUnique(newKundenCids, 'kundenCID')
-        console.log('2', uniqueKundenCids)
         this.setState({
           kundencids: uniqueKundenCids
         })
@@ -776,7 +727,7 @@ export default class Maintenance extends React.Component {
   /// /////////////////////////////////////////////////////////
 
   // prepare mail from direct-send button
-  prepareDirectSend (recipient, customerCID, frozen, companyName) {
+  prepareDirectSend = (recipient, customerCID, frozen, companyName) => {
     if (frozen) {
       this.setState({
         frozenCompany: companyName || '',
@@ -916,7 +867,7 @@ export default class Maintenance extends React.Component {
   }
 
   // send out the created mail
-  sendMail (recipient, customerCid, subj, htmlBody, isFromPreview, isFromSendAll) {
+  sendMail = (recipient, customerCid, subj, htmlBody, isFromPreview, isFromSendAll) => {
     const activeRowIndex = this.state.kundencids.findIndex(el => el.kundenCID === customerCid)
     const kundenCidRow = this.state.kundencids[activeRowIndex]
     // if (kundenCidRow.sent != 0) { // eslint-disable
@@ -1025,7 +976,7 @@ export default class Maintenance extends React.Component {
       .catch(err => console.error(`Error - ${err}`))
   }
 
-  handleSendAll () {
+  handleSendAll = () => {
     const rowCount = this.gridApi.getDisplayedRowCount() - 1
     this.gridApi.forEachNode((node, index) => {
       setTimeout(() => {
@@ -1059,7 +1010,7 @@ export default class Maintenance extends React.Component {
     }
   }
 
-  moveCalendarEntry (startDateTime, endDateTime, rcounter) {
+  moveCalendarEntry = (startDateTime, endDateTime, rcounter) => {
     const calId = this.state.maintenance.calendarId
     const company = this.state.maintenance.name
     const maintId = this.state.maintenance.id
@@ -1112,7 +1063,7 @@ export default class Maintenance extends React.Component {
     }
   }
 
-  handleCalendarCreate () {
+  handleCalendarCreate = () => {
     const host = window.location.host
     const company = this.state.maintenance.name
     const maintId = this.state.maintenance.id
@@ -1197,7 +1148,7 @@ export default class Maintenance extends React.Component {
   /// /////////////////////////////////////////////////////////
 
   // mail preview modal change
-  handleMailPreviewChange (content, delta, source, editor) {
+  handleMailPreviewChange = (content, delta, source, editor) => {
     this.setState({ mailBodyText: editor.getContents() })
   }
 
@@ -1216,13 +1167,13 @@ export default class Maintenance extends React.Component {
     }
   }
 
-  handleEditorChange (data) {
+  handleEditorChange = (data) => {
     this.setState({
       mailBodyText: data.level.content
     })
   }
 
-  handleNotesChange (data) {
+  handleNotesChange = (data) => {
     const newMaint = {
       ...this.state.maintenance,
       notes: data.level.content
@@ -1326,7 +1277,7 @@ export default class Maintenance extends React.Component {
     }
   }
 
-  handleToggleChange (element, event) {
+  handleToggleChange = (element, event) => {
     const host = window.location.host
     const maintId = this.state.maintenance.id
     const activeUserEmail = this.props.session.user.email
@@ -1439,7 +1390,7 @@ export default class Maintenance extends React.Component {
       .catch(err => console.error(err))
   }
 
-  handleReasonChange (event) {
+  handleReasonChange = (event) => {
     this.setState({
       maintenance: {
         ...this.state.maintenance,
@@ -1448,7 +1399,7 @@ export default class Maintenance extends React.Component {
     })
   }
 
-  handleMaintNoteChange (event) {
+  handleMaintNoteChange = (event) => {
     this.setState({
       maintenance: {
         ...this.state.maintenance,
@@ -1457,7 +1408,7 @@ export default class Maintenance extends React.Component {
     })
   }
 
-  handleLocationChange (event) {
+  handleLocationChange = (event) => {
     this.setState({
       maintenance: {
         ...this.state.maintenance,
@@ -1466,7 +1417,7 @@ export default class Maintenance extends React.Component {
     })
   }
 
-  handleImpactChange (event) {
+  handleImpactChange = (event) => {
     this.setState({
       maintenance: {
         ...this.state.maintenance,
@@ -1475,7 +1426,7 @@ export default class Maintenance extends React.Component {
     })
   }
 
-  handleTimezoneChange (selection) {
+  handleTimezoneChange = (selection) => {
     const timezoneLabel = selection.label // 'Europe/Amsterdam'
     const timezoneValue = selection.value // '(GMT+02:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna'
 
@@ -1488,7 +1439,7 @@ export default class Maintenance extends React.Component {
     })
   }
 
-  handleUpdatedByChange () {
+  handleUpdatedByChange = () => {
     const value = this.state.maintenance.updatedBy
     this.setState({
       maintenance: {
@@ -1498,7 +1449,7 @@ export default class Maintenance extends React.Component {
     })
   }
 
-  handleUpdatedAtChange () {
+  handleUpdatedAtChange = () => {
     const value = this.state.maintenance.updatedAt
     this.setState({
       maintenance: {
@@ -1508,7 +1459,7 @@ export default class Maintenance extends React.Component {
     })
   }
 
-  handleSupplierChange (selectedOption) {
+  handleSupplierChange = (selectedOption) => {
     this.setState({
       maintenance: {
         ...this.state.maintenance,
@@ -1527,13 +1478,13 @@ export default class Maintenance extends React.Component {
   //
   /// /////////////////////////////////////////////////////////
 
-  handleDateTimeBlur (element) {
+  handleDateTimeBlur = (element) => {
     cogoToast.success('Save Success', {
       position: 'top-right'
     })
   }
 
-  handleCIDBlur (ev) {
+  handleCIDBlur = (ev) => {
     const postSelection = (id) => {
       const host = window.location.host
       let idParameter
@@ -1595,7 +1546,7 @@ export default class Maintenance extends React.Component {
     }
   }
 
-  handleTimezoneBlur (ev) {
+  handleTimezoneBlur = (ev) => {
     const incomingTimezone = this.state.maintenance.timezone || 'Europe/Amsterdam'
     const incomingTimezoneLabel = encodeURIComponent(this.state.maintenance.timezoneLabel || '(GMT+02:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna')
     const activeUserEmail = this.props.session.user.email
@@ -1629,7 +1580,7 @@ export default class Maintenance extends React.Component {
       .catch(err => console.error(err))
   }
 
-  handleTextInputBlur (element) {
+  handleTextInputBlur = (element) => {
     const host = window.location.host
     const newValue = eval(`this.state.maintenance.${element}`)
     const originalValue = eval(`this.props.jsonData.profile.${element}`)
@@ -1675,7 +1626,7 @@ export default class Maintenance extends React.Component {
       .catch(err => console.error(err))
   }
 
-  handleNotesBlur (event) {
+  handleNotesBlur = (event) => {
     const host = window.location.host
     const newValue = this.state.maintenance.notes
     const originalValue = this.props.jsonData.profile.notes
@@ -1719,7 +1670,7 @@ export default class Maintenance extends React.Component {
       .catch(err => console.error(err))
   }
 
-  handleSupplierBlur () {
+  handleSupplierBlur = () => {
     const host = window.location.host
     const newValue = this.state.maintenance.lieferant
     const maintId = this.state.maintenance.id
@@ -1766,7 +1717,7 @@ export default class Maintenance extends React.Component {
   /// /////////////////////////////////////////////////////////
 
   // open / close Read Modal
-  toggleReadModal () {
+  toggleReadModal = () => {
     if (!this.state.maintenance.incomingBody) {
       const host = window.location.host
       const mailId = this.state.maintenance.mailId || this.state.maintenance.receivedmail
@@ -1849,25 +1800,25 @@ export default class Maintenance extends React.Component {
     this.mailSubjectText()
   }
 
-  toggleHelpModal () {
+  toggleHelpModal = () => {
     this.setState({
       openHelpModal: !this.state.openHelpModal
     })
   }
 
-  toggleRescheduleModal () {
+  toggleRescheduleModal = () => {
     this.setState({
       openRescheduleModal: !this.state.openRescheduleModal
     })
   }
 
-  toggleHistoryView () {
+  toggleHistoryView = () => {
     this.setState({
       openMaintenanceChangelog: !this.state.openMaintenanceChangelog
     })
   }
 
-  toggleConfirmFreezeModal () {
+  toggleConfirmFreezeModal = () => {
     this.setState({
       openConfirmFreezeModal: !this.state.openConfirmFreezeModal
     })
@@ -1879,7 +1830,7 @@ export default class Maintenance extends React.Component {
   //
   /// /////////////////////////////////////////////////////////
 
-  handleRescheduleTimezoneChange (selection) {
+  handleRescheduleTimezoneChange = (selection) => {
     const timezoneLabel = selection.label // 'Europe/Amsterdam'
     const timezoneValue = selection.value // '(GMT+02:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna'
 
@@ -1892,7 +1843,7 @@ export default class Maintenance extends React.Component {
     })
   }
 
-  handleRescheduleStartDateTimeChange (date) {
+  handleRescheduleStartDateTimeChange = (date) => {
     const startDate = moment(date[0]).format('YYYY-MM-DD HH:mm:ss')
 
     this.setState({
@@ -1903,7 +1854,7 @@ export default class Maintenance extends React.Component {
     })
   }
 
-  handleRescheduleEndDateTimeChange (date) {
+  handleRescheduleEndDateTimeChange = (date) => {
     const endDate = moment(date[0]).format('YYYY-MM-DD HH:mm:ss')
 
     this.setState({
@@ -1914,7 +1865,7 @@ export default class Maintenance extends React.Component {
     })
   }
 
-  handleRescheduleImpactChange (event) {
+  handleRescheduleImpactChange = (event) => {
     this.setState({
       reschedule: {
         ...this.state.reschedule,
@@ -1923,7 +1874,7 @@ export default class Maintenance extends React.Component {
     })
   }
 
-  handleRescheduleReasonChange (reasonSelection) {
+  handleRescheduleReasonChange = (reasonSelection) => {
     this.setState({
       reschedule: {
         ...this.state.reschedule,
@@ -1932,7 +1883,7 @@ export default class Maintenance extends React.Component {
     })
   }
 
-  handleRescheduleSave () {
+  handleRescheduleSave = () => {
     const newImpact = this.state.reschedule.impact
     const newReason = this.state.reschedule.reason.label
     const timezone = this.state.reschedule.timezone
@@ -1977,7 +1928,7 @@ export default class Maintenance extends React.Component {
       .catch(err => console.error(`Error Incrementing Reschedule - ${err}`))
   }
 
-  handleRescheduleCellEdit (params) {
+  handleRescheduleCellEdit = (params) => {
     const rcounter = params.data.rcounter
     const newStartDateTime = moment(params.data.startDateTime).format('YYYY.MM.DD HH:mm:ss')
     const newEndDateTime = moment(params.data.endDateTime).format('YYYY.MM.DD HH:mm:ss')
@@ -1998,7 +1949,7 @@ export default class Maintenance extends React.Component {
       .catch(err => console.error(`Reschedule Edit Error - ${err}`))
   }
 
-  toggleRescheduleSentBtn (rcounter) {
+  toggleRescheduleSentBtn = (rcounter) => {
     const newRescheduleData = this.state.rescheduleData
     const reschedIndex = newRescheduleData.findIndex(el => el.rcounter === rcounter)
     const currentSentStatus = newRescheduleData[reschedIndex].sent
@@ -2029,7 +1980,7 @@ export default class Maintenance extends React.Component {
     this.rescheduleGridApi.refreshCells()
   }
 
-  toggleConfirmDeleteRescheduleModal () {
+  toggleConfirmDeleteRescheduleModal = () => {
     if (this.rescheduleGridApi) {
       const row = this.rescheduleGridApi.getSelectedRows()
       const rescheduleId = `NT-${this.state.maintenance.id}-${row[0].rcounter}`
@@ -2043,13 +1994,13 @@ export default class Maintenance extends React.Component {
     }
   }
 
-  toggleDownloadPopover () {
+  toggleDownloadPopover = () => {
     this.setState({
       openedDownloadPopupId: null
     })
   }
 
-  handleDeleteReschedule () {
+  handleDeleteReschedule = () => {
     const host = window.location.host
     fetch(`https://${host}/api/reschedule/delete?mid=${this.state.maintenance.id}&rcounter=${this.state.rescheduleToDelete.rcounter}&user=${encodeURIComponent(this.props.session.user.email)}`, {
       method: 'get'
@@ -2081,171 +2032,171 @@ export default class Maintenance extends React.Component {
   //
   /// /////////////////////////////////////////////////////////
 
-  showAttachments (id, filename) {
-    function fixBase64 (binaryData) {
-      var base64str = binaryData
-      var binary = atob(base64str.replace(/\s/g, ''))
-      var len = binary.length
-      var buffer = new ArrayBuffer(len)
-      var view = new Uint8Array(buffer)
+  // showAttachments = (id, filename) => {
+  //   function fixBase64 (binaryData) {
+  //     var base64str = binaryData
+  //     var binary = atob(base64str.replace(/\s/g, ''))
+  //     var len = binary.length
+  //     var buffer = new ArrayBuffer(len)
+  //     var view = new Uint8Array(buffer)
 
-      for (var i = 0; i < len; i++) {
-        view[i] = binary.charCodeAt(i)
-      }
-      return view
-    }
-    function downloadFile (base64, filename, mimeType) {
-      const base64Fixed = fixBase64(base64)
-      const fileData = new Blob([base64Fixed], { type: mimeType })
-      saveAs(fileData, filename)
-    }
-    if (id !== null) {
-      let filetype = ''
-      const fileExt = filename.match(/\.[0-9a-z]+$/i)
-      switch (fileExt[0]) {
-        case '.xlsx':
-          filetype = 'excel'
-          break
-        case '.xls':
-          filetype = 'excel'
-          break
-        case '.pdf':
-          filetype = 'pdf'
-          break
-        case '.html':
-          filetype = 'html'
-          break
-      }
-      if (filetype === 'excel') {
-        const excelIndex = this.state.maintenance.incomingAttachments.findIndex(el => el.id === id)
-        const file = this.state.maintenance.incomingAttachments[excelIndex]
-        const filedata = file.data
-        const mime = file.mime
-        const filename = file.name
-        let base64 = (filedata).replace(/_/g, '/')
-        base64 = base64.replace(/-/g, '+')
-        const base64Fixed = fixBase64(base64)
-        var fileData = new Blob([base64Fixed], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;' })
+  //     for (var i = 0; i < len; i++) {
+  //       view[i] = binary.charCodeAt(i)
+  //     }
+  //     return view
+  //   }
+  //   function downloadFile (base64, filename, mimeType) {
+  //     const base64Fixed = fixBase64(base64)
+  //     const fileData = new Blob([base64Fixed], { type: mimeType })
+  //     saveAs(fileData, filename)
+  //   }
+  //   if (id !== null) {
+  //     let filetype = ''
+  //     const fileExt = filename.match(/\.[0-9a-z]+$/i)
+  //     switch (fileExt[0]) {
+  //       case '.xlsx':
+  //         filetype = 'excel'
+  //         break
+  //       case '.xls':
+  //         filetype = 'excel'
+  //         break
+  //       case '.pdf':
+  //         filetype = 'pdf'
+  //         break
+  //       case '.html':
+  //         filetype = 'html'
+  //         break
+  //     }
+  //     if (filetype === 'excel') {
+  //       const excelIndex = this.state.maintenance.incomingAttachments.findIndex(el => el.id === id)
+  //       const file = this.state.maintenance.incomingAttachments[excelIndex]
+  //       const filedata = file.data
+  //       const mime = file.mime
+  //       const filename = file.name
+  //       let base64 = (filedata).replace(/_/g, '/')
+  //       base64 = base64.replace(/-/g, '+')
+  //       const base64Fixed = fixBase64(base64)
+  //       var fileData = new Blob([base64Fixed], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;' })
 
-        ExcelRenderer(fileData, (err, resp) => {
-          if (err) {
-            console.log(err)
-          } else {
-            resp.cols.forEach(col => {
-              col.name = resp.rows[0][col.key]
-              col.key = col.key + 1
-            })
-            resp.cols.unshift({ key: 0, name: '' })
-            resp.rows.shift()
-            this.setState({
-              filetype: filetype,
-              cols: resp.cols,
-              rows: resp.rows,
-              currentAttachmentName: filename,
-              currentAttachment: id || null,
-              openedDownloadPopupId: id,
-              attachmentPopoverBody:
-              <span>
-                <ButtonGroup>
-                  <Button onClick={() => this.setState({ openAttachmentModal: !this.state.openAttachmentModal, openedDownloadPopupId: null })} outline size='sm'>Preview</Button>
-                  <Button onClick={() => downloadFile(base64, filename, mime)} size='sm'>Download</Button>
-                </ButtonGroup>
-              </span>
-            })
-          }
-        })
-      } else if (filetype === 'pdf') {
-        const pdfIndex = this.state.maintenance.incomingAttachments.findIndex(el => el.id === id)
-        const file = this.state.maintenance.incomingAttachments[pdfIndex]
-        const filedata = file.data
-        const mime = file.mime
-        const filename = file.name
-        let base64 = (filedata).replace(/_/g, '/')
-        base64 = base64.replace(/-/g, '+')
-        const base64Fixed = fixBase64(base64)
-        const fileData = new Blob([base64Fixed], { type: 'application/pdf' })
-        this.setState({
-          attachmentModalSize: {
-            height: 800,
-            width: 950
-          },
-          filetype: filetype,
-          pdfid: id,
-          pdfB64: fileData,
-          currentAttachmentName: filename,
-          currentAttachment: id || null,
-          openedDownloadPopupId: id,
-          attachmentPopoverBody:
-          <span>
-            <ButtonGroup>
-              <Button onClick={() => this.setState({ openAttachmentModal: !this.state.openAttachmentModal, openedDownloadPopupId: null })} outline size='sm'>Preview</Button>
-              <Button onClick={() => downloadFile(base64, filename, mime)} size='sm'>Download</Button>
-            </ButtonGroup>
-          </span>
-        })
-      } else if (filetype === 'html') {
-        const fileIndex = this.state.maintenance.incomingAttachments.findIndex(el => el.id === id)
-        const file = this.state.maintenance.incomingAttachments[fileIndex]
-        const filedata = file.data
-        const filename = file.name
-        const mime = file.mime
-        let base64 = (filedata).replace(/_/g, '/')
-        base64 = base64.replace(/-/g, '+')
-        this.setState({
-          attachmentHTMLContent: window.atob(base64),
-          filetype: filetype,
-          currentAttachment: id || null,
-          currentAttachmentName: filename,
-          openedDownloadPopupId: id,
-          attachmentPopoverBody:
-          <span>
-            <ButtonGroup>
-              <Button onClick={() => this.setState({ openAttachmentModal: !this.state.openAttachmentModal, openedDownloadPopupId: null })} outline size='sm'>Preview</Button>
-              <Button onClick={() => downloadFile(base64, filename, mime)} size='sm'>Download</Button>
-            </ButtonGroup>
-          </span>
-        })
-      } else {
-        const fileIndex = this.state.maintenance.incomingAttachments.findIndex(el => el.id === id)
-        const file = this.state.maintenance.incomingAttachments[fileIndex]
-        const mime = file.mime
-        const rawData = file.data
-        let base64 = (rawData).replace(/_/g, '/')
-        base64 = base64.replace(/-/g, '+')
-        this.setState({
-          attachmentPopoverBody:
-          <span>
-            <ButtonGroup>
-              <Button outline disabled size='sm'>
-                <Tooltip
-                  title='Preview not available for this filetype'
-                  position='bottom'
-                  trigger='mouseenter'
-                  delay='250'
-                  distance='25'
-                  interactiveBorder='15'
-                  arrow
-                  size='small'
-                  theme='transparent'
-                >
-                  Preview
-                </Tooltip>
-              </Button>
-              <Button onClick={() => downloadFile(base64, filename, mime)} size='sm'>Download</Button>
-            </ButtonGroup>
-          </span>,
-          openedDownloadPopupId: id
-        })
-      }
-    } else {
-      this.setState({
-        openAttachmentModal: !this.state.openAttachmentModal,
-        currentAttachment: id || null
-      })
-    }
-  }
+  //       ExcelRenderer(fileData, (err, resp) => {
+  //         if (err) {
+  //           console.log(err)
+  //         } else {
+  //           resp.cols.forEach(col => {
+  //             col.name = resp.rows[0][col.key]
+  //             col.key = col.key + 1
+  //           })
+  //           resp.cols.unshift({ key: 0, name: '' })
+  //           resp.rows.shift()
+  //           this.setState({
+  //             filetype: filetype,
+  //             cols: resp.cols,
+  //             rows: resp.rows,
+  //             currentAttachmentName: filename,
+  //             currentAttachment: id || null,
+  //             openedDownloadPopupId: id,
+  //             attachmentPopoverBody:
+  //             <span>
+  //               <ButtonGroup>
+  //                 <Button onClick={() => this.setState({ openAttachmentModal: !this.state.openAttachmentModal, openedDownloadPopupId: null })} outline size='sm'>Preview</Button>
+  //                 <Button onClick={() => downloadFile(base64, filename, mime)} size='sm'>Download</Button>
+  //               </ButtonGroup>
+  //             </span>
+  //           })
+  //         }
+  //       })
+  //     } else if (filetype === 'pdf') {
+  //       const pdfIndex = this.state.maintenance.incomingAttachments.findIndex(el => el.id === id)
+  //       const file = this.state.maintenance.incomingAttachments[pdfIndex]
+  //       const filedata = file.data
+  //       const mime = file.mime
+  //       const filename = file.name
+  //       let base64 = (filedata).replace(/_/g, '/')
+  //       base64 = base64.replace(/-/g, '+')
+  //       const base64Fixed = fixBase64(base64)
+  //       const fileData = new Blob([base64Fixed], { type: 'application/pdf' })
+  //       this.setState({
+  //         attachmentModalSize: {
+  //           height: 800,
+  //           width: 950
+  //         },
+  //         filetype: filetype,
+  //         pdfid: id,
+  //         pdfB64: fileData,
+  //         currentAttachmentName: filename,
+  //         currentAttachment: id || null,
+  //         openedDownloadPopupId: id,
+  //         attachmentPopoverBody:
+  //         <span>
+  //           <ButtonGroup>
+  //             <Button onClick={() => this.setState({ openAttachmentModal: !this.state.openAttachmentModal, openedDownloadPopupId: null })} outline size='sm'>Preview</Button>
+  //             <Button onClick={() => downloadFile(base64, filename, mime)} size='sm'>Download</Button>
+  //           </ButtonGroup>
+  //         </span>
+  //       })
+  //     } else if (filetype === 'html') {
+  //       const fileIndex = this.state.maintenance.incomingAttachments.findIndex(el => el.id === id)
+  //       const file = this.state.maintenance.incomingAttachments[fileIndex]
+  //       const filedata = file.data
+  //       const filename = file.name
+  //       const mime = file.mime
+  //       let base64 = (filedata).replace(/_/g, '/')
+  //       base64 = base64.replace(/-/g, '+')
+  //       this.setState({
+  //         attachmentHTMLContent: window.atob(base64),
+  //         filetype: filetype,
+  //         currentAttachment: id || null,
+  //         currentAttachmentName: filename,
+  //         openedDownloadPopupId: id,
+  //         attachmentPopoverBody:
+  //         <span>
+  //           <ButtonGroup>
+  //             <Button onClick={() => this.setState({ openAttachmentModal: !this.state.openAttachmentModal, openedDownloadPopupId: null })} outline size='sm'>Preview</Button>
+  //             <Button onClick={() => downloadFile(base64, filename, mime)} size='sm'>Download</Button>
+  //           </ButtonGroup>
+  //         </span>
+  //       })
+  //     } else {
+  //       const fileIndex = this.state.maintenance.incomingAttachments.findIndex(el => el.id === id)
+  //       const file = this.state.maintenance.incomingAttachments[fileIndex]
+  //       const mime = file.mime
+  //       const rawData = file.data
+  //       let base64 = (rawData).replace(/_/g, '/')
+  //       base64 = base64.replace(/-/g, '+')
+  //       this.setState({
+  //         attachmentPopoverBody:
+  //         <span>
+  //           <ButtonGroup>
+  //             <Button outline disabled size='sm'>
+  //               <Tooltip
+  //                 title='Preview not available for this filetype'
+  //                 position='bottom'
+  //                 trigger='mouseenter'
+  //                 delay='250'
+  //                 distance='25'
+  //                 interactiveBorder='15'
+  //                 arrow
+  //                 size='small'
+  //                 theme='transparent'
+  //               >
+  //                 Preview
+  //               </Tooltip>
+  //             </Button>
+  //             <Button onClick={() => downloadFile(base64, filename, mime)} size='sm'>Download</Button>
+  //           </ButtonGroup>
+  //         </span>,
+  //         openedDownloadPopupId: id
+  //       })
+  //     }
+  //   } else {
+  //     this.setState({
+  //       openAttachmentModal: !this.state.openAttachmentModal,
+  //       currentAttachment: id || null
+  //     })
+  //   }
+  // }
 
-  handleProtectionSwitch () {
+  handleProtectionSwitch = () => {
     this.setState({
       maintenance: {
         ...this.state.maintenance,
@@ -2255,7 +2206,7 @@ export default class Maintenance extends React.Component {
     this.handleTextInputBlur('impact')
   }
 
-  useImpactPlaceholder () {
+  useImpactPlaceholder = () => {
     this.setState({
       maintenance: {
         ...this.state.maintenance,
@@ -2264,13 +2215,13 @@ export default class Maintenance extends React.Component {
     })
   }
 
-  handleCreateOnClick (event) {
+  handleCreateOnClick = (event) => {
     const {
       bearbeitetvon,
       maileingang,
       lieferant,
       mailId,
-      updatedAt
+      updatedAt,
     } = this.state.maintenance
 
     let incomingFormatted
@@ -2372,7 +2323,9 @@ export default class Maintenance extends React.Component {
       selectedLieferant,
       impactPlaceholder,
       openPreviewModal,
-      notesText
+      notesText,
+      incomingAttachments,
+      night
     } = this.state
 
     let maintenanceIdDisplay
@@ -3027,9 +2980,10 @@ export default class Maintenance extends React.Component {
                     </div>
                   </Rnd>
                 ) : (
-                  <></>
+                  null
                 )}
-              {typeof window !== 'undefined'
+              <Attachment night={night} incomingAttachments={incomingAttachments} />
+              {/* {typeof window !== 'undefined'
                 ? (
                   <Rnd
                     default={{
@@ -3049,8 +3003,8 @@ export default class Maintenance extends React.Component {
                     }}
                     bounds='window'
                     dragHandleClassName='modal-attachment-header-text'
-                  >
-                    <div style={{ borderRadius: '15px', position: 'relative' }}>
+                  > */}
+                    {/* <div style={{ borderRadius: '15px', position: 'relative' }}>
                       <ModalHeader
                         className='modal-attachment-header-text'
                         style={{
@@ -3096,11 +3050,11 @@ export default class Maintenance extends React.Component {
                             null
                           )}
                       </ModalBody>
-                    </div>
-                  </Rnd>
-                ) : (
+                    </div> */}
+                  {/* </Rnd> */}
+                {/* ) : (
                   null
-                )}
+                )} */}
               <Modal className='modal-preview-send' backdropClassName='modal-backdrop modal-preview-send-backdrop' animation backdrop size='lg' open={openPreviewModal} toggle={this.togglePreviewModal}>
                 <ModalHeader>
                   <div className='modal-preview-text-wrapper'>
