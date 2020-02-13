@@ -23,7 +23,6 @@ import TimezoneSelector from '../components/timezone'
 import { getUnique, convertDateTime } from '../components/maintenance/helper'
 import { HotKeys } from 'react-hotkeys'
 import { OutTable, ExcelRenderer } from 'react-excel-renderer'
-// import { OutTable } from 'react-excel-renderer'
 import ProtectedIcon from '../components/ag-grid/protected'
 import SentIcon from '../components/ag-grid/sent'
 import StartDateTime from '../components/ag-grid/startdatetime'
@@ -327,8 +326,6 @@ export default class Maintenance extends React.Component {
         }
       }
     }
-    this.toggleReadModal = this.toggleReadModal.bind(this)
-    this.togglePreviewModal = this.togglePreviewModal.bind(this)
     this.handleNotesChange = this.handleNotesChange.bind(this)
     this.handleMailPreviewChange = this.handleMailPreviewChange.bind(this)
     this.sendMail = this.sendMail.bind(this)
@@ -1766,7 +1763,7 @@ export default class Maintenance extends React.Component {
   /// /////////////////////////////////////////////////////////
 
   // open / close Read Modal
-  toggleReadModal () {
+  toggleReadModal = () => {
     if (!this.state.maintenance.incomingBody) {
       const host = window.location.host
       const mailId = this.state.maintenance.mailId || this.state.maintenance.receivedmail
