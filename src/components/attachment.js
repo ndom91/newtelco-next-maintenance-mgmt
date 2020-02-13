@@ -205,73 +205,75 @@ export default class Attachment extends React.Component {
       currentAttachmentName
     } = this.state
 
-    typeof window !== 'undefined' && return (
-      <Rnd
-        default={{
-          x: HALF_WIDTH,
-          y: 125,
-          width: 800,
-          height: 'auto'
-        }}
-        style={{
-          visibility: openAttachmentModal ? 'visible' : 'hidden',
-          opacity: openAttachmentModal ? 1 : 0,
-          backgroundColor: 'var(--primary-bg)',
-          overflow: 'hidden',
-          borderRadius: '15px',
-          zIndex: '101',
-          boxShadow: '0px 0px 20px 1px var(--dark)'
-        }}
-        bounds='window'
-        dragHandleClassName='modal-attachment-header-text'
-      >
-      <div style={{ borderRadius: '15px', position: 'relative' }}>
-        <ModalHeader
-          className='modal-attachment-header-text'
-          style={{
-            background: 'var(--fourth-bg)',
-            borderRadius: '0px',
-            color: 'var(--white)',
-            display: 'flex',
-            justifyContent: 'space-between'
+    return (
+      typeof window !== 'undefined' && (
+        <Rnd
+          default={{
+            x: HALF_WIDTH,
+            y: 125,
+            width: 800,
+            height: 'auto'
           }}
+          style={{
+            visibility: openAttachmentModal ? 'visible' : 'hidden',
+            opacity: openAttachmentModal ? 1 : 0,
+            backgroundColor: 'var(--primary-bg)',
+            overflow: 'hidden',
+            borderRadius: '15px',
+            zIndex: '101',
+            boxShadow: '0px 0px 20px 1px var(--dark)'
+          }}
+          bounds='window'
+          dragHandleClassName='modal-attachment-header-text'
         >
-          {currentAttachmentName}
-          <Button outline className='close-attachment-modal-btn' theme='light' style={{ borderRadius: '5px', padding: '0.7em 0.9em' }} onClick={() => this.showAttachments(null)}>
-            <FontAwesomeIcon
-              className='close-attachment-modal-icon' width='1.5em' style={{ color: 'var(--light)', fontSize: '12px' }}
-              icon={faTimesCircle}
-            />
-          </Button>
-        </ModalHeader>
-        <ModalBody style={filetype === 'pdf' ? { overflow: 'scroll', padding: '0', height: '450px' } : null}>
-          {filetype === 'excel'
-            ? (
-              <div className='attachment-body pdf'>
-                <OutTable data={rows} columns={cols} tableClassName='ExcelTable2007' tableHeaderRowClass='heading' />
-              </div>
-            ) : (
-              null
-            )}
-          {filetype === 'pdf'
-            ? (
-              <div className='attachment-body excel'>
-                <PDF file={pdfB64} scale={1.75} />
-              </div>
-            ) : (
-              null
-            )}
-          {filetype === 'html'
-            ? (
-              <root.div className='attachment-body html'>
-                <div style={this.props.night ? { color: '#6c757d' } : {}} dangerouslySetInnerHTML={{ __html: attachmentHTMLContent }} />
-              </root.div>
-            ) : (
-              null
-            )}
-        </ModalBody>
-      </div>
-      </Rnd>
+          <div style={{ borderRadius: '15px', position: 'relative' }}>
+            <ModalHeader
+              className='modal-attachment-header-text'
+              style={{
+                background: 'var(--fourth-bg)',
+                borderRadius: '0px',
+                color: 'var(--white)',
+                display: 'flex',
+                justifyContent: 'space-between'
+              }}
+            >
+              {currentAttachmentName}
+              <Button outline className='close-attachment-modal-btn' theme='light' style={{ borderRadius: '5px', padding: '0.7em 0.9em' }} onClick={() => this.showAttachments(null)}>
+                <FontAwesomeIcon
+                  className='close-attachment-modal-icon' width='1.5em' style={{ color: 'var(--light)', fontSize: '12px' }}
+                  icon={faTimesCircle}
+                />
+              </Button>
+            </ModalHeader>
+            <ModalBody style={filetype === 'pdf' ? { overflow: 'scroll', padding: '0', height: '450px' } : null}>
+              {filetype === 'excel'
+                ? (
+                  <div className='attachment-body pdf'>
+                    <OutTable data={rows} columns={cols} tableClassName='ExcelTable2007' tableHeaderRowClass='heading' />
+                  </div>
+                ) : (
+                  null
+                )}
+              {filetype === 'pdf'
+                ? (
+                  <div className='attachment-body excel'>
+                    <PDF file={pdfB64} scale={1.75} />
+                  </div>
+                ) : (
+                  null
+                )}
+              {filetype === 'html'
+                ? (
+                  <root.div className='attachment-body html'>
+                    <div style={this.props.night ? { color: '#6c757d' } : {}} dangerouslySetInnerHTML={{ __html: attachmentHTMLContent }} />
+                  </root.div>
+                ) : (
+                  null
+                )}
+            </ModalBody>
+          </div>
+        </Rnd>
+      )
     )
   }
 }
