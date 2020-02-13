@@ -726,9 +726,7 @@ export default class Maintenance extends React.Component {
         kundencids.forEach(cid => {
           newKundenCids.push(cid)
         })
-        console.log('1', kundencids)
         const uniqueKundenCids = getUnique(newKundenCids, 'kundenCID')
-        console.log('2', uniqueKundenCids)
         this.setState({
           kundencids: uniqueKundenCids
         })
