@@ -379,10 +379,10 @@ export default class History extends React.Component {
                       <FontAwesomeIcon icon={faPlusCircle} width='1.5em' style={{ marginRight: '10px', color: 'secondary' }} />
                       New
                     </Button>
-                    <Button onClick={this.handleToggleView} theme='dark'>
+                    {/* <Button onClick={this.handleToggleView} theme='dark'>
                       <FontAwesomeIcon icon={faTable} width='1.5em' style={{ marginRight: '10px', color: 'secondary' }} />
                       View
-                    </Button>
+                    </Button> */}
                     <Button onClick={this.deleteMaint} theme='dark'>
                       <FontAwesomeIcon icon={faTrashAlt} width='1.5em' style={{ marginRight: '10px', color: 'secondary' }} />
                       Delete
@@ -396,7 +396,27 @@ export default class History extends React.Component {
                   </ButtonGroup>
                 </ButtonToolbar>
               </CardHeader>
-              {openTableView
+              <CardBody>
+                <div className='table-wrapper'>
+                  <div
+                    className={`ag-theme-material ${this.props.night === 'true' ? 'darkmode-aggrid' : ''}`}
+                    style={{
+                      height: '700px',
+                      width: '100%'
+                    }}
+                  >
+                    <AgGridReact
+                      gridOptions={gridOptions}
+                      rowData={rowData}
+                      onGridReady={this.handleGridReady}
+                      animateRows
+                      pagination
+                      onFirstDataRendered={this.onFirstDataRendered.bind(this)}
+                    />
+                  </div>
+                </div>
+              </CardBody>
+              {/* {openTableView
                 ? (
                   <CSSTransition
                     timeout={500}
@@ -434,7 +454,7 @@ export default class History extends React.Component {
                       <InfiniteHistory length={this.state.rowData.length} />
                     </CardBody>
                   </CSSTransition>
-                )}
+                )} */}
               <Footer />
             </Card>
             <Modal className='mail-modal-body' animation backdrop backdropClassName='modal-backdrop' open={openNewModal} size='md' toggle={this.handleToggleNewModal}>
