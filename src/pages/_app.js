@@ -8,7 +8,6 @@ import './style/theme.css'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import './style/shards.min.css'
 const LogRocket = require('logrocket')
-const Sentry = require('@sentry/browser')
 export default class MyApp extends App {
   static async getInitialProps ({ Component, ctx }) {
     let pageProps = {}
@@ -21,12 +20,6 @@ export default class MyApp extends App {
       LogRocket.identify(pageProps.session.user.id, {
         name: pageProps.session.user.name,
         email: pageProps.session.user.email
-      })
-      Sentry.init({ dsn: 'https://627b5da84c4944f4acc2118b47dad88e@sentry.ndo.dev/3' })
-      LogRocket.getSessionURL(sessionURL => {
-        Sentry.configureScope(scope => {
-          scope.setExtra('sessionURL', sessionURL)
-        })
       })
     }
 

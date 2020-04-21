@@ -8,8 +8,6 @@ import {
   CardHeader,
   CardBody
 } from 'shards-react'
-const Sentry = require('@sentry/browser')
-Sentry.init({ dsn: 'https://627b5da84c4944f4acc2118b47dad88e@sentry.ndo.dev/3' })
 
 export default class ErrorBoundary extends React.Component {
   constructor (props) {
@@ -19,7 +17,6 @@ export default class ErrorBoundary extends React.Component {
 
   componentDidCatch (error, errorInfo) {
     this.setState({ error })
-    Sentry.captureException(error, { extra: errorInfo })
   }
 
   render () {
@@ -35,7 +32,7 @@ export default class ErrorBoundary extends React.Component {
               <h4>Oops — something's gone wrong.</h4>
               <p>If you would like to provide us more information, please select 'Report' below.</p>
               <ButtonGroup style={{ width: '100%' }}>
-                <Button outline theme='secondary' onClick={() => Sentry.showReportDialog({ eventId: Sentry.lastEventId() })}>
+                <Button outline theme='secondary' onClick={console.error('TODO')}>
                   Report
                 </Button>
                 <Button theme='primary' onClick={() => window.location.reload(true)}>

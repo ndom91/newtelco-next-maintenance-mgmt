@@ -10,7 +10,7 @@
 - Clean, professional, responsive UI
 - TinyMCE WYSIWYG Editor
 - Export history data to CSV
-- LogRocket + Sentry Error Logging
+- LogRocket
 - Keyboard Shortcuts
 - Darkmode :)  
 ![darkmode switch](https://imgur.com/XpHgYlX.gif)
