@@ -1,6 +1,7 @@
 import React from 'react'
 import Layout from '../components/layout'
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
 import RequireLogin from '../components/require-login'
 import { NextAuth } from 'next-auth/client'
 import ReactTooltip from 'react-tooltip'
@@ -23,6 +24,10 @@ import {
   Col
 } from 'shards-react'
 
+const BarChart = dynamic(
+  () => import('../components/homepage/barchart'),
+  { ssr: false }
+)
 export default class Index extends React.Component {
   static async getInitialProps ({ res, req, query }) {
     const host = req ? req.headers['x-forwarded-host'] : location.host
@@ -153,7 +158,8 @@ export default class Index extends React.Component {
                       </Link>
                     </Card>
                   </Col>
-                  {people.map((person, index) => {
+                  <BarChart />
+                  {/* {people.map((person, index) => {
                     return (
                       <Col className='person-wrapper' key={person.name}>
                         <Card className='card-stats'>
@@ -163,9 +169,9 @@ export default class Index extends React.Component {
                               {people && people[index].total}
                             </span>
                             <Sparklines
-                              data={people && people[index].weeks} 
-                              limit={10} 
-                              margin={1} 
+                              data={people && people[index].weeks}
+                              limit={10}
+                              margin={1}
                               style={{
                                 position: 'absolute',
                                 bottom: '0'
@@ -177,7 +183,7 @@ export default class Index extends React.Component {
                         </Card>
                       </Col>
                     )
-                  }, this)}
+                  }, this)} */}
                 </Row>
                 <Row className='heatmap-row' style={{ width: '90vw', padding: '50px' }}>
                   <Col>
