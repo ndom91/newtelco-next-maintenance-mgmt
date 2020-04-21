@@ -149,7 +149,7 @@ export default class Index extends React.Component {
             <CardHeader><h2 className='title-text'>Newtelco Maintenance</h2></CardHeader>
             <CardBody>
               <Container className='card-container'>
-                <Row>
+                <Row style={{ width: '90%'}}>
                   <Col>
                     <Card className='card-inboxUnread'>
                       <p className='card-body-text person-text unread-text'>Unread</p>
@@ -298,8 +298,15 @@ export default class Index extends React.Component {
               border-radius: 0.325em;
             }
             :global(.card-inboxUnread) {
-              max-width: 350px;
+              max-width: 250px;
+              margin-top: 50px;
               border-radius: 0.625em;
+            }
+            :global(.card-inboxUnread > a) {
+              display: flex;
+              flex-direction: column;
+              justify-content: center;
+              padding: 20px;
             }
             :global(.card-person-body) {
               display: flex;
