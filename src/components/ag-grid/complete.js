@@ -18,14 +18,14 @@ export default class CompleteIcon extends Component {
       } else {
         return (
           <span style={{ display: 'flex', justifyContent: 'center', height: '50px', alignItems: 'center' }}>
-            <FontAwesomeIcon style={{ fontSize: '12px' }} width='1.5em' icon={faTimes} />
+            <FontAwesomeIcon style={{ fontSize: '12px' }} width='1.5em' icon={faQuestion} />
           </span>
         )
       }
     } else {
       return (
         <span style={{ display: 'flex', justifyContent: 'center', height: '50px', alignItems: 'center' }}>
-          <FontAwesomeIcon style={{ fontSize: '12px' }} width='1.5em' icon={faQuestion} />
+          <FontAwesomeIcon style={{ fontSize: '12px' }} width='1.5em' icon={faTimes} />
         </span>
       )
     }
