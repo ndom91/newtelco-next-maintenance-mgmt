@@ -15,7 +15,7 @@ export default class CompleteIcon extends Component {
             <FontAwesomeIcon style={{ fontSize: '12px' }} width='1.5em' icon={faCheckCircle} />
           </span>
         )
-      } else (this.props.node.data.done === 0 || this.props.node.data.done === 'false') {
+      } else {
         return (
           <span style={{ display: 'flex', justifyContent: 'center', height: '50px', alignItems: 'center' }}>
             <FontAwesomeIcon style={{ fontSize: '12px' }} width='1.5em' icon={faTimes} />
