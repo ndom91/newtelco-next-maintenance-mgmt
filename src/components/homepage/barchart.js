@@ -4,34 +4,28 @@ import moment from 'moment-timezone'
 import Chart from 'react-apexcharts'
 
 class BarChart extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
+      loading: true,
       series: [],
       options: {
         chart: {
-          type: 'area',
-          height: 350,
-          stacked: false,
-          zoom: {
-            enabled: true
-          },
-          toolbar: {
-            show: false
-          }
+          type: 'donut',
+          width: 350,
+          // zoom: {
+          //   enabled: false
+          // },
+          // toolbar: {
+          //   show: false
+          // }
         },
         dataLabels: {
           enabled: false
         },
-        markers: {
-          size: 0
-        },
-        stroke: {
-          curve: 'smooth'
-        },
-        tooltip: {
-          shared: true
-        },
+        // tooltip: {
+        //   shared: true
+        // },
         responsive: [{
           breakpoint: 480,
           options: {
@@ -42,38 +36,44 @@ class BarChart extends React.Component {
             }
           }
         }],
+        // xaxis: {
+        //   axisTicks: {
+        //     show: false
+        //   },
+        //   tooltip: {
+        //     enabled: false
+        //   },
+        //   categories: ['a', 'b', 'c', 'd', 'lol'],
+        //   labels: {
+        //     style: {
+        //       fontSize: '12px'
+        //     }
+        //   }
+        // },
         plotOptions: {
-          bar: {
-            horizontal: false
-          }
-        },
-        xaxis: {
-          type: 'datetime',
-          axisTicks: {
-            show: false
-          },
-          tooltip: {
-            enabled: false
+          pie: {
+            donut: {
+              size: '55%',
+              labels: {
+                show: true
+              }
+            },
+            total: {
+              show: true,
+              showAlways: true
+            }
           }
         },
         title: {
           text: 'Maintenances Completed',
           align: 'left',
           offsetX: 14
-        },
-        legend: {
-          position: 'top',
-          horizontalAlign: 'right',
-          offsetY: -30
-        },
-        theme: {
-          palette: 'palette4' // upto palette10
         }
       }
     }
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const host = window.location.host
     const protocol = window.location.protocol
     fetch(`${protocol}//${host}/api/homepage/barchart`)
@@ -111,21 +111,48 @@ class BarChart extends React.Component {
             const data = user.map(user => [user.date, user.count])
             series.push({ data: data, name: user[0].user })
           })
+          // console.log(userSeries)
+          const barSeries = []
+          const barCategories = []
+          userSeries.forEach(user => {
+            const username = user[0].user
+            fetch(`${protocol}//${host}/api/homepage/week?person=${username}`)
+              .then(res => res.json())
+              .then(peopleData => {
+                if (peopleData) {
+                  // console.log(peopleData)
+                  barCategories.push(username)
+                  // barSeries.push({ label: username, value: peopleData.totalCount.maints })
+                  barSeries.push(peopleData.totalCount.maints)
+                }
+              })
+              .catch(err => console.error(err))
+          })
+          // const opts = this.state.options
+          // opts.xaxis.categories = barCategories
           this.setState({
-            series: series
+            series: barSeries,
+            // options: opts,
+            loading: false
           })
         }
       })
       .catch(err => console.error(err))
   }
 
-  render () {
+  render() {
     const {
       options,
-      series
+      series,
+      loading
     } = this.state
 
-    return <Chart options={options} series={series} type='area' width={600} height={320} />
+    console.log(series)
+    if (!loading) {
+      return <Chart options={options} series={series} type='donut' width={400} />
+    } else {
+      return <span>Loading...</span>
+    }
   }
 }
 
