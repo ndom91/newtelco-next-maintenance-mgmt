@@ -1,20 +1,19 @@
 import React from 'react'
-import Header from './header'
-import Head from 'next/head'
+import MaintHeader from './header'
 import Router from 'next/router'
+import KeyboardShortcuts from './keyboardShortcuts'
 import { NextAuth } from 'next-auth/client'
-import { HotKeys } from 'react-hotkeys'
-// import MorphTransition from 'nextjs-morph-page'
+
 import {
+  Navbar,
+  Footer,
   Container,
-  Row,
-  Col,
+  Content,
   Modal,
-  ModalHeader,
-  ModalBody,
-  Badge,
-  Button
-} from 'shards-react'
+  Button,
+  Icon,
+  Dropdown
+} from 'rsuite'
 
 const TIMEOUT = 300
 
@@ -22,12 +21,10 @@ export default class Layout extends React.PureComponent {
   constructor (props) {
     super(props)
     this.state = {
-      openHelpModal: false,
       openA2HSModal: false,
       deferredPrompt: null
     }
     this.handleSignOutSubmit = this.handleSignOutSubmit.bind(this)
-    this.toggleHelpModal = this.toggleHelpModal.bind(this)
     this.toggleA2HSModal = this.toggleA2HSModal.bind(this)
     this.addToHomescreen = this.addToHomescreen.bind(this)
   }
@@ -102,12 +99,6 @@ export default class Layout extends React.PureComponent {
       })
   }
 
-  toggleHelpModal () {
-    this.setState({
-      openHelpModal: !this.state.openHelpModal
-    })
-  }
-
   onToggleNight = () => {
     if (this.state.night) {
       document.documentElement.setAttribute('data-theme', 'light')
@@ -123,149 +114,39 @@ export default class Layout extends React.PureComponent {
 
   render () {
     const {
-      openHelpModal,
       openA2HSModal
     } = this.state
 
-    const keyMap = {
-      TOGGLE_HELP: 'shift+?',
-      NAV_HOME: 'alt+h',
-      NAV_INBOX: 'alt+i',
-      NAV_HISTORY: 'alt+y',
-      NAV_SETTINGS: 'alt+s'
-    }
-
-    const handlers = {
-      TOGGLE_HELP: this.toggleHelpModal,
-      NAV_HOME: () => Router.push('/'),
-      NAV_INBOX: () => Router.push('/inbox'),
-      NAV_HISTORY: () => Router.push('/history'),
-      NAV_SETTINGS: () => Router.push('/settings')
-    }
-
     return (
-      <div>
-        <HotKeys keyMap={keyMap} handlers={handlers}>
-          <Head>
-            <link rel='stylesheet' type='text/css' src={this.state.night ? '/static/css/darkmode.css' : ''} />
-          </Head>
-          <Header data-morph-ms='800' id='header-wrapper' night={this.state.night} toggleNight={this.onToggleNight} handleSearchSelection={this.props.handleSearchSelection} unread={this.props.unread} session={this.props.session} />
-          <Container fluid>
-            <Row style={{ height: '20px' }} />
-            {/* <MorphTransition
-              skipInitialTransition
-              timeout={TIMEOUT}
-              classNames='morph'
-            > */}
-            <Row className='top-level-row'>
-              <Col className='toplevel-col' sm='12' lg='12'>
+          <div className="show-fake-browser navbar-page">
+        <KeyboardShortcuts>
+    <Container>
+      <MaintHeader unread={this.props.unread} night={this.state.night} session={this.props.session} toggleNight={this.onToggleNight} />
+      <Content>
                 {this.props.children}
-              </Col>
-            </Row>
-            {/* </MorphTransition> */}
+</Content>
+      <Footer>Footer</Footer>
+    </Container>
             <Modal className='a2hs-modal' backdropClassName='a2hs-modal-backdrop' animation backdrop size='md' open={openA2HSModal} toggle={this.toggleA2HSModal} style={{ marginTop: '75px' }}>
-              <ModalHeader className='keyboard-shortcut-header'>
+              <Modal.Header className='keyboard-shortcut-header'>
                 Save Application
-              </ModalHeader>
-              <ModalBody className='keyboard-shortcut-body'>
+              </Modal.Header>
+              <Modal.Body className='keyboard-shortcut-body'>
                 <Container className='keyboard-shortcut-container'>
                   Do you want to save this app to the homescreen?
                   <Button style={{ width: '100%', marginTop: '20px' }} onClick={this.addToHomescreen} className='a2hs-btn'>
                     Add to Homescreen
                   </Button>
                 </Container>
-              </ModalBody>
+              </Modal.Body>
             </Modal>
-            <Modal backdropClassName='modal-backdrop' animation backdrop size='md' open={openHelpModal} toggle={this.toggleHelpModal} style={{ marginTop: '75px' }}>
-              <ModalHeader className='keyboard-shortcut-header'>
-                Keyboard Shortcuts
-              </ModalHeader>
-              <ModalBody className='keyboard-shortcut-body'>
-                <Container className='keyboard-shortcut-container'>
-                  {typeof window !== 'undefined' && window.location.pathname === '/settings'
-                    ? (
-                      <Row className='keyboard-row'>
-                        <Col>
-                          <Badge className='key-badge' outline theme='primary'>ALT</Badge> <span className='keyboard-plus'>+</span><Badge className='key-badge' outline theme='primary'>L</Badge>
-                        </Col>
-                        <Col>
-                          Delete Selected
-                        </Col>
-                      </Row>
-                    ) : (
-                      null
-                    )}
-                  {typeof window !== 'undefined' && window.location.pathname === '/history'
-                    ? (
-                      <Row className='keyboard-row'>
-                        <Col>
-                          <Badge className='key-badge' outline theme='primary'>ALT</Badge> <span className='keyboard-plus'>+</span><Badge className='key-badge' outline theme='primary'>L</Badge>
-                        </Col>
-                        <Col>
-                          Delete Selected
-                        </Col>
-                      </Row>
-                    ) : (
-                      null
-                    )}
-                  {typeof window !== 'undefined' && window.location.pathname === '/maintenance'
-                    ? (
-                      <>
-                        <Row className='keyboard-row'>
-                          <Col>
-                            <Badge className='key-badge' outline theme='primary'>ALT</Badge> <span className='keyboard-plus'>+</span><Badge className='key-badge' outline theme='primary'>R</Badge>
-                          </Col>
-                          <Col>
-                            Toggle Read Mail
-                          </Col>
-                        </Row>
-                        <Row className='keyboard-row'>
-                          <Col>
-                            <Badge className='key-badge' outline theme='primary'>ALT</Badge> <span className='keyboard-plus'>+</span><Badge className='key-badge' outline theme='primary'>L</Badge>
-                          </Col>
-                          <Col>
-                            Delete Reschedule
-                          </Col>
-                        </Row>
-                      </>
-                    ) : (
-                      null
-                    )}
-                  <Row className='keyboard-row'>
-                    <Col>
-                      <Badge className='key-badge' outline theme='primary'>ALT</Badge> <span className='keyboard-plus'>+</span><Badge className='key-badge' outline theme='primary'>H</Badge>
-                    </Col>
-                    <Col>
-                      Home
-                    </Col>
-                  </Row>
-                  <Row className='keyboard-row'>
-                    <Col>
-                      <Badge className='key-badge' outline theme='primary'>ALT</Badge> <span className='keyboard-plus'>+</span><Badge className='key-badge' outline theme='primary'>I</Badge>
-                    </Col>
-                    <Col>
-                      Inbox
-                    </Col>
-                  </Row>
-                  <Row className='keyboard-row'>
-                    <Col>
-                      <Badge className='key-badge' outline theme='primary'>ALT</Badge> <span className='keyboard-plus'>+</span><Badge className='key-badge' outline theme='primary'>Y</Badge>
-                    </Col>
-                    <Col>
-                      History
-                    </Col>
-                  </Row>
-                  <Row className='keyboard-row'>
-                    <Col>
-                      <Badge className='key-badge' outline theme='primary'>ALT</Badge> <span className='keyboard-plus'>+</span><Badge className='key-badge' outline theme='primary'>S</Badge>
-                    </Col>
-                    <Col>
-                      Settings
-                    </Col>
-                  </Row>
-                </Container>
-              </ModalBody>
-            </Modal>
+          {/* <Header data-morph-ms='800' id='header-wrapper' night={this.state.night} toggleNight={this.onToggleNight} handleSearchSelection={this.props.handleSearchSelection} unread={this.props.unread} session={this.props.session} />
+          <Container fluid>
+            <Row style={{ height: '20px' }} />
+            <Row className='top-level-row'>
+              <Col className='toplevel-col' sm='12' lg='12'>
+              </Col>
+            </Row> */}
             <style jsx>{`
               :global(.morph.enter) {
                 opacity: 0;
@@ -448,10 +329,8 @@ export default class Layout extends React.PureComponent {
               }
             `}
             </style>
-          </Container>
-        </HotKeys>
-        {/* <Footer /> */}
-      </div>
+        </KeyboardShortcuts>
+  </div>
     )
   }
 }

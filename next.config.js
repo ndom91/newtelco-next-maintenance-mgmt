@@ -4,7 +4,8 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 })
 const dev = process.env.NODE_ENV !== 'production'
 const webpack = require('webpack')
-// const withCSS = require('@zeit/next-css')
+const withCSS = require('@zeit/next-css')
+const withLess = require('@zeit/next-less');
 require('dotenv').config()
 const path = require('path')
 const Dotenv = require('dotenv-webpack')
@@ -139,6 +140,9 @@ const nextConfig = {
   //     '/': { page: '/' }
   //   }
   // },
+  lessLoaderOptions: {
+    javascriptEnabled: true
+  },
   webpack (config, { isServer, buildId, dev }) {
     config.plugins.push(new webpack.EnvironmentPlugin(localEnv))
     HACK_removeMinimizeOptionFromCssLoaders(config)
@@ -152,5 +156,4 @@ const nextConfig = {
   }
 }
 
-// module.exports = withBundleAnalyzer(withPWA(withCSS(nextConfig)))
-module.exports = withBundleAnalyzer(withPWA(nextConfig))
+module.exports = withBundleAnalyzer(withPWA(withLess(withCSS(nextConfig))))

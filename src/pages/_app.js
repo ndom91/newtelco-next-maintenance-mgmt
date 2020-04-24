@@ -3,16 +3,16 @@ import App from 'next/app'
 import Head from 'next/head'
 import ErrorBoundary from '../components/errorboundary'
 import OfflineSupport from '../components/offlineSupport'
+
 import './style/app.css'
-import './style/theme.css'
+// import './style/theme.css'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import './style/shards.min.css'
 
+import './style/ntTheme.less'
+
 import 'algolia-react-autocomplete/build/css/index.css'
 import 'react-calendar-heatmap/dist/styles.css'
-
-import 'normalize.css'
-import '@blueprintjs/core/lib/css/blueprint.css'
 
 const LogRocket = require('logrocket')
 export default class MyApp extends App {
@@ -63,46 +63,6 @@ export default class MyApp extends App {
         </Head>
         <OfflineSupport />
         <Component {...pageProps} key={router.route} />
-        <style jsx global>{`
-          .navbar {
-            padding: 0 1.5rem;
-          }
-          body,
-          .container,
-          .container-fluid,
-          .row {
-            background: none;
-          }
-          :global(#ct-container) {
-            z-index: 10001 !important;
-          }
-          :global(.darkmode) {
-            background-color: #121212 !important;
-            color: var(--light) !important;
-          }
-          :global(.darkmode-bgdark) {
-            background-color: #121212 !important;
-            color: #fff !important;
-          }
-          :global(.darkmode-bgdark-dp2) {
-            background-color: #272727 !important;
-            color: #fff !important;
-          }
-          :global(.darkmode-bgdark-dp4) {
-            background-color: #121212 !important;
-            color: #fff !important;
-          }
-          :global(.darkmode-boxshadow) {
-            box-shadow: 0 0 20px 2px rgba(0,0,0,0.6) !important;
-          }
-          :global(.darkmode-fgdark) {
-            color: #272727 !important;
-          }
-          :global(.darkmode-fgdark-dp2) {
-            color: #1f1f1f !important;
-          }
-        `}
-        </style>
       </ErrorBoundary>
     )
   }
