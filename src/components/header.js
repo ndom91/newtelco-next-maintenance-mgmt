@@ -5,7 +5,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import DarkmodeSwitch from './darkmode'
 import algoliasearch from 'algoliasearch'
 import Autocomplete from 'algolia-react-autocomplete'
-import 'algolia-react-autocomplete/build/css/index.css'
 import {
   faAngleRight,
   faClock,

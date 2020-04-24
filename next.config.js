@@ -4,16 +4,16 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 })
 const dev = process.env.NODE_ENV !== 'production'
 const webpack = require('webpack')
-const withCSS = require('@zeit/next-css')
+// const withCSS = require('@zeit/next-css')
 require('dotenv').config()
 const path = require('path')
 const Dotenv = require('dotenv-webpack')
 const withPWA = require('next-pwa')
 
 function HACK_removeMinimizeOptionFromCssLoaders (config) {
-  console.warn(
-    'HACK: Removing `minimize` option from `css-loader` entries in Webpack config'
-  )
+  // console.warn(
+  //   'HACK: Removing `minimize` option from `css-loader` entries in Webpack config'
+  // )
   config.module.rules.forEach(rule => {
     if (Array.isArray(rule.use)) {
       rule.use.forEach(u => {
@@ -134,11 +134,11 @@ const nextConfig = {
       }
     }]
   },
-  exportPathMap: function () {
-    return {
-      '/': { page: '/' }
-    }
-  },
+  // exportPathMap: function () {
+  //   return {
+  //     '/': { page: '/' }
+  //   }
+  // },
   webpack (config, { isServer, buildId, dev }) {
     config.plugins.push(new webpack.EnvironmentPlugin(localEnv))
     HACK_removeMinimizeOptionFromCssLoaders(config)
@@ -152,4 +152,5 @@ const nextConfig = {
   }
 }
 
-module.exports = withBundleAnalyzer(withPWA(withCSS(nextConfig)))
+// module.exports = withBundleAnalyzer(withPWA(withCSS(nextConfig)))
+module.exports = withBundleAnalyzer(withPWA(nextConfig))

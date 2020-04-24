@@ -12,7 +12,6 @@ import UnreadCount from '../components/unreadcount'
 import Footer from '../components/footer'
 import { Sparklines, SparklinesLine } from 'react-sparklines'
 import CalendarHeatmap from 'react-calendar-heatmap'
-import 'react-calendar-heatmap/dist/styles.css'
 import UseAnimations from 'react-useanimations'
 import {
   Badge,

@@ -7,6 +7,13 @@ import './style/app.css'
 import './style/theme.css'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import './style/shards.min.css'
+
+import 'algolia-react-autocomplete/build/css/index.css'
+import 'react-calendar-heatmap/dist/styles.css'
+
+import 'normalize.css'
+import '@blueprintjs/core/lib/css/blueprint.css'
+
 const LogRocket = require('logrocket')
 export default class MyApp extends App {
   static async getInitialProps ({ Component, ctx }) {
