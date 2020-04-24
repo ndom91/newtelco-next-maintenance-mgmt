@@ -5,17 +5,14 @@ import KeyboardShortcuts from './keyboardShortcuts'
 import { NextAuth } from 'next-auth/client'
 
 import {
-  Navbar,
-  Footer,
   Container,
   Content,
   Modal,
   Button,
-  Icon,
-  Dropdown
+  FlexboxGrid
 } from 'rsuite'
 
-const TIMEOUT = 300
+// const TIMEOUT = 300
 
 export default class Layout extends React.PureComponent {
   constructor (props) {
@@ -24,9 +21,9 @@ export default class Layout extends React.PureComponent {
       openA2HSModal: false,
       deferredPrompt: null
     }
-    this.handleSignOutSubmit = this.handleSignOutSubmit.bind(this)
-    this.toggleA2HSModal = this.toggleA2HSModal.bind(this)
-    this.addToHomescreen = this.addToHomescreen.bind(this)
+    // this.handleSignOutSubmit = this.handleSignOutSubmit.bind(this)
+    // this.toggleA2HSModal = this.toggleA2HSModal.bind(this)
+    // this.handleAddToHomescreen = this.addToHomescreen.bind(this)
   }
 
   componentDidMount () {
@@ -59,13 +56,13 @@ export default class Layout extends React.PureComponent {
     })
   }
 
-  toggleA2HSModal () {
+  toggleA2HSModal =() => {
     this.setState({
       openA2HSModal: !this.state.openA2HSModal
     })
   }
 
-  addToHomescreen () {
+  addToHomescreen = () => {
     this.state.deferredPrompt.prompt()
     // Wait for the user to respond to the prompt
     this.state.deferredPrompt.userChoice.then((choiceResult) => {
@@ -87,7 +84,7 @@ export default class Layout extends React.PureComponent {
     })
   }
 
-  handleSignOutSubmit (event) {
+  handleSignOutSubmit = (event) => {
     event.preventDefault()
     NextAuth.signout()
       .then(() => {
@@ -118,36 +115,32 @@ export default class Layout extends React.PureComponent {
     } = this.state
 
     return (
-          <div className="show-fake-browser navbar-page">
+      <div className='show-fake-browser navbar-page'>
         <KeyboardShortcuts>
-    <Container>
-      <MaintHeader unread={this.props.unread} night={this.state.night} session={this.props.session} toggleNight={this.onToggleNight} />
-      <Content>
-                {this.props.children}
-</Content>
-      <Footer>Footer</Footer>
-    </Container>
-            <Modal className='a2hs-modal' backdropClassName='a2hs-modal-backdrop' animation backdrop size='md' open={openA2HSModal} toggle={this.toggleA2HSModal} style={{ marginTop: '75px' }}>
-              <Modal.Header className='keyboard-shortcut-header'>
+          <Container>
+            <MaintHeader unread={this.props.unread} night={this.state.night} session={this.props.session} toggleNight={this.onToggleNight} />
+            <Content>
+              <FlexboxGrid justify='center'>
+                <FlexboxGrid.Item colspan={23} style={{ marginTop: '20px'}}>
+                  {this.props.children}
+                </FlexboxGrid.Item>
+              </FlexboxGrid>
+            </Content>
+          </Container>
+          <Modal className='a2hs-modal' backdrop='static' size='md' show={openA2HSModal} onHide={() => this.toggleA2HSModal} style={{ marginTop: '75px' }}>
+            <Modal.Header className='keyboard-shortcut-header'>
                 Save Application
-              </Modal.Header>
-              <Modal.Body className='keyboard-shortcut-body'>
-                <Container className='keyboard-shortcut-container'>
-                  Do you want to save this app to the homescreen?
-                  <Button style={{ width: '100%', marginTop: '20px' }} onClick={this.addToHomescreen} className='a2hs-btn'>
-                    Add to Homescreen
-                  </Button>
-                </Container>
-              </Modal.Body>
-            </Modal>
-          {/* <Header data-morph-ms='800' id='header-wrapper' night={this.state.night} toggleNight={this.onToggleNight} handleSearchSelection={this.props.handleSearchSelection} unread={this.props.unread} session={this.props.session} />
-          <Container fluid>
-            <Row style={{ height: '20px' }} />
-            <Row className='top-level-row'>
-              <Col className='toplevel-col' sm='12' lg='12'>
-              </Col>
-            </Row> */}
-            <style jsx>{`
+            </Modal.Header>
+            <Modal.Body className='keyboard-shortcut-body'>
+              <Container className='keyboard-shortcut-container'>
+                Do you want to save this app to the homescreen?
+                <Button style={{ width: '100%', marginTop: '20px' }} onClick={this.handleAddToHomescreen} className='a2hs-btn'>
+                  Add to Homescreen
+                </Button>
+              </Container>
+            </Modal.Body>
+          </Modal>
+          {/* <style jsx>{`
               :global(.morph.enter) {
                 opacity: 0;
                 transform: translate3d(0, 20px, 0);
@@ -328,9 +321,9 @@ export default class Layout extends React.PureComponent {
                 }
               }
             `}
-            </style>
+          </style> */}
         </KeyboardShortcuts>
-  </div>
+      </div>
     )
   }
 }

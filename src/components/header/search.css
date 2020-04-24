@@ -1,0 +1,18 @@
+.aa-dropdown-menus {
+  position: absolute;
+  z-index: 9999;
+}
+
+.aa-dropdown-menu {
+  max-height: 60vh;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+.aa-suggestions {
+  max-width: 270px;
+}
+
+.aa-suggestions {
+  transform: translate(-285px,20px);
+}

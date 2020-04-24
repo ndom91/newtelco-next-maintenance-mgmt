@@ -32,7 +32,7 @@ export default class ErrorBoundary extends React.Component {
               <h4>Oops — something's gone wrong.</h4>
               <p>If you would like to provide us more information, please select 'Report' below.</p>
               <ButtonGroup style={{ width: '100%' }}>
-                <Button outline theme='secondary' onClick={console.error('TODO')}>
+                <Button outline theme='secondary' onClick={() => console.error('TODO')}>
                   Report
                 </Button>
                 <Button theme='primary' onClick={() => window.location.reload(true)}>
