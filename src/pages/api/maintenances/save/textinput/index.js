@@ -1,4 +1,4 @@
-const db = require('../../../../../../lib/db')
+const db = require('../../../../../lib/db')
 const escape = require('sql-template-strings')
 const sqlstring = require('sqlstring')
 
