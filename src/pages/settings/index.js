@@ -11,7 +11,7 @@ import SupplierCIDs from '../../components/settings/suppliercids'
 import Freeze from '../../components/settings/freeze'
 import Templates from '../../components/settings/templates'
 import UnreadCount from '../../components/unreadcount'
-import Footer from '../../components/footer'
+import Footer from '../../components/cardFooter'
 import {
   Nav,
   NavItem,

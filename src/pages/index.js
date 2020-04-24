@@ -9,7 +9,7 @@ import Router from 'next/router'
 import fetch from 'isomorphic-unfetch'
 import Fonts from '../components/fonts'
 import UnreadCount from '../components/unreadcount'
-import Footer from '../components/footer'
+import Footer from '../components/cardFooter'
 import CalendarHeatmap from 'react-calendar-heatmap'
 // import * as S fro./styled.js
 import {

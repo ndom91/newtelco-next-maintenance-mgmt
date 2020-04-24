@@ -4,29 +4,28 @@
 
 ## Features
 
-- Gmail API - Create maintenance entries directly from incoming Emails as well as send mails to notify clients
-- Google Translate API - Translate Russian mails directly in the read preview
-- Google Calendar API - Create calendar entries at the click of a button
+- Gmail API - Create maintenance entries directly from incoming Emails
+- Google Translate API - Translate mails directly in the read preview
+- Google Calendar API - Create calendar entries from the application
 - Clean, professional, responsive UI
-- TinyMCE WYSIWYG Editor
+- WYSIWYG Editor
 - Export history data to CSV
-- LogRocket
+- LogRocket error tracking
 - Keyboard Shortcuts
-- Darkmode :)  
-![darkmode switch](https://imgur.com/XpHgYlX.gif)
+- Darkmode 
 - SMTP Outbound Mail
-- Blazing fast SPA built on:  
-  - Next.js / React
-  - Custom Next.js Server (Express)
-  - ShardsUI (Bootstrap 4 spin-off)
-  - MongoDB backend for auth 
-  - MySQL backend for data
-  - Nedb
-  - Passport
-  - Ag-Grid
-  - Algolia Search
 
-## Setup
+## Technology
+
+- Next.js / React
+- Custom Next.js Server (Express)
+- RSuite UI Library
+- MySQL
+- Passport Auth
+- Ag-Grid
+- Algolia Search
+
+## Contributing
 
 There is an API part to this project contained in a sister repo (`ndom91/api-maintenance`) which must be running as well. 
 

@@ -1,6 +1,6 @@
 import React from 'react'
 import Layout from '../../components/layout'
-import Footer from '../../components/footer'
+import Footer from '../../components/cardFooter'
 import Link from 'next/link'
 import Router from 'next/router'
 import RequireLogin from '../../components/require-login'

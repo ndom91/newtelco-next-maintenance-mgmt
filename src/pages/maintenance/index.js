@@ -1,7 +1,7 @@
 import React from 'react'
 import Layout from '../components/layout'
 import fetch from 'isomorphic-unfetch'
-import Footer from '../components/footer'
+import Footer from '../components/cardFooter'
 import Attachment from '../components/attachment'
 import RequireLogin from '../components/require-login'
 import { NextAuth } from 'next-auth/client'
