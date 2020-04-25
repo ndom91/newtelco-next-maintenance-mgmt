@@ -13,11 +13,6 @@ import {
 import {
   faClock as faClockRegular
 } from '@fortawesome/free-regular-svg-icons'
-import {
-  InputGroup,
-  Input,
-  Icon
-} from 'rsuite'
 
 const SearchInput = props => {
   const toCamelCase = (str) => {
@@ -55,8 +50,8 @@ const SearchInput = props => {
                   {suggestion.location
                     ? (
                       <span>
-                        <FontAwesomeIcon icon={faMapMarkerAlt} className='search-list-icons' width='0.6em' style={{ color: 'secondary', margin: '3px 5px' }} />
-                        <span style={{ fontSize: '70%' }} dangerouslySetInnerHTML={{ __html: toCamelCase(suggestion.location) }} />
+                        <FontAwesomeIcon icon={faMapMarkerAlt} className='search-list-icons' width='0.6em' style={{ color: 'secondary', margin: '0px 5px' }} />
+                        <span style={{ fontSize: '80%' }} dangerouslySetInnerHTML={{ __html: toCamelCase(suggestion.location) }} />
                       </span>
                     ) : (
                       null
@@ -66,7 +61,7 @@ const SearchInput = props => {
                   {suggestion.startDateTime
                     ? (
                       <span>
-                        <FontAwesomeIcon icon={faClock} className='search-list-icons' width='0.8em' style={{ color: 'secondary', margin: '3px 5px 3px 0px' }} />
+                        <FontAwesomeIcon icon={faClock} className='search-list-icons' width='0.8em' style={{ color: 'secondary', margin: '-2px 5px 0px 0px' }} />
                         <span dangerouslySetInnerHTML={{ __html: suggestion.startDateTime.substr(0, suggestion.startDateTime.length - 3) }} />
                       </span>
                     ) : (
@@ -75,7 +70,7 @@ const SearchInput = props => {
                   {suggestion.endDateTime
                     ? (
                       <span>
-                        <FontAwesomeIcon icon={faClockRegular} className='search-list-icons' width='0.8em' style={{ color: 'secondary', margin: '6px 3px' }} />
+                        <FontAwesomeIcon icon={faClockRegular} className='search-list-icons' width='0.8em' style={{ color: 'secondary', margin: '-2px 3px 0px 0px' }} />
                         <span dangerouslySetInnerHTML={{ __html: suggestion.endDateTime.substr(0, suggestion.endDateTime.length - 3) }} />
                       </span>
                     ) : (
@@ -84,14 +79,15 @@ const SearchInput = props => {
                 </div>
                 {suggestion.derenCID
                   ? (
-                    <div style={{ fontSize: '80%' }}>
-                      <FontAwesomeIcon icon={faEthernet} className='search-list-icons' width='0.8em' style={{ color: 'secondary', margin: '3px 5px 3px 0px' }} />
+                    <div style={{ fontSize: '80%', display: 'flex', alignItems: 'flex-start' }}>
+                      <FontAwesomeIcon icon={faEthernet} className='search-list-icons' width='0.8em' style={{ color: 'secondary', margin: '3px 5px 0px 0px' }} />
                       <span dangerouslySetInnerHTML={{ __html: suggestion.derenCID }} />
                       {suggestion.betroffeneCIDs
                         ? (
                           <>
-                            <FontAwesomeIcon icon={faAngleRight} className='search-icon' width='0.5em' style={{ color: 'secondary', margin: '3px 5px' }} />
-                            <span dangerouslySetInnerHTML={{ __html: newtelcoCID.substr(0, 20) }} />
+                            <FontAwesomeIcon icon={faAngleRight} className='search-icon' width='0.5em' style={{ color: 'secondary', margin: '2px 5px' }} />
+                            <span style={{ textOverflow: 'ellipsis', maxWidth: `calc( 300px - ${suggestion.derenCID.length}px * 4 )`, overflow: 'hidden', whiteSpace: 'nowrap', marginBottom: '-5px', display: 'inline-block' }} dangerouslySetInnerHTML={{ __html: newtelcoCID }} />
+                            {/* <span dangerouslySetInnerHTML={{ __html: newtelcoCID.substr(0, 40).concat('...') }} /> */}
                           </>
                         ) : (
                           null
@@ -111,32 +107,28 @@ const SearchInput = props => {
   ]
 
   const handleSearchSelection = selection => {
-    // this.removeClass('.aa-dropdown-menus', 'visible')
     const newLocation = `/maintenance?id=${selection.id}`
     Router.push(newLocation)
   }
 
   return (
-    <div style={{ width: '200px'}}>
-      <Autocomplete
-        indexes={indexes}
-        onSelectionChange={handleSearchSelection}
-      >
-        <input
-          key='input'
-          type='search'
-          id='aa-search-input'
-          className='rs-input'
-          placeholder='Search...'
-          name='search'
-          autoComplete='off'
-          // onClick={this.selectSearchInput}
-          // onFocus={this.handleSearchFocus}
-          // onBlur={this.handleSearchBlur}
-        />
-      </Autocomplete>
-    </div>
-
+    <Autocomplete
+      indexes={indexes}
+      onSelectionChange={handleSearchSelection}
+    >
+      <input
+        key='input'
+        type='search'
+        id='aa-search-input'
+        className='rs-input'
+        placeholder='Search'
+        name='search'
+        autoComplete='off'
+        // onClick={this.selectSearchInput}
+        // onFocus={this.handleSearchFocus}
+        // onBlur={this.handleSearchBlur}
+      />
+    </Autocomplete>
   )
 }
 

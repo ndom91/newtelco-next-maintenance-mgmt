@@ -1,12 +1,12 @@
 import React from 'react'
-import Layout from '../components/layout'
+import Layout from '../../components/layout'
 import fetch from 'isomorphic-unfetch'
-import Footer from '../components/cardFooter'
-import Attachment from '../components/attachment'
-import RequireLogin from '../components/require-login'
+import Footer from '../../components/cardFooter'
+import Attachment from '../../components/attachment'
+import RequireLogin from '../../components/require-login'
 import { NextAuth } from 'next-auth/client'
 import Toggle from 'react-toggle'
-import './style/maintenance.css'
+import '../style/maintenance.css'
 import cogoToast from 'cogo-toast'
 import Select from 'react-select'
 import CreatableSelect from 'react-select/creatable'
@@ -20,14 +20,14 @@ import { Rnd } from 'react-rnd'
 import { CSSTransition } from 'react-transition-group'
 import Flatpickr from 'react-flatpickr'
 import 'flatpickr/dist/themes/material_blue.css'
-import TimezoneSelector from '../components/timezone'
-import { getUnique, convertDateTime } from '../components/maintenance/helper'
+import TimezoneSelector from '../../components/timezone'
+import { getUnique, convertDateTime } from '../../components/maintenance/helper'
 import { HotKeys } from 'react-hotkeys'
 import { OutTable, ExcelRenderer } from 'react-excel-renderer'
-import ProtectedIcon from '../components/ag-grid/protected'
-import SentIcon from '../components/ag-grid/sent'
-import StartDateTime from '../components/ag-grid/startdatetime'
-import EndDateTime from '../components/ag-grid/enddatetime'
+import ProtectedIcon from '../../components/ag-grid/protected'
+import SentIcon from '../../components/ag-grid/sent'
+import StartDateTime from '../../components/ag-grid/startdatetime'
+import EndDateTime from '../../components/ag-grid/enddatetime'
 import { AgGridReact } from 'ag-grid-react'
 import PDF from 'react-pdf-js-infinite'
 import root from 'react-shadow'
@@ -90,7 +90,7 @@ import {
 const animatedComponents = makeAnimated()
 
 const Changelog = dynamic(
-  () => import('../components/timeline'),
+  () => import('../../components/timeline'),
   { ssr: false }
 )
 
