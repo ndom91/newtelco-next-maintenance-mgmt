@@ -1,22 +1,24 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import Head from 'next/head'
 import Store from './store'
 
 const UnreadCount = () => {
+  const [faviconEl, setFaviconEl] = useState({})
   const store = Store.useStore()
   const count = store.get('count')
-  const favicon = document.getElementById('favicon')
-  const faviconSize = 16
 
-  const canvas = document.createElement('canvas')
-  canvas.width = faviconSize
-  canvas.height = faviconSize
+  const getFavicon = () => {
+    const favicon = document.getElementById('favicon')
+    const faviconSize = 16
 
-  const context = canvas.getContext('2d')
-  const img = document.createElement('img')
-  img.src = favicon.href
+    const canvas = document.createElement('canvas')
+    canvas.width = faviconSize
+    canvas.height = faviconSize
 
-  const getFavicon = img => {
+    const context = canvas.getContext('2d')
+    const img = document.createElement('img')
+    img.src = favicon.href
+
     img.onload = () => {
       // Draw Original Favicon as Background
       context.drawImage(img, 0, 0, faviconSize, faviconSize)
@@ -40,7 +42,10 @@ const UnreadCount = () => {
     }
   }
 
-  const faviconEl = getFavicon(img)
+  useEffect(() => {
+    const fav = getFavicon()
+    setFaviconEl(fav)
+  }, [count])
 
   return (
     <Head>
