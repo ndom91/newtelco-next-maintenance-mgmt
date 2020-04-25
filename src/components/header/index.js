@@ -1,17 +1,45 @@
 import React from 'react'
 import Link from 'next/link'
+import Store from '../store'
 // import DarkmodeSwitch from '../darkmode'
 import SearchInput from './search'
+import './header.css'
 
 import {
   Header,
   Nav,
   Navbar,
   Icon,
+  Dropdown,
+  Avatar,
   Badge
 } from 'rsuite'
 
+const NextLink = React.forwardRef((props, ref) => {
+  const { href, as, ...rest } = props
+  return (
+    <Link href={href} as={as}>
+      <a ref={ref} {...rest} />
+    </Link>
+  )
+})
+
+const NavLink = props => <Dropdown.Item componentClass={NextLink} {...props} />
+
 const MaintHeader = props => {
+  const store = Store.useStore()
+  const count = store.get('count')
+  const session = store.get('session')
+
+  const r = Math.floor(Math.random() * 6) + 1
+  let avatarPath = `/static/images/avatars/avatar${r}.svg`
+  if (session.user) {
+    const username = session.user.email.match(/^([^@]*)@/)[1]
+    if (username !== '') {
+      avatarPath = `/static/images/avatars/${username}.png`
+    }
+  }
+
   return (
     <Header>
       <Navbar appearance='default' style={{ boxShadow: '0 5px 10px rgba(0,0,0,0.15)' }}>
@@ -53,7 +81,7 @@ const MaintHeader = props => {
             >
               <Nav.Item>
                 <span>
-                  <Badge style={{ position: 'absolute', top: '10px', right: '5px', background: '#67B246' }} content={props.unread} />
+                  <Badge style={{ position: 'absolute', top: '10px', right: '5px', background: '#67B246' }} content={count} />
                   Inbox
                 </span>
               </Nav.Item>
@@ -87,25 +115,17 @@ const MaintHeader = props => {
               </Nav.Item>
             </Link>
           </Nav>
-          <Nav pullRight>
+          <Nav pullRight style={{ margin: '0px 20px' }}>
             <div style={{ width: '400px', height: '56px', display: 'inline-flex', alignItems: 'center' }}>
               <SearchInput />
             </div>
-            <Link
-              href={{
-                pathname: '/settings',
-                query: {
-                  tab: 'companies',
-                  night: props.night
-                }
-              }}
-              as='/settings'
-              passHref
+            <Dropdown
+              className='header-dropdown'
+              icon={<Avatar size='md' circle src={avatarPath} style={{ border: '2px solid #67b246' }} />}
             >
-              <Nav.Item icon={<Icon icon='cog' />}>
-                <span>Settings</span>
-              </Nav.Item>
-            </Link>
+              <NavLink href='/settings'>Settings</NavLink>
+              <Dropdown.Item onClick={(e) => props.signOut(e)}>Logout</Dropdown.Item>
+            </Dropdown>
           </Nav>
         </Navbar.Body>
       </Navbar>

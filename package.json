@@ -85,6 +85,7 @@
     "sqlstring": "^2.3.1",
     "styled-components": "^4.4.1",
     "styled-media-queries": "^1.0.1",
+    "undux": "^5.2.0",
     "webpack": "^4.41.2"
   },
   "devDependencies": {

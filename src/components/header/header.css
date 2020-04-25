@@ -1,0 +1,12 @@
+.header-dropdown .rs-dropdown-toggle-caret {
+  display: none;
+}
+
+.header-dropdown .rs-ripple-pond {
+  display: none !important;
+}
+
+.rs-navbar-nav .rs-dropdown > .rs-dropdown-toggle {
+  padding: 8px 14px;
+  padding-right: 10px;
+}

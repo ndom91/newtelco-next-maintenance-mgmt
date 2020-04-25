@@ -13,6 +13,7 @@ import './style/ntTheme.less'
 
 import 'algolia-react-autocomplete/build/css/index.css'
 import 'react-calendar-heatmap/dist/styles.css'
+import Store from '../components/store'
 
 const LogRocket = require('logrocket')
 export default class MyApp extends App {
@@ -62,7 +63,9 @@ export default class MyApp extends App {
           <link rel='shortcut icon' id='favicon' href='/static/images/favicon/favicon.ico' />
         </Head>
         <OfflineSupport />
-        <Component {...pageProps} key={router.route} />
+        <Store.Container>
+          <Component {...pageProps} key={router.route} />
+        </Store.Container>
       </ErrorBoundary>
     )
   }

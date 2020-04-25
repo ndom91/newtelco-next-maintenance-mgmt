@@ -8,40 +8,10 @@ export default class EdittedBy extends Component {
     } else if (this.props.username) {
       username = this.props.username
     }
-    if (username === 'fwaleska') {
+    if (username !== '') {
       return (
         <span className='user-pic-wrapper'>
-          <img className='user-pic' style={{ border: '2px solid #67B246', borderRadius: '50%' }} src='/static/images/avatars/FWA.png' width='32px' height='32px' />
-        </span>
-      )
-    } else if (username === 'alissitsin') {
-      return (
-        <span>
-          <img className='user-pic' style={{ border: '2px solid #67B246', borderRadius: '50%' }} src='/static/images/avatars/ALI.png' width='32px' height='32px' />
-        </span>
-      )
-    } else if (username === 'ndomino') {
-      return (
-        <span>
-          <img className='user-pic' style={{ border: '2px solid #67B246', borderRadius: '50%' }} src='/static/images/avatars/NDO.png' width='32px' height='32px' />
-        </span>
-      )
-    } else if (username === 'nchachua') {
-      return (
-        <span>
-          <img className='user-pic' style={{ border: '2px solid #67B246', borderRadius: '50%' }} src='/static/images/avatars/NCH.png' width='32px' height='32px' />
-        </span>
-      )
-    } else if (username === 'kmoeller') {
-      return (
-        <span>
-          <img className='user-pic' style={{ border: '2px solid #67B246', borderRadius: '50%' }} src='/static/images/avatars/KMO.png' width='32px' height='32px' />
-        </span>
-      )
-    } else if (username === 'sstergiou') {
-      return (
-        <span>
-          <img className='user-pic' style={{ border: '2px solid #67B246', borderRadius: '50%' }} src='/static/images/avatars/SST.png' width='32px' height='32px' />
+          <img className='user-pic' style={{ border: '2px solid #67B246', borderRadius: '50%' }} src={`/static/images/avatars/${username}.png`} width='32px' height='32px' />
         </span>
       )
     } else {

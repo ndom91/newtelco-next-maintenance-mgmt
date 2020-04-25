@@ -8,9 +8,9 @@ import ReactTooltip from 'react-tooltip'
 import Router from 'next/router'
 import fetch from 'isomorphic-unfetch'
 import Fonts from '../components/fonts'
-import UnreadCount from '../components/unreadcount'
 import Footer from '../components/cardFooter'
 import CalendarHeatmap from 'react-calendar-heatmap'
+import MaintPanel from '../components/panel'
 // import * as S fro./styled.js
 import {
   Badge,
@@ -37,6 +37,10 @@ export default class Index extends React.Component {
       }
     })
     const json = await fetchRes.json()
+    const mail = { count: 0 }
+    if (json !== 'No unread emails') {
+      mail.count = json.count
+    }
     if (req && !req.user) {
       if (res) {
         res.writeHead(302, {
@@ -46,10 +50,6 @@ export default class Index extends React.Component {
       } else {
         Router.push('/auth')
       }
-    }
-    const mail = { count: 0 }
-    if (json !== 'No unread emails') {
-      mail.count = json.count
     }
     return {
       jsonData: mail,
@@ -98,9 +98,16 @@ export default class Index extends React.Component {
 
     if (this.props.session.user) {
       return (
-        <Layout night={this.props.night} handleSearchSelection={this.handleSearchSelection} unread={this.props.jsonData.count} session={this.props.session}>
-          {UnreadCount()}
-          <Card className='top-card-wrapper' style={{ maxWidth: '100%' }}>
+        <Layout night={this.props.night} handleSearchSelection={this.handleSearchSelection} session={this.props.session} count={this.props.jsonData.count}>
+          <MaintPanel header='Maintenance'>
+            <Card className='card-inboxUnread'>
+              <p className='card-body-text person-text unread-text'>Unread</p>
+              <Link href='/inbox' passHref>
+                <Badge className='card-badge'>{this.props.jsonData.count}</Badge>
+              </Link>
+            </Card>
+          </MaintPanel>
+          {/* <Card className='top-card-wrapper' style={{ maxWidth: '100%' }}>
             <CardHeader><h2 className='title-text'>Newtelco Maintenance</h2></CardHeader>
             <CardBody>
               <Container className='card-container'>
@@ -144,7 +151,7 @@ export default class Index extends React.Component {
               </Container>
             </CardBody>
             <Footer />
-          </Card>
+          </Card> */}
         </Layout>
       )
     } else {

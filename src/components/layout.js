@@ -1,9 +1,11 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
+import fetch from 'isomorphic-unfetch'
 import MaintHeader from './header'
 import Router from 'next/router'
+import dynamic from 'next/dynamic'
 import KeyboardShortcuts from './keyboardShortcuts'
 import { NextAuth } from 'next-auth/client'
-
+import Store from './store'
 import {
   Container,
   Content,
@@ -12,60 +14,54 @@ import {
   FlexboxGrid
 } from 'rsuite'
 
-// const TIMEOUT = 300
+const UnreadFavicon = dynamic(
+  () => import('../components/unreadcount'),
+  { ssr: false }
+)
 
-export default class Layout extends React.PureComponent {
-  constructor (props) {
-    super(props)
-    this.state = {
-      openA2HSModal: false,
-      deferredPrompt: null
-    }
-    // this.handleSignOutSubmit = this.handleSignOutSubmit.bind(this)
-    // this.toggleA2HSModal = this.toggleA2HSModal.bind(this)
-    // this.handleAddToHomescreen = this.addToHomescreen.bind(this)
-  }
+const Layout = props => {
+  const [openA2HS, setOpenA2HS] = useState(false)
+  const [deferredPrompt, setDeferredPrompt] = useState(null)
+  const [night, setNight] = useState(false)
+  const store = Store.useStore()
 
-  componentDidMount () {
-    let night = window.localStorage.getItem('theme')
-    const mqnight = window.matchMedia('(prefers-color-scheme: dark)').matches
+  useEffect(() => {
+    let nightStorage = window.localStorage.getItem('theme')
+    const mqNight = window.matchMedia('(prefers-color-scheme: dark)').matches
     const installAsk = window.localStorage.getItem('askA2HS') || 0
 
     if (window.outerWidth < 500 && installAsk < 3) {
       window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault()
-        this.setState({
-          openA2HSModal: !this.state.openA2HSModal,
-          deferredPrompt: e
-        })
+        setOpenA2HS(!openA2HS)
+        setDeferredPrompt(e)
         window.localStorage.setItem('askA2HS', parseInt(installAsk) + 1)
       })
     }
 
-    if (night === undefined && mqnight) {
-      night = 'dark'
+    if (nightStorage === undefined && mqNight) {
+      nightStorage = 'dark'
     } else {
-      night = 'light'
+      nightStorage = 'light'
     }
 
     var el = document.querySelector('html')
-    el.setAttribute('data-theme', night)
+    el.setAttribute('data-theme', nightStorage)
 
-    this.setState({
-      night: night === 'dark'
-    })
+    setNight(nightStorage)
+    store.set('night')(nightStorage)
+    store.set('count')(props.count)
+    store.set('session')(props.session)
+  }, [])
+
+  const toggleA2HSModal = () => {
+    setOpenA2HS(!openA2HS)
   }
 
-  toggleA2HSModal =() => {
-    this.setState({
-      openA2HSModal: !this.state.openA2HSModal
-    })
-  }
-
-  addToHomescreen = () => {
-    this.state.deferredPrompt.prompt()
+  const addToHomescreen = () => {
+    deferredPrompt.prompt()
     // Wait for the user to respond to the prompt
-    this.state.deferredPrompt.userChoice.then((choiceResult) => {
+    deferredPrompt.userChoice.then((choiceResult) => {
       console.log(choiceResult)
       if (choiceResult.outcome === 'accepted') {
         console.log('User accepted the A2HS prompt')
@@ -77,253 +73,64 @@ export default class Layout extends React.PureComponent {
         }
         window.localStorage.setItem('a2hs', a2hsDismisCount + 1)
       }
-      this.setState({
-        deferredPrompt: null,
-        openA2HSModal: !this.state.openA2HSModal
-      })
+      setDeferredPrompt(null)
+      setOpenA2HS(!openA2HS)
     })
   }
 
-  handleSignOutSubmit = (event) => {
+  const onSignOutSubmit = (event) => {
     event.preventDefault()
     NextAuth.signout()
       .then(() => {
-        Router.push('/auth/callback')
+        Router.push('/')
       })
       .catch(err => {
         process.env.NODE_ENV === 'development' && console.err(err)
-        Router.push('/auth/error?action=signout')
+        Router.push('/')
       })
   }
 
-  onToggleNight = () => {
-    if (this.state.night) {
+  const onToggleNight = () => {
+    if (night) {
       document.documentElement.setAttribute('data-theme', 'light')
       window.localStorage.setItem('theme', 'light')
     } else {
       document.documentElement.setAttribute('data-theme', 'dark')
       window.localStorage.setItem('theme', 'dark')
     }
-    this.setState({
-      night: !this.state.night
-    })
+    setNight(!night)
   }
 
-  render () {
-    const {
-      openA2HSModal
-    } = this.state
-
-    return (
-      <div className='show-fake-browser navbar-page'>
-        <KeyboardShortcuts>
-          <Container>
-            <MaintHeader unread={this.props.unread} night={this.state.night} session={this.props.session} toggleNight={this.onToggleNight} />
-            <Content>
-              <FlexboxGrid justify='center'>
-                <FlexboxGrid.Item colspan={23} style={{ marginTop: '20px'}}>
-                  {this.props.children}
-                </FlexboxGrid.Item>
-              </FlexboxGrid>
-            </Content>
-          </Container>
-          <Modal className='a2hs-modal' backdrop='static' size='md' show={openA2HSModal} onHide={() => this.toggleA2HSModal} style={{ marginTop: '75px' }}>
-            <Modal.Header className='keyboard-shortcut-header'>
-                Save Application
-            </Modal.Header>
-            <Modal.Body className='keyboard-shortcut-body'>
-              <Container className='keyboard-shortcut-container'>
-                Do you want to save this app to the homescreen?
-                <Button style={{ width: '100%', marginTop: '20px' }} onClick={this.handleAddToHomescreen} className='a2hs-btn'>
-                  Add to Homescreen
-                </Button>
-              </Container>
-            </Modal.Body>
-          </Modal>
-          {/* <style jsx>{`
-              :global(.morph.enter) {
-                opacity: 0;
-                transform: translate3d(0, 20px, 0);
-              }
-              :global(.morph.enter.active) {
-                opacity: 1;
-                transform: translate3d(0, 0, 0);
-                transition: opacity ${TIMEOUT}ms, transform ${TIMEOUT}ms;
-              }
-              :global(.morph.exit) {
-                opacity: 0;
-              }
-              :global(.morph.exit.active) {
-                opacity: 0;
-                transition: opacity ${TIMEOUT}ms;
-              }
-              :global(html) {
-                background-color: var(--secondary-bg);
-                color: var(--light);
-              }
-              :global(.card) {
-                border-radius: 1rem;
-                background-color: var(--primary-bg);
-              }
-              :global(.card-body h5) {
-                color: var(--font-color);
-                font-weight: 100 !important;
-              }
-              :global(.card-header > h2) {
-                color: var(--font-color);
-                font-weight: 100 !important;
-              }
-              :global(.card-header) {
-                background-color: var(--secondary-bg);
-                color: var(--font-color);
-              }
-              :global(.card-body) {
-                background-color: var(--primary-bg);
-              }
-              :global(.card-footer) {
-                background-color: var(--secondary-bg);
-                color: var(--bg-font-color);
-              }
-              :global([class^="ct-"]) {
-                pointer-events: none
-              }
-              :global(.key-badge) {
-                font-size: 90%;
-                padding: 0.7rem;
-              }
-              .keyboard-plus {
-                margin: 5px;
-              }
-              :global(.keyboard-row > .col:last-child) {
-                font-size: 18px;
-              }
-              :global(.keyboard-shortcut-header > .modal-title) {
-                justify-content: center !important;
-              }
-              :global(.keyboard-shortcut-header) {
-                background: var(--light);
-              }
-              :global(.keyboard-shortcut-body) {
-                padding: 1rem;
-              }
-              :global(.keyboard-row > .col) {
-                display: flex;
-                justify-content: center;
-              }
-              :global(.keyboard-row) {
-                border-top: 1px solid var(--light);
-                padding-top: 15px;
-                padding-bottom: 15px;
-              }
-              :global(.keyboard-row:first-child) {
-                border-top: none;
-              }
-              :global(.toplevel-col) {
-                margin-bottom: 50px !important;
-              }
-              :global(.ag-theme-material) {
-                background-color: ${this.state.night ? '#272727' : '#fff'} !important;
-              }
-              :global(.ag-root-wrapper-body.ag-layout-normal) {
-                background-color: ${this.state.night ? '#272727' : '#fff'} !important;
-                color: ${this.state.night ? '#fff' : ''};
-              }
-              :global(.ag-theme-material .ag-paging-panel) {
-                color: ${this.state.night ? '#fff' : ''};
-              }
-              :global(.ag-theme-material .ag-row) {
-                border-color: ${this.state.night ? '#313131 !important' : '#e1e3e4 !important'};
-              }
-              :global(.ag-theme-material .ag-row-hover) {
-                background-color: ${this.state.night ? '#121212' : ''};
-              }
-              :global(.ag-theme-material .ag-header) {
-                background-color: ${this.state.night ? '#272727' : '#fff'} !important;
-                color: ${this.state.night ? '#fff' : ''};
-              }
-              :global(.ag-theme-material .ag-row-selected) {
-                background-color: ${this.state.night ? 'rgba(103, 178, 70, 0.1)' : '#eee'} !important;
-              }
-              :global(.ag-theme-material .ag-header-group-cell:not(.ag-column-resizing) + .ag-header-group-cell:hover, .ag-theme-material .ag-header-group-cell:not(.ag-column-resizing) + .ag-header-group-cell.ag-column-resizing, .ag-theme-material .ag-header-cell:not(.ag-column-resizing) + .ag-header-cell:hover, .ag-theme-material .ag-header-cell:not(.ag-column-resizing) + .ag-header-cell.ag-column-resizing, .ag-theme-material .ag-header-group-cell:first-of-type:hover, .ag-theme-material .ag-header-group-cell:first-of-type.ag-column-resizing, .ag-theme-material .ag-header-cell:first-of-type:hover, .ag-theme-material .ag-header-cell:first-of-type.ag-column-resizing) {
-                background-color: var(--bg-secondary);
-              }
-              :global(.ag-theme-material .ag-paging-page-summary-panel .ag-paging-button.ag-disabled .ag-icon) {
-                color: ${this.state.night ? '#fff' : ''};
-              }
-              :global(.row-emergency) {
-                background: ${this.state.night ? 'repeating-linear-gradient( 45deg, #272727, #272727 10px, #c3565f2d 10px, #c3565f2d 20px) !important' : ''};
-              }
-              :global(.btn-dark) {
-                color: ${this.state.night ? '#fff' : ''};
-                border-color: ${this.state.night ? '#fff' : ''};
-              }
-              :global(.btn-outline-dark) {
-                color: ${this.state.night ? '#fff' : ''};
-                border-color: ${this.state.night ? '#fff' : ''};
-              }
-              :global(::-webkit-scrollbar-track) {
-                  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0);
-                  border-radius: 10px;
-                  background-color: rgba(0,0,0,0);
-              }
-              :global(::-webkit-scrollbar) {
-                width: 8px;
-                height: 8px;
-                background-color: transparent;
-              }
-              :global(::-webkit-scrollbar-thumb) {
-                border-radius: 10px;
-                -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.2);
-                background-color: rgba(0,0,0,0.4);
-              }
-              :global(.a2hs-modal-backdrop) {
-                opacity: 0.9 !important;
-                background-color: #212529 !important;
-               }
-              :global(.a2hs-modal) {
-                position: absolute;
-                bottom: 0;
-                left: 50%;
-                width: 96%;
-              }
-              @media only screen and (max-width: 500px) {
-                :global(.top-card-wrapper) {
-                  margin-top: 60px;
-                }
-                :global(.navbar) {
-                  position: fixed;
-                  z-index: 1000;
-                  width: 100%;
-                }
-                :global(.top-card-wrapper) {
-                  margin-top: 60px;
-                }
-                :global(.card-header) {
-                  padding: 1rem;
-                }
-                :global(.card-header .btn) {
-                  padding: .50rem 0.75rem;
-                }
-              }
-              @media only screen and (min-width: 1024px) {
-                :global(div.toplevel-col) {
-                  flex: 1;
-                  margin: 0 30px;
-                }
-              }
-              @media only screen and (max-width: 1024px) {
-                :global(div.toplevel-col) {
-                  flex: 1;
-                  margin: 0;
-                }
-                :global(.a2hs-modal) {
-                  left: 0;
-                }
-              }
-            `}
-          </style> */}
-        </KeyboardShortcuts>
-      </div>
-    )
-  }
+  return (
+    <div className='show-fake-browser navbar-page'>
+      <KeyboardShortcuts>
+        <UnreadFavicon />
+        <Container>
+          <MaintHeader night={night} toggleNight={onToggleNight} signOut={onSignOutSubmit} />
+          <Content>
+            <FlexboxGrid justify='center'>
+              <FlexboxGrid.Item colspan={23} style={{ marginTop: '20px'}}>
+                {props.children}
+              </FlexboxGrid.Item>
+            </FlexboxGrid>
+          </Content>
+        </Container>
+        <Modal className='a2hs-modal' backdrop='static' size='md' show={openA2HS} onHide={() => toggleA2HSModal} style={{ marginTop: '75px' }}>
+          <Modal.Header className='keyboard-shortcut-header'>
+              Save Application
+          </Modal.Header>
+          <Modal.Body className='keyboard-shortcut-body'>
+            <Container className='keyboard-shortcut-container'>
+              Do you want to save this app to the homescreen?
+              <Button style={{ width: '100%', marginTop: '20px' }} onClick={addToHomescreen} className='a2hs-btn'>
+                Add to Homescreen
+              </Button>
+            </Container>
+          </Modal.Body>
+        </Modal>
+      </KeyboardShortcuts>
+    </div>
+  )
 }
+
+export default Layout

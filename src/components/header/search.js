@@ -87,7 +87,6 @@ const SearchInput = props => {
                           <>
                             <FontAwesomeIcon icon={faAngleRight} className='search-icon' width='0.5em' style={{ color: 'secondary', margin: '2px 5px' }} />
                             <span style={{ textOverflow: 'ellipsis', maxWidth: `calc( 300px - ${suggestion.derenCID.length}px * 4 )`, overflow: 'hidden', whiteSpace: 'nowrap', marginBottom: '-5px', display: 'inline-block' }} dangerouslySetInnerHTML={{ __html: newtelcoCID }} />
-                            {/* <span dangerouslySetInnerHTML={{ __html: newtelcoCID.substr(0, 40).concat('...') }} /> */}
                           </>
                         ) : (
                           null
