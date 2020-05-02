@@ -9,5 +9,6 @@ ecosystem.config.js.og
 ecosystem.config.js
 public/precache*
 public/sw.js
+public/workbox-*
 db_backup
 stats*.json
