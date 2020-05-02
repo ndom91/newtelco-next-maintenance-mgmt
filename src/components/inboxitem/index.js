@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
+import './inbox.css'
 import {
   Panel,
   Badge,
@@ -17,7 +18,7 @@ import {
   ListGroupItemText
 } from 'shards-react'
 
-const InboxItem = ({ mail, index, windowWidth }) => {
+const InboxItem = ({ mail, index, handleDelete }) => {
   const [loading, setLoading] = useState(true)
 
   const handleImageLoad = () => {
@@ -39,13 +40,7 @@ const InboxItem = ({ mail, index, windowWidth }) => {
             {mail.snippet}
           </ListGroupItemText>
         </div>
-        <ButtonGroup className='inbox-btn-group'>
-          {/* {windowWidth < 500
-            ? (
-              <IconButton onClick={() => this.toggle(mail.id)} icon={<img alt='Icon' className='mail-icon' src={mail.faviconUrl} />} />
-            ) : (
-              <></>
-            )} */}
+        <ButtonGroup className='inbox-btn-group' vertical>
           <Link
             href={{
               pathname: '/maintenance',
@@ -62,13 +57,9 @@ const InboxItem = ({ mail, index, windowWidth }) => {
             passHref
             as='/maintenance/new'
           >
-            <Button className='mail-edit-btn pencil-icon' outline>
-              {/* <FontAwesomeIcon width='1.2em' className='edit-icon' icon={faPencilAlt} /> */}
-            </Button>
+            <IconButton appearance='subtle' size='lg' icon={<svg height='24' width='24' fill='none' strokeLinecap='round' strokeLinejoin='round' strokeWidth='2' stroke='var(--grey4)' viewBox='0 0 24 24'><path d='M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z' /></svg>} />
           </Link>
-          <Button onClick={() => this.handleDelete(mail.id)} className='mail-edit-btn trash-icon' outline>
-            {/* <FontAwesomeIcon width='1.2em' className='edit-icon' icon={faTrashAlt} /> */}
-          </Button>
+          <IconButton appearance='subtle' size='lg' onClick={() => handleDelete(mail.id)} icon={<svg height='24' width='24' fill='none' strokeLinecap='round' strokeLinejoin='round' strokeWidth='2' stroke='var(--grey4)' viewBox='0 0 24 24'><path d='M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16' /></svg>} />
         </ButtonGroup>
       </div>
     </Panel>

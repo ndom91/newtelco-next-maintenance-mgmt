@@ -1,56 +1,13 @@
 import React from 'react'
 import Layout from '../../components/layout'
-import Footer from '../../components/cardFooter'
-import Link from 'next/link'
 import Router from 'next/router'
 import RequireLogin from '../../components/require-login'
 import fetch from 'isomorphic-unfetch'
 import { NextAuth } from 'next-auth/client'
 import cogoToast from 'cogo-toast'
 import { CSSTransition, TransitionGroup } from 'react-transition-group'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import 'react-tippy/dist/tippy.css'
-// import { Tooltip } from 'react-tippy'
 import MaintPanel from '../../components/panel'
 import InboxItem from '../../components/inboxitem'
-import './inbox.css'
-import {
-  faPencilAlt,
-  faEnvelopeOpenText,
-  faTrashAlt,
-  faTimesCircle,
-  faLanguage
-} from '@fortawesome/free-solid-svg-icons'
-import {
-  Panel,
-  Badge,
-  Icon,
-  Button,
-  IconButton,
-  ButtonGroup,
-  Whisper,
-  Loader,
-  Tooltip,
-  Placeholder
-} from 'rsuite'
-import {
-  Card,
-  CardHeader,
-  CardBody,
-  ListGroup,
-  ListGroupItem,
-  ListGroupItemHeading,
-  ListGroupItemText,
-  Modal,
-  ModalBody,
-  ModalHeader,
-  InputGroup,
-  InputGroupText,
-  InputGroupAddon,
-  FormInput
-} from 'shards-react'
-
-const { Paragraph } = Placeholder
 
 export default class Inbox extends React.PureComponent {
   static async getInitialProps ({ req, query }) {
@@ -93,8 +50,6 @@ export default class Inbox extends React.PureComponent {
       originalModayBody: '',
       translated: false,
       translateTooltipOpen: false,
-      windowInnerHeight: 0,
-      windowInnerWidth: 0,
       unread: 0
     }
 
@@ -104,8 +59,6 @@ export default class Inbox extends React.PureComponent {
   componentDidMount () {
     this.setState({
       inboxMails: this.props.jsonData,
-      windowInnerHeight: window.innerHeight,
-      windowInnerWidth: window.innerWidth,
       unread: this.props.unread
     })
     const host = window.location.host
@@ -131,10 +84,6 @@ export default class Inbox extends React.PureComponent {
                 inboxMails: newInboxMails
               }))
             }
-            const imgArray = Array(this.props.jsonData.length).fill({ loaded: false, style: { display: 'none' } })
-            this.setState({
-              images: imgArray
-            })
           })
       })
     }
@@ -248,23 +197,12 @@ export default class Inbox extends React.PureComponent {
     Router.push(newLocation)
   }
 
-  setImageLoaded = index => {
-    console.log('Loaded', index)
-    const imgArray = this.state.images
-    imgArray[index].loaded = true
-    imgArray[index].style = { display: 'inline-block' }
-    this.setState({
-      images: imgArray
-    })
-  }
-
   render () {
     if (this.props.session.user) {
       const {
         inboxMails,
         open,
-        unread,
-        images
+        unread
       } = this.state
 
       return (
@@ -278,13 +216,12 @@ export default class Inbox extends React.PureComponent {
                     timeout={500}
                     classNames='item'
                   >
-                    <InboxItem mail={mail} index={index} />
+                    <InboxItem mail={mail} index={index} handleDelete={this.handleDelete} />
                   </CSSTransition>
                 )
               }) : (
                 null
               )}
-
             {!Array.isArray(inboxMails) && (
               <div className='inbox0-wrapper'>
                 <img src='/static/images/inbox0.svg' alt='Inbox' style={{ width: '400px' }} />

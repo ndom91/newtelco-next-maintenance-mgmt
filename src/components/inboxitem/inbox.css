@@ -12,4 +12,10 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  border-color: var(--grey2);
+  transition: border 250 ease-in-out;
+}
+
+.rs-btn.rs-btn-icon {
+  padding-left: 16px !important;
 }
