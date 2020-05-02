@@ -4,7 +4,6 @@ import Store from '../store'
 // import DarkmodeSwitch from '../darkmode'
 import SearchInput from './search'
 import './header.css'
-
 import {
   Header,
   Nav,
@@ -12,7 +11,8 @@ import {
   Icon,
   Dropdown,
   Avatar,
-  Badge
+  Badge,
+  Divider
 } from 'rsuite'
 
 const NextLink = React.forwardRef((props, ref) => {
@@ -29,15 +29,13 @@ const NavLink = props => <Dropdown.Item componentClass={NextLink} {...props} />
 const MaintHeader = props => {
   const store = Store.useStore()
   const count = store.get('count')
+  // this session is empty
   const session = store.get('session')
 
-  const r = Math.floor(Math.random() * 6) + 1
-  let avatarPath = `/static/images/avatars/avatar${r}.svg`
-  if (session.user) {
-    const username = session.user.email.match(/^([^@]*)@/)[1]
-    if (username !== '') {
-      avatarPath = `/static/images/avatars/${username}.png`
-    }
+  let avatarPath = `https://api.adorable.io/avatars/128/${props.session.user.email}.png`
+  const username = props.session.user.email.match(/^([^@]*)@/)[1]
+  if (['alissitsin', 'fwaleska', 'ndomino', 'kmoeller', 'nchachua'].includes(username)) {
+    avatarPath = `/static/images/avatars/${username}.png`
   }
 
   return (
@@ -55,6 +53,7 @@ const MaintHeader = props => {
         </Navbar.Header>
         <Navbar.Body>
           <Nav>
+            <Divider vertical />
             <Link
               href={{
                 pathname: '/',
@@ -119,8 +118,10 @@ const MaintHeader = props => {
             <div style={{ width: '400px', height: '56px', display: 'inline-flex', alignItems: 'center' }}>
               <SearchInput />
             </div>
+            <Divider vertical />
             <Dropdown
               className='header-dropdown'
+              noCaret
               placement='bottomEnd'
               icon={<Avatar size='md' circle src={avatarPath} style={{ border: '2px solid #67b246' }} />}
             >

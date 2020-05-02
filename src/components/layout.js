@@ -6,6 +6,7 @@ import dynamic from 'next/dynamic'
 import KeyboardShortcuts from './keyboardShortcuts'
 import { NextAuth } from 'next-auth/client'
 import Store from './store'
+import Fonts from './fonts'
 import {
   Container,
   Content,
@@ -15,7 +16,7 @@ import {
 } from 'rsuite'
 
 const UnreadFavicon = dynamic(
-  () => import('../components/unreadcount'),
+  () => import('./unreadcount'),
   { ssr: false }
 )
 
@@ -26,6 +27,8 @@ const Layout = props => {
   const store = Store.useStore()
 
   useEffect(() => {
+    Fonts()
+
     let nightStorage = window.localStorage.getItem('theme')
     const mqNight = window.matchMedia('(prefers-color-scheme: dark)').matches
     const installAsk = window.localStorage.getItem('askA2HS') || 0
@@ -48,10 +51,8 @@ const Layout = props => {
     var el = document.querySelector('html')
     el.setAttribute('data-theme', nightStorage)
 
-    setNight(nightStorage)
-    store.set('night')(nightStorage)
-    store.set('count')(props.count)
-    store.set('session')(props.session)
+    setNight(nightStorage === 'dark')
+    store.set('night')(nightStorage === 'dark')
   }, [])
 
   const toggleA2HSModal = () => {
@@ -93,10 +94,10 @@ const Layout = props => {
   const onToggleNight = () => {
     if (night) {
       document.documentElement.setAttribute('data-theme', 'light')
-      window.localStorage.setItem('theme', 'light')
+      window.localStorage.setItem('night', false)
     } else {
       document.documentElement.setAttribute('data-theme', 'dark')
-      window.localStorage.setItem('theme', 'dark')
+      window.localStorage.setItem('night', true)
     }
     setNight(!night)
   }
@@ -104,12 +105,12 @@ const Layout = props => {
   return (
     <div className='show-fake-browser navbar-page'>
       <KeyboardShortcuts>
-        <UnreadFavicon />
+        <UnreadFavicon count={props.count} />
         <Container>
-          <MaintHeader night={night} toggleNight={onToggleNight} signOut={onSignOutSubmit} />
+          <MaintHeader unread={props.count} night={night} session={props.session} toggleNight={onToggleNight} signOut={onSignOutSubmit} />
           <Content>
             <FlexboxGrid justify='center'>
-              <FlexboxGrid.Item colspan={23} style={{ marginTop: '20px'}}>
+              <FlexboxGrid.Item colspan={23} style={{ marginTop: '20px' }}>
                 {props.children}
               </FlexboxGrid.Item>
             </FlexboxGrid>
@@ -117,13 +118,13 @@ const Layout = props => {
         </Container>
         <Modal className='a2hs-modal' backdrop='static' size='md' show={openA2HS} onHide={() => toggleA2HSModal} style={{ marginTop: '75px' }}>
           <Modal.Header className='keyboard-shortcut-header'>
-              Save Application
+                Save Application
           </Modal.Header>
           <Modal.Body className='keyboard-shortcut-body'>
             <Container className='keyboard-shortcut-container'>
-              Do you want to save this app to the homescreen?
+                Do you want to save this app to the homescreen?
               <Button style={{ width: '100%', marginTop: '20px' }} onClick={addToHomescreen} className='a2hs-btn'>
-                Add to Homescreen
+                  Add to Homescreen
               </Button>
             </Container>
           </Modal.Body>

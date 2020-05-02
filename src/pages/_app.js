@@ -2,10 +2,8 @@ import React from 'react'
 import App from 'next/app'
 import Head from 'next/head'
 import ErrorBoundary from '../components/errorboundary'
-import OfflineSupport from '../components/offlineSupport'
 
 import './style/app.css'
-// import './style/theme.css'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import './style/shards.min.css'
 
@@ -62,7 +60,6 @@ export default class MyApp extends App {
           <link rel='mask-icon' href='/static/icons/safari-pinned-tab.svg' color='#5bbad5' />
           <link rel='shortcut icon' id='favicon' href='/static/images/favicon/favicon.ico' />
         </Head>
-        <OfflineSupport />
         <Store.Container>
           <Component {...pageProps} key={router.route} />
         </Store.Container>

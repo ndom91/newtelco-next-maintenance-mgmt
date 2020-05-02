@@ -1,0 +1,15 @@
+.mail-wrapper {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.read-mail-btn {
+  height: 75px !important;
+  width: 75px;
+  margin-right: 10px;
+  padding-left: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

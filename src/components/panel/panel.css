@@ -1,4 +1,6 @@
 .rs-panel-heading {
+  font-family: var(--font-body);
   font-size: 1.5rem;
   font-weight: 200;
+  background-color: var(--grey1);
 }

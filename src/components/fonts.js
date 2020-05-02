@@ -2,19 +2,23 @@ const FontFaceObserver = require('fontfaceobserver')
 
 const Fonts = () => {
   const link = document.createElement('link')
-  link.href = 'https://fonts.googleapis.com/css?family=Roboto:500,700,Poppins:100,300'
+  link.href = 'https://fonts.googleapis.com/css2?family=Fira+Sans:wght@200;400&family=Chivo:wght@300;400;700&family=Dosis:wght@200;400&display=swap'
   link.rel = 'stylesheet'
 
   document.head.appendChild(link)
 
-  const Roboto = new FontFaceObserver('Roboto')
-  const Poppins = new FontFaceObserver('Poppins')
+  const Fira = new FontFaceObserver('Fira Sans')
+  const Chivo = new FontFaceObserver('Chivo')
+  const Dosis = new FontFaceObserver('Dosis')
 
-  Poppins.load().then(() => {
-    document.documentElement.classList.add('Poppins')
+  Fira.load().then(() => {
+    document.documentElement.classList.add('FiraSans')
   })
-  Roboto.load().then(() => {
-    document.documentElement.classList.add('Roboto')
+  Chivo.load().then(() => {
+    document.documentElement.classList.add('Chivo')
+  })
+  Dosis.load().then(() => {
+    document.documentElement.classList.add('Dosis')
   })
 }
 

@@ -5,7 +5,7 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 const dev = process.env.NODE_ENV !== 'production'
 const webpack = require('webpack')
 const withCSS = require('@zeit/next-css')
-const withLess = require('@zeit/next-less');
+const withLess = require('@zeit/next-less')
 require('dotenv').config()
 const path = require('path')
 const Dotenv = require('dotenv-webpack')
@@ -33,16 +33,16 @@ const nextConfig = {
     modern: true
   },
   pwa: {
-    disable: dev,
     dest: 'public',
-    register: true,
-    scope: '/',
-    sw: 'sw.js',
-    clientsClaim: true,
-    skipWaiting: true,
-    modifyURLPrefix: {
-      '.next': '/_next'
-    },
+    disable: dev,
+    // register: true
+    // scope: '/',
+    // sw: 'sw.js',
+    // modifyURLPrefix: {
+    //   '.next': '/_next'
+    // }
+    // clientsClaim: true,
+    // skipWaiting: true,
     runtimeCaching: [{
       urlPattern: /api/i,
       handler: 'NetworkFirst',

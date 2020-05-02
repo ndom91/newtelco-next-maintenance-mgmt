@@ -1,0 +1,21 @@
+.unread-panel {
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.unread-panel > .rs-panel-heading {
+  width: 100%;
+  text-align: center;
+}
+
+.unread-count {
+  padding: 30px;
+  font-size: 6rem;
+  font-weight: 400;
+}
+
+.unread-count:hover {
+  cursor: pointer;
+}

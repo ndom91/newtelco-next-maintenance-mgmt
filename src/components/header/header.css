@@ -1,12 +1,8 @@
-.header-dropdown .rs-dropdown-toggle-caret {
-  display: none;
-}
-
-.header-dropdown .rs-ripple-pond {
-  display: none !important;
-}
-
 .rs-navbar-nav .rs-dropdown > .rs-dropdown-toggle {
-  padding: 8px 14px;
-  padding-right: 10px;
+  padding: 8px 0px 8px 0px;
+}
+
+.rs-divider-vertical {
+  height: 2.3em;
+  margin: 11px;
 }
