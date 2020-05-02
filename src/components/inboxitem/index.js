@@ -3,13 +3,9 @@ import Link from 'next/link'
 import './inbox.css'
 import {
   Panel,
-  Badge,
-  Icon,
-  Button,
   IconButton,
   ButtonGroup,
   Whisper,
-  Loader,
   Tooltip
 } from 'rsuite'
 import {
@@ -29,7 +25,20 @@ const InboxItem = ({ mail, index, handleDelete }) => {
     <Panel bordered key={mail.id}>
       <div className='mail-wrapper'>
         <Whisper speaker={<Tooltip>Read Mail</Tooltip>}>
-          <IconButton loading={loading} appearance='ghost' className='read-mail-btn' onClick={() => this.toggle(mail.id)} icon={<img alt='Icon' src={mail.faviconUrl} onLoad={() => handleImageLoad()} />} />
+          <IconButton
+            loading={loading}
+            appearance='ghost'
+            className='read-mail-btn'
+            onClick={() => this.toggle(mail.id)}
+            icon={
+              <img
+                alt='Icon'
+                src={mail.faviconUrl}
+                onLoad={() => handleImageLoad()}
+                onError={() => handleImageLoad()}
+              />
+            }
+          />
         </Whisper>
         <div className='mail-info'>
           <ListGroupItemHeading>

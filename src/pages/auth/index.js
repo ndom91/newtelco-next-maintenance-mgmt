@@ -6,6 +6,15 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
   faGoogle
 } from '@fortawesome/free-brands-svg-icons'
+import Fonts from '../../components/fonts'
+import {
+  Container,
+  FlexboxGrid,
+  Panel,
+  Content,
+  IconButton,
+  Icon
+} from 'rsuite'
 
 export default class App extends React.Component {
   static async getInitialProps ({ req }) {
@@ -22,17 +31,21 @@ export default class App extends React.Component {
       email: '',
       session: this.props.session
     }
-    this.handleEmailChange = this.handleEmailChange.bind(this)
-    this.handleSignInSubmit = this.handleSignInSubmit.bind(this)
+    // this.handleEmailChange = this.handleEmailChange.bind(this)
+    // this.handleSignInSubmit = this.handleSignInSubmit.bind(this)
   }
 
-  handleEmailChange (event) {
+  componentDidMount () {
+    Fonts()
+  }
+
+  handleEmailChange = (event) => {
     this.setState({
       email: event.target.value
     })
   }
 
-  handleSignInSubmit (event) {
+  handleSignInSubmit = (event) => {
     event.preventDefault()
 
     if (!this.state.email) return
@@ -77,42 +90,22 @@ export default class App extends React.Component {
       )
     } else {
       return (
-        <div className='container'>
-          <div className='text-center'>
-            <img width='384px' src='/static/images/nt-black.png' alt='Newtelco Maintenance' />
-          </div>
-          <div className='row'>
-            <div className='col-sm-6 mr-auto ml-auto'>
-              <div className='card mt-3 mb-3'>
-                <h4 className='card-header'>Sign In</h4>
-                <div className='card-body pb-0'>
+        <Container>
+          <Content>
+            <FlexboxGrid justify='center' align='middle' style={{ height: '70vh', flexDirection: 'column' }}>
+              <FlexboxGrid justify='center' align='middle'>
+                <FlexboxGrid.Item colspan={20} style={{ maxWidth: '350px' }}>
+                  <img src='/static/images/nt-black.png' alt='Newtelco Maintenance' width='100%' />
+                </FlexboxGrid.Item>
+              </FlexboxGrid>
+              <FlexboxGrid.Item componentClass={Panel} colspan={8} md={10} sm={18}>
+                <Panel header='Sign in' bordered shaded style={{ backgroundColor: '#fff' }}>
                   <SignInButtons providers={this.props.providers} />
-                  <form id='signin' method='post' action='/auth/email/signin' onSubmit={this.handleSignInSubmit}>
-                    <input name='_csrf' type='hidden' value={this.state.session.csrfToken} />
-                    <p>
-                      <label htmlFor='email'>Email address</label><br />
-                      <input name='email' type='text' placeholder='jcleese@newtelco.de' id='email' className='form-control' value={this.state.email} onChange={this.handleEmailChange} />
-                    </p>
-                    <p className='text-right'>
-                      <button id='submitButton' type='submit' style={{ width: '10rem' }} className='btn btn-outline-success'>
-                        Sign in
-                      </button>
-                    </p>
-                  </form>
-                </div>
-              </div>
-            </div>
-          </div>
-          <style jsx>{`
-            .text-center {
-              margin: 100px 0 50px 0;
-            } 
-            #email::placeholder {
-              opacity: 0.4;
-            }
-          `}
-          </style>
-        </div>
+                </Panel>
+              </FlexboxGrid.Item>
+            </FlexboxGrid>
+          </Content>
+        </Container>
       )
     }
   }
@@ -171,12 +164,16 @@ export class SignInButtons extends React.Component {
         {
           Object.keys(this.props.providers).map((provider, i) => {
             return (
-              <p key={i}>
-                <a className='btn btn-block btn-outline-secondary' href={this.props.providers[provider].signin}>
-                  <FontAwesomeIcon icon={faGoogle} width='1em' style={{ float: 'left', color: 'secondary' }} />
-                  Sign in with {provider}
-                </a>
-              </p>
+              <IconButton
+                block
+                key={i}
+                placement='left'
+                appearance='primary'
+                icon={<Icon icon='google' />}
+                href={this.props.providers[provider].signin}
+              >
+                Login with Google
+              </IconButton>
             )
           })
         }

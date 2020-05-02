@@ -160,7 +160,7 @@ export default class Inbox extends React.PureComponent {
     }
   }
 
-  handleDelete (mailId) {
+  onDelete (mailId) {
     const host = window.location.host
     fetch(`https://api.${host}/inbox/delete`, {
       method: 'post',
@@ -216,7 +216,7 @@ export default class Inbox extends React.PureComponent {
                     timeout={500}
                     classNames='item'
                   >
-                    <InboxItem mail={mail} index={index} handleDelete={this.handleDelete} />
+                    <InboxItem mail={mail} index={index} handleDelete={this.onDelete} />
                   </CSSTransition>
                 )
               }) : (
@@ -292,7 +292,7 @@ export default class Inbox extends React.PureComponent {
                                     <FontAwesomeIcon width='1.2em' className='edit-icon' icon={faPencilAlt} />
                                   </Button>
                                 </Link>
-                                <Button onClick={() => this.handleDelete(mail.id)} className='mail-edit-btn trash-icon' outline>
+                                <Button onClick={() => this.onDelete(mail.id)} className='mail-edit-btn trash-icon' outline>
                                   <FontAwesomeIcon width='1.2em' className='edit-icon' icon={faTrashAlt} />
                                 </Button>
                               </ButtonGroup>
