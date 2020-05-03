@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import MaintHeader from './header'
+import useSWR from 'swr'
 import Router from 'next/router'
 import dynamic from 'next/dynamic'
 import KeyboardShortcuts from './keyboardShortcuts'
@@ -24,6 +25,16 @@ const Layout = props => {
   const [deferredPrompt, setDeferredPrompt] = useState(null)
   const [night, setNight] = useState(false)
   const store = Store.useStore()
+
+  const { unreadCount } = useSWR(
+    `/v1/api/count`,
+    (...args) => fetch(...args).then(res => res.json()),
+    { refreshInterval: 30000, focusThrottleInterval: 10000 }
+  )
+
+  useEffect(() => {
+    unreadCount !== 'No unread emails' && store.set('count')(unreadCount)
+  }, [unreadCount])
 
   useEffect(() => {
     store.set('count')(props.count)

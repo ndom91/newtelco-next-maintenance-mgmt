@@ -79,10 +79,8 @@ const options = {
 }
 
 const NTChart = () => {
-  const host = window.location.host
-  const protocol = window.location.protocol
   const { data } = useSWR(
-    `${protocol}//${host}/api/homepage/barchart`,
+    `/api/homepage/barchart`,
     (...args) => fetch(...args).then(res => res.json()),
     { suspense: true, revalidateOnFocus: false }
   )
@@ -117,11 +115,9 @@ const NTChart = () => {
 
 const BarChart = () => {
   return (
-    <React.Suspense fallback={<Placeholder.Graph active height='320' width='600' />}>
-      <Panel header={null} bordered>
-        <NTChart />
-      </Panel>
-    </React.Suspense>
+    <Panel header={null} bordered>
+      <NTChart />
+    </Panel>
   )
 }
 

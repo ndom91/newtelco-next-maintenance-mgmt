@@ -32,8 +32,7 @@ import {
 
 export default class Freeze extends React.Component {
   static async getInitialProps ({ req, query }) {
-    const host = req ? req.headers['x-forwarded-host'] : location.host
-    const pageRequest = `https://${host}/api/settings/freeze`
+    const pageRequest = `/api/settings/freeze`
     const res = await fetch(pageRequest)
     const json = await res.json()
     return {
@@ -104,8 +103,7 @@ export default class Freeze extends React.Component {
   }
 
   componentDidMount () {
-    const host = window.location.host
-    fetch(`https://${host}/api/freeze`, {
+    fetch(`/api/freeze`, {
       method: 'get'
     })
       .then(resp => resp.json())
@@ -116,7 +114,7 @@ export default class Freeze extends React.Component {
       })
       .catch(err => console.error(err))
     // fill Companies Select
-    fetch(`https://${host}/api/companies/selectmaint`, {
+    fetch(`/api/companies/selectmaint`, {
       method: 'get'
     })
       .then(resp => resp.json())
@@ -188,9 +186,8 @@ export default class Freeze extends React.Component {
   }
 
   handleDelete () {
-    const host = window.location.host
     const freezeId = this.state.freezeIdToDelete
-    fetch(`https://${host}/api/settings/delete/freeze?id=${freezeId}`, {
+    fetch(`/api/settings/delete/freeze?id=${freezeId}`, {
       method: 'get'
     })
       .then(resp => resp.json())
@@ -235,8 +232,7 @@ export default class Freeze extends React.Component {
       newNotes
     } = this.state
 
-    const host = window.location.host
-    fetch(`https://${host}/api/settings/add/freeze?companyid=${encodeURIComponent(newCompany.value)}&startdatetime=${encodeURIComponent(newStartDateTime)}&enddatetime=${encodeURIComponent(newEndDateTime)}&notes=${encodeURIComponent(newNotes)}`, {
+    fetch(`/api/settings/add/freeze?companyid=${encodeURIComponent(newCompany.value)}&startdatetime=${encodeURIComponent(newStartDateTime)}&enddatetime=${encodeURIComponent(newEndDateTime)}&notes=${encodeURIComponent(newNotes)}`, {
       method: 'get'
     })
       .then(resp => resp.json())
@@ -270,8 +266,7 @@ export default class Freeze extends React.Component {
     const enddate = moment(params.data.endDateTime).format('YYYY.MM.DD HH:mm:ss')
     const notes = params.data.notes
 
-    const host = window.location.host
-    fetch(`https://${host}/api/settings/edit/freeze?id=${id}&startdate=${encodeURIComponent(startdate)}&enddate=${encodeURIComponent(enddate)}&notes=${encodeURIComponent(notes)}`, {
+    fetch(`/api/settings/edit/freeze?id=${id}&startdate=${encodeURIComponent(startdate)}&enddate=${encodeURIComponent(enddate)}&notes=${encodeURIComponent(notes)}`, {
       method: 'get'
     })
       .then(resp => resp.json())

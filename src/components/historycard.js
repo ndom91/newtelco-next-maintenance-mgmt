@@ -34,8 +34,7 @@ class MaintCard extends React.Component {
   }
 
   componentDidMount () {
-    const host = window.location.host
-    fetch(`https://api.${host}/favicon?d=${this.props.maint.mailDomain}`, {
+    fetch(`/v1/api/favicon?d=${this.props.maint.mailDomain}`, {
       method: 'get'
     })
       .then(resp => resp.json())

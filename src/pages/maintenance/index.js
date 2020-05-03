@@ -96,8 +96,7 @@ const Changelog = dynamic(
 
 export default class Maintenance extends React.Component {
   static async getInitialProps ({ req, query }) {
-    const host = req ? req.headers['x-forwarded-host'] : location.host
-    const pageRequest2 = `https://api.${host}/inbox/count`
+    const pageRequest2 = `/v1/api/inbox/count`
     const res2 = await fetch(pageRequest2)
     const count = await res2.json()
     let display
@@ -114,7 +113,7 @@ export default class Maintenance extends React.Component {
         session: await NextAuth.init({ req })
       }
     } else {
-      const pageRequest = `https://${host}/api/maintenances/${query.id}`
+      const pageRequest = `/api/maintenances/${query.id}`
       const res = await fetch(pageRequest)
       const json = await res.json()
       return {
@@ -439,7 +438,6 @@ export default class Maintenance extends React.Component {
     }
 
     // prepare to get available supplier CIDs for selected supplier
-    const host = window.location.host
     if (this.props.jsonData.profile.lieferant) {
       const lieferantId = this.props.jsonData.profile.lieferant
 
@@ -451,7 +449,7 @@ export default class Maintenance extends React.Component {
       } else {
         lieferantDomain = this.props.jsonData.profile.mailDomain
       }
-      fetch(`https://${host}/api/companies/domain?id=${lieferantDomain}`, {
+      fetch(`/api/companies/domain?id=${lieferantDomain}`, {
         method: 'get'
       })
         .then(resp => resp.json())
@@ -474,7 +472,7 @@ export default class Maintenance extends React.Component {
         .catch(err => console.error(`Error - ${err}`))
     }
     // get choices for company select
-    fetch(`https://${host}/api/companies/selectmaint`, {
+    fetch(`/api/companies/selectmaint`, {
       method: 'get'
     })
       .then(resp => resp.json())
@@ -499,7 +497,7 @@ export default class Maintenance extends React.Component {
     }
 
     if (this.props.jsonData.profile.id !== 'NEW') {
-      fetch(`https://${host}/api/reschedule?id=${this.props.jsonData.profile.id}`, {
+      fetch(`/api/reschedule?id=${this.props.jsonData.profile.id}`, {
         method: 'get'
       })
         .then(resp => resp.json())
@@ -609,8 +607,7 @@ export default class Maintenance extends React.Component {
         translated: !this.state.translated
       })
     } else if (this.state.maintenance.incomingBody) {
-      const host = window.location.host
-      fetch(`https://api.${host}/translate`, {
+      fetch(`/v1/api/translate`, {
         method: 'post',
         body: JSON.stringify({ q: body }),
         mode: 'cors',
@@ -643,8 +640,7 @@ export default class Maintenance extends React.Component {
       })
       return
     }
-    const host = window.location.host
-    fetch(`https://${host}/api/lieferantcids?id=${lieferantId}`, {
+    fetch(`/api/lieferantcids?id=${lieferantId}`, {
       method: 'get'
     })
       .then(resp => resp.json())
@@ -662,7 +658,7 @@ export default class Maintenance extends React.Component {
           this.setState({
             lieferantcids: data.lieferantCIDsResult
           })
-          fetch(`https://${host}/api/lieferantcids/label?id=${derenCIDidField}`, {
+          fetch(`/api/lieferantcids/label?id=${derenCIDidField}`, {
             method: 'get'
           })
             .then(resp => resp.json())
@@ -699,11 +695,10 @@ export default class Maintenance extends React.Component {
 
   // fetch customer CIDs based on selected Supplier CID
   fetchMailCIDs (lieferantCidId) {
-    const host = window.location.host
     if (!lieferantCidId) {
       return
     }
-    fetch(`https://${host}/api/customercids/${lieferantCidId}`, {
+    fetch(`/api/customercids/${lieferantCidId}`, {
       method: 'get'
     })
       .then(resp => resp.json())
@@ -736,11 +731,10 @@ export default class Maintenance extends React.Component {
   }
 
   async checkFreezeStatus (cid) {
-    const host = window.location.host
     const startDate = this.state.maintenance.startDateTime
     const endDate = this.state.maintenance.endDateTime
 
-    await fetch(`https://${host}/api/maintenances/freeze?companyid=${cid.kunde}&startDate=${startDate}&endDate=${endDate}`, {
+    await fetch(`/api/maintenances/freeze?companyid=${cid.kunde}&startDate=${startDate}&endDate=${endDate}`, {
       method: 'get'
     })
       .then(resp => resp.json())
@@ -932,7 +926,6 @@ export default class Maintenance extends React.Component {
       // })
       return
     }
-    const host = window.location.host
     const body = htmlBody || this.state.mailBodyText
     let subject = subj || this.state.mailPreviewSubjectText
     const to = recipient || this.state.mailPreviewHeaderText
@@ -949,7 +942,7 @@ export default class Maintenance extends React.Component {
       subject = `[RESCHEDULED] ${subject}-${this.state.rescheduleData[this.state.rescheduleData.length - 1].rcounter}`
     }
 
-    fetch(`https://api.${host}/mail/send`, {
+    fetch(`/v1/api/mail/send`, {
       method: 'post',
       body: JSON.stringify({
         body: body,
@@ -1000,7 +993,7 @@ export default class Maintenance extends React.Component {
           const user = this.props.session.user.email
           const action = 'sent to'
           const field = kundenCidRow.name
-          fetch(`https://${host}/api/history?mid=${maintId}&user=${user}&field=${field}&action=${action}`, {
+          fetch(`/api/history?mid=${maintId}&user=${user}&field=${field}&action=${action}`, {
             method: 'get'
           })
             .then(resp => resp.json())
@@ -1072,9 +1065,8 @@ export default class Maintenance extends React.Component {
     })
     cids = cids.trim()
 
-    const host = window.location.host
     if (calId) {
-      fetch(`https://api.${host}/calendar/reschedule`, {
+      fetch(`/v1/api/calendar/reschedule`, {
         method: 'post',
         body: JSON.stringify({
           company: company,
@@ -1109,7 +1101,6 @@ export default class Maintenance extends React.Component {
   }
 
   handleCalendarCreate = () => {
-    const host = window.location.host
     const company = this.state.maintenance.name
     const maintId = this.state.maintenance.id
     const startDateTime = this.state.maintenance.startDateTime
@@ -1132,7 +1123,7 @@ export default class Maintenance extends React.Component {
     const endMoment = moment.tz(endDateTime, this.state.maintenance.timezone)
     const endDE = endMoment.tz('Europe/Berlin').format()
 
-    fetch(`https://api.${host}/calendar/create`, {
+    fetch(`/v1/api/calendar/create`, {
       method: 'post',
       body: JSON.stringify({
         company: company,
@@ -1169,7 +1160,7 @@ export default class Maintenance extends React.Component {
             }
           })
 
-          fetch(`https://${host}/api/maintenances/save/calendar?mid=${this.state.maintenance.id}&cid=${calId}&updatedby=${this.props.session.user.email}`, {
+          fetch(`/api/maintenances/save/calendar?mid=${this.state.maintenance.id}&cid=${calId}&updatedby=${this.props.session.user.email}`, {
             method: 'get'
           })
             .then(resp => resp.json())
@@ -1244,8 +1235,7 @@ export default class Maintenance extends React.Component {
     newISOTime = newISOTime.utc().format('YYYY-MM-DD HH:mm:ss')
     const activeUserEmail = this.props.session.user.email
     const activeUser = activeUserEmail.substring(0, activeUserEmail.lastIndexOf('@'))
-    const host = window.location.host
-    fetch(`https://${host}/api/maintenances/save/dateTime?maintId=${maintId}&element=${element}&value=${newISOTime}&updatedby=${activeUser}`, {
+    fetch(`/api/maintenances/save/dateTime?maintId=${maintId}&element=${element}&value=${newISOTime}&updatedby=${activeUser}`, {
       method: 'get',
       headers: {
         'Access-Control-Allow-Origin': '*',
@@ -1323,7 +1313,6 @@ export default class Maintenance extends React.Component {
   }
 
   handleToggleChange = (element, event) => {
-    const host = window.location.host
     const maintId = this.state.maintenance.id
     const activeUserEmail = this.props.session.user.email
     const activeUser = activeUserEmail.substring(0, activeUserEmail.lastIndexOf('@'))
@@ -1363,7 +1352,7 @@ export default class Maintenance extends React.Component {
       if (this.state.maintenance.receivedmail) {
         const mailId = this.state.maintenance.receivedmail
         if (!mailId.startsWith('NT-')) {
-          fetch(`https://api.${host}/inbox/markcomplete`, {
+          fetch(`/v1/api/inbox/markcomplete`, {
             method: 'post',
             body: JSON.stringify({ m: mailId }),
             mode: 'cors',
@@ -1384,7 +1373,7 @@ export default class Maintenance extends React.Component {
         }
       }
 
-      fetch(`https://${host}/api/maintenances/save/impactedcids?cids=${impactedCIDs}&maintId=${this.state.maintenance.id}&updatedby=${activeUser}`, {
+      fetch(`/api/maintenances/save/impactedcids?cids=${impactedCIDs}&maintId=${this.state.maintenance.id}&updatedby=${activeUser}`, {
         method: 'get',
         headers: {
           'Access-Control-Allow-Origin': '*',
@@ -1402,7 +1391,7 @@ export default class Maintenance extends React.Component {
         .catch(err => console.error(`Error - ${err}`))
 
       // update Algolia Index
-      fetch(`https://api.${host}/search/update`, {
+      fetch(`/v1/api/search/update`, {
         method: 'get'
       })
     }
@@ -1413,7 +1402,7 @@ export default class Maintenance extends React.Component {
       })
       return
     }
-    fetch(`https://${host}/api/maintenances/save/toggle?maintId=${maintId}&element=${element}&value=${newValue}&updatedby=${activeUser}`, {
+    fetch(`/api/maintenances/save/toggle?maintId=${maintId}&element=${element}&value=${newValue}&updatedby=${activeUser}`, {
       method: 'get',
       headers: {
         'Access-Control-Allow-Origin': '*',
@@ -1531,7 +1520,6 @@ export default class Maintenance extends React.Component {
 
   handleCIDBlur = (ev) => {
     const postSelection = (id) => {
-      const host = window.location.host
       let idParameter
       if (Array.isArray(id)) {
         idParameter = id.join(',')
@@ -1550,7 +1538,7 @@ export default class Maintenance extends React.Component {
       }
       const activeUserEmail = this.props.session.user.email
       const activeUser = activeUserEmail.substring(0, activeUserEmail.lastIndexOf('@'))
-      fetch(`https://${host}/api/maintenances/save/lieferant?maintId=${maintId}&cid=${idParameter}&updatedby=${activeUser}`, {
+      fetch(`/api/maintenances/save/lieferant?maintId=${maintId}&cid=${idParameter}&updatedby=${activeUser}`, {
         method: 'get',
         headers: {
           'Access-Control-Allow-Origin': '*',
@@ -1596,8 +1584,7 @@ export default class Maintenance extends React.Component {
     const incomingTimezoneLabel = encodeURIComponent(this.state.maintenance.timezoneLabel || '(GMT+02:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna')
     const activeUserEmail = this.props.session.user.email
     const activeUser = activeUserEmail.substring(0, activeUserEmail.lastIndexOf('@'))
-    const host = window.location.host
-    fetch(`https://${host}/api/maintenances/save/timezone?maintId=${this.state.maintenance.id}&timezone=${incomingTimezone}&timezoneLabel=${incomingTimezoneLabel}&updatedby=${activeUser}`, {
+    fetch(`/api/maintenances/save/timezone?maintId=${this.state.maintenance.id}&timezone=${incomingTimezone}&timezoneLabel=${incomingTimezoneLabel}&updatedby=${activeUser}`, {
       method: 'get',
       headers: {
         'Access-Control-Allow-Origin': '*',
@@ -1626,7 +1613,6 @@ export default class Maintenance extends React.Component {
   }
 
   handleTextInputBlur = (element) => {
-    const host = window.location.host
     const newValue = eval(`this.state.maintenance.${element}`)
     const originalValue = eval(`this.props.jsonData.profile.${element}`)
     const maintId = this.state.maintenance.id
@@ -1643,7 +1629,7 @@ export default class Maintenance extends React.Component {
       })
       return
     }
-    fetch(`https://${host}/api/maintenances/save/textinput?maintId=${maintId}&element=${element}&value=${newValue}&updatedby=${activeUser}`, {
+    fetch(`/api/maintenances/save/textinput?maintId=${maintId}&element=${element}&value=${newValue}&updatedby=${activeUser}`, {
       method: 'get',
       headers: {
         'Access-Control-Allow-Origin': '*',
@@ -1672,7 +1658,6 @@ export default class Maintenance extends React.Component {
   }
 
   handleNotesBlur = (event) => {
-    const host = window.location.host
     const newValue = this.state.maintenance.notes
     const originalValue = this.props.jsonData.profile.notes
     const activeUserEmail = this.props.session.user.email
@@ -1687,7 +1672,7 @@ export default class Maintenance extends React.Component {
       })
       return
     }
-    fetch(`https://${host}/api/maintenances/save/notes?maintId=${maintId}&value=${newValue}&updatedby=${activeUser}`, {
+    fetch(`/api/maintenances/save/notes?maintId=${maintId}&value=${newValue}&updatedby=${activeUser}`, {
       method: 'get',
       headers: {
         'Access-Control-Allow-Origin': '*',
@@ -1716,7 +1701,6 @@ export default class Maintenance extends React.Component {
   }
 
   handleSupplierBlur = () => {
-    const host = window.location.host
     const newValue = this.state.maintenance.lieferant
     const maintId = this.state.maintenance.id
     const activeUserEmail = this.props.session.user.email
@@ -1727,7 +1711,7 @@ export default class Maintenance extends React.Component {
       })
       return
     }
-    fetch(`https://${host}/api/maintenances/save/supplier?maintId=${maintId}&value=${newValue}&updatedby=${activeUser}`, {
+    fetch(`/api/maintenances/save/supplier?maintId=${maintId}&value=${newValue}&updatedby=${activeUser}`, {
       method: 'get',
       headers: {
         'Access-Control-Allow-Origin': '*',
@@ -1764,7 +1748,6 @@ export default class Maintenance extends React.Component {
   // open / close Read Modal
   toggleReadModal = () => {
     if (!this.state.maintenance.incomingBody) {
-      const host = window.location.host
       const mailId = this.state.maintenance.mailId || this.state.maintenance.receivedmail
       if (mailId === 'NT') {
         cogoToast.warn('Self created Maintenance - No mail available', {
@@ -1772,7 +1755,7 @@ export default class Maintenance extends React.Component {
         })
         return
       }
-      fetch(`https://api.${host}/mail/${mailId}`, {
+      fetch(`/v1/api/mail/${mailId}`, {
         method: 'get'
       })
         .then(resp => resp.json())
@@ -1813,8 +1796,7 @@ export default class Maintenance extends React.Component {
       })
     }
     if (!this.state.readIconUrl) {
-      const host = window.location.host
-      fetch(`https://api.${host}/favicon?d=${this.props.jsonData.profile.mailDomain}`, {
+      fetch(`/v1/api/favicon?d=${this.props.jsonData.profile.mailDomain}`, {
         method: 'get'
       })
         .then(resp => resp.json())
@@ -1935,8 +1917,7 @@ export default class Maintenance extends React.Component {
     const newStartDateTime = moment.tz(this.state.reschedule.startDateTime, timezone).utc().format('YYYY-MM-DD HH:mm:ss')
     const newEndDateTime = moment.tz(this.state.reschedule.endDateTime, timezone).utc().format('YYYY-MM-DD HH:mm:ss')
 
-    const host = window.location.host
-    fetch(`https://${host}/api/reschedule/save?mid=${this.state.maintenance.id}&impact=${encodeURIComponent(newImpact)}&sdt=${encodeURIComponent(newStartDateTime)}&edt=${encodeURIComponent(newEndDateTime)}&rcounter=${this.state.rescheduleData.length + 1}&user=${encodeURIComponent(this.props.session.user.email)}&reason=${encodeURIComponent(newReason)}`, {
+    fetch(`/api/reschedule/save?mid=${this.state.maintenance.id}&impact=${encodeURIComponent(newImpact)}&sdt=${encodeURIComponent(newStartDateTime)}&edt=${encodeURIComponent(newEndDateTime)}&rcounter=${this.state.rescheduleData.length + 1}&user=${encodeURIComponent(this.props.session.user.email)}&reason=${encodeURIComponent(newReason)}`, {
       method: 'get'
     })
       .then(resp => resp.json())
@@ -1963,7 +1944,7 @@ export default class Maintenance extends React.Component {
         }
       })
       .catch(err => console.error(`Error Saving Reschedule - ${err}`))
-    fetch(`https://${host}/api/reschedule/increment?id=${this.state.maintenance.id}`, {
+    fetch(`/api/reschedule/increment?id=${this.state.maintenance.id}`, {
       method: 'get'
     })
       .then(resp => resp.json())
@@ -1979,8 +1960,7 @@ export default class Maintenance extends React.Component {
     const newEndDateTime = moment(params.data.endDateTime).format('YYYY.MM.DD HH:mm:ss')
     const newImpact = params.data.impact
 
-    const host = window.location.host
-    fetch(`https://${host}/api/reschedule/edit?mid=${this.state.maintenance.id}&impact=${encodeURIComponent(newImpact)}&sdt=${encodeURIComponent(newStartDateTime)}&edt=${encodeURIComponent(newEndDateTime)}&rcounter=${rcounter}&user=${encodeURIComponent(this.props.session.user.email)}`, {
+    fetch(`/api/reschedule/edit?mid=${this.state.maintenance.id}&impact=${encodeURIComponent(newImpact)}&sdt=${encodeURIComponent(newStartDateTime)}&edt=${encodeURIComponent(newEndDateTime)}&rcounter=${rcounter}&user=${encodeURIComponent(this.props.session.user.email)}`, {
       method: 'get'
     })
       .then(resp => resp.json())
@@ -2009,8 +1989,7 @@ export default class Maintenance extends React.Component {
     this.setState({
       rescheduleData: newRescheduleData
     })
-    const host = window.location.host
-    fetch(`https://${host}/api/reschedule/sent?mid=${this.state.maintenance.id}&rcounter=${rcounter}&sent=${newSentStatus}&user=${encodeURIComponent(this.props.session.user.email)}`, {
+    fetch(`/api/reschedule/sent?mid=${this.state.maintenance.id}&rcounter=${rcounter}&sent=${newSentStatus}&user=${encodeURIComponent(this.props.session.user.email)}`, {
       method: 'get'
     })
       .then(resp => resp.json())
@@ -2046,8 +2025,7 @@ export default class Maintenance extends React.Component {
   }
 
   handleDeleteReschedule = () => {
-    const host = window.location.host
-    fetch(`https://${host}/api/reschedule/delete?mid=${this.state.maintenance.id}&rcounter=${this.state.rescheduleToDelete.rcounter}&user=${encodeURIComponent(this.props.session.user.email)}`, {
+    fetch(`/api/reschedule/delete?mid=${this.state.maintenance.id}&rcounter=${this.state.rescheduleToDelete.rcounter}&user=${encodeURIComponent(this.props.session.user.email)}`, {
       method: 'get'
     })
       .then(resp => resp.json())
@@ -2277,8 +2255,7 @@ export default class Maintenance extends React.Component {
     }
     const updatedAtFormatted = format(new Date(updatedAt), 'yyyy-MM-dd HH:mm:ss')
 
-    const host = window.location.host
-    fetch(`https://${host}/api/maintenances/save/create?bearbeitetvon=${bearbeitetvon}&lieferant=${lieferant}&mailId=${mailId}&updatedAt=${updatedAtFormatted}&maileingang=${incomingFormatted}`, {
+    fetch(`/api/maintenances/save/create?bearbeitetvon=${bearbeitetvon}&lieferant=${lieferant}&mailId=${mailId}&updatedAt=${updatedAtFormatted}&maileingang=${incomingFormatted}`, {
       method: 'get'
     })
       .then(resp => resp.json())
@@ -2307,7 +2284,7 @@ export default class Maintenance extends React.Component {
     // mark mail as unread as well
     const incomingMailId = this.state.maintenance.mailId || this.state.maintenance.receivedmail
     if (incomingMailId !== 'NT') {
-      fetch(`https://api.${host}/inbox/delete`, {
+      fetch(`/v1/api/inbox/delete`, {
         method: 'post',
         body: JSON.stringify({ m: incomingMailId }),
         mode: 'cors',

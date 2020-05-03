@@ -18,8 +18,7 @@ import {
 
 export default class Templates extends React.Component {
   static async getInitialProps ({ req, query }) {
-    // const host = req ? req.headers['x-forwarded-host'] : location.host
-    // const pageRequest = `https://${host}/api/settings/lieferantcids`
+    // const pageRequest = `/api/settings/lieferantcids`
     // const res = await fetch(pageRequest)
     // const json = await res.json()
     // return {

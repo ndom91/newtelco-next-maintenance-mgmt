@@ -22,8 +22,7 @@ class InfiniteHistory extends React.Component {
       this.setState({ hasMore: false })
       return
     }
-    const host = window.location.host
-    const pageRequest = `https://${host}/api/maintenances/infinite?count=${this.state.count}`
+    const pageRequest = `/api/maintenances/infinite?count=${this.state.count}`
     fetch(pageRequest)
       .then(res => res.json())
       .then(data => {

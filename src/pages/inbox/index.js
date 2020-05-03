@@ -23,8 +23,7 @@ import {
 
 export default class Inbox extends React.PureComponent {
   static async getInitialProps ({ req, query }) {
-    const host = req ? req.headers['x-forwarded-host'] : location.host
-    const pageRequest = `https://api.${host}/inbox`
+    const pageRequest = `/v1/api/inbox`
     const res = await fetch(pageRequest, {
       mode: 'cors',
       headers: {
@@ -32,7 +31,7 @@ export default class Inbox extends React.PureComponent {
       }
     })
     const inboxContent = await res.json()
-    const pageRequest2 = `https://api.${host}/inbox/count`
+    const pageRequest2 = `/v1/api/inbox/count`
     const res2 = await fetch(pageRequest2)
     const count = await res2.json()
     let unreadCount
@@ -71,11 +70,10 @@ export default class Inbox extends React.PureComponent {
       inboxMails: this.props.inboxItems,
       unread: this.props.unread
     })
-    const host = window.location.host
     if (this.props.inboxItems.length > 0) {
       this.props.inboxItems.forEach((mail, index) => {
         const mailDomain = mail.domain
-        fetch(`https://api.${host}/favicon?d=${mailDomain}`, {
+        fetch(`/v1/api/favicon?d=${mailDomain}`, {
           method: 'get'
         })
           .then(resp => resp.json())
@@ -147,8 +145,7 @@ export default class Inbox extends React.PureComponent {
         translated: !this.state.translated
       })
     } else {
-      const host = window.location.host
-      fetch(`https://api.${host}/translate`, {
+      fetch(`/v1/api/translate`, {
         method: 'post',
         body: JSON.stringify({ q: modalBody }),
         mode: 'cors',
@@ -171,8 +168,7 @@ export default class Inbox extends React.PureComponent {
   }
 
   onDelete = (mailId) => {
-    const host = window.location.host
-    fetch(`https://api.${host}/inbox/delete`, {
+    fetch(`/v1/api/inbox/delete`, {
       method: 'post',
       body: JSON.stringify({ m: mailId }),
       mode: 'cors',

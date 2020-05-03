@@ -27,8 +27,7 @@ import {
 
 export default class SupplierCIDs extends React.Component {
   static async getInitialProps ({ req, query }) {
-    const host = req ? req.headers['x-forwarded-host'] : location.host
-    const pageRequest = `https://${host}/api/settings/lieferantcids`
+    const pageRequest = `/api/settings/lieferantcids`
     const res = await fetch(pageRequest)
     const json = await res.json()
     return {
@@ -82,8 +81,7 @@ export default class SupplierCIDs extends React.Component {
   }
 
   componentDidMount () {
-    const host = window.location.host
-    fetch(`https://${host}/api/lieferantcids/settings`, {
+    fetch(`/api/lieferantcids/settings`, {
       method: 'get'
     })
       .then(resp => resp.json())
@@ -94,7 +92,7 @@ export default class SupplierCIDs extends React.Component {
       })
       .catch(err => console.error(err))
     // fill Companies Select
-    fetch(`https://${host}/api/companies/selectmaint`, {
+    fetch(`/api/companies/selectmaint`, {
       method: 'get'
     })
       .then(resp => resp.json())
@@ -144,9 +142,8 @@ export default class SupplierCIDs extends React.Component {
   }
 
   handleDelete () {
-    const host = window.location.host
     const supplierCidId = this.state.supplierCidIdToDelete
-    fetch(`https://${host}/api/settings/delete/suppliercids?id=${supplierCidId}`, {
+    fetch(`/api/settings/delete/suppliercids?id=${supplierCidId}`, {
       method: 'get'
     })
       .then(resp => resp.json())
@@ -189,8 +186,7 @@ export default class SupplierCIDs extends React.Component {
       newSupplierCid
     } = this.state
 
-    const host = window.location.host
-    fetch(`https://${host}/api/settings/add/suppliercids?cid=${encodeURIComponent(newSupplierCid)}&company=${encodeURIComponent(newCompanySelection.value)}`, {
+    fetch(`/api/settings/add/suppliercids?cid=${encodeURIComponent(newSupplierCid)}&company=${encodeURIComponent(newCompanySelection.value)}`, {
       method: 'get'
     })
       .then(resp => resp.json())
@@ -220,8 +216,7 @@ export default class SupplierCIDs extends React.Component {
     const id = params.data.id
     const newSupplierCid = params.data.derenCID
 
-    const host = window.location.host
-    fetch(`https://${host}/api/settings/edit/suppliercids?id=${id}&suppliercid=${encodeURIComponent(newSupplierCid)}`, {
+    fetch(`/api/settings/edit/suppliercids?id=${id}&suppliercid=${encodeURIComponent(newSupplierCid)}`, {
       method: 'get'
     })
       .then(resp => resp.json())

@@ -51,11 +51,10 @@ import {
 // { maintenances, page, pageCount }
 export default class History extends React.Component {
   static async getInitialProps ({ req, query }) {
-    const host = req ? req.headers['x-forwarded-host'] : location.host
-    const pageRequest = `https://${host}/api/maintenances`
+    const pageRequest = `/api/maintenances`
     const res = await fetch(pageRequest)
     const json = await res.json()
-    const pageRequest2 = `https://api.${host}/inbox/count`
+    const pageRequest2 = `/v1/api/inbox/count`
     const res2 = await fetch(pageRequest2)
     const count = await res2.json()
     let display
@@ -256,8 +255,7 @@ export default class History extends React.Component {
     this.setState({
       openNewModal: !this.state.openNewModal
     })
-    const host = window.location.host
-    fetch(`https://${host}/api/companies/select`, {
+    fetch(`/api/companies/select`, {
       method: 'get'
     })
       .then(resp => resp.json())
@@ -290,9 +288,8 @@ export default class History extends React.Component {
   }
 
   handleDelete () {
-    const host = window.location.host
     const maintId = this.state.maintIdtoDelete
-    fetch(`https://${host}/api/maintenances/delete?maintId=${maintId}`, {
+    fetch(`/api/maintenances/delete?maintId=${maintId}`, {
       method: 'get'
     })
       .then(resp => resp.json())

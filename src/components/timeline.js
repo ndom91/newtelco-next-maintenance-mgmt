@@ -12,9 +12,8 @@ class Changelog extends React.Component {
   }
 
   componentDidMount () {
-    const host = window.location.host
     const maintId = this.props.maintid
-    fetch(`https://${host}/api/maintenances/history?mid=${maintId}`, {
+    fetch(`/api/maintenances/history?mid=${maintId}`, {
       method: 'get'
     })
       .then(resp => resp.json())

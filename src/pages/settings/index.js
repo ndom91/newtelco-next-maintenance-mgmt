@@ -23,8 +23,7 @@ import {
 
 class Settings extends React.Component {
   static async getInitialProps ({ req, query }) {
-    const host = req ? req.headers['x-forwarded-host'] : location.host
-    const pageRequest2 = `https://api.${host}/inbox/count`
+    const pageRequest2 = `/v1/api/inbox/count`
     const res2 = await fetch(pageRequest2)
     const count = await res2.json()
     let display

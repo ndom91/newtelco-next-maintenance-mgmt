@@ -33,8 +33,7 @@ import {
 
 export default class CustomerCIDs extends React.Component {
   static async getInitialProps ({ req, query }) {
-    const host = req ? req.headers['x-forwarded-host'] : location.host
-    const pageRequest = `https://${host}/api/settings/theircids` // ?page=${query.page || 1}&limit=${query.limit || 41}`
+    const pageRequest = `/api/settings/theircids` // ?page=${query.page || 1}&limit=${query.limit || 41}`
     const res = await fetch(pageRequest)
     const json = await res.json()
     return {
@@ -112,8 +111,7 @@ export default class CustomerCIDs extends React.Component {
   }
 
   componentDidMount () {
-    const host = window.location.host
-    fetch(`https://${host}/api/customercids`, {
+    fetch(`/api/customercids`, {
       method: 'get'
     })
       .then(resp => resp.json())
@@ -124,7 +122,7 @@ export default class CustomerCIDs extends React.Component {
       })
       .catch(err => console.error(err))
     // fill Companies Select
-    fetch(`https://${host}/api/companies/selectmaint`, {
+    fetch(`/api/companies/selectmaint`, {
       method: 'get'
     })
       .then(resp => resp.json())
@@ -135,7 +133,7 @@ export default class CustomerCIDs extends React.Component {
       })
       .catch(err => console.error(`Error - ${err}`))
     // fill Supplier Select
-    fetch(`https://${host}/api/lieferantcids/select`, {
+    fetch(`/api/lieferantcids/select`, {
       method: 'get'
     })
       .then(resp => resp.json())
@@ -197,9 +195,8 @@ export default class CustomerCIDs extends React.Component {
   }
 
   handleDelete () {
-    const host = window.location.host
     const customerCidId = this.state.customerCidIdToDelete
-    fetch(`https://${host}/api/settings/delete/customercids?id=${customerCidId}`, {
+    fetch(`/api/settings/delete/customercids?id=${customerCidId}`, {
       method: 'get'
     })
       .then(resp => resp.json())
@@ -244,8 +241,7 @@ export default class CustomerCIDs extends React.Component {
       newSupplierSelection
     } = this.state
 
-    const host = window.location.host
-    fetch(`https://${host}/api/settings/add/customercids?customercid=${encodeURIComponent(newNewtelcoCid)}&company=${encodeURIComponent(newCompanySelection.value)}&protection=${encodeURIComponent(newProtection)}&supplier=${encodeURIComponent(newSupplierSelection.value)}`, {
+    fetch(`/api/settings/add/customercids?customercid=${encodeURIComponent(newNewtelcoCid)}&company=${encodeURIComponent(newCompanySelection.value)}&protection=${encodeURIComponent(newProtection)}&supplier=${encodeURIComponent(newSupplierSelection.value)}`, {
       method: 'get'
     })
       .then(resp => resp.json())
@@ -287,8 +283,7 @@ export default class CustomerCIDs extends React.Component {
     const newCustomerCid = params.data.kundenCID
     const newProtected = params.data.protected
 
-    const host = window.location.host
-    fetch(`https://${host}/api/settings/edit/customercids?id=${id}&customercid=${encodeURIComponent(newCustomerCid)}&protected=${encodeURIComponent(newProtected)}`, {
+    fetch(`/api/settings/edit/customercids?id=${id}&customercid=${encodeURIComponent(newCustomerCid)}&protected=${encodeURIComponent(newProtected)}`, {
       method: 'get'
     })
       .then(resp => resp.json())

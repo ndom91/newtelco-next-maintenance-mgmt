@@ -8,7 +8,8 @@ import fetch from 'isomorphic-unfetch'
 import MaintPanel from '../components/panel'
 import UnreadBadge from '../components/unread'
 import {
-  FlexboxGrid
+  FlexboxGrid,
+  Placeholder
 } from 'rsuite'
 
 const BarChart = dynamic(
@@ -16,14 +17,15 @@ const BarChart = dynamic(
   { ssr: false }
 )
 const Heatmap = dynamic(
-  () => import('../components/heatmap'),
+  () => import('../components/homepage/heatmap'),
   { ssr: false }
 )
 
+const isServer = typeof window === "undefined";
+
 export default class Index extends React.Component {
   static async getInitialProps ({ res, req, query }) {
-    const host = req ? req.headers['x-forwarded-host'] : window.location.host
-    const pageRequest = `https://api.${host}/inbox/count`
+    const pageRequest = `/v1/api/inbox/count`
     const fetchRes = await fetch(pageRequest, {
       mode: 'cors',
       headers: {
@@ -68,7 +70,13 @@ export default class Index extends React.Component {
           <MaintPanel header='Maintenance'>
             <FlexboxGrid align='middle' justify='space-around' style={{ width: '100%' }}>
               <UnreadBadge count={this.props.jsonData.count} />
-              <BarChart />
+              {!isServer ? (
+                <React.Suspense fallback={<Placeholder.Graph active height='320' width='600' />}>
+                  <BarChart />
+                </React.Suspense>
+              ) : (
+                null
+              )}
             </FlexboxGrid>
             <FlexboxGrid align='middle' justify='space-around' style={{ width: '100%', padding: '50px' }}>
               <Heatmap />

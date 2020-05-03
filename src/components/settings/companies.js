@@ -27,8 +27,7 @@ import {
 
 export default class Companies extends React.Component {
   static async getInitialProps ({ req, query }) {
-    const host = req ? req.headers['x-forwarded-host'] : location.host
-    const pageRequest = `https://${host}/api/settings/companies`
+    const pageRequest = `/api/settings/companies`
     const res = await fetch(pageRequest)
     const json = await res.json()
     return {
@@ -90,8 +89,7 @@ export default class Companies extends React.Component {
   }
 
   componentDidMount () {
-    const host = window.location.host
-    fetch(`https://${host}/api/companies`, {
+    fetch(`/api/companies`, {
       method: 'get'
     })
       .then(resp => resp.json())
@@ -141,9 +139,8 @@ export default class Companies extends React.Component {
   }
 
   handleDelete () {
-    const host = window.location.host
     const companyId = this.state.companyIdToDelete
-    fetch(`https://${host}/api/settings/delete/companies?id=${companyId}`, {
+    fetch(`/api/settings/delete/companies?id=${companyId}`, {
       method: 'get'
     })
       .then(resp => resp.json())
@@ -187,8 +184,7 @@ export default class Companies extends React.Component {
       newRecipient
     } = this.state
 
-    const host = window.location.host
-    fetch(`https://${host}/api/settings/add/companies?name=${encodeURIComponent(newName)}&domain=${encodeURIComponent(newDomain)}&recipient=${encodeURIComponent(newRecipient)}`, {
+    fetch(`/api/settings/add/companies?name=${encodeURIComponent(newName)}&domain=${encodeURIComponent(newDomain)}&recipient=${encodeURIComponent(newRecipient)}`, {
       method: 'get'
     })
       .then(resp => resp.json())
@@ -220,8 +216,7 @@ export default class Companies extends React.Component {
     const newDomain = params.data.mailDomain
     const newRecipient = params.data.maintenanceRecipient
 
-    const host = window.location.host
-    fetch(`https://${host}/api/settings/edit/companies?id=${id}&name=${encodeURIComponent(newName)}&domain=${encodeURIComponent(newDomain)}&recipient=${encodeURIComponent(newRecipient)}`, {
+    fetch(`/api/settings/edit/companies?id=${id}&name=${encodeURIComponent(newName)}&domain=${encodeURIComponent(newDomain)}&recipient=${encodeURIComponent(newRecipient)}`, {
       method: 'get'
     })
       .then(resp => resp.json())
