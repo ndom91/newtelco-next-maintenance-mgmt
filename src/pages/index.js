@@ -7,6 +7,7 @@ import Router from 'next/router'
 import fetch from 'isomorphic-unfetch'
 import MaintPanel from '../components/panel'
 import UnreadBadge from '../components/unread'
+import Store from '../components/store'
 import {
   FlexboxGrid,
   Placeholder
@@ -23,71 +24,56 @@ const Heatmap = dynamic(
 
 const isServer = typeof window === "undefined";
 
-export default class Index extends React.Component {
-  static async getInitialProps ({ res, req, query }) {
-    const pageRequest = `/v1/api/inbox/count`
-    const fetchRes = await fetch(pageRequest, {
-      mode: 'cors',
-      headers: {
-        'Access-Control-Allow-Origin': '*'
-      }
-    })
-    const json = await fetchRes.json()
-    const mail = { count: 0 }
-    if (json !== 'No unread emails') {
-      mail.count = json.count
-    }
-    if (req && !req.user) {
-      if (res) {
-        res.writeHead(302, {
-          Location: '/auth'
-        })
-        res.end()
-      } else {
-        Router.push('/auth')
-      }
-    }
-    return {
-      jsonData: mail,
-      night: query.night,
-      session: await NextAuth.init({ req })
-    }
-  }
+const Index = props => {
+  const store = Store.useStore()
 
-  componentWillUnmount () {
-    clearInterval(this.unreadInterval)
-  }
-
-  onSearchSelection = selection => {
+  const onSearchSelection = selection => {
     const newLocation = `/maintenance?id=${selection.id}`
     Router.push(newLocation)
   }
 
-  render () {
-    if (this.props.session.user) {
-      return (
-        <Layout night={this.props.night} handleSearchSelection={this.onSearchSelection} session={this.props.session} count={this.props.jsonData.count}>
-          <MaintPanel header='Maintenance'>
-            <FlexboxGrid align='middle' justify='space-around' style={{ width: '100%' }}>
-              <UnreadBadge count={this.props.jsonData.count} />
-              {!isServer ? (
-                <React.Suspense fallback={<Placeholder.Graph active height='320' width='600' />}>
-                  <BarChart />
-                </React.Suspense>
-              ) : (
-                null
-              )}
-            </FlexboxGrid>
-            <FlexboxGrid align='middle' justify='space-around' style={{ width: '100%', padding: '50px' }}>
-              <Heatmap />
-            </FlexboxGrid>
-          </MaintPanel>
-        </Layout>
-      )
-    } else {
-      return (
-        <RequireLogin />
-      )
-    }
+  if (props.session.user) {
+    return (
+      <Layout night={props.night} handleSearchSelection={onSearchSelection} session={props.session} >
+        <MaintPanel header='Maintenance'>
+          <FlexboxGrid align='middle' justify='space-around' style={{ width: '100%' }}>
+            <UnreadBadge count={store.get('count')} />
+            {!isServer ? (
+              <React.Suspense fallback={<Placeholder.Graph active height='320' width='600' />}>
+                <BarChart />
+              </React.Suspense>
+            ) : (
+              null
+            )}
+          </FlexboxGrid>
+          <FlexboxGrid align='middle' justify='space-around' style={{ width: '100%', padding: '50px' }}>
+            <Heatmap />
+          </FlexboxGrid>
+        </MaintPanel>
+      </Layout>
+    )
+  } else {
+    return (
+      <RequireLogin />
+    )
   }
 }
+
+Index.getInitialProps = async ({ req }) => {
+  if (req && !req.user) {
+    if (res) {
+      res.writeHead(302, {
+        Location: '/auth'
+      })
+      res.end()
+    } else {
+      Router.push('/auth')
+    }
+  }
+  return {
+    night: req.query.night,
+    session: await NextAuth.init({ req })
+  }
+}
+
+export default Index

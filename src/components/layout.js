@@ -20,24 +20,25 @@ const UnreadFavicon = dynamic(
   { ssr: false }
 )
 
-const Layout = props => {
+const Layout = ({ session, children }) => {
   const [openA2HS, setOpenA2HS] = useState(false)
   const [deferredPrompt, setDeferredPrompt] = useState(null)
   const [night, setNight] = useState(false)
   const store = Store.useStore()
 
-  const { unreadCount } = useSWR(
+  const { data } = useSWR(
     `/v1/api/count`,
-    (...args) => fetch(...args).then(res => res.json()),
+    url => fetch(url).then(res => res.json()),
+    // (...args) => fetch(...args).then(res => res.json()),
     { refreshInterval: 30000, focusThrottleInterval: 10000 }
   )
+  console.log(data)
 
   useEffect(() => {
-    unreadCount !== 'No unread emails' && store.set('count')(unreadCount)
-  }, [unreadCount])
+    store.set('count')(data ? data.count : 0)
+  }, [data])
 
   useEffect(() => {
-    store.set('count')(props.count)
     Fonts()
 
     let nightStorage = window.localStorage.getItem('theme')
@@ -116,13 +117,13 @@ const Layout = props => {
   return (
     <div className='show-fake-browser navbar-page'>
       <KeyboardShortcuts>
-        <UnreadFavicon count={props.count} />
+        <UnreadFavicon count={store.get('count')} />
         <Container>
-          <MaintHeader unread={props.count} night={night} session={props.session} toggleNight={onToggleNight} signOut={onSignOutSubmit} />
+          <MaintHeader unread={store.get('count')} night={night} session={session} toggleNight={onToggleNight} signOut={onSignOutSubmit} />
           <Content>
             <FlexboxGrid justify='center'>
               <FlexboxGrid.Item colspan={23} style={{ marginTop: '20px' }}>
-                {props.children}
+                {children}
               </FlexboxGrid.Item>
             </FlexboxGrid>
           </Content>
