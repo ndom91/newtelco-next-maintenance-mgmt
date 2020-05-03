@@ -59,18 +59,8 @@ export default class History extends React.Component {
     const pageRequest = `${protocol}//${host}/api/maintenances`
     const res = await fetch(pageRequest)
     const json = await res.json()
-    const pageRequest2 = `${protocol}//${host}/v1/api/inbox/count`
-    const res2 = await fetch(pageRequest2)
-    const count = await res2.json()
-    let display
-    if (count === 'No unread emails') {
-      display = 0
-    } else {
-      display = count.count
-    }
     return {
       jsonData: json,
-      unread: display,
       night: query.night,
       session: await NextAuth.init({ req })
     }
