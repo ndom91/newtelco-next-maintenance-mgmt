@@ -34,7 +34,7 @@ const InboxItem = ({ toggle, mail, index, handleDelete }) => {
         }
       })
       .catch(err => console.error(err))
-  }, [])
+  }, [mail])
 
   return (
     <Panel key={mail.id}>
@@ -49,7 +49,7 @@ const InboxItem = ({ toggle, mail, index, handleDelete }) => {
               <Avatar
                 alt='Icon'
                 size='lg'
-                src={mail.faviconUrl}
+                src={faviconUrl}
                 style={{ backgroundColor: 'transparent' }}
                 onLoad={() => handleImageLoad()}
                 onError={() => handleImageLoad()}
