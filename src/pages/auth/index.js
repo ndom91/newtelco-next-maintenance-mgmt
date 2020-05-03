@@ -2,10 +2,6 @@ import React from 'react'
 import Router from 'next/router'
 import Link from 'next/link'
 import { NextAuth } from 'next-auth/client'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import {
-  faGoogle
-} from '@fortawesome/free-brands-svg-icons'
 import Fonts from '../../components/fonts'
 import {
   Container,
@@ -31,8 +27,6 @@ export default class App extends React.Component {
       email: '',
       session: this.props.session
     }
-    // this.handleEmailChange = this.handleEmailChange.bind(this)
-    // this.handleSignInSubmit = this.handleSignInSubmit.bind(this)
   }
 
   componentDidMount () {
@@ -62,31 +56,25 @@ export default class App extends React.Component {
   render () {
     if (this.props.session.user) {
       return (
-        <div className='container'>
-          <div className='text-center'>
-            <img width='384px' src='/static/images/nt-black.png' alt='Newtelco Maintenance' />
-          </div>
-          <div className='row'>
-            <div className='col-sm-5 mr-auto ml-auto'>
-              <LinkAccounts
-                session={this.props.session}
-                linkedAccounts={this.props.linkedAccounts}
-              />
-            </div>
-          </div>
-          <style jsx>{`
-            .text-center {
-              margin: 100px 0 10px 0;
-            } 
-            :global(.btn) {
-              margin-bottom: 10px;
-            }
-            :global(.btn-primary) {
-              margin-bottom: 30px;
-            }
-          `}
-          </style>
-        </div>
+        <Container>
+          <Content>
+            <FlexboxGrid justify='center' align='middle' style={{ height: '70vh', flexDirection: 'column' }}>
+              <FlexboxGrid justify='center' align='middle'>
+                <FlexboxGrid.Item colspan={20} style={{ maxWidth: '350px' }}>
+                  <img src='/static/images/nt-black.png' alt='Newtelco Maintenance' width='100%' />
+                </FlexboxGrid.Item>
+              </FlexboxGrid>
+              <FlexboxGrid.Item componentClass={Panel} colspan={8} md={10} sm={18}>
+                <Panel header='Sign in' bordered shaded style={{ backgroundColor: '#fff' }}>
+                  <LinkAccounts
+                    session={this.props.session}
+                    linkedAccounts={this.props.linkedAccounts}
+                  />
+                </Panel>
+              </FlexboxGrid.Item>
+            </FlexboxGrid>
+          </Content>
+        </Container>
       )
     } else {
       return (

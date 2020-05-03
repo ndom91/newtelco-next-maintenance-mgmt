@@ -3,18 +3,15 @@ import Link from 'next/link'
 import './inbox.css'
 import {
   Panel,
+  FlexboxGrid,
   IconButton,
   ButtonGroup,
   Whisper,
-  Tooltip
+  Tooltip,
+  Avatar
 } from 'rsuite'
-import {
-  ListGroupItem,
-  ListGroupItemHeading,
-  ListGroupItemText
-} from 'shards-react'
 
-const InboxItem = ({ mail, index, handleDelete }) => {
+const InboxItem = ({ toggle, mail, index, handleDelete }) => {
   const [loading, setLoading] = useState(true)
 
   const handleImageLoad = () => {
@@ -22,18 +19,20 @@ const InboxItem = ({ mail, index, handleDelete }) => {
   }
 
   return (
-    <Panel bordered key={mail.id}>
+    <Panel key={mail.id}>
       <div className='mail-wrapper'>
-        <Whisper speaker={<Tooltip>Read Mail</Tooltip>}>
+        <Whisper placement='top' speaker={<Tooltip>Read Mail</Tooltip>}>
           <IconButton
             loading={loading}
-            appearance='ghost'
-            className='read-mail-btn'
-            onClick={() => this.toggle(mail.id)}
+            appearance='link'
+            onClick={() => toggle(mail.id)}
+            style={{ height: '74px' }}
             icon={
-              <img
+              <Avatar
                 alt='Icon'
+                size='lg'
                 src={mail.faviconUrl}
+                style={{ backgroundColor: 'transparent' }}
                 onLoad={() => handleImageLoad()}
                 onError={() => handleImageLoad()}
               />
@@ -41,15 +40,15 @@ const InboxItem = ({ mail, index, handleDelete }) => {
           />
         </Whisper>
         <div className='mail-info'>
-          <ListGroupItemHeading>
-            <div className='inbox-from-text'>{mail.from}</div>
-            <div className='inbox-subject-text'>{mail.subject}</div>
-          </ListGroupItemHeading>
-          <ListGroupItemText>
-            {mail.snippet}
-          </ListGroupItemText>
+          <FlexboxGrid justify='start' align='middle' style={{ flexDirection: 'column' }}>
+            <FlexboxGrid.Item>
+              <h5>{mail.from}</h5>
+              <h5>{mail.subject}</h5>
+              <div>{mail.snippet}</div>
+            </FlexboxGrid.Item>
+          </FlexboxGrid>
         </div>
-        <ButtonGroup className='inbox-btn-group' vertical>
+        <ButtonGroup vertical>
           <Link
             href={{
               pathname: '/maintenance',

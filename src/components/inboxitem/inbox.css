@@ -13,9 +13,44 @@
   justify-content: center;
   align-items: center;
   border-color: var(--grey2);
-  transition: border 250 ease-in-out;
+  transition: border-color 250 ease-in-out;
 }
 
-.rs-btn.rs-btn-icon {
-  padding-left: 16px !important;
+.mail-info {
+  font-family: var(--font-body);
+}
+
+.mail-body {
+  border: 1px solid var(--grey2);
+  border-radius: 5px;
+}
+
+.mail-body::-webkit-scrollbar-track {
+  border-radius: 10px;
+  background-color: rgba(0,0,0,0);
+}
+.mail-body::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+  background-color: transparent;
+}
+.mail-body::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background-color: rgba(0,0,0,0.4);
+}
+
+.modal-textbox {
+  margin: 5px;
+}
+
+.modal-textbox input:hover {
+  cursor: default;
+}
+
+.rs-list-item-content .rs-panel-body {
+  padding: 10px;
+}
+
+.rs-list-item-content .rs-btn.rs-btn-icon {
+  padding-left: 14px;
 }

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import fetch from 'isomorphic-unfetch'
 import MaintHeader from './header'
 import Router from 'next/router'
 import dynamic from 'next/dynamic'
@@ -27,6 +26,7 @@ const Layout = props => {
   const store = Store.useStore()
 
   useEffect(() => {
+    store.set('count')(props.count)
     Fonts()
 
     let nightStorage = window.localStorage.getItem('theme')
