@@ -3,7 +3,6 @@ import Layout from '../../components/layout'
 import RequireLogin from '../../components/require-login'
 import fetch from 'isomorphic-unfetch'
 import { NextAuth } from 'next-auth/client'
-// import cogoToast from 'cogo-toast'
 import useSWR from 'swr'
 import MaintPanel from '../../components/panel'
 import InboxItem from '../../components/inboxitem'
@@ -23,25 +22,7 @@ import {
   Alert
 } from 'rsuite'
 
-// export default class Inbox extends React.PureComponent {
 const Inbox = props => {
-
-  // constructor (props) {
-  //   super(props)
-
-  //   this.state = {
-  //     images: [],
-  //     inboxMails: [],
-  //     open: false,
-  //     modalSubject: '',
-  //     modalFrom: '',
-  //     modalBody: '',
-  //     originalModayBody: '',
-  //     translated: false,
-  //     translateTooltipOpen: false,
-  //     unread: props.unread
-  //   }
-  // }
   const store = Store.useStore()
   const unread = store.get('count')
   const [isHtml, setIsHtml] = useState(false)
@@ -64,23 +45,27 @@ const Inbox = props => {
   useEffect(() => {
     if (inboxMails.length > 0) {
       inboxMails.forEach((mail, index) => {
-        const mailDomain = mail.domain
-        fetch(`/v1/api/favicon?d=${mailDomain}`, {
-          method: 'get'
-        })
-          .then(resp => resp.json())
-          .then(data => {
-            const iconUrl = data.icons
-            if (data.icons.substr(0, 4) !== 'http') {
-              const newInboxMails = inboxMails
-              newInboxMails[index].faviconUrl = `https://${iconUrl}`
-              setInboxMails(newInboxMails)
-            } else {
-              const newInboxMails = inboxMails
-              newInboxMails[index].faviconUrl = iconUrl
-              setInboxMails(newInboxMails)
-            }
+        if (mail.faviconUrl.length === 0) {
+          const mailDomain = mail.domain
+          fetch(`/v1/api/favicon?d=${mailDomain}`, {
+            method: 'get'
           })
+            .then(resp => resp.json())
+            .then(data => {
+              const iconUrl = data.icons
+              if (data.icons.substr(0, 4) !== 'http') {
+                // const newInboxMails = inboxMails
+                // newInboxMails[index].faviconUrl = `https://${iconUrl}`
+                mail.faviconUrl = `https://${iconUrl}`
+                inboxMails[index] = mail
+                setInboxMails(inboxMails)
+              } else {
+                const newInboxMails = inboxMails
+                newInboxMails[index].faviconUrl = iconUrl
+                setInboxMails(newInboxMails)
+              }
+            })
+        }
       })
     }
   }, [])
@@ -156,7 +141,7 @@ const Inbox = props => {
         if (data.status === 'complete') {
           Notify('success', 'Message Deleted')
           const newUnread = unread - 1
-          const array = [inboxMails]
+          const array = inboxMails
           const index = inboxMails.findIndex(el => el.id === data.id)
           if (index !== -1) {
             array.splice(index, 1)
@@ -169,10 +154,8 @@ const Inbox = props => {
   }
 
   if (props.session.user) {
-
     return (
       <Layout night={false} count={unread} session={props.session}>
-      {/* <Layout night={this.props.night} count={unread} session={this.props.session}> */}
         <MaintPanel header='Inbox'>
           {inboxMails.length === 0 ? (
             <FlexboxGrid justify='center' align='middle' style={{ margin: '40px 0' }}>
@@ -266,7 +249,6 @@ Inbox.getInitialProps = async ({ req }) => {
     const inboxContent = await res.json()
     return {
       inboxItems: inboxContent === 'No unread emails' ? [] : inboxContent,
-      // night: req.query.night,
       session: await NextAuth.init({ req })
     }
   }
