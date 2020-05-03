@@ -33,7 +33,12 @@ import {
 
 export default class CustomerCIDs extends React.Component {
   static async getInitialProps ({ req, query }) {
-    const pageRequest = `/api/settings/theircids` // ?page=${query.page || 1}&limit=${query.limit || 41}`
+    const host = req ? req.headers['x-forwarded-host'] : window.location.hostname
+    const protocol = 'https:'
+    if (host.indexOf('localhost') > -1) {
+      protocol = 'http:'
+    }
+    const pageRequest = `${protocol}//${host}/api/settings/theircids` // ?page=${query.page || 1}&limit=${query.limit || 41}`
     const res = await fetch(pageRequest)
     const json = await res.json()
     return {

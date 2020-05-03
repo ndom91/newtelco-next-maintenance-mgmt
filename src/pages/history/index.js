@@ -51,10 +51,15 @@ import {
 // { maintenances, page, pageCount }
 export default class History extends React.Component {
   static async getInitialProps ({ req, query }) {
-    const pageRequest = `/api/maintenances`
+    const host = req ? req.headers['x-forwarded-host'] : window.location.hostname
+    const protocol = 'https:'
+    if (host.indexOf('localhost') > -1) {
+      protocol = 'http:'
+    }
+    const pageRequest = `${protocol}//${host}/api/maintenances`
     const res = await fetch(pageRequest)
     const json = await res.json()
-    const pageRequest2 = `/v1/api/inbox/count`
+    const pageRequest2 = `${protocol}//${host}/v1/api/inbox/count`
     const res2 = await fetch(pageRequest2)
     const count = await res2.json()
     let display

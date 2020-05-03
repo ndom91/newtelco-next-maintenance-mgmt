@@ -32,7 +32,12 @@ import {
 
 export default class Freeze extends React.Component {
   static async getInitialProps ({ req, query }) {
-    const pageRequest = `/api/settings/freeze`
+    const host = req ? req.headers['x-forwarded-host'] : window.location.hostname
+    const protocol = 'https:'
+    if (host.indexOf('localhost') > -1) {
+      protocol = 'http:'
+    }
+    const pageRequest = `${protocol}//${host}/api/settings/freeze`
     const res = await fetch(pageRequest)
     const json = await res.json()
     return {

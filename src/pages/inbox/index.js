@@ -23,7 +23,12 @@ import {
 
 export default class Inbox extends React.PureComponent {
   static async getInitialProps ({ req, query }) {
-    const pageRequest = `/v1/api/inbox`
+    const host = req ? req.headers['x-forwarded-host'] : window.location.hostname
+    const protocol = 'https:'
+    if (host.indexOf('localhost') > -1) {
+      protocol = 'http:'
+    }
+    const pageRequest = `${protocol}//${host}/v1/api/inbox`
     const res = await fetch(pageRequest, {
       mode: 'cors',
       headers: {
@@ -31,18 +36,8 @@ export default class Inbox extends React.PureComponent {
       }
     })
     const inboxContent = await res.json()
-    const pageRequest2 = `/v1/api/inbox/count`
-    const res2 = await fetch(pageRequest2)
-    const count = await res2.json()
-    let unreadCount
-    if (count === 'No unread emails') {
-      unreadCount = 0
-    } else {
-      unreadCount = count.count
-    }
     return {
       inboxItems: inboxContent === 'No unread emails' ? [] : inboxContent,
-      unread: unreadCount,
       night: query.night,
       session: await NextAuth.init({ req })
     }
