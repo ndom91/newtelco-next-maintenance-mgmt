@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import './inbox.css'
 import {
@@ -13,10 +13,28 @@ import {
 
 const InboxItem = ({ toggle, mail, index, handleDelete }) => {
   const [loading, setLoading] = useState(true)
+  const [faviconUrl, setFaviconUrl] = useState('')
 
   const handleImageLoad = () => {
     setLoading(false)
   }
+
+  useEffect(() => {
+    fetch(`/v1/api/favicon?d=${mail.domain}`, {
+      method: 'get'
+    })
+      .then(resp => resp.json())
+      .then(data => {
+        const iconUrl = data.icons
+        if (data.icons.substr(0, 4) !== 'http') {
+          const newInboxMails = this.state.inboxMails
+          setFaviconUrl(`https://${iconUrl}`)
+        } else {
+          setFaviconUrl(iconUrl)
+        }
+      })
+      .catch(err => console.error(err))
+  }, [])
 
   return (
     <Panel key={mail.id}>
