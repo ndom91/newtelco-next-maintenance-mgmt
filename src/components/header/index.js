@@ -39,7 +39,7 @@ const MaintHeader = props => {
   }
 
   return (
-    <Header>
+    <Header className='header-wrapper'>
       <Navbar appearance='default' style={{ boxShadow: '0 5px 10px rgba(0,0,0,0.15)' }}>
         <Navbar.Header>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', marginLeft: '15px', marginRight: '10px' }}>

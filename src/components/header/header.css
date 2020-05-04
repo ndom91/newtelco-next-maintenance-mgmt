@@ -1,3 +1,9 @@
+.header-wrapper {
+  position: fixed;
+  width: 100%;
+  z-index: 999;
+}
+
 .rs-navbar-nav .rs-dropdown > .rs-dropdown-toggle {
   padding: 8px 0px 8px 0px;
 }

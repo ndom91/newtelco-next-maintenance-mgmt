@@ -33,9 +33,9 @@ const SearchInput = props => {
 
   const handleOuterClick = e => {
     // console.log(e.target.value)
-    console.log(searchInput.current)
+    // console.log(searchInput.current)
     if (searchInput && searchInput.current && !searchInput.current.contains(e.target)) {
-      console.log(algoliaClient)
+      // console.log(algoliaClient)
       setValue('')
     }
   }
