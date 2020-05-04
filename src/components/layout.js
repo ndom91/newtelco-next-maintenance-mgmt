@@ -29,7 +29,6 @@ const Layout = ({ session, children }) => {
   const { data } = useSWR(
     `/v1/api/count`,
     url => fetch(url).then(res => res.json()),
-    // (...args) => fetch(...args).then(res => res.json()),
     { refreshInterval: 30000, focusThrottleInterval: 10000 }
   )
 
