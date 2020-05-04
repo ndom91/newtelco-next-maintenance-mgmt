@@ -13,14 +13,17 @@ import {
   Placeholder
 } from 'rsuite'
 
-const BarChart = dynamic(
-  () => import('../components/homepage/barchart'),
-  { ssr: false }
-)
-const Heatmap = dynamic(
-  () => import('../components/homepage/heatmap'),
-  { ssr: false }
-)
+// const BarChart = dynamic(
+//   () => import('../components/homepage/barchart'),
+//   { ssr: false }
+// )
+// const Heatmap = dynamic(
+//   () => import('../components/homepage/heatmap'),
+//   { ssr: false }
+// )
+
+const BarChart = React.lazy(() => import('../components/homepage/barchart'))
+const Heatmap = React.lazy(() => import('../components/homepage/heatmap'))
 
 const isServer = typeof window === "undefined";
 
@@ -39,7 +42,7 @@ const Index = props => {
           <FlexboxGrid align='middle' justify='space-around' style={{ width: '100%' }}>
             <UnreadBadge count={store.get('count')} />
             {!isServer ? (
-              <React.Suspense fallback={<Placeholder.Graph active height='320' width='600' />}>
+              <React.Suspense fallback={<Placeholder.Graph active width='640px' height='375px' />}>
                 <BarChart />
               </React.Suspense>
             ) : (
@@ -47,7 +50,13 @@ const Index = props => {
             )}
           </FlexboxGrid>
           <FlexboxGrid align='middle' justify='space-around' style={{ width: '100%', padding: '50px' }}>
-            <Heatmap />
+            {!isServer ? (
+              <React.Suspense fallback={<Placeholder.Graph active height='165px' />}>
+                <Heatmap />
+              </React.Suspense>
+            ) : (
+              null
+            )}
           </FlexboxGrid>
         </MaintPanel>
       </Layout>
@@ -59,7 +68,7 @@ const Index = props => {
   }
 }
 
-Index.getInitialProps = async ({ req }) => {
+Index.getInitialProps = async ({ req, res }) => {
   if (req && !req.user) {
     if (res) {
       res.writeHead(302, {
