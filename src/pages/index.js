@@ -13,15 +13,6 @@ import {
   Placeholder
 } from 'rsuite'
 
-// const BarChart = dynamic(
-//   () => import('../components/homepage/barchart'),
-//   { ssr: false }
-// )
-// const Heatmap = dynamic(
-//   () => import('../components/homepage/heatmap'),
-//   { ssr: false }
-// )
-
 const BarChart = React.lazy(() => import('../components/homepage/barchart'))
 const Heatmap = React.lazy(() => import('../components/homepage/heatmap'))
 

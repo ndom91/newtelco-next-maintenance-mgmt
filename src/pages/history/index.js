@@ -87,7 +87,7 @@ const History = props => {
             field: 'name',
             cellRenderer: 'supplier',
             cellStyle: (params) => {
-              return { display: 'flex', alignItems: 'center', justifyContent: 'center' };
+              return { display: 'flex', alignItems: 'center', justifyContent: 'start' };
             }
           }, {
             headerName: 'Their CID',

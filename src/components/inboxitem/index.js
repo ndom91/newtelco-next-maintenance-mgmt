@@ -15,10 +15,6 @@ const InboxItem = ({ toggle, mail, index, handleDelete }) => {
   const [loading, setLoading] = useState(true)
   const [faviconUrl, setFaviconUrl] = useState('')
 
-  const handleImageLoad = () => {
-    setLoading(false)
-  }
-
   useEffect(() => {
     fetch(`/v1/api/favicon?d=${mail.domain}`, {
       method: 'get'
@@ -51,8 +47,8 @@ const InboxItem = ({ toggle, mail, index, handleDelete }) => {
                 size='lg'
                 src={faviconUrl}
                 style={{ backgroundColor: 'transparent' }}
-                onLoad={() => handleImageLoad()}
-                onError={() => handleImageLoad()}
+                onLoad={() => setLoading(false)}
+                onError={() => setLoading(false)}
               />
             }
           />
