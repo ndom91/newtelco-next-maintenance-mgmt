@@ -15,10 +15,9 @@ export default class EdittedBy extends Component {
         </span>
       )
     } else {
-      const r = Math.floor(Math.random() * 6) + 1
       return (
         <span>
-          <img className='user-pic' src={`/static/images/avatars/avatar${r}.svg`} width='32px' height='32px' />
+          <img className='user-pic' src={`/static/images/avatars/avatar.svg`} width='32px' height='32px' />
         </span>
       )
     }

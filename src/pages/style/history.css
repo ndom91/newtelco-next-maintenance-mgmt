@@ -1,12 +1,3 @@
-h1,
-h2,
-h3,
-h4,
-h5 {
-  font-family: Roboto, Helvetica !important;
-  font-weight: 500 !important;
-}
-
 .row-class {
   vertical-align: center;
 }
@@ -25,24 +16,8 @@ h5 {
   );
 }
 
-.ag-filter-select {
-	position: relative;
-	font-family: inherit;
-	background-color: transparent;
-	width: 179px;
-	padding: 10px 10px 10px 0;
-	font-size: 12px;
-	border-radius: 0;
-	border: none;
-	border-bottom: 1px solid rgba(0,0,0, 0.12);
-}
-
-.ag-filter-select:focus {
-  outline: none;
-	border-bottom: 1px solid rgba(0,0,0, 0);
-}
-
 .ag-tooltip {
+  font-family: var(--font-body);
   border: 2px solid var(--secondary) !important;
   border-radius: 5px !important;
   background: #fff !important;
@@ -70,6 +45,14 @@ div.ag-row-selected {
 
 .user-pic:hover {
   filter: grayscale(0%);
-  box-shadow: 0 5px 10px 1px rgba(0,0,0,0.4);
-  transform: translateY(-3px);
+  box-shadow: 0 5px 10px 1px rgba(0,0,0,0.15);
+}
+
+.ag-root {
+  font-family: var(--font-body);
+}
+
+.ag-header-cell-text {
+  font-family: var(--font-body);
+  font-size: 110%;
 }

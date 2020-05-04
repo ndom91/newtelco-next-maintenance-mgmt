@@ -71,7 +71,7 @@ Index.getInitialProps = async ({ req }) => {
     }
   }
   return {
-    night: req.query.night,
+    // night: req.query.night,
     session: await NextAuth.init({ req })
   }
 }

@@ -32,7 +32,6 @@ const Layout = ({ session, children }) => {
     // (...args) => fetch(...args).then(res => res.json()),
     { refreshInterval: 30000, focusThrottleInterval: 10000 }
   )
-  console.log(data)
 
   useEffect(() => {
     store.set('count')(data ? data.count : 0)
@@ -115,7 +114,7 @@ const Layout = ({ session, children }) => {
   }
 
   return (
-    <div className='show-fake-browser navbar-page'>
+    <div>
       <KeyboardShortcuts>
         <UnreadFavicon count={store.get('count')} />
         <Container>
