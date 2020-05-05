@@ -10,7 +10,6 @@ import CustomerCIDs from '../../components/settings/customercids'
 import SupplierCIDs from '../../components/settings/suppliercids'
 import Freeze from '../../components/settings/freeze'
 import Templates from '../../components/settings/templates'
-import UnreadCount from '../../components/unreadcount'
 import Footer from '../../components/cardFooter'
 import {
   Nav,
@@ -28,7 +27,7 @@ class Settings extends React.Component {
     if (host.indexOf('localhost') > -1) {
       protocol = 'http:'
     }
-    const pageRequest2 = `${protocol}//${host}/v1/api/inbox/count`
+    const pageRequest2 = `${protocol}//${host}/v1/api/count`
     const res2 = await fetch(pageRequest2)
     const count = await res2.json()
     let display
@@ -122,7 +121,6 @@ class Settings extends React.Component {
     if (this.props.session.user) {
       return (
         <Layout night={this.props.night} unread={this.props.unread} handleSearchSelection={this.onSearchSelection} session={this.props.session}>
-          {UnreadCount()}
           <Card className='top-card-wrapper' style={{ maxWidth: '100%' }}>
             <CardHeader>
               <h2>Settings</h2>
