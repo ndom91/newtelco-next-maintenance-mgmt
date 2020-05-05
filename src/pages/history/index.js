@@ -18,6 +18,7 @@ import EndDateTime from '../../components/ag-grid/enddatetime'
 import MailArrived from '../../components/ag-grid/mailarrived'
 import UpdatedAt from '../../components/ag-grid/updatedat'
 import Supplier from '../../components/ag-grid/supplier'
+import RescheduledIcon from '../../components/ag-grid/rescheduled'
 import CompleteIcon from '../../components/ag-grid/complete'
 import { CSSTransition } from 'react-transition-group'
 import EdittedBy from '../../components/ag-grid/edittedby'
@@ -53,132 +54,134 @@ import {
 
 const History = props => {
   const gridOptions = {
-        defaultColDef: {
-          resizable: true,
-          sortable: true,
-          filter: true,
-          selectable: true
-        },
-        columnDefs: [
-          {
-            headerName: '',
-            width: 80,
-            sortable: false,
-            filter: false,
-            resizable: false,
-            cellRenderer: 'editBtn',
-            pinned: 'left'
-          }, {
-            headerName: 'ID',
-            field: 'id',
-            width: 100,
-            pinned: 'left',
-            sort: { direction: 'asc', priority: 0 }
-          }, {
-            headerName: 'By',
-            field: 'bearbeitetvon',
-            cellRenderer: 'edittedby',
-            width: 100,
-            cellStyle: (params) => {
-              return { display: 'flex', alignItems: 'center', justifyContent: 'center' };
-            }
-          }, {
-            headerName: 'Supplier',
-            field: 'name',
-            cellRenderer: 'supplier',
-            cellStyle: (params) => {
-              return { display: 'flex', alignItems: 'center', justifyContent: 'start' };
-            }
-          }, {
-            headerName: 'Their CID',
-            field: 'derenCID',
-            tooltipField: 'derenCID'
-          }, {
-            headerName: 'Start',
-            field: 'startDateTime',
-            width: 160,
-            cellRenderer: 'startdateTime'
-          }, {
-            headerName: 'End',
-            field: 'endDateTime',
-            width: 160,
-            cellRenderer: 'enddateTime'
-          }, {
-            headerName: 'Newtelco CIDs',
-            field: 'betroffeneCIDs',
-            tooltipField: 'betroffeneCIDs'
-          }, {
-            headerName: 'Mail Arrived',
-            field: 'maileingang',
-            cellRenderer: 'mailArrived'
-          }, {
-            headerName: 'Updated',
-            field: 'updatedAt',
-            cellRenderer: 'updatedAt'
-          }, {
-            headerName: 'Rescheduled',
-            field: 'rescheduled',
-            width: 150,
-            cellStyle: {
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              height: '100%'
-            }
-          }, {
-            headerName: 'Complete',
-            field: 'done',
-            width: 100,
-            pinned: 'right',
-            cellRenderer: 'complete'
-          }
-        ],
-        context: { componentParent: this },
-        frameworkComponents: {
-          editBtn: EditBtn,
-          startdateTime: StartDateTime,
-          enddateTime: EndDateTime,
-          mailArrived: MailArrived,
-          updatedAt: UpdatedAt,
-          supplier: Supplier,
-          complete: CompleteIcon,
-          edittedby: EdittedBy
-        },
-        rowSelection: 'multiple',
-        paginationPageSize: 10,
-        rowClass: 'row-class',
-        rowClassRules: {
-          'row-completed': (params) => {
-            const done = params.data.done
-            if (done === 'true' || done === '1') {
-              return true
-            }
-            return false
-          },
-          'row-cancelled': (params) => {
-            const cancelled = params.data.cancelled
-            if (cancelled === 'true' || cancelled === '1') {
-              return true
-            }
-            return false
-          },
-          'row-emergency': (params) => {
-            const emergency = params.data.emergency
-            if (emergency === 'true' || emergency === '1') {
-              return true
-            }
-            return false
-          }
+    defaultColDef: {
+      resizable: true,
+      sortable: true,
+      filter: true,
+      selectable: true
+    },
+    columnDefs: [
+      {
+        headerName: '',
+        width: 80,
+        sortable: false,
+        filter: false,
+        resizable: false,
+        cellRenderer: 'editBtn',
+        pinned: 'left'
+      }, {
+        headerName: 'ID',
+        field: 'id',
+        width: 100,
+        pinned: 'left',
+        sort: { direction: 'asc', priority: 0 }
+      }, {
+        headerName: 'By',
+        field: 'bearbeitetvon',
+        cellRenderer: 'edittedby',
+        width: 100,
+        cellStyle: (params) => {
+          return { display: 'flex', alignItems: 'center', justifyContent: 'center' };
         }
+      }, {
+        headerName: 'Supplier',
+        field: 'name',
+        cellRenderer: 'supplier',
+        cellStyle: (params) => {
+          return { display: 'flex', alignItems: 'center', justifyContent: 'start' };
+        }
+      }, {
+        headerName: 'Their CID',
+        field: 'derenCID',
+        tooltipField: 'derenCID'
+      }, {
+        headerName: 'Start',
+        field: 'startDateTime',
+        width: 160,
+        cellRenderer: 'startdateTime'
+      }, {
+        headerName: 'End',
+        field: 'endDateTime',
+        width: 160,
+        cellRenderer: 'enddateTime'
+      }, {
+        headerName: 'Newtelco CIDs',
+        field: 'betroffeneCIDs',
+        tooltipField: 'betroffeneCIDs'
+      }, {
+        headerName: 'Mail Arrived',
+        field: 'maileingang',
+        cellRenderer: 'mailArrived'
+      }, {
+        headerName: 'Updated',
+        field: 'updatedAt',
+        cellRenderer: 'updatedAt'
+      }, {
+        headerName: 'Rescheduled',
+        field: 'rescheduled',
+        width: 150,
+        cellRenderer: 'rescheduledIcon',
+        cellStyle: {
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100%'
+        }
+      }, {
+        headerName: 'Complete',
+        field: 'done',
+        width: 100,
+        pinned: 'right',
+        cellRenderer: 'complete'
       }
+    ],
+    context: { componentParent: this },
+    frameworkComponents: {
+      editBtn: EditBtn,
+      startdateTime: StartDateTime,
+      enddateTime: EndDateTime,
+      mailArrived: MailArrived,
+      updatedAt: UpdatedAt,
+      supplier: Supplier,
+      complete: CompleteIcon,
+      edittedby: EdittedBy,
+      rescheduledIcon: RescheduledIcon
+    },
+    rowSelection: 'multiple',
+    paginationPageSize: 10,
+    rowClass: 'row-class',
+    rowClassRules: {
+      'row-completed': (params) => {
+        const done = params.data.done
+        if (done === 'true' || done === '1') {
+          return true
+        }
+        return false
+      },
+      'row-cancelled': (params) => {
+        const cancelled = params.data.cancelled
+        if (cancelled === 'true' || cancelled === '1') {
+          return true
+        }
+        return false
+      },
+      'row-emergency': (params) => {
+        const emergency = params.data.emergency
+        if (emergency === 'true' || emergency === '1') {
+          return true
+        }
+        return false
+      }
+    }
+  }
 
-    const gridApi = useRef();
+  const gridApi = useRef();
 
-    const [openNewModal, setOpenNewModal] = useState(false)
-    const [openConfirmDeleteModal, setOpenConfirmDeleteModal] = useState(false)
-    const [rowData, setRowData] = useState(props.jsonData.maintenances)
-    const [newMaintenanceInfo, setNewMaintenanceInfo] = useState({})
-    const [idToDelete, setIdToDelete] = useState('')
+  const [openNewModal, setOpenNewModal] = useState(false)
+  const [openConfirmDeleteModal, setOpenConfirmDeleteModal] = useState(false)
+  const [rowData, setRowData] = useState(props.jsonData.maintenances)
+  const [newMaintenanceInfo, setNewMaintenanceInfo] = useState({})
+  const [idToDelete, setIdToDelete] = useState('')
 
   const handleGridReady = params => {
     gridApi.current = params.api;  // <== this is how you save it

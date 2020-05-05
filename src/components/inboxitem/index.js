@@ -40,7 +40,7 @@ const InboxItem = ({ toggle, mail, index, handleDelete }) => {
             loading={loading}
             appearance='link'
             onClick={() => toggle(mail.id)}
-            style={{ height: '74px' }}
+            style={{ height: '74px', flexBasis: '100px' }}
             icon={
               <Avatar
                 alt='Icon'
@@ -62,7 +62,7 @@ const InboxItem = ({ toggle, mail, index, handleDelete }) => {
             </FlexboxGrid.Item>
           </FlexboxGrid>
         </div>
-        <ButtonGroup vertical>
+        <ButtonGroup vertical style={{ flexBasis: '80px' }}>
           <Link
             href={{
               pathname: '/maintenance',

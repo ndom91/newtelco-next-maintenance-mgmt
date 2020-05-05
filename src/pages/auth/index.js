@@ -65,7 +65,7 @@ export default class App extends React.Component {
                 </FlexboxGrid.Item>
               </FlexboxGrid>
               <FlexboxGrid.Item componentClass={Panel} colspan={8} md={10} sm={18}>
-                <Panel header='Sign in' bordered shaded style={{ backgroundColor: '#fff' }}>
+                <Panel header='Sign in' bordered shaded style={{ backgroundColor: '#fff'  }}>
                   <LinkAccounts
                     session={this.props.session}
                     linkedAccounts={this.props.linkedAccounts}
@@ -82,12 +82,27 @@ export default class App extends React.Component {
           <Content>
             <FlexboxGrid justify='center' align='middle' style={{ height: '70vh', flexDirection: 'column' }}>
               <FlexboxGrid justify='center' align='middle'>
-                <FlexboxGrid.Item colspan={20} style={{ maxWidth: '350px' }}>
+                <FlexboxGrid.Item colspan={20} style={{ maxWidth: '350px', marginBottom: '30px' }}>
                   <img src='/static/images/nt-black.png' alt='Newtelco Maintenance' width='100%' />
                 </FlexboxGrid.Item>
               </FlexboxGrid>
-              <FlexboxGrid.Item componentClass={Panel} colspan={8} md={10} sm={18}>
-                <Panel header='Sign in' bordered shaded style={{ backgroundColor: '#fff' }}>
+              <FlexboxGrid.Item colspan={8} md={10} sm={18}>
+                <Panel 
+                  header={
+                    <div style={{ width: '100%', textAlign: 'center' }}>
+                      <span 
+                        style={{ 
+                          fontSize: '1.5rem', 
+                        }}
+                      >
+                        Maintenance Application
+                      </span>
+                    </div>
+                  } 
+                  bordered 
+                  shaded 
+                  style={{ backgroundColor: '#fff', fontFamily: 'var(--font-body)' }}
+                >
                   <SignInButtons providers={this.props.providers} />
                 </Panel>
               </FlexboxGrid.Item>

@@ -18,6 +18,10 @@
 
 .mail-info {
   font-family: var(--font-body);
+  flex-grow: 1;
+  display: flex;
+  justify-content: flex-start;
+  margin-left: 10px;
 }
 
 .mail-body {

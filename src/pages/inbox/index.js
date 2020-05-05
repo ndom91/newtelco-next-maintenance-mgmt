@@ -54,14 +54,14 @@ const Inbox = props => {
             .then(data => {
               const iconUrl = data.icons
               if (data.icons.substr(0, 4) !== 'http') {
-                // const newInboxMails = inboxMails
-                // newInboxMails[index].faviconUrl = `https://${iconUrl}`
                 mail.faviconUrl = `https://${iconUrl}`
                 inboxMails[index] = mail
                 setInboxMails(inboxMails)
               } else {
-                const newInboxMails = inboxMails
-                newInboxMails[index].faviconUrl = iconUrl
+                mail.faviconUrl = iconUrl
+                inboxMails[index] = mail
+                // const newInboxMails = inboxMails
+                // newInboxMails[index].faviconUrl = iconUrl
                 setInboxMails(newInboxMails)
               }
             })
@@ -165,7 +165,7 @@ const Inbox = props => {
               </FlexboxGrid.Item>
             </FlexboxGrid>
           ) : (
-            <List bordered>
+            <List bordered style={{ width: '100%' }}>
               {Array.isArray(inboxMails) && inboxMails.map((mail, index) => {
                 return (
                   <List.Item key={index}>
@@ -185,7 +185,7 @@ const Inbox = props => {
           <Modal className='mail-modal-body' autoFocus backdrop show={isOpen} size='lg' onHide={() => toggle(null)} full>
             <Modal.Header>
               <FlexboxGrid justify='start' align='middle' style={{ width: '100%' }}>
-                <FlexboxGrid.Item colspan={2}>
+                <FlexboxGrid.Item colspan={2} style={{ display: 'flex', justifyContent: 'center' }}>
                   <Avatar
                     size='lg'
                     src={modalInfo.favicon}
