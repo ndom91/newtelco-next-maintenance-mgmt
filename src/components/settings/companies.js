@@ -256,7 +256,7 @@ export default class Companies extends React.Component {
     }
 
     return (
-      <>
+      <div style={{ width: '100%' }}>
         <HotKeys keyMap={keyMap} handlers={handlers}>
           <CardTitle>
             <span className='section-title'>Companies</span>
@@ -452,7 +452,7 @@ export default class Companies extends React.Component {
             `}
           </style>
         </HotKeys>
-      </>
+      </div>
     )
   }
 }

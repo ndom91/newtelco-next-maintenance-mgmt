@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react'
-import '../style/history.css'
+import './history.css'
 import Layout from '../../components/layout'
 import { AgGridReact } from 'ag-grid-react'
 import 'ag-grid-community/dist/styles/ag-grid.css'
@@ -22,19 +22,6 @@ import EdittedBy from '../../components/ag-grid/edittedby'
 import MaintPanel from '../../components/panel'
 import Notify from '../../lib/notification'
 import ConfirmModal from '../../components/confirmmodal'
-import {
-  Card,
-  CardHeader,
-  CardBody,
-  ButtonToolbar,
-  // Modal,
-  // ModalHeader,
-  // ModalBody,
-  Container,
-  FormGroup,
-  Col,
-  Row
-} from 'shards-react'
 import {
   Icon,
   Button,
@@ -306,7 +293,7 @@ const History = props => {
 
   if (props.session.user) {
     return (
-      <Layout night={props.night} handleSearchSelection={onSearchSelection} unread={props.unread} session={props.session}>
+      <Layout session={props.session}>
         <MaintPanel 
           header='History' 
           buttons={
