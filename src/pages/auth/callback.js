@@ -75,7 +75,7 @@ export default class extends React.Component {
             <circle cx='30' cy='30' r='15' />
           </svg>
           <noscript>
-          Click here to continue
+            Click here to continue
           </noscript>
         </a>
       </>

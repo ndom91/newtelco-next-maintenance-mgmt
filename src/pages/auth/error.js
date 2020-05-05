@@ -1,5 +1,14 @@
 import React from 'react'
 import Link from 'next/link'
+import Fonts from '../../components/fonts'
+import {
+  Container,
+  FlexboxGrid,
+  Panel,
+  Content,
+  IconButton,
+  Icon
+} from 'rsuite'
 
 export default class extends React.Component {
   static async getInitialProps ({ query }) {
@@ -13,12 +22,16 @@ export default class extends React.Component {
   render () {
     if (this.props.action === 'signin' && this.props.type === 'oauth') {
       return (
-        <div className='row mt-5'>
-          <div className='col-sm-6 mr-auto ml-auto'>
-            <div className='card mt-3 mb-3'>
-              <h4 className='card-header'>Unable to sign in</h4>
-              <div className='card-body pb-0'>
-                <div className='row'>
+        <Container>
+          <Content>
+            <FlexboxGrid justify='center' align='middle' style={{ height: '70vh', flexDirection: 'column' }}>
+              <FlexboxGrid justify='center' align='middle'>
+                <FlexboxGrid.Item colspan={20} style={{ maxWidth: '350px' }}>
+                  <img src='/static/images/nt-black.png' alt='Newtelco Maintenance' width='100%' />
+                </FlexboxGrid.Item>
+              </FlexboxGrid>
+              <FlexboxGrid.Item componentClass={Panel} colspan={8} md={10} sm={18}>
+                <Panel header='Sign in' bordered shaded style={{ backgroundColor: '#fff'  }}>
                   <div className='col-sm-10 mr-auto ml-auto mb-5'>
                     <p className='lead'>An account associated with your email address already exists.</p>
                     <Link href='/auth'>
@@ -46,31 +59,53 @@ export default class extends React.Component {
                       </p>
                     </div>
                   </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+                </Panel>
+              </FlexboxGrid.Item>
+            </FlexboxGrid>
+          </Content>
+        </Container>
       )
     } else if (this.props.action === 'signin' && this.props.type === 'token-invalid') {
       return (
-        <div className='container'>
-          <div className='text-center'>
-            <h1 className='display-4 mt-5 mb-2'>Link not valid</h1>
-            <p className='lead'>This sign in link is no longer valid.</p>
-            <p className='lead'><Link href='/auth'><a>Get a new sign in link</a></Link></p>
-          </div>
-        </div>
+        <Container>
+          <Content>
+            <FlexboxGrid justify='center' align='middle' style={{ height: '70vh', flexDirection: 'column' }}>
+              <FlexboxGrid justify='center' align='middle'>
+                <FlexboxGrid.Item colspan={20} style={{ maxWidth: '350px' }}>
+                  <img src='/static/images/nt-black.png' alt='Newtelco Maintenance' width='100%' />
+                </FlexboxGrid.Item>
+              </FlexboxGrid>
+              <FlexboxGrid.Item componentClass={Panel} colspan={8} md={10} sm={18}>
+                <Panel header='Sign in' bordered shaded style={{ backgroundColor: '#fff'  }}>
+                  <h1 className='display-4 mt-5 mb-2'>Link not valid</h1>
+                  <p className='lead'>This sign in link is no longer valid.</p>
+                  <p className='lead'><Link href='/auth'><a>Get a new sign in link</a></Link></p>
+                </Panel>
+              </FlexboxGrid.Item>
+            </FlexboxGrid>
+          </Content>
+        </Container>
       )
     } else {
       return (
-        <div className='container'>
-          <div className='text-center'>
-            <h1 className='display-4 mt-5'>Error signing in</h1>
-            <p className='lead'>An error occured while trying to sign in.</p>
-            <p className='lead'><Link href='/auth'><a>Sign in with email or another service</a></Link></p>
-          </div>
-        </div>
+        <Container>
+          <Content>
+            <FlexboxGrid justify='center' align='middle' style={{ height: '70vh', flexDirection: 'column' }}>
+              <FlexboxGrid justify='center' align='middle'>
+                <FlexboxGrid.Item colspan={20} style={{ maxWidth: '350px' }}>
+                  <img src='/static/images/nt-black.png' alt='Newtelco Maintenance' width='100%' />
+                </FlexboxGrid.Item>
+              </FlexboxGrid>
+              <FlexboxGrid.Item componentClass={Panel} colspan={8} md={10} sm={18}>
+                <Panel header='Sign in' bordered shaded style={{ backgroundColor: '#fff'  }}>
+                  <h1 className='display-4 mt-5'>Error signing in</h1>
+                  <p className='lead'>An error occured while trying to sign in.</p>
+                  <p className='lead'><Link href='/auth'><a>Sign in with email or another service</a></Link></p>
+                </Panel>
+              </FlexboxGrid.Item>
+            </FlexboxGrid>
+          </Content>
+        </Container>
       )
     }
   }
