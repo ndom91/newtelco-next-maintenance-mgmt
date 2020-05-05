@@ -169,19 +169,19 @@ const History = props => {
     gridApi.current = params.api;  // <== this is how you save it
   }
 
-  const onFirstDataRendered = (params) => {
+  const onFirstDataRendered = params => {
     params.columnApi.autoSizeColumns()
     params.api.redrawRows()
   }
 
   const handleGridExport = () => {
-    if (window.gridApi) {
+    if (gridApi.current) {
       const params = {
         allColumns: true,
         fileName: `maintenanceExport_${moment(new Date()).format('YYYYMMDD')}`,
         columnSeparator: ','
       }
-      window.gridApi.exportDataAsCsv(params)
+      gridApi.current.exportDataAsCsv(params)
     }
   }
 

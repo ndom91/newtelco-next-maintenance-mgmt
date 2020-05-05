@@ -18,30 +18,6 @@ import {
 } from 'rsuite'
 
 const Settings = ({ session, router }) => {
-  const [active, setActive] = useState({ active: {
-      companies: router.query.tab === 'companies',
-      customercids: router.query.tab === 'customercids',
-      suppliercids: router.query.tab === 'suppliercids',
-      templates: router.query.tab === 'templates',
-      freeze: router.query.tab === 'freeze'
-    }}
-  )
-
-  useEffect(() => {
-    if (router.asPath) {
-      const pathname = router.asPath
-      const pathMatch = pathname.match(/^\/(.*)\/(.*)/)
-      if (pathMatch && pathMatch[2]) {
-        setActive({
-          active: {
-            ...this.state.active,
-            [pathMatch[2]]: true
-          }
-        })
-      }
-    }
-  }, [])
-
   const { tab } = router.query
 
   const SettingsNav = () => {
@@ -49,22 +25,22 @@ const Settings = ({ session, router }) => {
       <Nav appearance='subtle'>
         <Nav.Item key={tab} componentClass='div' active={tab === 'companies'}>
           <Link href={{ pathname: '/settings', query: { tab: 'companies' } }}>
-            Companies
+            <a>Companies</a>
           </Link>
         </Nav.Item>
         <Nav.Item componentClass='div'  active={tab === 'customercids'}>
           <Link href={{ pathname: '/settings', query: { tab: 'customercids' } }}>
-            Customer CIDs
+            <a>Customer CIDs</a>
           </Link>
         </Nav.Item>
         <Nav.Item componentClass='div' active={tab === 'suppliercids'}>
           <Link href={{ pathname: '/settings', query: { tab: 'suppliercids' } }}>
-            Supplier CIDs
+            <a>Supplier CIDs</a>
           </Link>
         </Nav.Item>
         <Nav.Item componentClass='div' active={tab === 'freeze'}>
           <Link href={{ pathname: '/settings', query: { tab: 'freeze' } }}>
-            Freeze
+            <a>Freeze</a>
           </Link>
         </Nav.Item>
         {/* <Nav.Item>Templates</Nav.Item> */}
