@@ -971,62 +971,43 @@ const Maintenance = props => {
   /// /////////////////////////////////////////////////////////
 
   // mail preview modal change
-  handleMailPreviewChange = (content, delta, source, editor) => {
-    this.setState({ mailBodyText: editor.getContents() })
+  const handleMailPreviewChange = (content, delta, source, editor) => {
+    setMailBodyText(editor.getContents())
   }
 
-  // react-select change cmoponent for supplier CIDs - change
-  handleSelectLieferantChange = selectedOption => {
+  // react-select onChange - supplier CIDs
+  const handleSelectLieferantChange = selectedOption => {
     if (selectedOption) {
-      this.setState({
-        kundencids: []
-      })
+      setKundencids([])
       selectedOption.forEach(option => {
-        this.fetchMailCIDs(option.value)
+        fetchMailCIDs(option.value)
       })
-      this.setState({
-        selectedLieferant: selectedOption
-      })
+      setSelectedLieferant(selectedOption)
     }
   }
 
-  handleEditorChange = (data) => {
-    this.setState({
-      mailBodyText: data.level.content
-    })
+  const handleEditorChange = (data) => {
+    setMailBodyText(data.level.content)
   }
 
-  handleNotesChange = (data) => {
-    const newMaint = {
-      ...this.state.maintenance,
-      notes: data.level.content
-    }
-
-    this.setState({
-      maintenance: newMaint
-    })
-  }
-
-  handleCreatedByChange (data) {
-    // dummy
+  const handleNotesChange = (data) => {
+    setMaintenance({...maintenance, notes: data.level.content})
   }
 
   saveDateTime = (maintId, element, newValue) => {
-    let newISOTime = moment.tz(newValue, this.state.maintenance.timezone)
+    let newISOTime = moment.tz(newValue, maintenance.timezone)
     if (maintId === 'NEW') {
-      cogoToast.warn('No CID assigned - Cannot Save', {
-        position: 'top-right'
-      })
+      Notify('error', 'Save Not Possible', 'No CID yet assigned.')
       return
     }
     newISOTime = newISOTime.utc().format('YYYY-MM-DD HH:mm:ss')
-    const activeUserEmail = this.props.session.user.email
+    const activeUserEmail = props.session.user.email
     const activeUser = activeUserEmail.substring(0, activeUserEmail.lastIndexOf('@'))
     fetch(`/api/maintenances/save/dateTime?maintId=${maintId}&element=${element}&value=${newISOTime}&updatedby=${activeUser}`, {
       method: 'get',
       headers: {
         'Access-Control-Allow-Origin': '*',
-        _csrf: this.props.session.csrfToken
+        _csrf: props.session.csrfToken
       }
     })
       .then(resp => resp.json())
@@ -1040,70 +1021,48 @@ const Maintenance = props => {
       .catch(err => console.error(err))
   }
 
-  handleStartDateChange (date) {
-    console.log(date)
+  const handleStartDateChange = date => {
     const startDate = moment(date[0]).format('YYYY-MM-DD HH:mm:ss')
 
-    this.setState({
-      maintenance: {
-        ...this.state.maintenance,
-        startDateTime: startDate
-      }
-    })
-    this.saveDateTime(this.state.maintenance.id, 'start', startDate)
-    const startDateTime = this.state.maintenance.startDateTime
-    const endDateTime = this.state.maintenance.endDateTime
+    setMaintenance({...maintenance, startDateTime: startDate})
+    saveDateTime(maintenance.id, 'start', startDate)
+    const startDateTime = maintenance.startDateTime
+    const endDateTime = maintenance.endDateTime
 
     if (startDateTime && endDateTime && isValid(parseISO(startDateTime)) && isValid(parseISO(endDateTime))) {
       const impactCalculation = formatDistance(parseISO(endDateTime), parseISO(startDateTime))
-      this.setState({
-        impactPlaceholder: impactCalculation
-      })
+      setImpactPlaceholder(impactCalculation)
     }
   }
 
-  handleEndDateChange (date) {
-    console.log(date)
+  const handleEndDateChange = date => {
     const endDate = moment(date[0]).format('YYYY-MM-DD HH:mm:ss')
 
-    this.setState({
-      maintenance: {
-        ...this.state.maintenance,
-        endDateTime: endDate
-      }
-    })
-    this.saveDateTime(this.state.maintenance.id, 'end', endDate)
-    const startDateTime = this.state.maintenance.startDateTime
-    const endDateTime = this.state.maintenance.endDateTime
+    setMaintenance({...maintenance, endDateTime: endDate})
+    saveDateTime(maintenance.id, 'end', endDate)
+    const startDateTime = maintenance.startDateTime
+    const endDateTime = maintenance.endDateTime
 
     if (startDateTime && endDateTime && isValid(parseISO(startDateTime)) && isValid(parseISO(endDateTime))) {
       const dateCompare = compareAsc(parseISO(endDateTime), parseISO(startDateTime))
       if (dateCompare !== 1) {
-        cogoToast.warn('End date is before Start date', {
-          position: 'top-right'
-        })
-        this.setState({
-          dateTimeWarning: true
-        })
+        Notify('warning', 'End date is before start date!')
+        setDateTimeWarning(true)
       } else {
-        if (this.state.dateTimeWarning) {
-          this.setState({
-            dateTimeWarning: false
-          })
+        if (dateTimeWarning) {
+          setDateTimeWarning(false)
         }
       }
       const impactCalculation = formatDistance(parseISO(endDateTime), parseISO(startDateTime))
-      this.setState({
-        impactPlaceholder: impactCalculation
-      })
+      setImpactPlaceholder(impactCalculation)
     }
   }
 
-  handleToggleChange = (element, event) => {
-    const maintId = this.state.maintenance.id
-    const activeUserEmail = this.props.session.user.email
+  const handleToggleChange = (element, event) => {
+    const maintId = maintenance.id
+    const activeUserEmail = props.session.user.email
     const activeUser = activeUserEmail.substring(0, activeUserEmail.lastIndexOf('@'))
-    let newValue = !eval(`this.state.maintenance.${element}`)
+    let newValue = !eval(`maintenance.${element}`)
     if (typeof newValue === 'string') {
       if (newValue === 'false') {
         newValue = false
@@ -1111,33 +1070,21 @@ const Maintenance = props => {
         newValue = true
       }
     }
-
-    this.setState({
-      maintenance: {
-        ...this.state.maintenance,
-        [element]: newValue
-      }
-    })
+    setMaintenance({...maintenance, [element]: newValue })
 
     if (element === 'done') {
       // save 'betroffeneCIDs'
       let impactedCIDs = ''
-      this.state.kundencids.forEach(cid => {
-        impactedCIDs = impactedCIDs + cid.kundenCID + ' '
+      kundencids.forEach(cid => {
+        impactedCIDs += cid.kundenCID + ' '
       })
 
       impactedCIDs = impactedCIDs.trim()
 
-      this.setState({
-        maintenance: {
-          ...this.state.maintenance,
-          betroffeneCIDs: impactedCIDs,
-          [element]: newValue
-        }
-      })
+      setMaintenance({...maintenance, betroffeneCIDs: impactedCIDs, [element]: newValue})
 
-      if (this.state.maintenance.receivedmail) {
-        const mailId = this.state.maintenance.receivedmail
+      if (maintenance.receivedmail) {
+        const mailId = maintenance.receivedmail
         if (!mailId.startsWith('NT-')) {
           fetch(`/v1/api/inbox/markcomplete`, {
             method: 'post',
@@ -1151,28 +1098,24 @@ const Maintenance = props => {
             .then(resp => resp.json())
             .then(data => {
               if (data.id === 500) {
-                cogoToast.warn('Error moving to Completed Label', {
-                  position: 'top-right'
-                })
+                Notify('error', 'Error moving Mail to Complete Label')
               }
             })
             .catch(err => console.error(`Error - ${err}`))
         }
       }
 
-      fetch(`/api/maintenances/save/impactedcids?cids=${impactedCIDs}&maintId=${this.state.maintenance.id}&updatedby=${activeUser}`, {
+      fetch(`/api/maintenances/save/impactedcids?cids=${impactedCIDs}&maintId=${state.maintenance.id}&updatedby=${activeUser}`, {
         method: 'get',
         headers: {
           'Access-Control-Allow-Origin': '*',
-          _csrf: this.props.session.csrfToken
+          _csrf: props.session.csrfToken
         }
       })
         .then(resp => resp.json())
         .then(data => {
           if (!data.status === 200) {
-            cogoToast.warn('Impacted CIDs Not Saved', {
-              position: 'top-right'
-            })
+            Notify('error', 'Impacted CIDs Not Saved')
           }
         })
         .catch(err => console.error(`Error - ${err}`))
@@ -1184,113 +1127,65 @@ const Maintenance = props => {
     }
 
     if (maintId === 'NEW') {
-      cogoToast.warn('No CID assigned - Cannot Save', {
-        position: 'top-right'
-      })
+      Notify('error', 'No CID Assigned', 'Cannot save updates.')
       return
     }
     fetch(`/api/maintenances/save/toggle?maintId=${maintId}&element=${element}&value=${newValue}&updatedby=${activeUser}`, {
       method: 'get',
       headers: {
         'Access-Control-Allow-Origin': '*',
-        _csrf: this.props.session.csrfToken
+        _csrf: props.session.csrfToken
       }
     })
       .then(resp => resp.json())
       .then(data => {
         if (data.status === 200 && data.statusText === 'OK') {
-          cogoToast.success('Save Success', {
-            position: 'top-right'
-          })
+          Notify('success', 'Save Success')
         } else {
-          cogoToast.warn(`Error - ${data.err}`, {
-            position: 'top-right'
-          })
+          Notify('error', 'Error Saving', data.err)
         }
       })
       .catch(err => console.error(err))
   }
 
   handleReasonChange = (event) => {
-    this.setState({
-      maintenance: {
-        ...this.state.maintenance,
-        reason: encodeURIComponent(event.target.value)
-      }
-    })
+    setMaintenance({...maintenance, reason: encodeURIComponent(event.target.value)})
   }
 
   handleMaintNoteChange = (event) => {
-    this.setState({
-      maintenance: {
-        ...this.state.maintenance,
-        maintNote: encodeURIComponent(event.target.value)
-      }
-    })
+    setMaintenance({...maintenance, maintNote: encodeURIComponent(event.target.value)})
   }
 
   handleLocationChange = (event) => {
-    this.setState({
-      maintenance: {
-        ...this.state.maintenance,
-        location: event.target.value
-      }
-    })
+    setMaintenance({...maintenance, location: event.target.value})
   }
 
   handleImpactChange = (event) => {
-    this.setState({
-      maintenance: {
-        ...this.state.maintenance,
-        impact: event.target.value
-      }
-    })
+    setMaintenance({...maintenance, impact: event.target.value})
   }
 
   handleTimezoneChange = (selection) => {
     const timezoneLabel = selection.label // 'Europe/Amsterdam'
     const timezoneValue = selection.value // '(GMT+02:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna'
 
-    this.setState({
-      maintenance: {
-        ...this.state.maintenance,
-        timezone: timezoneValue,
-        timezoneLabel: timezoneLabel
-      }
-    })
+    setMaintenance({...maintenance, timezone: timezoneValue, timezoneLabel: timezoneLabel })
   }
 
   handleUpdatedByChange = () => {
-    const value = this.state.maintenance.updatedBy
-    this.setState({
-      maintenance: {
-        ...this.state.maintenance,
-        updatedBy: value
-      }
-    })
+    const value = maintenance.updatedBy
+    setMaintenance({...maintenance, updatedBy: value })
   }
 
   handleUpdatedAtChange = () => {
     const value = this.state.maintenance.updatedAt
-    this.setState({
-      maintenance: {
-        ...this.state.maintenance,
-        updatedAt: value
-      }
-    })
+    setMaintenance({...maintenance, updatedAt: value })
   }
 
   handleSupplierChange = (selectedOption) => {
-    this.setState({
-      maintenance: {
-        ...this.state.maintenance,
-        lieferant: selectedOption.value,
-        name: selectedOption.label
-      },
-      selectedLieferant: [],
-      kundencids: []
-    })
-    this.fetchLieferantCIDs(selectedOption.value)
+    setMaintenance({...maintenance, lieferant: selectedOption.value, name: selectedOption.label })
+    setSelectedLieferant([])
+    setKundencids([])
+    fetchLieferantCIDs(selectedOption.value)
   }
 
   /// /////////////////////////////////////////////////////////
@@ -2275,7 +2170,7 @@ const Maintenance = props => {
                             <Col style={{ width: '30vw' }}>
                               <FormGroup>
                                 <label htmlFor='edited-by'>Created By</label>
-                                <FormInput tabIndex='-1' readOnly id='edited-by-input' name='edited-by' type='text' value={maintenance.bearbeitetvon} onChange={this.handleCreatedByChange} />
+                                <FormInput tabIndex='-1' readOnly id='edited-by-input' name='edited-by' type='text' value={maintenance.bearbeitetvon} />
                               </FormGroup>
                               <FormGroup>
                                 <label htmlFor='supplier'>Timezone</label>
