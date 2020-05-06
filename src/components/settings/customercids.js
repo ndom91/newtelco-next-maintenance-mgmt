@@ -20,7 +20,8 @@ import {
   Button,
   Icon,
   ButtonGroup,
-  Toggle
+  Toggle,
+  Loader
 } from 'rsuite'
 
 const CustomerCIDs = props => {
@@ -86,8 +87,10 @@ const CustomerCIDs = props => {
     ],
     rowSelection: 'single',
     frameworkComponents: {
-      protectedIcon: ProtectedIcon
-    }
+      protectedIcon: ProtectedIcon,
+      customLoadingOverlay: Loader
+    },
+    loadingOverlayComponent: 'customLoadingOverlay'
   }
 
   useEffect(() => {

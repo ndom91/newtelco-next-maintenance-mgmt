@@ -24,7 +24,8 @@ import {
   Input,
   ControlLabel,
   HelpBlock,
-  DatePicker
+  DatePicker,
+  Loader
 } from 'rsuite'
 
 const Freeze = props => { 
@@ -82,8 +83,10 @@ const Freeze = props => {
     rowSelection: 'single',
     frameworkComponents: {
       startdateTime: StartDateTime,
-      enddateTime: EndDateTime
-    }
+      enddateTime: EndDateTime,
+      customLoadingOverlay: Loader
+    },
+    loadingOverlayComponent: 'customLoadingOverlay'
   }
 
   useEffect(() => {

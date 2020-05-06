@@ -18,7 +18,8 @@ import {
   FormGroup,
   ControlLabel,
   HelpBlock,
-  Modal
+  Modal,
+  Loader
 } from 'rsuite'
 
 const Companies = props => {
@@ -53,7 +54,11 @@ const Companies = props => {
         field: 'maintenanceRecipient'
       }
     ],
-    rowSelection: 'single'
+    rowSelection: 'single',
+    frameworkComponents: {
+      customLoadingOverlay: Loader
+    },
+    loadingOverlayComponent: 'customLoadingOverlay'
   }
 
   const gridApi = useRef()

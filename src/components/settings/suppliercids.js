@@ -18,7 +18,8 @@ import {
   Input,
   FlexboxGrid,
   Modal,
-  ControlLabel
+  ControlLabel,
+  Loader
 } from 'rsuite'
 
 const SupplierCIDs = props => {
@@ -58,7 +59,11 @@ const SupplierCIDs = props => {
         width: 200
       }
     ],
-    rowSelection: 'single'
+    rowSelection: 'single',
+    frameworkComponents: {
+      customLoadingOverlay: Loader
+    },
+    loadingOverlayComponent: 'customLoadingOverlay'
   }
 
   useEffect(() => {

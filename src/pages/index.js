@@ -10,7 +10,8 @@ import UnreadBadge from '../components/unread'
 import Store from '../components/store'
 import {
   FlexboxGrid,
-  Placeholder
+  Placeholder,
+  Loader
 } from 'rsuite'
 
 const BarChart = React.lazy(() => import('../components/homepage/barchart'))
@@ -33,7 +34,7 @@ const Index = props => {
           <FlexboxGrid align='middle' justify='space-around' style={{ width: '100%' }}>
             <UnreadBadge count={store.get('count')} />
             {!isServer ? (
-              <React.Suspense fallback={<Placeholder.Graph active width='640px' height='375px' />}>
+              <React.Suspense fallback={<Placeholder.Graph height='375px' width='640px' />}>
                 <BarChart />
               </React.Suspense>
             ) : (
@@ -42,7 +43,7 @@ const Index = props => {
           </FlexboxGrid>
           <FlexboxGrid align='middle' justify='space-around' style={{ width: '100%', padding: '50px' }}>
             {!isServer ? (
-              <React.Suspense fallback={<Placeholder.Graph active height='165px' />}>
+              <React.Suspense fallback={<Placeholder.Graph active height='165px' style={{ maxWidth: '1300px' }} />}>
                 <Heatmap />
               </React.Suspense>
             ) : (
