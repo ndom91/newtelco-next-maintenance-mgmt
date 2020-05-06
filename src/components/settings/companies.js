@@ -78,12 +78,14 @@ const Companies = props => {
       .then(resp => resp.json())
       .then(data => {
         setRowData(data.companies)
+        gridApi.current.hideOverlay()
       })
       .catch(err => console.error(err))
   }, [])
 
   const handleGridReady = params => {
     gridApi.current = params.api
+    gridApi.current.showLoadingOverlay()
     params.api.sizeColumnsToFit()
     params.api.setSortModel({ colId: 'name', sort: 'asc' })
   };

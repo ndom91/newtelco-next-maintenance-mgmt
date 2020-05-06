@@ -96,6 +96,7 @@ const CustomerCIDs = props => {
     })
       .then(resp => resp.json())
       .then(data => {
+        gridApi.current.hideOverlay()
         setRowData(data.customercids)
       })
       .catch(err => console.error(err))
@@ -121,6 +122,7 @@ const CustomerCIDs = props => {
 
   const handleGridReady = params => {
     gridApi.current = params.api
+    gridApi.current.showLoadingOverlay()
     gridColumnApi.current = params.columnApi
     params.api.sizeColumnsToFit()
   };

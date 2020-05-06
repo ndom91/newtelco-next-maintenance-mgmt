@@ -67,6 +67,7 @@ const SupplierCIDs = props => {
     })
       .then(resp => resp.json())
       .then(data => {
+        gridApi.current.hideOverlay()
         setRowData(data.lieferantCIDsResult)
       })
       .catch(err => console.error(err))
@@ -83,6 +84,7 @@ const SupplierCIDs = props => {
 
   const handleGridReady = params => {
     gridApi.current = params.api
+    gridApi.current.showLoadingOverlay()
     gridColumnApi.current = params.columnApi
     params.api.sizeColumnsToFit()
   }
@@ -172,21 +174,21 @@ const SupplierCIDs = props => {
 
   const Header = () => {
     return (
-        <FlexboxGrid justify='space-between' align='middle'>
-          <FlexboxGrid.Item>
-            Newtelco CIDs
-          </FlexboxGrid.Item>
-          <FlexboxGrid.Item>
-            <ButtonGroup>
-              <IconButton onClick={toggleSupplierCidAdd} icon={<Icon icon='plus-circle' />} appearance='ghost' placement='right'>
-                Add
-              </IconButton>
-              <IconButton onClick={toggleSupplierCidDeleteModal} icon={<Icon icon='trash' />} appearance='ghost' placement='right'>
-                Delete
-              </IconButton>
-            </ButtonGroup>
-          </FlexboxGrid.Item>
-        </FlexboxGrid>
+      <FlexboxGrid justify='space-between' align='middle'>
+        <FlexboxGrid.Item>
+          Newtelco CIDs
+        </FlexboxGrid.Item>
+        <FlexboxGrid.Item>
+          <ButtonGroup>
+            <IconButton onClick={toggleSupplierCidAdd} icon={<Icon icon='plus-circle' />} appearance='ghost' placement='right'>
+              Add
+            </IconButton>
+            <IconButton onClick={toggleSupplierCidDeleteModal} icon={<Icon icon='trash' />} appearance='ghost' placement='right'>
+              Delete
+            </IconButton>
+          </ButtonGroup>
+        </FlexboxGrid.Item>
+      </FlexboxGrid>
     )
   }
 

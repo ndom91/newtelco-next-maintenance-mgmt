@@ -5,3 +5,12 @@
 .section .rs-panel-heading {
   background-color: #fff;
 }
+
+.ag-root {
+  font-family: var(--font-body);
+}
+
+.ag-header-cell-text {
+  font-family: var(--font-body);
+  font-size: 110%;
+}
