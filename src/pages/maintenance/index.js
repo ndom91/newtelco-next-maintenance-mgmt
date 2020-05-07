@@ -28,12 +28,16 @@ import ProtectedIcon from '../../components/ag-grid/protected'
 import SentIcon from '../../components/ag-grid/sent'
 import StartDateTime from '../../components/ag-grid/startdatetime'
 import EndDateTime from '../../components/ag-grid/enddatetime'
+import sentBtn from '../../components/ag-grid/sentBtn'
+import sendMailBtns from '../../components/ag-grid/sendMailBtns'
 import { AgGridReact } from 'ag-grid-react'
 import PDF from 'react-pdf-js-infinite'
 import root from 'react-shadow'
 import dynamic from 'next/dynamic'
 import Popover from 'react-popover'
 import { saveAs } from 'file-saver'
+
+import MaintPanel from '../../components/panel'
 
 import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-material.css'
@@ -96,66 +100,9 @@ const Changelog = dynamic(
   { ssr: false }
 )
 
-const sentBtn = (row, actionA, actionB) => {
-  return (
-    <ButtonGroup>
-      <Button onClick={() => actionA(row.data.rcounter)} style={{ padding: '0.75em' }} size='sm' outline>
-        <Tooltip
-          title='Toggle Sent Status'
-          position='top'
-          trigger='mouseenter'
-          delay='250'
-          distance='25'
-          interactiveBorder='15'
-          arrow
-          size='small'
-          theme='transparent'
-        >
-          <FontAwesomeIcon width='1.325em' icon={row.data.sent === 1 ? faCheck : faTimesCircle} />
-        </Tooltip>
-      </Button>
-      <Button onClick={() => actionB(row.data.startDateTime, row.data.endDateTime, row.data.rcounter)} style={{ padding: '0.7em' }} size='sm' outline>
-        <Tooltip
-          title='Move Calendar Entry'
-          position='top'
-          trigger='mouseenter'
-          delay='250'
-          distance='25'
-          interactiveBorder='15'
-          arrow
-          size='small'
-          theme='transparent'
-        >
-          <FontAwesomeIcon width='1.325em' icon={faCalendarCheck} />
-        </Tooltip>
-      </Button>
-    </ButtonGroup>
-  )
-}
-
-const sendMailBtns = (row, actionA, actionB) => {
-  return (
-    <ButtonGroup>
-      <Button onClick={() => actionA(row.data.maintenanceRecipient, row.data.kundenCID, row.data.frozen, row.data.name)} style={{ padding: '0.7em' }} size='sm' outline>
-        <FontAwesomeIcon width='1.325em' icon={faPaperPlane} />
-      </Button>
-      <Button onClick={() => actionB(row.data.maintenanceRecipient, row.data.kundenCID, row.data.protected)} style={{ padding: '0.7em' }} size='sm' outline>
-        <FontAwesomeIcon width='1.325em' icon={faSearch} />
-      </Button>
-    </ButtonGroup>
-  )
-}
-
 const HALF_WIDTH = 600
 
-// export default class Maintenance extends React.Component {
 const Maintenance = props => {
-  // constructor (props) {
-  //   super(props)
-  //   let night
-  //   if (typeof window !== 'undefined') {
-  //     night = window.localStorage.getItem('theme')
-  //   }
   const [width, setWidth] = useState(0)
   const [maintenance, setMaintenance] = useState({
     incomingAttachments: [],
@@ -228,8 +175,8 @@ const Maintenance = props => {
 
   const gridApi = useRef()
   const gridColumnApi = useRef()
-  const reschedGridApi = useRef()
-  const reschedGridColumnApi = useRef()
+  const rescheduleGridApi = useRef()
+  const rescheduleGridColumnApi = useRef()
 
   const rescheduleGridOptions = {
     defaultColDef: {
@@ -284,10 +231,11 @@ const Maintenance = props => {
     ],
     rowSelection: 'single',
     paginationPageSize: 10,
+    context: { moveCalendarEntry: moveCalendarEntry, toggleRescheduleSentBtn: toggleRescheduleSentBtn },
     frameworkComponents: {
       startdateTime: StartDateTime,
       enddateTime: EndDateTime,
-      sentBtn: sentBtn(toggleRescheduleSentBtn, moveCalendarEntry)
+      sentBtn: sentBtn
     }
   }
   const gridOptions = {
@@ -344,8 +292,9 @@ const Maintenance = props => {
         }
       }
     ],
+    context: { prepareDirectSend: prepareDirectSend, togglePreviewModal: togglePreviewModal },
     frameworkComponents: {
-      sendMailBtn: sendMailBtns(prepareDirectSend, togglePreviewModal),
+      sendMailBtn: sendMailBtns,
       protectedIcon: ProtectedIcon,
       sentIcon: SentIcon
     },
@@ -621,6 +570,7 @@ const Maintenance = props => {
     const subject = `Planned Work Notification - NT-${maintenance.id}`
     sendMail(recipient, customerCID, subject, HtmlBody, false)
   }
+
 
   // generate Mail contents
   const generateMail = (customerCID, protection) => {
@@ -1428,7 +1378,6 @@ const Maintenance = props => {
     }
   }
 
-  // open / close send preview modal
   const togglePreviewModal = (recipient, customerCID, protection) => {
     if (recipient && customerCID) {
       const HtmlBody = generateMail(customerCID, protection)
@@ -1444,6 +1393,7 @@ const Maintenance = props => {
     }
     mailSubjectText()
   }
+
 
   const toggleHelpModal = () => {
     setOpenHelpModal(!openHelpModal)
@@ -1743,7 +1693,7 @@ const Maintenance = props => {
         const mime = file.mime
         let base64 = (filedata).replace(/_/g, '/')
         base64 = base64.replace(/-/g, '+')
-        setAttachmentHtmlContent(attachmentHTMLContent: window.atob(base64)),
+        setAttachmentHtmlContent(window.atob(base64)),
         setAttachmentDetails({
           filetype: filetype,
           currentAttachment: id || null,
@@ -1915,119 +1865,123 @@ const Maintenance = props => {
   // }
 
   if (props.session.user) {
+    const HeaderLeft = () => {
+      return (
+        <>
+          <ButtonGroup size='md'>
+            <Button onClick={() => Router.back()}>
+              <FontAwesomeIcon icon={faArrowLeft} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
+                Back
+            </Button>
+            <Button onClick={toggleReadModal} outline>
+              <Tooltip
+                title='Open Incoming Mail'
+                position='bottom'
+                trigger='mouseenter'
+                delay='250'
+                distance='25'
+                interactiveBorder='15'
+                arrow
+                size='small'
+                theme='transparent'
+              >
+                <FontAwesomeIcon icon={faEnvelopeOpenText} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
+                Read
+              </Tooltip>
+            </Button>
+          </ButtonGroup>
+          <span className='maint-header-text-wrapper'>
+            <Badge theme='secondary' style={{ fontSize: '2rem', marginRight: '20px', maxWidth: '140px' }} outline>
+              {maintenanceIdDisplay}
+            </Badge>
+            <h2 style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', display: 'inline-block', marginBottom: '0px' }}>{maintenance.name}</h2>
+          </span>
+        </>
+      )
+    }
+    const HeaderRight = () => {
+      return (
+        <ButtonGroup className='btn-group-2' size='md'>
+          <Button outline onClick={toggleRescheduleModal}>
+            <Tooltip
+              title='Create New Reschedule'
+              position='bottom'
+              trigger='mouseenter'
+              delay='250'
+              distance='25'
+              interactiveBorder='15'
+              arrow
+              size='small'
+              theme='transparent'
+            >
+              <FontAwesomeIcon icon={faClock} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
+              Reschedule
+            </Tooltip>
+          </Button>
+          <Button onClick={handleCalendarCreate} outline>
+            <Tooltip
+              title='Create Calendar Entry'
+              position='bottom'
+              trigger='mouseenter'
+              delay='250'
+              distance='25'
+              interactiveBorder='15'
+              arrow
+              size='small'
+              theme='transparent'
+            >
+              <FontAwesomeIcon icon={faCalendarAlt} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
+              Calendar
+            </Tooltip>
+          </Button>
+          {maintenance.id === 'NEW'
+            ? (
+              <Button className='create-btn' onClick={handleCreateOnClick}>
+                <Tooltip
+                  title='Create New Maintenance'
+                  position='bottom'
+                  trigger='mouseenter'
+                  delay='250'
+                  distance='25'
+                  interactiveBorder='15'
+                  arrow
+                  size='small'
+                  theme='transparent'
+                >
+                  <FontAwesomeIcon icon={faPlusCircle} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
+                  Create
+                </Tooltip>
+              </Button>
+            ) : (
+              <Button className='send-bulk' theme='primary' onClick={handleSendAll}>
+                <Tooltip
+                  title='Send All Notifications'
+                  position='bottom'
+                  trigger='mouseenter'
+                  delay='250'
+                  distance='25'
+                  interactiveBorder='15'
+                  arrow
+                  size='small'
+                  theme='transparent'
+                >
+                  <FontAwesomeIcon icon={faMailBulk} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
+                  Send All
+                </Tooltip>
+              </Button>
+            )}
+        </ButtonGroup>
+      )
+    }
     return (
       <Layout count={props.unread} session={props.session}>
         <Helmet>
           <title>{`Newtelco Maintenance - NT-${maintenance.id}`}</title>
         </Helmet>
+        <MaintPanel header={<HeaderLeft />} buttons={<HeaderRight />}>
+
+        </MaintPanel>
         <Card className='top-card-wrapper' style={{ maxWidth: '100%' }}>
-          <CardHeader>
-            <ButtonToolbar style={{ justifyContent: 'space-between' }}>
-              <ButtonGroup size='md'>
-                <Button onClick={() => Router.back()}>
-                  <FontAwesomeIcon icon={faArrowLeft} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
-                    Back
-                </Button>
-                <Button onClick={toggleReadModal} outline>
-                  <Tooltip
-                    title='Open Incoming Mail'
-                    position='bottom'
-                    trigger='mouseenter'
-                    delay='250'
-                    distance='25'
-                    interactiveBorder='15'
-                    arrow
-                    size='small'
-                    theme='transparent'
-                  >
-                    <FontAwesomeIcon icon={faEnvelopeOpenText} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
-                    Read
-                  </Tooltip>
-                </Button>
-              </ButtonGroup>
-              <span className='maint-header-text-wrapper'>
-                <Badge theme='secondary' style={{ fontSize: '2rem', marginRight: '20px', maxWidth: '140px' }} outline>
-                  {maintenanceIdDisplay}
-                </Badge>
-                <h2 style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', display: 'inline-block', marginBottom: '0px' }}>{maintenance.name}</h2>
-              </span>
-              {width > 500
-                ? (
-                  <ButtonGroup className='btn-group-2' size='md'>
-                    <Button outline onClick={toggleRescheduleModal}>
-                      <Tooltip
-                        title='Create New Reschedule'
-                        position='bottom'
-                        trigger='mouseenter'
-                        delay='250'
-                        distance='25'
-                        interactiveBorder='15'
-                        arrow
-                        size='small'
-                        theme='transparent'
-                      >
-                        <FontAwesomeIcon icon={faClock} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
-                        Reschedule
-                      </Tooltip>
-                    </Button>
-                    <Button onClick={handleCalendarCreate} outline>
-                      <Tooltip
-                        title='Create Calendar Entry'
-                        position='bottom'
-                        trigger='mouseenter'
-                        delay='250'
-                        distance='25'
-                        interactiveBorder='15'
-                        arrow
-                        size='small'
-                        theme='transparent'
-                      >
-                        <FontAwesomeIcon icon={faCalendarAlt} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
-                        Calendar
-                      </Tooltip>
-                    </Button>
-                    {maintenance.id === 'NEW'
-                      ? (
-                        <Button className='create-btn' onClick={handleCreateOnClick}>
-                          <Tooltip
-                            title='Create New Maintenance'
-                            position='bottom'
-                            trigger='mouseenter'
-                            delay='250'
-                            distance='25'
-                            interactiveBorder='15'
-                            arrow
-                            size='small'
-                            theme='transparent'
-                          >
-                            <FontAwesomeIcon icon={faPlusCircle} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
-                            Create
-                          </Tooltip>
-                        </Button>
-                      ) : (
-                        <Button className='send-bulk' theme='primary' onClick={handleSendAll}>
-                          <Tooltip
-                            title='Send All Notifications'
-                            position='bottom'
-                            trigger='mouseenter'
-                            delay='250'
-                            distance='25'
-                            interactiveBorder='15'
-                            arrow
-                            size='small'
-                            theme='transparent'
-                          >
-                            <FontAwesomeIcon icon={faMailBulk} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
-                            Send All
-                          </Tooltip>
-                        </Button>
-                      )}
-                  </ButtonGroup>
-                ) : (
-                  <></>
-                )}
-            </ButtonToolbar>
-          </CardHeader>
           <CardBody>
             <Container fluid>
               <Row style={{ height: '20px' }} />
