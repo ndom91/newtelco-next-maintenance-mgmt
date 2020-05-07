@@ -6,7 +6,7 @@ import {
 } from 'rsuite'
 import './panel.css'
 
-const MaintPanel = ({ children, header, buttons = null }) => {
+const MaintPanel = ({ children, header, buttons = null, center = null }) => {
   const Header = () => {
     if (!buttons) {
       return <span>{header}</span>
@@ -15,6 +15,9 @@ const MaintPanel = ({ children, header, buttons = null }) => {
         <FlexboxGrid justify='space-between' align='middle'>
           <FlexboxGrid.Item>
             {header}
+          </FlexboxGrid.Item>
+          <FlexboxGrid.Item>
+            {center}
           </FlexboxGrid.Item>
           <FlexboxGrid.Item>
             {buttons}

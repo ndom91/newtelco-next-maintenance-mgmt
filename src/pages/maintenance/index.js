@@ -5,9 +5,8 @@ import Footer from '../../components/cardFooter'
 import Attachment from '../../components/attachment'
 import RequireLogin from '../../components/require-login'
 import { NextAuth } from 'next-auth/client'
-import Toggle from 'react-toggle'
+// import Toggle from 'react-toggle'
 import './maintenance.css'
-import cogoToast from 'cogo-toast'
 import Select from 'react-select'
 import CreatableSelect from 'react-select/creatable'
 import makeAnimated from 'react-select/animated'
@@ -22,7 +21,6 @@ import Flatpickr from 'react-flatpickr'
 import 'flatpickr/dist/themes/material_blue.css'
 import TimezoneSelector from '../../components/timezone'
 import { getUnique, convertDateTime } from '../../components/maintenance/helper'
-import { HotKeys } from 'react-hotkeys'
 import { OutTable, ExcelRenderer } from 'react-excel-renderer'
 import ProtectedIcon from '../../components/ag-grid/protected'
 import SentIcon from '../../components/ag-grid/sent'
@@ -42,8 +40,8 @@ import MaintPanel from '../../components/panel'
 import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-material.css'
 
-import 'react-tippy/dist/tippy.css'
-import { Tooltip } from 'react-tippy'
+// import 'react-tippy/dist/tippy.css'
+// import { Tooltip } from 'react-tippy'
 
 import Notify from '../../lib/notification'
 
@@ -52,16 +50,12 @@ import {
   faPlusCircle,
   faArrowLeft,
   faEnvelopeOpenText,
-  faLanguage,
   faFirstAid,
   faPaperPlane,
   faTimesCircle,
   faRandom,
-  faSearch,
   faHistory,
   faMailBulk,
-  faCheck,
-  faCalendarCheck,
   faLandmark,
   faQuestionCircle
 } from '@fortawesome/free-solid-svg-icons'
@@ -71,17 +65,9 @@ import {
 } from '@fortawesome/free-regular-svg-icons'
 import {
   Container,
-  Row,
-  Col,
   Card,
-  CardHeader,
   CardBody,
   CardFooter,
-  ButtonToolbar,
-  ButtonGroup,
-  Button,
-  Badge,
-  FormGroup,
   FormTextarea,
   FormInput,
   InputGroup,
@@ -92,6 +78,27 @@ import {
   ModalBody,
   Progress
 } from 'shards-react'
+
+import {
+  Icon,
+  Form,
+  FormGroup,
+  ControlLabel,
+  HelpBlock,
+  FormControl,
+  Badge,
+  Button,
+  Whisper,
+  Tooltip,
+  IconButton,
+  ButtonGroup,
+  ButtonToolbar,
+  FlexboxGrid,
+  Toggle,
+  Grid,
+  Row,
+  Col
+} from 'rsuite'
 
 const animatedComponents = makeAnimated()
 
@@ -247,14 +254,6 @@ const Maintenance = props => {
     },
     columnDefs: [
       {
-        headerName: 'Mail',
-        width: 80,
-        sortable: false,
-        filter: false,
-        resizable: false,
-        cellRenderer: 'sendMailBtn',
-        cellStyle: { 'padding-right': '0px', 'padding-left': '10px' }
-      }, {
         headerName: 'CID',
         field: 'kundenCID',
         width: 100,
@@ -284,12 +283,22 @@ const Maintenance = props => {
         field: 'sent',
         cellRenderer: 'sentIcon',
         width: 100,
+        pinned: 'right',
         cellStyle: {
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
           height: '100%'
         }
+      }, {
+        headerName: 'Mail',
+        width: 80,
+        sortable: false,
+        filter: false,
+        resizable: false,
+        pinned: 'right',
+        cellRenderer: 'sendMailBtn',
+        cellStyle: { 'padding-right': '0px', 'padding-left': '10px' }
       }
     ],
     context: { prepareDirectSend: prepareDirectSend, togglePreviewModal: togglePreviewModal },
@@ -349,9 +358,7 @@ const Maintenance = props => {
       })
         .then(resp => resp.json())
         .then(data => {
-          setState({
-            rescheduleData: data.reschedules
-          })
+          setRescheduleData(data.reschedules)
         })
         .catch(err => console.error(`Error Loading Reschedules - ${err}`))
 
@@ -556,7 +563,7 @@ const Maintenance = props => {
   /// /////////////////////////////////////////////////////////
 
   // prepare mail from direct-send button
-  const prepareDirectSend = (recipient, customerCID, frozen, companyName) => {
+  function prepareDirectSend (recipient, customerCID, frozen, companyName) {
     if (frozen) {
       setFrozenState({
         recipient: recipient,
@@ -803,7 +810,7 @@ const Maintenance = props => {
     }
   }
 
-  const moveCalendarEntry = (startDateTime, endDateTime, rcounter) => {
+  function moveCalendarEntry (startDateTime, endDateTime, rcounter) {
     const calId = maintenance.calendarId
     const company = maintenance.name
     const maintId = maintenance.id
@@ -1378,7 +1385,7 @@ const Maintenance = props => {
     }
   }
 
-  const togglePreviewModal = (recipient, customerCID, protection) => {
+  function togglePreviewModal (recipient, customerCID, protection) {
     if (recipient && customerCID) {
       const HtmlBody = generateMail(customerCID, protection)
       if (HtmlBody) {
@@ -1393,7 +1400,6 @@ const Maintenance = props => {
     }
     mailSubjectText()
   }
-
 
   const toggleHelpModal = () => {
     setOpenHelpModal(!openHelpModal)
@@ -1499,7 +1505,7 @@ const Maintenance = props => {
       .catch(err => console.error(`Reschedule Edit Error - ${err}`))
   }
 
-  const toggleRescheduleSentBtn = (rcounter) => {
+  function toggleRescheduleSentBtn (rcounter) {
     const newRescheduleData = rescheduleData
     const reschedIndex = newRescheduleData.findIndex(el => el.rcounter === rcounter)
     const currentSentStatus = newRescheduleData[reschedIndex].sent
@@ -1838,20 +1844,6 @@ const Maintenance = props => {
   //
   /// /////////////////////////////////////////////////////////
 
-  // const {
-  //   maintenance,
-  //   dateTimeWarning,
-  //   suppliers,
-  //   lieferantcids,
-  //   openReadModal,
-  //   selectedLieferant,
-  //   impactPlaceholder,
-  //   openPreviewModal,
-  //   notesText,
-  //   incomingAttachments,
-  //   night
-  // } = this.state
-
   let maintenanceIdDisplay
   if (maintenance.id === 'NEW') {
     maintenanceIdDisplay = maintenance.id
@@ -1867,108 +1859,55 @@ const Maintenance = props => {
   if (props.session.user) {
     const HeaderLeft = () => {
       return (
-        <>
-          <ButtonGroup size='md'>
-            <Button onClick={() => Router.back()}>
-              <FontAwesomeIcon icon={faArrowLeft} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
-                Back
-            </Button>
-            <Button onClick={toggleReadModal} outline>
-              <Tooltip
-                title='Open Incoming Mail'
-                position='bottom'
-                trigger='mouseenter'
-                delay='250'
-                distance='25'
-                interactiveBorder='15'
-                arrow
-                size='small'
-                theme='transparent'
-              >
-                <FontAwesomeIcon icon={faEnvelopeOpenText} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
-                Read
-              </Tooltip>
-            </Button>
-          </ButtonGroup>
-          <span className='maint-header-text-wrapper'>
-            <Badge theme='secondary' style={{ fontSize: '2rem', marginRight: '20px', maxWidth: '140px' }} outline>
-              {maintenanceIdDisplay}
-            </Badge>
-            <h2 style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', display: 'inline-block', marginBottom: '0px' }}>{maintenance.name}</h2>
-          </span>
-        </>
+        <ButtonGroup size='md'>
+          <IconButton appearance='ghost' onClick={() => Router.back()} icon={<Icon icon='chevron-left' />}>
+              Back
+          </IconButton>
+          <Whisper placement='bottom' speaker={<Tooltip>Open Incoming Mail</Tooltip>}>
+            <IconButton appearance='ghost' onClick={toggleReadModal} icon={<Icon icon='at' />}>
+              Read
+            </IconButton>
+          </Whisper>
+        </ButtonGroup>
       )
     }
+
+    const HeaderCenter = () => {
+      return (
+        <Badge content={maintenanceIdDisplay} className='header-badge'>
+          <Button appearance='subtle' size='lg' style={{ fontSize: '1.1em', fontWeight: '200' }}>
+            {maintenance.name}
+          </Button>
+        </Badge>
+      )
+    }
+
     const HeaderRight = () => {
       return (
-        <ButtonGroup className='btn-group-2' size='md'>
-          <Button outline onClick={toggleRescheduleModal}>
-            <Tooltip
-              title='Create New Reschedule'
-              position='bottom'
-              trigger='mouseenter'
-              delay='250'
-              distance='25'
-              interactiveBorder='15'
-              arrow
-              size='small'
-              theme='transparent'
-            >
-              <FontAwesomeIcon icon={faClock} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
+        <ButtonGroup size='md'>
+          <Whisper placement='bottom' speaker={<Tooltip>Create New Reschedule</Tooltip>}>
+            <IconButton appearance='ghost' onClick={toggleRescheduleModal} icon={<Icon icon='clock-o' />}>
               Reschedule
-            </Tooltip>
-          </Button>
-          <Button onClick={handleCalendarCreate} outline>
-            <Tooltip
-              title='Create Calendar Entry'
-              position='bottom'
-              trigger='mouseenter'
-              delay='250'
-              distance='25'
-              interactiveBorder='15'
-              arrow
-              size='small'
-              theme='transparent'
-            >
-              <FontAwesomeIcon icon={faCalendarAlt} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
-              Calendar
-            </Tooltip>
-          </Button>
+            </IconButton>
+          </Whisper>
+          <Whisper placement='bottom' speaker={<Tooltip>Create Calendar Entry</Tooltip>}>
+            <IconButton appearance='ghost' onClick={handleCalendarCreate} icon={<Icon icon='calendar' />}>
+              Create
+            </IconButton>
+          </Whisper>
           {maintenance.id === 'NEW'
             ? (
-              <Button className='create-btn' onClick={handleCreateOnClick}>
-                <Tooltip
-                  title='Create New Maintenance'
-                  position='bottom'
-                  trigger='mouseenter'
-                  delay='250'
-                  distance='25'
-                  interactiveBorder='15'
-                  arrow
-                  size='small'
-                  theme='transparent'
-                >
-                  <FontAwesomeIcon icon={faPlusCircle} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
-                  Create
-                </Tooltip>
-              </Button>
+              <Whisper placement='bottom' speaker={<Tooltip>Create New Maintenance</Tooltip>}>
+                <IconButton appearance='ghost' onClick={handleCreateOnClick} icon={<Icon icon='circle-plus' />}>
+                  New
+                </IconButton>
+              </Whisper>
             ) : (
-              <Button className='send-bulk' theme='primary' onClick={handleSendAll}>
-                <Tooltip
-                  title='Send All Notifications'
-                  position='bottom'
-                  trigger='mouseenter'
-                  delay='250'
-                  distance='25'
-                  interactiveBorder='15'
-                  arrow
-                  size='small'
-                  theme='transparent'
-                >
-                  <FontAwesomeIcon icon={faMailBulk} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
-                  Send All
-                </Tooltip>
-              </Button>
+              <Whisper placement='bottom' speaker={<Tooltip>Send All Notifications</Tooltip>}>
+                <IconButton appearance='ghost' onClick={handleSendAll} icon={<Icon icon='envelope-o' />}>
+                  Send
+                </IconButton>
+              </Whisper>
             )}
         </ButtonGroup>
       )
@@ -1978,396 +1917,411 @@ const Maintenance = props => {
         <Helmet>
           <title>{`Newtelco Maintenance - NT-${maintenance.id}`}</title>
         </Helmet>
-        <MaintPanel header={<HeaderLeft />} buttons={<HeaderRight />}>
-
-        </MaintPanel>
-        <Card className='top-card-wrapper' style={{ maxWidth: '100%' }}>
-          <CardBody>
-            <Container fluid>
-              <Row style={{ height: '20px' }} />
-              <Row>
-                <Col sm='12' lg='6'>
-                  <Row>
-                    <Col>
-                      <Container className='maintenance-subcontainer'>
-                        <Row>
-                          <Col style={{ width: '30vw' }}>
-                            <FormGroup>
-                              <label htmlFor='edited-by'>Created By</label>
-                              <FormInput tabIndex='-1' readOnly id='edited-by-input' name='edited-by' type='text' value={maintenance.bearbeitetvon} />
-                            </FormGroup>
-                            <FormGroup>
-                              <label htmlFor='supplier'>Timezone</label>
-                              <TimezoneSelector
-                                className='maint-select'
-                                value={{ value: maintenance.timezone, label: maintenance.timezoneLabel }}
-                                onChange={handleTimezoneChange}
-                                onBlur={handleTimezoneBlur}
-                              />
-                            </FormGroup>
-                            <FormGroup>
-                              <label htmlFor='start-datetime'>Start Date/Time</label>
-                              <Flatpickr
-                                data-enable-time
-                                options={{ time_24hr: 'true', allow_input: 'true' }}
-                                className='flatpickr end-date-time'
-                                value={maintenance.startDateTime || null}
-                                onChange={date => handleStartDateChange(date)}
-                                onClose={() => handleDateTimeBlur('start')}
-                              />
-                            </FormGroup>
-                          </Col>
-                          <Col style={{ width: '30vw' }}>
-                            <FormGroup>
-                              <label htmlFor='maileingang'>Mail Arrived</label>
-                              <FormInput tabIndex='-1' readOnly id='maileingang-input' name='maileingang' type='text' value={convertDateTime(maintenance.maileingang)} />
-                            </FormGroup>
-                            <FormGroup>
-                              <label htmlFor='supplier'>Supplier</label>
-                              <Select
-                                className='maint-select'
-                                value={{ label: maintenance.name, value: maintenance.lieferant }}
-                                onChange={handleSupplierChange}
-                                options={suppliers}
-                                noOptionsMessage={() => 'No Suppliers'}
-                                placeholder='Please select a Supplier'
-                                onBlur={handleSupplierBlur}
-                              />
-                            </FormGroup>
-                            <FormGroup>
-                              <label htmlFor='end-datetime'>End Date/Time</label>
-                              <Flatpickr
-                                data-enable-time
-                                options={{ time_24hr: 'true', allow_input: 'true' }}
-                                className='flatpickr end-date-time'
-                                style={dateTimeWarning ? { border: '2px solid #dc3545', boxShadow: '0 0 10px 1px #dc3545' } : null}
-                                value={maintenance.endDateTime || null}
-                                onChange={date => handleEndDateChange(date)}
-                                onClose={() => handleDateTimeBlur('end')}
-                              />
-                            </FormGroup>
-                          </Col>
-                        </Row>
-                        <Row>
-                          <Col>
-                            <FormGroup>
-                              <label htmlFor='their-cid'>{maintenance.name} CID</label>
-                              <Select
-                                className='maint-select'
-                                value={selectedLieferant || undefined}
-                                onChange={handleSelectLieferantChange}
-                                options={lieferantcids}
-                                components={animatedComponents}
-                                isMulti
-                                noOptionsMessage={() => 'No CIDs for this Supplier'}
-                                placeholder='Please select a CID'
-                                onBlur={handleCIDBlur}
-                              />
-                            </FormGroup>
-                          </Col>
-                        </Row>
-                      </Container>
-                      <Container className='maintenance-subcontainer'>
-                        <Row>
-                          <Col>
-                            <Row className='impact-row'>
-                              <Col>
-                                <FormGroup>
-                                  <div className='impact-title-group'>
-                                    <label style={{ flexGrow: '1', margin: '10px' }} htmlFor='impact'>Impact</label>
-                                    <Tooltip
-                                      title='Use Protection Switch Text'
-                                      position='top'
-                                      theme='transparent'
-                                      size='small'
-                                      trigger='mouseenter'
-                                      delay='150'
-                                      arrow
-                                      animation='shift'
-                                    >
-                                      <Button id='protectionswitchtext' style={{ padding: '0.35em', marginRight: '10px', marginTop: '10px' }} onClick={handleProtectionSwitch} outline theme='secondary'>
-                                        <FontAwesomeIcon width='16px' icon={faRandom} />
-                                      </Button>
-                                    </Tooltip>
-                                    <Tooltip
-                                      title='Use Time Difference Text'
-                                      position='top'
-                                      theme='transparent'
-                                      size='small'
-                                      trigger='mouseenter'
-                                      delay='150'
-                                      arrow
-                                      animation='shift'
-                                    >
-                                      <Button id='impactplaceholdertext' style={{ padding: '0.35em', marginTop: '10px' }} onClick={useImpactPlaceholder} outline theme='secondary'>
-                                        <FontAwesomeIcon width='16px' icon={faHistory} />
-                                      </Button>
-                                    </Tooltip>
-                                  </div>
-                                  <FormInput onBlur={() => handleTextInputBlur('impact')} id='impact' name='impact' type='text' onChange={handleImpactChange} placeholder={impactPlaceholder} value={maintenance.impact || ''} />
-                                </FormGroup>
-                              </Col>
-                              <Col>
-                                <FormGroup>
-                                  <label htmlFor='location'>Location</label>
-                                  <FormInput onBlur={() => handleTextInputBlur('location')} id='location' name='location' type='text' onChange={handleLocationChange} value={maintenance.location || ''} />
-                                </FormGroup>
-                              </Col>
-                            </Row>
-                            <FormGroup>
-                              <label htmlFor='reason'>Reason</label>
-                              <FormTextarea id='reason' name='reason' onBlur={() => handleTextInputBlur('reason')} onChange={handleReasonChange} type='text' value={maintenance.reason && decodeURIComponent(maintenance.reason)} />
-                            </FormGroup>
-                            <FormGroup>
-                              <span
-                                style={{
-                                  display: 'flex',
-                                  justifyContent: 'flex-start',
-                                  alignItems: 'center'
-                                }}
-                              >
-                                <label htmlFor='maintNote'>Note</label>
-                                <Tooltip
-                                  title='This note will be included in the mail'
-                                  position='top'
-                                  trigger='mouseenter'
-                                  delay='250'
-                                  interactiveBorder='15'
-                                  arrow
-                                  size='small'
-                                  theme='transparent'
-                                >
-                                  <FontAwesomeIcon width='16px' icon={faQuestionCircle} />
-                                </Tooltip>
-                              </span>
-                              <FormTextarea id='maintNote' name='maintNote' onBlur={() => handleTextInputBlur('maintNote')} onChange={handleMaintNoteChange} type='text' value={maintenance.maintNote && decodeURIComponent(maintenance.maintNote)} />
-                            </FormGroup>
-                          </Col>
-                        </Row>
-                      </Container>
-                      <Container style={{ paddingTop: '20px' }} className='maintenance-subcontainer'>
-                        <Row>
-                          <Col>
-                            <FormGroup className='form-group-toggle'>
-                              <Badge theme='light' outline>
-                                <label>
-                                  <div>Cancelled</div>
-                                  <Toggle
-                                    checked={maintenance.cancelled === 'false' ? false : !!maintenance.cancelled}
-                                    onChange={(event) => handleToggleChange('cancelled', event)}
-                                  />
-                                </label>
-                              </Badge>
-                              <Badge theme='light' outline>
-                                <label>
-                                  <div>Emergency</div>
-                                  <Toggle
-                                    icons={{
-                                      checked: <FontAwesomeIcon icon={faFirstAid} width='1em' style={{ color: 'var(--white)' }} />,
-                                      unchecked: null
-                                    }}
-                                    checked={maintenance.emergency === 'false' ? false : !!maintenance.emergency}
-                                    onChange={(event) => handleToggleChange('emergency', event)}
-                                  />
-                                </label>
-                              </Badge>
-                              <Badge theme='secondary' outline>
-                                <label>
-                                  <div>Done</div>
-                                  <Toggle
-                                    checked={maintenance.done === 'false' ? false : !!maintenance.done}
-                                    onChange={(event) => handleToggleChange('done', event)}
-                                  />
-                                </label>
-                              </Badge>
-                            </FormGroup>
-                          </Col>
-                        </Row>
-                      </Container>
-                      <Container className='maintenance-subcontainer'>
-                        <Row>
-                          <Col>
-                            <FormGroup>
-                              <label htmlFor='notes'>Notes</label>
-                              <TinyEditor
-                                initialValue={notesText}
-                                apiKey='ttv2x1is9joc0fi7v6f6rzi0u98w2mpehx53mnc1277omr7s'
-                                onBlur={handleNotesBlur}
-                                init={{
-                                  height: 300,
-                                  menubar: false,
-                                  statusbar: false,
-                                  plugins: [
-                                    'advlist autolink lists link image print preview anchor',
-                                    'searchreplace code',
-                                    'insertdatetime table paste code help wordcount'
-                                  ],
-                                  toolbar:
-                                      `undo redo | formatselect | bold italic backcolor | 
-                                      alignleft aligncenter alignright alignjustify | 
-                                      bullist numlist outdent indent | removeformat | help`,
-                                  content_style: 'html { color: #828282 }'
-                                }}
-                                onChange={handleNotesChange}
-                              />
-                            </FormGroup>
-                          </Col>
-                        </Row>
-                      </Container>
+        <MaintPanel header={<HeaderLeft />} center={<HeaderCenter />} buttons={<HeaderRight />}>
+          <FlexboxGrid justify='space-around' align='top'>
+            <FlexboxGrid.Item colspan={12}>
+              <Form>
+                <Grid fluid>
+                  <Row gutter={20}>
+                    <Col sm={12} xs={24}>
+                      <FormGroup>
+                        <ControlLabel htmlFor='edited-by'>Created By</ControlLabel>
+                        <FormInput tabIndex='-1' readOnly id='edited-by-input' name='edited-by' type='text' value={maintenance.bearbeitetvon} />
+                      </FormGroup>
+                    </Col>
+                    <Col sm={12} xs={24}>
+                      <FormGroup>
+                        <ControlLabel htmlFor='maileingang'>Mail Arrived</ControlLabel>
+                        <FormInput tabIndex='-1' readOnly id='maileingang-input' name='maileingang' type='text' value={convertDateTime(maintenance.maileingang)} />
+                      </FormGroup>
                     </Col>
                   </Row>
-                </Col>
-                <Col sm='12' lg='6' className='flip-container'>
-                  {openMaintenanceChangelog
-                    ? (
-                      <CSSTransition
-                        timeout={500}
-                        classNames='flip-transition'
-                        in={openMaintenanceChangelog}
-                      >
-                        <Row>
-                          <Col>
-                            <Container style={{ padding: '20px' }} className='maintenance-subcontainer'>
-                              <Row>
-                                <Col>
-                                  <span style={{ color: 'var(--font-color)', fontWeight: '300 !important', fontSize: '1.5rem' }}>Maintenance History</span>
-                                </Col>
-                                <Col style={{ flexGrow: '0' }}>
-                                  <Button style={{ float: 'right' }} onClick={toggleHistoryView} outline>
-                                    <Tooltip
-                                      title='View Customer CIDs'
-                                      position='top'
-                                      trigger='mouseenter'
-                                      delay='250'
-                                      distance='20'
-                                      interactiveBorder='15'
-                                      arrow
-                                      size='small'
-                                      theme='transparent'
-                                    >
-                                      <FontAwesomeIcon icon={faLandmark} width='1em' style={{ color: 'secondary' }} />
-                                    </Tooltip>
-                                  </Button>
-                                </Col>
-                              </Row>
-                              <Row>
-                                <Col className='changelog-wrapper'>
-                                  <Changelog maintid={maintenance.id} />
-                                </Col>
-                              </Row>
-                            </Container>
-                          </Col>
-                        </Row>
-                      </CSSTransition>
-                    ) : (
-                      <CSSTransition
-                        timeout={500}
-                        classNames='flip-transition'
-                        in={openMaintenanceChangelog}
-                      >
-                        <Row>
-                          <Col>
-                            <Container style={{ padding: '20px' }} className='maintenance-subcontainer'>
-                              <Row style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                <Col>
-                                  <span style={{ color: 'var(--font-color)', fontWeight: '300 !important', fontSize: '1.5rem' }}>Customer CIDs</span>
-                                </Col>
-                                <Col style={{ flexGrow: '0' }}>
-                                  <Button style={{ float: 'right' }} onClick={toggleHistoryView} outline>
-                                    <Tooltip
-                                      title='View Maintenance Changelog'
-                                      position='top'
-                                      trigger='mouseenter'
-                                      delay='250'
-                                      distance='20'
-                                      interactiveBorder='15'
-                                      arrow
-                                      size='small'
-                                      theme='transparent'
-                                    >
-                                      <FontAwesomeIcon icon={faLandmark} width='1em' style={{ color: 'secondary' }} />
-                                    </Tooltip>
-                                  </Button>
-                                </Col>
-                              </Row>
-                              <Row>
-                                <Col>
-                                  {kundencids.length !== 0
-                                    ? (
-                                      <Progress theme='primary' value={sentProgress()} />
-                                    ) : (
-                                      null
-                                    )}
-                                </Col>
-                              </Row>
-                              <Row>
-                                <Col style={{ width: '100%', height: '600px' }}>
-                                  <div
-                                    className='ag-theme-material'
-                                    style={{
-                                      height: '100%',
-                                      width: '100%'
-                                    }}
-                                  >
-                                    <AgGridReact
-                                      gridOptions={gridOptions}
-                                      rowData={kundencids}
-                                      onGridReady={handleGridReady}
-                                      pagination
-                                      deltaRowDataMode
-                                      getRowNodeId={(data) => {
-                                        return data.kundenCID
-                                      }}
-                                    />
-                                  </div>
-                                </Col>
-                              </Row>
-                            </Container>
-                            {rescheduleData.length !== 0
-                              ? (
-                                <Container style={{ padding: '20px' }} className='maintenance-subcontainer'>
-                                  <Row>
-                                    <Col>
-                                      <span style={{ color: 'var(--font-color)', fontWeight: '300 !important', fontSize: '1.5rem' }}>Reschedule</span>
-                                    </Col>
-                                  </Row>
-                                  <Row>
-                                    <Col style={{ width: '100%', height: '600px' }}>
-                                      <div
-                                        className='ag-theme-material'
-                                        style={{
-                                          height: '100%',
-                                          width: '100%'
-                                        }}
+                  <Row gutter={20}>
+                    <Col sm={12} xs={24}>
+                      <FormGroup>
+                        <ControlLabel htmlFor='supplier'>Timezone</ControlLabel>
+                        <TimezoneSelector
+                          className='maint-select'
+                          value={{ value: maintenance.timezone, label: maintenance.timezoneLabel }}
+                          onChange={handleTimezoneChange}
+                          onBlur={handleTimezoneBlur}
+                        />
+                      </FormGroup>
+                    </Col>
+                    <Col sm={12} xs={24}>
+                      <FormGroup>
+                        <ControlLabel htmlFor='supplier'>Supplier</ControlLabel>
+                        <Select
+                          className='maint-select'
+                          value={{ label: maintenance.name, value: maintenance.lieferant }}
+                          onChange={handleSupplierChange}
+                          options={suppliers}
+                          noOptionsMessage={() => 'No Suppliers'}
+                          placeholder='Please select a Supplier'
+                          onBlur={handleSupplierBlur}
+                        />
+                      </FormGroup>
+                    </Col>
+                  </Row>
+                  <Row gutter={20}>
+                    <Col sm={12} xs={24}>
+                      <FormGroup>
+                        <ControlLabel htmlFor='start-datetime'>Start Date/Time</ControlLabel>
+                        <Flatpickr
+                          data-enable-time
+                          options={{ time_24hr: 'true', allow_input: 'true' }}
+                          className='flatpickr end-date-time'
+                          value={maintenance.startDateTime || null}
+                          onChange={date => handleStartDateChange(date)}
+                          onClose={() => handleDateTimeBlur('start')}
+                        />
+                      </FormGroup>
+                    </Col>
+                    <Col sm={12} xs={24}>
+                      <FormGroup>
+                        <ControlLabel htmlFor='end-datetime'>End Date/Time</ControlLabel>
+                        <Flatpickr
+                          data-enable-time
+                          options={{ time_24hr: 'true', allow_input: 'true' }}
+                          className='flatpickr end-date-time'
+                          style={dateTimeWarning ? { border: '2px solid #dc3545', boxShadow: '0 0 10px 1px #dc3545' } : null}
+                          value={maintenance.endDateTime || null}
+                          onChange={date => handleEndDateChange(date)}
+                          onClose={() => handleDateTimeBlur('end')}
+                        />
+                      </FormGroup>
+                    </Col>
+                  </Row>
+                  <Row gutter={20}>
+                    <Col sm={24}>
+                      <FormGroup>
+                        <ControlLabel htmlFor='their-cid'>{maintenance.name} CID</ControlLabel>
+                        <Select
+                          className='maint-select'
+                          value={selectedLieferant || undefined}
+                          onChange={handleSelectLieferantChange}
+                          options={lieferantcids}
+                          components={animatedComponents}
+                          isMulti
+                          noOptionsMessage={() => 'No CIDs for this Supplier'}
+                          placeholder='Please select a CID'
+                          onBlur={handleCIDBlur}
+                        />
+                      </FormGroup>
+                    </Col>
+                  </Row>
+                  <Row gutter={20}>
+                    <Col sm={12} xs={24}>
+                      <FormGroup>
+                        <div className='impact-title-group'>
+                          <ControlLabel style={{ flexGrow: '1', margin: '10px' }} htmlFor='impact'>Impact</ControlLabel>
+                          <Tooltip
+                            title='Use Protection Switch Text'
+                            position='top'
+                            theme='transparent'
+                            size='small'
+                            trigger='mouseenter'
+                            delay='150'
+                            arrow
+                            animation='shift'
+                          >
+                            <Button id='protectionswitchtext' style={{ padding: '0.35em', marginRight: '10px', marginTop: '10px' }} onClick={handleProtectionSwitch} outline theme='secondary'>
+                              <FontAwesomeIcon width='16px' icon={faRandom} />
+                            </Button>
+                          </Tooltip>
+                          <Tooltip
+                            title='Use Time Difference Text'
+                            position='top'
+                            theme='transparent'
+                            size='small'
+                            trigger='mouseenter'
+                            delay='150'
+                            arrow
+                            animation='shift'
+                          >
+                            <Button id='impactplaceholdertext' style={{ padding: '0.35em', marginTop: '10px' }} onClick={useImpactPlaceholder} outline theme='secondary'>
+                              <FontAwesomeIcon width='16px' icon={faHistory} />
+                            </Button>
+                          </Tooltip>
+                        </div>
+                        <FormInput onBlur={() => handleTextInputBlur('impact')} id='impact' name='impact' type='text' onChange={handleImpactChange} placeholder={impactPlaceholder} value={maintenance.impact || ''} />
+                      </FormGroup>
+                    </Col>
+                    <Col sm={12} xs={24}>
+                      <FormGroup>
+                        <ControlLabel htmlFor='location'>Location</ControlLabel>
+                        <FormInput onBlur={() => handleTextInputBlur('location')} id='location' name='location' type='text' onChange={handleLocationChange} value={maintenance.location || ''} />
+                      </FormGroup>
+                    </Col>
+                  </Row>
+                  <Row gutter={20}>
+                    <Col sm={24}>
+                      <FormGroup>
+                        <ControlLabel htmlFor='reason'>Reason</ControlLabel>
+                        <FormTextarea id='reason' name='reason' onBlur={() => handleTextInputBlur('reason')} onChange={handleReasonChange} type='text' value={maintenance.reason && decodeURIComponent(maintenance.reason)} />
+                      </FormGroup>
+                    </Col>
+                  </Row>
+                  <Row gutter={20}>
+                    <Col sm={24}>
+                      <FormGroup>
+                        <span
+                          style={{
+                            display: 'flex',
+                            justifyContent: 'flex-start',
+                            alignItems: 'center'
+                          }}
+                        >
+                          <ControlLabel htmlFor='maintNote'>Note</ControlLabel>
+                          <Tooltip
+                            title='This note will be included in the mail'
+                            position='top'
+                            trigger='mouseenter'
+                            delay='250'
+                            interactiveBorder='15'
+                            arrow
+                            size='small'
+                            theme='transparent'
+                          >
+                            <FontAwesomeIcon width='16px' icon={faQuestionCircle} />
+                          </Tooltip>
+                        </span>
+                        <FormTextarea id='maintNote' name='maintNote' onBlur={() => handleTextInputBlur('maintNote')} onChange={handleMaintNoteChange} type='text' value={maintenance.maintNote && decodeURIComponent(maintenance.maintNote)} />
+                      </FormGroup>
+                    </Col>
+                  </Row>
+                  <Row gutter={20}>
+                    <Col xs={8}>
+                      <FormGroup className='form-group-toggle'>
+                        <Badge theme='light' outline>
+                          <ControlLabel>
+                            Cancelled
+                          </ControlLabel>
+                          <Toggle
+                            checked={maintenance.cancelled === 'false' ? false : !!maintenance.cancelled}
+                            onChange={(event) => handleToggleChange('cancelled', event)}
+                          />
+                        </Badge>
+                      </FormGroup>
+                    </Col>
+                    <Col xs={8}>
+                      <FormGroup className='form-group-toggle'>
+                        <Badge theme='light' outline>
+                          <ControlLabel>
+                            Emergency
+                          </ControlLabel>
+                          <Toggle
+                            icons={{
+                              checked: <FontAwesomeIcon icon={faFirstAid} width='1em' style={{ color: 'var(--white)' }} />,
+                              unchecked: null
+                            }}
+                            checked={maintenance.emergency === 'false' ? false : !!maintenance.emergency}
+                            onChange={(event) => handleToggleChange('emergency', event)}
+                          />
+                        </Badge>
+                      </FormGroup>
+                    </Col>
+                    <Col xs={8}>
+                      <FormGroup className='form-group-toggle'>
+                        <Badge theme='secondary' outline>
+                          <ControlLabel>
+                            Done
+                          </ControlLabel>
+                          <Toggle
+                            checked={maintenance.done === 'false' ? false : !!maintenance.done}
+                            onChange={(event) => handleToggleChange('done', event)}
+                          />
+                        </Badge>
+                      </FormGroup>
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col>
+                      <FormGroup>
+                        <label htmlFor='notes'>Notes</label>
+                        <TinyEditor
+                          initialValue={notesText}
+                          apiKey='ttv2x1is9joc0fi7v6f6rzi0u98w2mpehx53mnc1277omr7s'
+                          onBlur={handleNotesBlur}
+                          init={{
+                            height: 300,
+                            menubar: false,
+                            statusbar: false,
+                            plugins: [
+                              'advlist autolink lists link image print preview anchor',
+                              'searchreplace code',
+                              'insertdatetime table paste code help wordcount'
+                            ],
+                            toolbar:
+                                `undo redo | formatselect | bold italic backcolor | 
+                                alignleft aligncenter alignright alignjustify | 
+                                bullist numlist outdent indent | removeformat | help`,
+                            content_style: 'html { color: #828282 }'
+                          }}
+                          onChange={handleNotesChange}
+                        />
+                      </FormGroup>
+                    </Col>
+                  </Row>
+                </Grid>
+              </Form>
+            </FlexboxGrid.Item>
+            <FlexboxGrid.Item colspan={12}>
+              <Grid fluid>
+                <Row style={{ height: '20px' }}>
+                  <Col className='flip-container'>
+                    {openMaintenanceChangelog
+                      ? (
+                        <CSSTransition
+                          timeout={500}
+                          classNames='flip-transition'
+                          in={openMaintenanceChangelog}
+                        >
+                          <Row>
+                            <Col>
+                              <Container style={{ padding: '20px' }} className='maintenance-subcontainer'>
+                                <Row>
+                                  <Col>
+                                    <span style={{ color: 'var(--font-color)', fontWeight: '300 !important', fontSize: '1.5rem' }}>Maintenance History</span>
+                                  </Col>
+                                  <Col style={{ flexGrow: '0' }}>
+                                    <Button style={{ float: 'right' }} onClick={toggleHistoryView} outline>
+                                      <Tooltip
+                                        title='View Customer CIDs'
+                                        position='top'
+                                        trigger='mouseenter'
+                                        delay='250'
+                                        distance='20'
+                                        interactiveBorder='15'
+                                        arrow
+                                        size='small'
+                                        theme='transparent'
                                       >
-                                        <AgGridReact
-                                          gridOptions={rescheduleGridOptions}
-                                          rowData={rescheduleData}
-                                          onGridReady={handleRescheduleGridReady}
-                                          pagination
-                                          onCellEditingStopped={handleRescheduleCellEdit}
-                                          animateRows
-                                          deltaRowDataMode
-                                          getRowNodeId={(data) => {
-                                            return data.rcounter
+                                        <FontAwesomeIcon icon={faLandmark} width='1em' style={{ color: 'secondary' }} />
+                                      </Tooltip>
+                                    </Button>
+                                  </Col>
+                                </Row>
+                                <Row>
+                                  <Col className='changelog-wrapper'>
+                                    <Changelog maintid={maintenance.id} />
+                                  </Col>
+                                </Row>
+                              </Container>
+                            </Col>
+                          </Row>
+                        </CSSTransition>
+                      ) : (
+                        <CSSTransition
+                          timeout={500}
+                          classNames='flip-transition'
+                          in={openMaintenanceChangelog}
+                        >
+                          <Row>
+                            <Col>
+                              <Container style={{ padding: '20px' }} className='maintenance-subcontainer'>
+                                <Row style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                  <Col>
+                                    <span style={{ color: 'var(--font-color)', fontWeight: '300 !important', fontSize: '1.5rem' }}>Customer CIDs</span>
+                                  </Col>
+                                  <Col style={{ flexGrow: '0' }}>
+                                    <Button style={{ float: 'right' }} onClick={toggleHistoryView} outline>
+                                      <Tooltip
+                                        title='View Maintenance Changelog'
+                                        position='top'
+                                        trigger='mouseenter'
+                                        delay='250'
+                                        distance='20'
+                                        interactiveBorder='15'
+                                        arrow
+                                        size='small'
+                                        theme='transparent'
+                                      >
+                                        <FontAwesomeIcon icon={faLandmark} width='1em' style={{ color: 'secondary' }} />
+                                      </Tooltip>
+                                    </Button>
+                                  </Col>
+                                </Row>
+                                <Row>
+                                  <Col>
+                                    {kundencids.length !== 0
+                                      ? (
+                                        <Progress theme='primary' value={sentProgress()} />
+                                      ) : (
+                                        null
+                                      )}
+                                  </Col>
+                                </Row>
+                                <Row>
+                                  <Col style={{ width: '100%', height: '600px' }}>
+                                    <div
+                                      className='ag-theme-material'
+                                      style={{
+                                        height: '100%',
+                                        width: '100%'
+                                      }}
+                                    >
+                                      <AgGridReact
+                                        gridOptions={gridOptions}
+                                        rowData={kundencids}
+                                        onGridReady={handleGridReady}
+                                        pagination
+                                        deltaRowDataMode
+                                        getRowNodeId={(data) => {
+                                          return data.kundenCID
+                                        }}
+                                      />
+                                    </div>
+                                  </Col>
+                                </Row>
+                              </Container>
+                              {rescheduleData.length !== 0
+                                ? (
+                                  <Container style={{ padding: '20px' }} className='maintenance-subcontainer'>
+                                    <Row>
+                                      <Col>
+                                        <span style={{ color: 'var(--font-color)', fontWeight: '300 !important', fontSize: '1.5rem' }}>Reschedule</span>
+                                      </Col>
+                                    </Row>
+                                    <Row>
+                                      <Col style={{ width: '100%', height: '600px' }}>
+                                        <div
+                                          className='ag-theme-material'
+                                          style={{
+                                            height: '100%',
+                                            width: '100%'
                                           }}
-                                          stopEditingWhenGridLosesFocus
-                                        />
-                                      </div>
-                                    </Col>
-                                  </Row>
-                                </Container>
-                              ) : (
-                                null
-                              )}
-                          </Col>
-                        </Row>
-                      </CSSTransition>
-                    )}
-                </Col>
-              </Row>
-            </Container>
-          </CardBody>
+                                        >
+                                          <AgGridReact
+                                            gridOptions={rescheduleGridOptions}
+                                            rowData={rescheduleData}
+                                            onGridReady={handleRescheduleGridReady}
+                                            pagination
+                                            onCellEditingStopped={handleRescheduleCellEdit}
+                                            animateRows
+                                            deltaRowDataMode
+                                            getRowNodeId={(data) => {
+                                              return data.rcounter
+                                            }}
+                                            stopEditingWhenGridLosesFocus
+                                          />
+                                        </div>
+                                      </Col>
+                                    </Row>
+                                  </Container>
+                                ) : (
+                                  null
+                                )}
+                            </Col>
+                          </Row>
+                        </CSSTransition>
+                      )}
+                  </Col>
+                </Row>
+              </Grid>
+            </FlexboxGrid.Item>
+          </FlexboxGrid>
+        </MaintPanel>
           {width < 500
             ? (
               <CardFooter className='card-footer'>
@@ -2810,7 +2764,6 @@ const Maintenance = props => {
               </ModalBody>
             </Modal>
           )}
-        </Card>
       </Layout>
     )
   } else {
