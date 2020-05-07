@@ -70,7 +70,6 @@ import {
   CardFooter,
   FormTextarea,
   FormInput,
-  InputGroup,
   InputGroupText,
   InputGroupAddon,
   Modal,
@@ -83,6 +82,8 @@ import {
   Icon,
   Form,
   FormGroup,
+  Input,
+  InputGroup,
   ControlLabel,
   HelpBlock,
   FormControl,
@@ -1918,21 +1919,21 @@ const Maintenance = props => {
           <title>{`Newtelco Maintenance - NT-${maintenance.id}`}</title>
         </Helmet>
         <MaintPanel header={<HeaderLeft />} center={<HeaderCenter />} buttons={<HeaderRight />}>
-          <FlexboxGrid justify='space-around' align='top'>
-            <FlexboxGrid.Item colspan={12}>
+          <FlexboxGrid justify='space-around' align='top' style={{ width: '100%' }}>
+            <FlexboxGrid.Item colspan={11} style={{ margin: '0 10px'}}>
               <Form>
                 <Grid fluid>
                   <Row gutter={20}>
                     <Col sm={12} xs={24}>
                       <FormGroup>
                         <ControlLabel htmlFor='edited-by'>Created By</ControlLabel>
-                        <FormInput tabIndex='-1' readOnly id='edited-by-input' name='edited-by' type='text' value={maintenance.bearbeitetvon} />
+                        <Input tabIndex='-1' readOnly id='edited-by-input' name='edited-by' type='text' value={maintenance.bearbeitetvon} />
                       </FormGroup>
                     </Col>
                     <Col sm={12} xs={24}>
                       <FormGroup>
                         <ControlLabel htmlFor='maileingang'>Mail Arrived</ControlLabel>
-                        <FormInput tabIndex='-1' readOnly id='maileingang-input' name='maileingang' type='text' value={convertDateTime(maintenance.maileingang)} />
+                        <Input tabIndex='-1' readOnly id='maileingang-input' name='maileingang' type='text' value={convertDateTime(maintenance.maileingang)} />
                       </FormGroup>
                     </Col>
                   </Row>
@@ -2013,44 +2014,24 @@ const Maintenance = props => {
                   <Row gutter={20}>
                     <Col sm={12} xs={24}>
                       <FormGroup>
-                        <div className='impact-title-group'>
-                          <ControlLabel style={{ flexGrow: '1', margin: '10px' }} htmlFor='impact'>Impact</ControlLabel>
-                          <Tooltip
-                            title='Use Protection Switch Text'
-                            position='top'
-                            theme='transparent'
-                            size='small'
-                            trigger='mouseenter'
-                            delay='150'
-                            arrow
-                            animation='shift'
-                          >
-                            <Button id='protectionswitchtext' style={{ padding: '0.35em', marginRight: '10px', marginTop: '10px' }} onClick={handleProtectionSwitch} outline theme='secondary'>
-                              <FontAwesomeIcon width='16px' icon={faRandom} />
-                            </Button>
-                          </Tooltip>
-                          <Tooltip
-                            title='Use Time Difference Text'
-                            position='top'
-                            theme='transparent'
-                            size='small'
-                            trigger='mouseenter'
-                            delay='150'
-                            arrow
-                            animation='shift'
-                          >
-                            <Button id='impactplaceholdertext' style={{ padding: '0.35em', marginTop: '10px' }} onClick={useImpactPlaceholder} outline theme='secondary'>
-                              <FontAwesomeIcon width='16px' icon={faHistory} />
-                            </Button>
-                          </Tooltip>
-                        </div>
-                        <FormInput onBlur={() => handleTextInputBlur('impact')} id='impact' name='impact' type='text' onChange={handleImpactChange} placeholder={impactPlaceholder} value={maintenance.impact || ''} />
+                        <ControlLabel htmlFor='impact'>
+                          Impact
+                          <ButtonGroup size='sm'>
+                            <Whisper speaker={<Tooltip>Use Protection Switch Text</Tooltip>}>
+                              <IconButton id='protectionswitchtext' onClick={handleProtectionSwitch} size='sm' icon={<Icon icon='clock-o' />} />
+                            </Whisper>
+                            <Whisper speaker={<Tooltip>Use Time Difference Text</Tooltip>}>
+                              <IconButton id='impactplaceholdertext' onClick={useImpactPlaceholder} size='sm' icon={<Icon icon='history' />} />
+                            </Whisper>
+                          </ButtonGroup>
+                        </ControlLabel>
+                        <Input onBlur={() => handleTextInputBlur('impact')} id='impact' name='impact' type='text' onChange={handleImpactChange} placeholder={impactPlaceholder} value={maintenance.impact || ''} />
                       </FormGroup>
                     </Col>
                     <Col sm={12} xs={24}>
                       <FormGroup>
                         <ControlLabel htmlFor='location'>Location</ControlLabel>
-                        <FormInput onBlur={() => handleTextInputBlur('location')} id='location' name='location' type='text' onChange={handleLocationChange} value={maintenance.location || ''} />
+                        <Input onBlur={() => handleTextInputBlur('location')} id='location' name='location' type='text' onChange={handleLocationChange} value={maintenance.location || ''} />
                       </FormGroup>
                     </Col>
                   </Row>
@@ -2058,35 +2039,38 @@ const Maintenance = props => {
                     <Col sm={24}>
                       <FormGroup>
                         <ControlLabel htmlFor='reason'>Reason</ControlLabel>
-                        <FormTextarea id='reason' name='reason' onBlur={() => handleTextInputBlur('reason')} onChange={handleReasonChange} type='text' value={maintenance.reason && decodeURIComponent(maintenance.reason)} />
+                        <Input 
+                          id='reason' 
+                          name='reason' 
+                          componentClass="textarea"
+                          rows={3}
+                          onBlur={() => handleTextInputBlur('reason')} 
+                          onChange={handleReasonChange} 
+                          type='text' 
+                          value={maintenance.reason && decodeURIComponent(maintenance.reason)} 
+                        />
                       </FormGroup>
                     </Col>
                   </Row>
                   <Row gutter={20}>
                     <Col sm={24}>
                       <FormGroup>
-                        <span
-                          style={{
-                            display: 'flex',
-                            justifyContent: 'flex-start',
-                            alignItems: 'center'
-                          }}
-                        >
-                          <ControlLabel htmlFor='maintNote'>Note</ControlLabel>
-                          <Tooltip
-                            title='This note will be included in the mail'
-                            position='top'
-                            trigger='mouseenter'
-                            delay='250'
-                            interactiveBorder='15'
-                            arrow
-                            size='small'
-                            theme='transparent'
-                          >
-                            <FontAwesomeIcon width='16px' icon={faQuestionCircle} />
-                          </Tooltip>
-                        </span>
-                        <FormTextarea id='maintNote' name='maintNote' onBlur={() => handleTextInputBlur('maintNote')} onChange={handleMaintNoteChange} type='text' value={maintenance.maintNote && decodeURIComponent(maintenance.maintNote)} />
+                        <ControlLabel htmlFor='maintNote'>
+                          Note
+                          <HelpBlock style={{ float: 'right' }} tooltip>
+                            This note will be included in the mail
+                          </HelpBlock>
+                        </ControlLabel>
+                        <Input 
+                          componentClass="textarea"
+                          rows={3}
+                          id='maintNote' 
+                          name='maintNote' 
+                          onBlur={() => handleTextInputBlur('maintNote')} 
+                          onChange={handleMaintNoteChange} 
+                          type='text' 
+                          value={maintenance.maintNote && decodeURIComponent(maintenance.maintNote)} 
+                        />
                       </FormGroup>
                     </Col>
                   </Row>
@@ -2166,7 +2150,7 @@ const Maintenance = props => {
                 </Grid>
               </Form>
             </FlexboxGrid.Item>
-            <FlexboxGrid.Item colspan={12}>
+            <FlexboxGrid.Item colspan={11} style={{ margin: '0 10px' }}>
               <Grid fluid>
                 <Row style={{ height: '20px' }}>
                   <Col className='flip-container'>

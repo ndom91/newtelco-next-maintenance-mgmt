@@ -1,8 +1,7 @@
 import React from 'react'
 import {
   Panel,
-  FlexboxGrid,
-  Col
+  FlexboxGrid
 } from 'rsuite'
 import './panel.css'
 
