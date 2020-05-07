@@ -14,10 +14,16 @@ import {
   Loader
 } from 'rsuite'
 
-const BarChart = React.lazy(() => import('../components/homepage/barchart'))
-const Heatmap = React.lazy(() => import('../components/homepage/heatmap'))
+const BarChart = dynamic(() => import('../components/homepage/barchart'), {
+  ssr: false,
+  loading: () => (
+    <div style={{ height: '377px', width: '642px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <Placeholder.Graph active height='377px' width='642px' style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Loader content='Loading...' /></Placeholder.Graph>
+    </div>
+  )
+})
 
-const isServer = typeof window === "undefined";
+const Heatmap = dynamic(() => import('../components/homepage/heatmap'))
 
 const Index = props => {
   const store = Store.useStore()
@@ -33,22 +39,10 @@ const Index = props => {
         <MaintPanel header='Maintenance'>
           <FlexboxGrid align='middle' justify='space-around' style={{ width: '100%' }}>
             <UnreadBadge count={store.get('count')} />
-            {!isServer ? (
-              <React.Suspense fallback={<Placeholder.Graph height='375px' width='640px' />}>
-                <BarChart />
-              </React.Suspense>
-            ) : (
-              null
-            )}
+            <BarChart />
           </FlexboxGrid>
           <FlexboxGrid align='middle' justify='space-around' style={{ width: '100%', padding: '50px' }}>
-            {!isServer ? (
-              <React.Suspense fallback={<Placeholder.Graph active height='165px' style={{ maxWidth: '1300px' }} />}>
-                <Heatmap />
-              </React.Suspense>
-            ) : (
-              null
-            )}
+            <Heatmap />
           </FlexboxGrid>
         </MaintPanel>
       </Layout>

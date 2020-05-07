@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef }from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import Layout from '../../components/layout'
 import fetch from 'isomorphic-unfetch'
 import Footer from '../../components/cardFooter'
@@ -96,10 +96,10 @@ const Changelog = dynamic(
   { ssr: false }
 )
 
-const sentBtn = (row) => {
+const sentBtn = (row, actionA, actionB) => {
   return (
     <ButtonGroup>
-      <Button onClick={() => toggleRescheduleSentBtn(row.data.rcounter)} style={{ padding: '0.75em' }} size='sm' outline>
+      <Button onClick={() => actionA(row.data.rcounter)} style={{ padding: '0.75em' }} size='sm' outline>
         <Tooltip
           title='Toggle Sent Status'
           position='top'
@@ -114,7 +114,7 @@ const sentBtn = (row) => {
           <FontAwesomeIcon width='1.325em' icon={row.data.sent === 1 ? faCheck : faTimesCircle} />
         </Tooltip>
       </Button>
-      <Button onClick={() => moveCalendarEntry(row.data.startDateTime, row.data.endDateTime, row.data.rcounter)} style={{ padding: '0.7em' }} size='sm' outline>
+      <Button onClick={() => actionB(row.data.startDateTime, row.data.endDateTime, row.data.rcounter)} style={{ padding: '0.7em' }} size='sm' outline>
         <Tooltip
           title='Move Calendar Entry'
           position='top'
@@ -133,13 +133,13 @@ const sentBtn = (row) => {
   )
 }
 
-const sendMailBtns = (row) => {
+const sendMailBtns = (row, actionA, actionB) => {
   return (
     <ButtonGroup>
-      <Button onClick={() => prepareDirectSend(row.data.maintenanceRecipient, row.data.kundenCID, row.data.frozen, row.data.name)} style={{ padding: '0.7em' }} size='sm' outline>
+      <Button onClick={() => actionA(row.data.maintenanceRecipient, row.data.kundenCID, row.data.frozen, row.data.name)} style={{ padding: '0.7em' }} size='sm' outline>
         <FontAwesomeIcon width='1.325em' icon={faPaperPlane} />
       </Button>
-      <Button onClick={() => togglePreviewModal(row.data.maintenanceRecipient, row.data.kundenCID, row.data.protected)} style={{ padding: '0.7em' }} size='sm' outline>
+      <Button onClick={() => actionB(row.data.maintenanceRecipient, row.data.kundenCID, row.data.protected)} style={{ padding: '0.7em' }} size='sm' outline>
         <FontAwesomeIcon width='1.325em' icon={faSearch} />
       </Button>
     </ButtonGroup>
@@ -150,7 +150,6 @@ const HALF_WIDTH = 600
 
 // export default class Maintenance extends React.Component {
 const Maintenance = props => {
-
   // constructor (props) {
   //   super(props)
   //   let night
@@ -175,10 +174,10 @@ const Maintenance = props => {
     calendarId: props.jsonData.profile.calendarId,
     maintNote: ''
   })
-  const [attachmentModalSize, setAttachmentModalSize] = useState({
-    width: 673,
-    height: 400
-  })
+  // const [attachmentModalSize, setAttachmentModalSize] = useState({
+  //   width: 673,
+  //   height: 400
+  // })
   const [frozenState, setFrozenState] = useState({
     recipient: '',
     cid: ''
@@ -288,7 +287,7 @@ const Maintenance = props => {
     frameworkComponents: {
       startdateTime: StartDateTime,
       enddateTime: EndDateTime,
-      sentBtn: sentBtn
+      sentBtn: sentBtn(toggleRescheduleSentBtn, moveCalendarEntry)
     }
   }
   const gridOptions = {
@@ -346,7 +345,7 @@ const Maintenance = props => {
       }
     ],
     frameworkComponents: {
-      sendMailBtn: sendMailBtns,
+      sendMailBtn: sendMailBtns(prepareDirectSend, togglePreviewModal),
       protectedIcon: ProtectedIcon,
       sentIcon: SentIcon
     },
@@ -444,9 +443,9 @@ const Maintenance = props => {
           const companyId = data.companyResults[0].id
           const companyName = data.companyResults[0].name
           setMaintenance({
-              ...maintenance,
-              name: companyName,
-              lieferant: companyId
+            ...maintenance,
+            name: companyName,
+            lieferant: companyId
           })
           fetchLieferantCIDs(companyId)
         })
@@ -454,7 +453,7 @@ const Maintenance = props => {
     }
 
     // get choices for company select
-    fetch(`/api/companies/selectmaint`, {
+    fetch('/api/companies/selectmaint', {
       method: 'get'
     })
       .then(resp => resp.json())
@@ -462,7 +461,6 @@ const Maintenance = props => {
         setSuppliers(data.companies)
       })
       .catch(err => console.error(`Error - ${err}`))
-
 
     // prepopulate impact placeholder
     const startDateTime = props.jsonData.profile.startDateTime
@@ -472,7 +470,6 @@ const Maintenance = props => {
       const impactCalculation = formatDistance(parseISO(endDateTime), parseISO(startDateTime))
       setImpactPlaceholder(impactCalculation)
     }
-
   }, [])
 
   /// /////////////////////////////////////////////////////////
@@ -491,13 +488,11 @@ const Maintenance = props => {
     gridColumnApi.current = params.gridColumnApi
   }
 
-
   /// /////////////////////////////////////////////////////////
   //
   //                ACTIONS: API CALLS
   //
   /// /////////////////////////////////////////////////////////
-
 
   // fetch supplier CIDs
   const fetchLieferantCIDs = lieferantId => {
@@ -583,7 +578,7 @@ const Maintenance = props => {
       .catch(err => console.error(`Error - ${err}`))
   }
 
-  const checkFreezeStatus = async (cid) =>  {
+  const checkFreezeStatus = async (cid) => {
     const startDate = maintenance.startDateTime
     const endDate = maintenance.endDateTime
 
@@ -767,7 +762,7 @@ const Maintenance = props => {
       subject = `[RESCHEDULED] ${subject}-${rescheduleData[rescheduleData.length - 1].rcounter}`
     }
 
-    fetch(`/v1/api/mail/send`, {
+    fetch('/v1/api/mail/send', {
       method: 'post',
       body: JSON.stringify({
         body: body,
@@ -876,7 +871,7 @@ const Maintenance = props => {
     cids = cids.trim()
 
     if (calId) {
-      fetch(`/v1/api/calendar/reschedule`, {
+      fetch('/v1/api/calendar/reschedule', {
         method: 'post',
         body: JSON.stringify({
           company: company,
@@ -929,7 +924,7 @@ const Maintenance = props => {
     const endMoment = moment.tz(endDateTime, maintenance.timezone)
     const endDE = endMoment.tz('Europe/Berlin').format()
 
-    fetch(`/v1/api/calendar/create`, {
+    fetch('/v1/api/calendar/create', {
       method: 'post',
       body: JSON.stringify({
         company: company,
@@ -1001,7 +996,7 @@ const Maintenance = props => {
   }
 
   const handleNotesChange = (data) => {
-    setMaintenance({...maintenance, notes: data.level.content})
+    setMaintenance({ ...maintenance, notes: data.level.content })
   }
 
   const saveDateTime = (maintId, element, newValue) => {
@@ -1034,7 +1029,7 @@ const Maintenance = props => {
   const handleStartDateChange = date => {
     const startDate = moment(date[0]).format('YYYY-MM-DD HH:mm:ss')
 
-    setMaintenance({...maintenance, startDateTime: startDate})
+    setMaintenance({ ...maintenance, startDateTime: startDate })
     saveDateTime(maintenance.id, 'start', startDate)
     const startDateTime = maintenance.startDateTime
     const endDateTime = maintenance.endDateTime
@@ -1048,7 +1043,7 @@ const Maintenance = props => {
   const handleEndDateChange = date => {
     const endDate = moment(date[0]).format('YYYY-MM-DD HH:mm:ss')
 
-    setMaintenance({...maintenance, endDateTime: endDate})
+    setMaintenance({ ...maintenance, endDateTime: endDate })
     saveDateTime(maintenance.id, 'end', endDate)
     const startDateTime = maintenance.startDateTime
     const endDateTime = maintenance.endDateTime
@@ -1080,7 +1075,7 @@ const Maintenance = props => {
         newValue = true
       }
     }
-    setMaintenance({...maintenance, [element]: newValue })
+    setMaintenance({ ...maintenance, [element]: newValue })
 
     if (element === 'done') {
       // save 'betroffeneCIDs'
@@ -1091,12 +1086,12 @@ const Maintenance = props => {
 
       impactedCIDs = impactedCIDs.trim()
 
-      setMaintenance({...maintenance, betroffeneCIDs: impactedCIDs, [element]: newValue})
+      setMaintenance({ ...maintenance, betroffeneCIDs: impactedCIDs, [element]: newValue })
 
       if (maintenance.receivedmail) {
         const mailId = maintenance.receivedmail
         if (!mailId.startsWith('NT-')) {
-          fetch(`/v1/api/inbox/markcomplete`, {
+          fetch('/v1/api/inbox/markcomplete', {
             method: 'post',
             body: JSON.stringify({ m: mailId }),
             mode: 'cors',
@@ -1131,7 +1126,7 @@ const Maintenance = props => {
         .catch(err => console.error(`Error - ${err}`))
 
       // update Algolia Index
-      fetch(`/v1/api/search/update`, {
+      fetch('/v1/api/search/update', {
         method: 'get'
       })
     }
@@ -1159,40 +1154,40 @@ const Maintenance = props => {
   }
 
   const handleReasonChange = (event) => {
-    setMaintenance({...maintenance, reason: encodeURIComponent(event.target.value)})
+    setMaintenance({ ...maintenance, reason: encodeURIComponent(event.target.value) })
   }
 
   const handleMaintNoteChange = (event) => {
-    setMaintenance({...maintenance, maintNote: encodeURIComponent(event.target.value)})
+    setMaintenance({ ...maintenance, maintNote: encodeURIComponent(event.target.value) })
   }
 
   const handleLocationChange = (event) => {
-    setMaintenance({...maintenance, location: event.target.value})
+    setMaintenance({ ...maintenance, location: event.target.value })
   }
 
   const handleImpactChange = (event) => {
-    setMaintenance({...maintenance, impact: event.target.value})
+    setMaintenance({ ...maintenance, impact: event.target.value })
   }
 
   const handleTimezoneChange = (selection) => {
     const timezoneLabel = selection.label // 'Europe/Amsterdam'
     const timezoneValue = selection.value // '(GMT+02:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna'
 
-    setMaintenance({...maintenance, timezone: timezoneValue, timezoneLabel: timezoneLabel })
+    setMaintenance({ ...maintenance, timezone: timezoneValue, timezoneLabel: timezoneLabel })
   }
 
   const handleUpdatedByChange = () => {
     const value = maintenance.updatedBy
-    setMaintenance({...maintenance, updatedBy: value })
+    setMaintenance({ ...maintenance, updatedBy: value })
   }
 
   const handleUpdatedAtChange = () => {
     const value = maintenance.updatedAt
-    setMaintenance({...maintenance, updatedAt: value })
+    setMaintenance({ ...maintenance, updatedAt: value })
   }
 
   const handleSupplierChange = (selectedOption) => {
-    setMaintenance({...maintenance, lieferant: selectedOption.value, name: selectedOption.label })
+    setMaintenance({ ...maintenance, lieferant: selectedOption.value, name: selectedOption.label })
     setSelectedLieferant([])
     setKundencids([])
     fetchLieferantCIDs(selectedOption.value)
@@ -1687,7 +1682,7 @@ const Maintenance = props => {
               currentAttachment: id || null,
               openedDownloadPopupId: id,
               attachmentPopoverBody:
-              <span>
+  <span>
                 <ButtonGroup>
                   <Button onClick={() => { setOpenAttachmentModal(!openAttachmentModal); setOpenedDownloadPopupId(null) }} outline size='sm'>Preview</Button>
                   <Button onClick={() => downloadFile(base64, filename, mime)} size='sm'>Download</Button>
@@ -1722,7 +1717,7 @@ const Maintenance = props => {
         const base64Fixed = fixBase64(base64)
         const fileData = new Blob([base64Fixed], { type: 'application/pdf' })
         setAttachmentDetails({
-          attachmentModalSize: {
+          size: {
             height: 800,
             width: 950
           },
@@ -1748,8 +1743,8 @@ const Maintenance = props => {
         const mime = file.mime
         let base64 = (filedata).replace(/_/g, '/')
         base64 = base64.replace(/-/g, '+')
+        setAttachmentHtmlContent(attachmentHTMLContent: window.atob(base64)),
         setAttachmentDetails({
-          attachmentHTMLContent: window.atob(base64),
           filetype: filetype,
           currentAttachment: id || null,
           currentAttachmentName: filename,
@@ -1771,7 +1766,7 @@ const Maintenance = props => {
         base64 = base64.replace(/-/g, '+')
         setAttachmentDetails({
           attachmentPopoverBody:
-          <span>
+  <span>
             <ButtonGroup>
               <Button outline disabled size='sm'>
                 <Tooltip
@@ -1815,7 +1810,7 @@ const Maintenance = props => {
       maileingang,
       lieferant,
       mailId,
-      updatedAt,
+      updatedAt
     } = maintenance
 
     let incomingFormatted
@@ -1849,7 +1844,7 @@ const Maintenance = props => {
     // mark mail as unread as well
     const incomingMailId = maintenance.mailId || maintenance.receivedmail
     if (incomingMailId !== 'NT') {
-      fetch(`/v1/api/inbox/delete`, {
+      fetch('/v1/api/inbox/delete', {
         method: 'post',
         body: JSON.stringify({ m: incomingMailId }),
         mode: 'cors',
@@ -1893,31 +1888,31 @@ const Maintenance = props => {
   //
   /// /////////////////////////////////////////////////////////
 
-    // const {
-    //   maintenance,
-    //   dateTimeWarning,
-    //   suppliers,
-    //   lieferantcids,
-    //   openReadModal,
-    //   selectedLieferant,
-    //   impactPlaceholder,
-    //   openPreviewModal,
-    //   notesText,
-    //   incomingAttachments,
-    //   night
-    // } = this.state
+  // const {
+  //   maintenance,
+  //   dateTimeWarning,
+  //   suppliers,
+  //   lieferantcids,
+  //   openReadModal,
+  //   selectedLieferant,
+  //   impactPlaceholder,
+  //   openPreviewModal,
+  //   notesText,
+  //   incomingAttachments,
+  //   night
+  // } = this.state
 
-    let maintenanceIdDisplay
-    if (maintenance.id === 'NEW') {
-      maintenanceIdDisplay = maintenance.id
-    } else {
-      maintenanceIdDisplay = `NT-${maintenance.id}`
-    }
+  let maintenanceIdDisplay
+  if (maintenance.id === 'NEW') {
+    maintenanceIdDisplay = maintenance.id
+  } else {
+    maintenanceIdDisplay = `NT-${maintenance.id}`
+  }
 
-    // let HALF_WIDTH = 500
-    // if (typeof window !== 'undefined') {
-    //   HALF_WIDTH = this.state.width !== 0 ? this.state.width / 2 : 500
-    // }
+  // let HALF_WIDTH = 500
+  // if (typeof window !== 'undefined') {
+  //   HALF_WIDTH = this.state.width !== 0 ? this.state.width / 2 : 500
+  // }
 
   if (props.session.user) {
     return (
@@ -2643,10 +2638,10 @@ const Maintenance = props => {
                 </InputGroup>
               </div>
               <ButtonGroup style={{ flexDirection: 'column' }}>
-                <Button theme={'light'} style={{ borderRadius: '5px 5px 0 0' }} onClick={togglePreviewModal}>
+                <Button theme="light" style={{ borderRadius: '5px 5px 0 0' }} onClick={togglePreviewModal}>
                   <FontAwesomeIcon width='1.5em' style={{ fontSize: '12px' }} className='modal-preview-send-icon' icon={faTimesCircle} />
                 </Button>
-                <Button theme={'light'} outline id='send-mail-btn' style={{ borderRadius: '0 0 5px 5px', padding: '0.9em 1.1em' }} onClick={() => sendMail(mailPreviewHeaderText, mailPreviewCustomerCid, mailPreviewSubjectText, mailBodyText, true)}>
+                <Button theme="light" outline id='send-mail-btn' style={{ borderRadius: '0 0 5px 5px', padding: '0.9em 1.1em' }} onClick={() => sendMail(mailPreviewHeaderText, mailPreviewCustomerCid, mailPreviewSubjectText, mailBodyText, true)}>
                   <FontAwesomeIcon width='1.5em' style={{ fontSize: '12px' }} className='modal-preview-send-icon modal-preview-paperplane-icon' icon={faPaperPlane} />
                 </Button>
               </ButtonGroup>

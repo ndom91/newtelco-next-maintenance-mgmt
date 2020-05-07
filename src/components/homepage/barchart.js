@@ -4,7 +4,8 @@ import useSWR from 'swr'
 import Chart from 'react-apexcharts'
 import {
   Panel,
-  Placeholder
+  Placeholder,
+  Loader
 } from 'rsuite'
 
 const options = {
@@ -78,15 +79,16 @@ const options = {
   }
 }
 
-const NTChart = () => {
+const BarChart = () => {
   const { data } = useSWR(
-    `/api/homepage/barchart`,
+    '/api/homepage/barchart',
     (...args) => fetch(...args).then(res => res.json()),
-    { suspense: true, revalidateOnFocus: false }
+    { suspense: false, revalidateOnFocus: false }
   )
-  const userSeries = []
-  const returnSeries = []
-  if (data.query) {
+
+  if (data) {
+    const userSeries = []
+    const returnSeries = []
     const users = Array.from(new Set(data.query.map(obj => JSON.stringify(({ user: obj.user }))))).map(JSON.parse)
     users.forEach(user => {
       const userData = data.query
@@ -108,17 +110,19 @@ const NTChart = () => {
       const data = user.map(user => [user.date, user.count])
       returnSeries.push({ data: data, name: user[0].user })
     })
+
+    return (
+      <Panel header={null} bordered>
+        <Chart options={options} series={returnSeries} type='area' width={600} height={320} />
+      </Panel>
+    )
+  } else {
+    return (
+      <div style={{ height: '377px', width: '642px' }}>
+        <Placeholder.Graph active height='377px' width='642px' style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Loader content='Loading...' /></Placeholder.Graph>
+      </div>
+    )
   }
-
-  return <Chart options={options} series={returnSeries} type='area' width={600} height={320} />
-}
-
-const BarChart = () => {
-  return (
-    <Panel header={null} bordered>
-      <NTChart />
-    </Panel>
-  )
 }
 
 export default BarChart
