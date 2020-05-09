@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react'
-import Router from 'next/router'
 import Link from 'next/link'
 import { NextAuth } from 'next-auth/client'
 import Fonts from '../../components/fonts'
@@ -9,7 +8,8 @@ import {
   Panel,
   Content,
   IconButton,
-  Icon
+  Icon,
+  Col
 } from 'rsuite'
 
 const App = ({ session, linkedAccounts, providers }) => {
@@ -27,8 +27,8 @@ const App = ({ session, linkedAccounts, providers }) => {
                 <img src='/static/images/nt-black.png' alt='Newtelco Maintenance' width='100%' />
               </FlexboxGrid.Item>
             </FlexboxGrid>
-            <FlexboxGrid.Item componentClass={Panel} colspan={8} md={10} sm={18}>
-              <Panel header='Sign in' bordered shaded style={{ backgroundColor: '#fff'  }}>
+            <FlexboxGrid.Item componentClass={Col} colspan={4} lg={6} md={8} sm={14} xs={18}>
+              <Panel header='Sign in' bordered shaded style={{ backgroundColor: '#fff' }}>
                 <LinkAccounts
                   session={session}
                   linkedAccounts={linkedAccounts}
@@ -49,21 +49,21 @@ const App = ({ session, linkedAccounts, providers }) => {
                 <img src='/static/images/nt-black.png' alt='Newtelco Maintenance' width='100%' />
               </FlexboxGrid.Item>
             </FlexboxGrid>
-            <FlexboxGrid.Item colspan={8} md={10} sm={18}>
-              <Panel 
+            <FlexboxGrid.Item componentClass={Col} colspan={4} lg={6} md={8} sm={14} xs={18}>
+              <Panel
                 header={
                   <div style={{ width: '100%', textAlign: 'center' }}>
-                    <span 
-                      style={{ 
-                        fontSize: '1.5rem', 
+                    <span
+                      style={{
+                        fontSize: '1.5rem'
                       }}
                     >
                       Maintenance Application
                     </span>
                   </div>
-                } 
-                bordered 
-                shaded 
+                }
+                bordered
+                shaded
                 style={{ backgroundColor: '#fff', fontFamily: 'var(--font-body)' }}
               >
                 <SignInButtons providers={providers} />
@@ -118,7 +118,7 @@ const LinkAccount = ({ linked, provider, session }) => {
   }
 }
 
-const SignInButtons = ({providers}) => {
+const SignInButtons = ({ providers }) => {
   return (
     <>
       {

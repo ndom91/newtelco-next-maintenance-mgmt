@@ -15,6 +15,9 @@ import {
   FlexboxGrid
 } from 'rsuite'
 
+// TODO: Darkmode
+// https://github.com/kazzkiq/darkmode
+
 const UnreadFavicon = dynamic(
   () => import('./unreadcount'),
   { ssr: false }

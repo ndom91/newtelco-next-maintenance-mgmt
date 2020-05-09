@@ -4,7 +4,6 @@ import { AgGridReact } from 'ag-grid-react'
 import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-material.css'
 import Notify from '../../lib/notification'
-import MaintPanel from '../panel'
 import ConfirmModal from '../confirmmodal'
 import {
   Icon,
@@ -93,7 +92,7 @@ const Companies = props => {
     gridApi.current.showLoadingOverlay()
     params.api.sizeColumnsToFit()
     params.api.setSortModel({ colId: 'name', sort: 'asc' })
-  };
+  }
 
   const toggleCompanyAdd = () => {
     setOpenCompanyModal(!openCompanyModal)
