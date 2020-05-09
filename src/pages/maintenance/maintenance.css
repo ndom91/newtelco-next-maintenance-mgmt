@@ -70,3 +70,38 @@
 .flatpickr-calendar.arrowTop:after {
   border-bottom-color: var(--grey3) !important;
 }
+
+.rs-timeline {
+  margin-top: 20px !important;
+}
+
+.rs-timeline-item {
+  margin-bottom: 5px;
+}
+
+.rs-timeline-item-dot {
+  left: calc(25% - 15px) !important;
+  top: -5px !important;
+}
+
+.rs-timeline-item-tail {
+  left: calc(25% - 1px) !important;
+}
+
+.rs-timeline-item-time {
+  flex: 1 !important;
+  text-align: left !important;
+}
+
+.rs-timeline-item-content {
+  flex: 1 !important;
+  margin-left: -190px;
+}
+
+.rs-timeline-item-dot .rs-avatar {
+  color: var(--primary) !important;
+}
+
+.rs-avatar-sm > .rs-icon {
+  font-size: 15px !important;
+}

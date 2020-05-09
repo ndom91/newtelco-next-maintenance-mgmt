@@ -49,7 +49,7 @@ import {
   faPlusCircle,
   faPaperPlane,
   faTimesCircle,
-  faMailBulk,
+  faMailBulk
 } from '@fortawesome/free-solid-svg-icons'
 import {
   faCalendarAlt,
@@ -63,7 +63,7 @@ import {
   InputGroupAddon,
   Modal,
   ModalHeader,
-  ModalBody,
+  ModalBody
 } from 'shards-react'
 
 import {
@@ -87,8 +87,6 @@ import {
   Row,
   Col,
   Loader,
-  CheckboxGroup,
-  Checkbox,
   Progress
 } from 'rsuite'
 
@@ -1082,6 +1080,7 @@ const Maintenance = props => {
         })
         .catch(err => console.error(`Error - ${err}`))
 
+      // TODO: Check whats up here
       // update Algolia Index
       // fetch('/v1/api/search/update', {
       //   method: 'get'
@@ -1685,11 +1684,11 @@ const Maintenance = props => {
           openedDownloadPopupId: id,
           attachmentPopoverBody:
   <span>
-            <ButtonGroup>
-              <Button onClick={() => { setOpenAttachmentModal(!openAttachmentModal); setOpenedDownloadPopupId(null) }} outline size='sm'>Preview</Button>
-              <Button onClick={() => downloadFile(base64, filename, mime)} size='sm'>Download</Button>
-            </ButtonGroup>
-          </span>
+    <ButtonGroup>
+      <Button onClick={() => { setOpenAttachmentModal(!openAttachmentModal); setOpenedDownloadPopupId(null) }} outline size='sm'>Preview</Button>
+      <Button onClick={() => downloadFile(base64, filename, mime)} size='sm'>Download</Button>
+    </ButtonGroup>
+  </span>
         })
       } else if (filetype === 'html') {
         const fileIndex = maintenance.incomingAttachments.findIndex(el => el.id === id)
@@ -1707,11 +1706,11 @@ const Maintenance = props => {
           openedDownloadPopupId: id,
           attachmentPopoverBody:
   <span>
-            <ButtonGroup>
-              <Button onClick={() => { setOpenAttachmentModal(!openAttachmentModal); setOpenedDownloadPopupId(null) }} outline size='sm'>Preview</Button>
-              <Button onClick={() => downloadFile(base64, filename, mime)} size='sm'>Download</Button>
-            </ButtonGroup>
-          </span>
+    <ButtonGroup>
+      <Button onClick={() => { setOpenAttachmentModal(!openAttachmentModal); setOpenedDownloadPopupId(null) }} outline size='sm'>Preview</Button>
+      <Button onClick={() => downloadFile(base64, filename, mime)} size='sm'>Download</Button>
+    </ButtonGroup>
+  </span>
         })
       } else {
         const fileIndex = maintenance.incomingAttachments.findIndex(el => el.id === id)
@@ -2081,9 +2080,9 @@ const Maintenance = props => {
                           <ControlLabel>
                             Cancelled
                           </ControlLabel>
-                          <Toggle 
+                          <Toggle
                             size='lg'
-                            checkedChildren={<Icon icon='ban' inverse />} 
+                            checkedChildren={<Icon icon='ban' inverse />}
                             checked={maintenance.cancelled === 'false' ? false : !!maintenance.cancelled}
                             onChange={(event) => handleToggleChange('cancelled', event)}
                           />
@@ -2096,7 +2095,7 @@ const Maintenance = props => {
                           </ControlLabel>
                           <Toggle
                             size='lg'
-                            checkedChildren={<Icon inverse icon='hospital-o' />} 
+                            checkedChildren={<Icon inverse icon='hospital-o' />}
                             checked={maintenance.emergency === 'false' ? false : !!maintenance.emergency}
                             onChange={(event) => handleToggleChange('emergency', event)}
                           />
@@ -2109,7 +2108,7 @@ const Maintenance = props => {
                           </ControlLabel>
                           <Toggle
                             size='lg'
-                            checkedChildren={<Icon inverse icon='check' />} 
+                            checkedChildren={<Icon inverse icon='check' />}
                             checked={maintenance.done === 'false' ? false : !!maintenance.done}
                             onChange={(event) => handleToggleChange('done', event)}
                           />
@@ -2181,7 +2180,7 @@ const Maintenance = props => {
                                   </Row>
                                   <Row>
                                     <Col>
-                                      <Changelog maintid={maintenance.id} />
+                                      <Changelog maintId={maintenance.id} />
                                     </Col>
                                   </Row>
                                 </Container>
@@ -2198,7 +2197,7 @@ const Maintenance = props => {
                               <Col>
                                 <Container>
                                   <Row>
-                                    <FlexboxGrid justify='space-between' align='middle'>
+                                    <FlexboxGrid justify='space-between' align='middle' style={{ margin: '0px 20px 10px 20px' }}>
                                       <FlexboxGrid.Item>
                                         <span style={{ color: 'var(--grey4)', fontFamily: 'var(--font-body)', fontWeight: '100 !important', fontSize: '1.5rem' }}>Customer CIDs</span>
                                       </FlexboxGrid.Item>
@@ -2215,12 +2214,7 @@ const Maintenance = props => {
                                   </Row>
                                   <Row>
                                     <Col>
-                                      {kundencids.length !== 0
-                                        ? (
-                                          <Progress.Line percent={sentProgress} showInfo={false} />
-                                        ) : (
-                                          null
-                                        )}
+                                      <Progress.Line percent={sentProgress} showInfo={false} />
                                     </Col>
                                   </Row>
                                   <Row>

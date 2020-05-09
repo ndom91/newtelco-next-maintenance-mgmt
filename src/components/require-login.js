@@ -8,7 +8,8 @@ import {
   Content,
   Button,
   IconButton,
-  Icon
+  Icon,
+  Col
 } from 'rsuite'
 
 const RequireLogin = () => {
@@ -20,7 +21,7 @@ const RequireLogin = () => {
     <Container>
       <Content>
         <FlexboxGrid justify='center' align='middle' style={{ height: '70vh', flexDirection: 'column' }}>
-          <FlexboxGrid.Item componentClass={Panel} colspan={8} md={10} sm={18}>
+          <FlexboxGrid.Item componentClass={Col} colspan={4} lg={6} md={8} sm={14} xs={18}>
             <Panel header='Sign in' bordered shaded style={{ backgroundColor: '#fff'  }}>
               <p style={{ margin: '20px' }}>
                   You must be signed-in to view this content.
