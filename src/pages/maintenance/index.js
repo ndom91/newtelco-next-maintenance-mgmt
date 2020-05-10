@@ -321,7 +321,6 @@ const Maintenance = props => {
         emergency,
         done
       } = props.jsonData.profile
-      console.table(props.jsonData.profile)
 
       const newMaintenance = {
         ...props.jsonData.profile,
@@ -436,7 +435,7 @@ const Maintenance = props => {
               data.respArray.forEach(respCid => {
                 fetchMailCIDs(respCid.value)
               })
-              setSelectedLieferant: data.respArray
+              setSelectedLieferant(data.respArray)
             })
         } else {
           // Single CID String
