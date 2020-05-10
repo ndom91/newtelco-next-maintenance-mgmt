@@ -2298,7 +2298,7 @@ const Maintenance = props => {
 
 Maintenance.getInitialProps = async ({ req }) => {
   const host = req ? req.headers['x-forwarded-host'] : window.location.hostname
-  const protocol = 'https:'
+  let protocol = 'https:'
   if (host.indexOf('localhost') > -1) {
     protocol = 'http:'
   }
@@ -2311,7 +2311,7 @@ Maintenance.getInitialProps = async ({ req }) => {
   } else {
     display = count.count
   }
-  if (req.query.id === 'NEW') {
+  if (req.query && req.query.id === 'NEW') {
     return {
       jsonData: { profile: req.query },
       unread: display,
