@@ -15,7 +15,7 @@ import './style/index.css'
 const BarChart = dynamic(() => import('../components/homepage/barchart'), {
   ssr: false,
   loading: () => (
-    <div style={{ height: '442px', width: '327px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <div style={{ height: '342px', width: '327px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <Loader />
     </div>
   )

@@ -4,7 +4,7 @@ import useSWR from 'swr'
 import Chart from 'react-apexcharts'
 import {
   Panel,
-  Placeholder,
+  Icon,
   Loader
 } from 'rsuite'
 
@@ -33,10 +33,10 @@ const options = {
     shared: true
   },
   grid: {
-    show: false,
+    show: false
   },
   fill: {
-    type: "gradient",
+    type: 'gradient',
     gradient: {
       shadeIntensity: 1,
       opacityFrom: 0.7,
@@ -97,13 +97,13 @@ const BarChart = () => {
     })
 
     return (
-      <Panel header='Completed' bordered>
+      <Panel bordered header={<div style={{ display: 'flex', justifyContent: 'space-between' }}>Completed<Icon icon='tasks' style={{ color: 'var(--primary)' }} size='lg' /></div>} style={{ height: '100%' }}>
         <Chart options={options} series={returnSeries} type='area' width={400} height={220} />
       </Panel>
     )
   } else {
     return (
-      <div style={{ height: '447px', width: '327px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+      <div style={{ height: '342px', width: '327px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
         <Loader />
       </div>
     )

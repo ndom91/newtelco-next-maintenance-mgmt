@@ -1,7 +1,7 @@
 import React from 'react'
 import fetch from 'isomorphic-unfetch'
 import useSWR from 'swr'
-import { Panel, Loader, Placeholder } from 'rsuite'
+import { Panel, Loader, Icon } from 'rsuite'
 import { ResponsiveCalendarCanvas } from '@nivo/calendar'
 
 const Heatmap = () => {
@@ -13,7 +13,7 @@ const Heatmap = () => {
 
   if (data) {
     return (
-      <Panel header='Calendar' bordered style={{ width: '100%' }}>
+      <Panel bordered header={<div style={{ display: 'flex', justifyContent: 'space-between' }}>Calendar<Icon icon='calendar-o' style={{ color: 'var(--primary)' }} size='lg' /></div>} style={{ height: '100%' }}>
         <div style={{ width: '100%', maxWidth: '1100px', height: '400px' }}>
           <ResponsiveCalendarCanvas
             data={data.maintenances}

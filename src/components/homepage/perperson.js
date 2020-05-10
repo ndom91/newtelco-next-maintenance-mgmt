@@ -2,7 +2,7 @@ import React from 'react'
 import fetch from 'isomorphic-unfetch'
 import { Bar } from '@nivo/bar'
 import useSWR from 'swr'
-import { Panel, Loader } from 'rsuite'
+import { Panel, Loader, Icon } from 'rsuite'
 
 const PerPerson = () => {
   const { data } = useSWR(
@@ -13,7 +13,7 @@ const PerPerson = () => {
 
   if (data) {
     return (
-      <Panel header='Totals' bordered>
+      <Panel bordered header={<div style={{ display: 'flex', justifyContent: 'space-between' }}>Totals<Icon icon='bar-chart' style={{ color: 'var(--primary)' }} size='lg' /></div>} style={{ height: '100%' }}>
         <Bar
           width={400}
           height={250}
@@ -36,7 +36,7 @@ const PerPerson = () => {
     )
   } else {
     return (
-      <div style={{ height: '240px', width: '400px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+      <div style={{ height: '342px', width: '449px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
         <Loader />
       </div>
     )
