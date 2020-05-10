@@ -33,7 +33,7 @@ export default class ErrorBoundary extends React.Component {
                     <h4 style={{ textAlign: 'center', marginBottom: '10px' }}>Oops — something's gone wrong.</h4>
                     <p>If you would like to provide us more information, please select 'Report' below.</p>
                     <ButtonGroup justified style={{ marginTop: '20px', width: '100%' }}>
-                      <Button componentClass='a' href={`mailto:ndomino@newtelco.de?subject=${encodeURIComponent('Newtelco Maintenance - Error')}&body=${encodeURIComponent(this.state.error)}%0D%0A%0D%0A${encodeURIComponent(JSON.stringify(this.state.errorInfo))}%0D%0A%0D%0AThanks%0D%0A${this.props.user}`}>
+                      <Button componentClass='a' href={`mailto:ndomino@newtelco.de?subject=${encodeURIComponent('Newtelco Maintenance - Error')}&body=${encodeURIComponent(this.state.error)}%0D%0A%0D%0A${encodeURIComponent(JSON.stringify(this.state.errorInfo))}%0D%0A%0D%0AThanks`}>
                         Report
                       </Button>
                       <Button appearance='primary' onClick={() => window.location.reload(true)}>

@@ -30,7 +30,7 @@ export default class MyApp extends App {
     const { Component, pageProps, router } = this.props
 
     return (
-      <ErrorBoundary user={pageProps.session.user ? pageProps.session.user.name : ''}>
+      <ErrorBoundary>
         <Head>
           <title>Newtelco Maintenance</title>
           <meta name='viewport' content='width=device-width, initial-scale=1' />
