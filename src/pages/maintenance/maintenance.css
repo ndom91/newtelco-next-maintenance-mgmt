@@ -37,7 +37,7 @@
   border: 1px solid #becad6;
   font-weight: 300;
   will-change: border-color,box-shadow;
-  border-radius: 10px;
+  border-radius: 5px;
   box-shadow: none;
   transition: box-shadow 250ms cubic-bezier(.27,.01,.38,1.06),border 250ms cubic-bezier(.27,.01,.38,1.06);
 }
@@ -153,33 +153,15 @@ textarea::-webkit-scrollbar-thumb {
   background-color: rgba(0,0,0,0.4);
 }
 
-/* .rs-timeline-item {
-  margin-bottom: 5px;
+.create-btn{
+  animation: glow 1s infinite alternate;
 }
 
-.rs-timeline-item-dot {
-  left: calc(25% - 15px) !important;
-  top: -5px !important;
+@keyframes glow {
+  from {
+    box-shadow: 0 0 10px -10px rgba(102, 178, 70, 0.3);
+  }
+  to {
+    box-shadow: 0 0 15px 15px rgba(102, 178, 70, 0.3);
+  }
 }
-
-.rs-timeline-item-tail {
-  left: calc(25% - 1px) !important;
-}
-
-.rs-timeline-item-time {
-  flex: 1 !important;
-  text-align: left !important;
-}
-
-.rs-timeline-item-content {
-  flex: 1 !important;
-  margin-left: -190px;
-}
-
-.rs-timeline-item-dot .rs-avatar {
-  color: var(--primary) !important;
-}
-
-.rs-avatar-sm > .rs-icon {
-  font-size: 15px !important;
-} */

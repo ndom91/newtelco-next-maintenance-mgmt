@@ -64,7 +64,8 @@ import {
   Loader,
   Progress,
   Modal,
-  Container
+  Container,
+  Message
 } from 'rsuite'
 
 const animatedComponents = makeAnimated()
@@ -83,7 +84,7 @@ const Maintenance = props => {
     bearbeitetvon: '',
     maileingang: '',
     updatedAt: '',
-    updatedBy: props.jsonData.profile.updatedBy,
+    updatedBy: props.jsonData.profile.updatedBy || '',
     name: '',
     impact: '',
     location: '',
@@ -295,15 +296,18 @@ const Maintenance = props => {
 
   useEffect(() => {
     let lieferantDomain
+    let localMaint
     if (props.jsonData.profile.id === 'NEW') {
       // prepare NEW maintenance
       const username = props.session.user.email.substr(0, props.session.user.email.indexOf('@'))
-      const maintenance = {
+      const newMaint = {
+        ...maintenance,
         ...props.jsonData.profile,
         bearbeitetvon: username,
         updatedAt: format(new Date(), 'MM.dd.yyyy HH:mm')
       }
-      setMaintenance(maintenance)
+      setMaintenance(newMaint)
+      localMaint = newMaint
       lieferantDomain = props.jsonData.profile.name
     } else {
       // prepare page for existing maintenance
@@ -336,7 +340,6 @@ const Maintenance = props => {
       setMaintenance(newMaintenance)
       lieferantDomain = props.jsonData.profile.mailDomain
     }
-
     // prepare to get available supplier CIDs for selected supplier
     if (props.jsonData.profile.lieferant) {
       fetchLieferantCIDs(props.jsonData.profile.lieferant)
@@ -354,6 +357,7 @@ const Maintenance = props => {
           const companyName = data.companyResults[0].name
           setMaintenance({
             ...maintenance,
+            ...localMaint,
             name: companyName,
             lieferant: companyId
           })
@@ -459,6 +463,7 @@ const Maintenance = props => {
   // fetch customer CIDs based on selected Supplier CID
   const fetchMailCIDs = lieferantCidId => {
     if (!lieferantCidId) {
+      gridApi.current.hideOverlay()
       return
     }
     fetch(`/api/customercids/${lieferantCidId}`, {
@@ -466,11 +471,8 @@ const Maintenance = props => {
     })
       .then(resp => resp.json())
       .then(data => {
-        const {
-          done
-        } = maintenance
         let currentSentStatus = 0
-        if (done === 1 || done === true || done === '1') {
+        if (maintenance.done) {
           currentSentStatus = 1
         }
         const kundencids = data.kundenCIDsResult
@@ -538,25 +540,17 @@ const Maintenance = props => {
 
   // generate Mail contents
   const generateMail = (customerCID, protection) => {
-    const {
-      id,
-      startDateTime,
-      endDateTime,
-      impact,
-      reason,
-      location,
-      timezone,
-      maintNote
-    } = maintenance
+    console.log(maintenance)
 
-    if (!id || !startDateTime || !endDateTime) {
+    console.log(maintenance.id, maintenance.startDateTime, maintenance.endDateTime)
+    if (!maintenance.id || !maintenance.startDateTime || !maintenance.endDateTime) {
       Notify('warning', 'Missing Required Fields')
       return
     }
 
-    const timezoneValue = timezone || 'Europe/Dublin'
-    const rawStart = moment.tz(startDateTime, timezoneValue)
-    const rawEnd = moment.tz(endDateTime, timezoneValue)
+    const timezoneValue = maintenance.timezone || 'Europe/Dublin'
+    const rawStart = moment.tz(maintenance.startDateTime, maintenance.timezoneValue)
+    const rawEnd = moment.tz(maintenance.endDateTime, timezoneValue)
     const utcStart1 = rawStart.tz('GMT').format('YYYY-MM-DD HH:mm:ss')
     const utcEnd1 = rawEnd.tz('GMT').format('YYYY-MM-DD HH:mm:ss')
     const utcStart = props.jsonData.profile.startDateTime || utcStart1
@@ -613,34 +607,34 @@ const Maintenance = props => {
     }
 
     let body = `<body style="color:#666666;">${rescheduleText} Dear Colleagues,​​<p><span>${maintenanceIntro}<br><br> <b>${customerCID}</b> <br><br>The maintenance work is with the following details:</span></p><table border="0" cellspacing="2" cellpadding="2" width="775px"><tr><td style='width: 205px;'>Maintenance ID:</td><td><b>NT-${id}</b></td></tr><tr><td>Start date and time:</td><td><b>${utcStart} (${tzSuffixRAW})</b></td></tr><tr><td>Finish date and time:</td><td><b>${utcEnd} (${tzSuffixRAW})</b></td></tr>`
-    if (impact || protection || impactPlaceholder) {
-      console.log(impact, protection, impactPlaceholder)
-      if (convertBool(protection)) {
+    if (maintenance.impact || maintenance.protection || impactPlaceholder) {
+      console.log(maintenance.impact, maintenance.protection, impactPlaceholder)
+      if (convertBool(maintenance.protection)) {
         body = body + '<tr><td>Impact:</td><td>50ms Protection Switch</td></tr>'
       } else {
-        const impactText = impact || impactPlaceholder
+        const impactText = maintenance.impact || impactPlaceholder
         body = body + '<tr><td>Impact:</td><td>' + impactText + '</td></tr>'
       }
     }
 
-    if (location) {
+    if (maintenance.location) {
       body = body + '<tr><td>Location:</td><td>' + location + '</td></tr>'
     }
 
-    if (reason) {
-      if (reason.includes('%20')) {
-        body = body + '<tr><td>Reason:</td><td>' + decodeURIComponent(reason) + '</td></tr>'
+    if (maintenance.reason) {
+      if (maintenance.reason.includes('%20')) {
+        body = body + '<tr><td>Reason:</td><td>' + decodeURIComponent(maintenance.reason) + '</td></tr>'
       } else {
-        body = body + '<tr><td>Reason:</td><td>' + reason + '</td></tr>'
+        body = body + '<tr><td>Reason:</td><td>' + maintenance.reason + '</td></tr>'
       }
     }
 
     let maintNoteBody = ''
-    if (maintNote) {
-      if (maintNote.includes('%20')) {
-        maintNoteBody = '<p>' + decodeURIComponent(maintNote) + '</p>'
+    if (maintenance.maintNote) {
+      if (maintenance.maintNote.includes('%20')) {
+        maintNoteBody = '<p>' + decodeURIComponent(maintenance.maintNote) + '</p>'
       } else {
-        maintNoteBody = '<p>' + maintNote + '</p>'
+        maintNoteBody = '<p>' + maintenance.maintNote + '</p>'
       }
     }
 
@@ -926,14 +920,13 @@ const Maintenance = props => {
       method: 'get',
       headers: {
         'Access-Control-Allow-Origin': '*',
-        _csrf: props.session.csrfToken
+        _csrf: props.session.accessToken
       }
     })
       .then(resp => resp.json())
       .then(data => {
-        if (data.status === 200 && data.statusText === 'OK') {
-          console.log(`DateTime Save Success\n${newISOTime}`)
-        } else {
+        if (data.status !== 200) {
+          Notify('error', 'Datetime Not Saved')
           console.warn(`DateTime Save Failed\n${element}\n${newValue}\n${newISOTime}`)
         }
       })
@@ -1002,33 +995,30 @@ const Maintenance = props => {
 
       setMaintenance({ ...maintenance, betroffeneCIDs: impactedCIDs, [element]: newValue })
 
-      if (maintenance.receivedmail) {
-        const mailId = maintenance.receivedmail
-        if (!mailId.startsWith('NT-')) {
-          fetch('/v1/api/inbox/markcomplete', {
-            method: 'post',
-            body: JSON.stringify({ m: mailId }),
-            mode: 'cors',
-            headers: {
-              'Access-Control-Allow-Origin': '*',
-              'Content-Type': 'application/json'
+      if (maintenance.receivedmail !== 'NT') {
+        fetch('/v1/api/inbox/markcomplete', {
+          method: 'post',
+          body: JSON.stringify({ m: maintenance.receivedmail }),
+          mode: 'cors',
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Content-Type': 'application/json'
+          }
+        })
+          .then(resp => resp.json())
+          .then(data => {
+            if (data.id === 500) {
+              Notify('error', 'Error moving Mail to Complete Label')
             }
           })
-            .then(resp => resp.json())
-            .then(data => {
-              if (data.id === 500) {
-                Notify('error', 'Error moving Mail to Complete Label')
-              }
-            })
-            .catch(err => console.error(`Error - ${err}`))
-        }
+          .catch(err => console.error(`Error - ${err}`))
       }
 
       fetch(`/api/maintenances/save/impactedcids?cids=${impactedCIDs}&maintId=${maintenance.id}&updatedby=${activeUser}`, {
         method: 'get',
         headers: {
           'Access-Control-Allow-Origin': '*',
-          _csrf: props.session.csrfToken
+          _csrf: props.session.accessToken
         }
       })
         .then(resp => resp.json())
@@ -1054,7 +1044,7 @@ const Maintenance = props => {
       method: 'get',
       headers: {
         'Access-Control-Allow-Origin': '*',
-        _csrf: props.session.csrfToken
+        _csrf: props.session.accessToken
       }
     })
       .then(resp => resp.json())
@@ -1068,20 +1058,20 @@ const Maintenance = props => {
       .catch(err => console.error(err))
   }
 
-  const handleReasonChange = (event) => {
-    setMaintenance({ ...maintenance, reason: encodeURIComponent(event.target.value) })
+  const handleReasonChange = (value) => {
+    setMaintenance({ ...maintenance, reason: encodeURIComponent(value) })
   }
 
-  const handleMaintNoteChange = (event) => {
-    setMaintenance({ ...maintenance, maintNote: encodeURIComponent(event.target.value) })
+  const handleMaintNoteChange = (value) => {
+    setMaintenance({ ...maintenance, maintNote: encodeURIComponent(value) })
   }
 
-  const handleLocationChange = (event) => {
-    setMaintenance({ ...maintenance, location: event.target.value })
+  const handleLocationChange = (value) => {
+    setMaintenance({ ...maintenance, location: value })
   }
 
-  const handleImpactChange = (event) => {
-    setMaintenance({ ...maintenance, impact: event.target.value })
+  const handleImpactChange = (value) => {
+    setMaintenance({ ...maintenance, impact: value })
   }
 
   const handleTimezoneChange = (selection) => {
@@ -1089,16 +1079,6 @@ const Maintenance = props => {
     const timezoneValue = selection.value // '(GMT+02:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna'
 
     setMaintenance({ ...maintenance, timezone: timezoneValue, timezoneLabel: timezoneLabel })
-  }
-
-  const handleUpdatedByChange = () => {
-    const value = maintenance.updatedBy
-    setMaintenance({ ...maintenance, updatedBy: value })
-  }
-
-  const handleUpdatedAtChange = () => {
-    const value = maintenance.updatedAt
-    setMaintenance({ ...maintenance, updatedAt: value })
   }
 
   const handleSupplierChange = (selectedOption) => {
@@ -1140,7 +1120,7 @@ const Maintenance = props => {
         method: 'get',
         headers: {
           'Access-Control-Allow-Origin': '*',
-          _csrf: props.session.csrfToken
+          _csrf: props.session.accessToken
         }
       })
         .then(resp => resp.json())
@@ -1177,7 +1157,7 @@ const Maintenance = props => {
       method: 'get',
       headers: {
         'Access-Control-Allow-Origin': '*',
-        _csrf: props.session.csrfToken
+        _csrf: props.session.accessToken
       }
     })
       .then(resp => resp.json())
@@ -1211,7 +1191,7 @@ const Maintenance = props => {
       method: 'get',
       headers: {
         'Access-Control-Allow-Origin': '*',
-        _csrf: props.session.csrfToken
+        _csrf: props.session.accessToken
       }
     })
       .then(resp => resp.json())
@@ -1243,7 +1223,7 @@ const Maintenance = props => {
       method: 'get',
       headers: {
         'Access-Control-Allow-Origin': '*',
-        _csrf: props.session.csrfToken
+        _csrf: props.session.accessToken
       }
     })
       .then(resp => resp.json())
@@ -1271,7 +1251,7 @@ const Maintenance = props => {
       method: 'get',
       headers: {
         'Access-Control-Allow-Origin': '*',
-        _csrf: props.session.csrfToken
+        _csrf: props.session.accessToken
       }
     })
       .then(resp => resp.json())
@@ -1523,6 +1503,7 @@ const Maintenance = props => {
 
   const useImpactPlaceholder = () => {
     setMaintenance({ ...maintenance, impact: impactPlaceholder })
+    handleTextInputBlur('impact')
   }
 
   const handleCreateOnClick = (event) => {
@@ -1652,8 +1633,8 @@ const Maintenance = props => {
           {maintenance.id === 'NEW'
             ? (
               <Whisper placement='bottom' speaker={<Tooltip>Create New Maintenance</Tooltip>}>
-                <IconButton appearance='ghost' onClick={handleCreateOnClick} icon={<Icon icon='circle-plus' />}>
-                  New
+                <IconButton appearance='ghost' onClick={handleCreateOnClick} icon={<Icon icon='plus' />} className='create-btn'>
+                  Save
                 </IconButton>
               </Whisper>
             ) : (
@@ -1669,6 +1650,9 @@ const Maintenance = props => {
 
     return (
       <Layout count={props.unread} session={props.session}>
+        {maintenance.id === 'NEW' && (
+          <Message full showIcon type="warning" description="Remember to Save before continuing to work!" style={{ position: 'fixed', zIndex: '999' }} />
+        )}
         <Helmet>
           <title>{`Newtelco Maintenance - NT-${maintenance.id}`}</title>
         </Helmet>
@@ -1769,7 +1753,7 @@ const Maintenance = props => {
                     <Row gutter={20} style={{ marginBottom: '20px' }}>
                       <Col sm={12} xs={24}>
                         <FormGroup>
-                          <ControlLabel htmlFor='impact'>
+                          <ControlLabel htmlFor='impact' style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             Impact
                             <ButtonGroup size='sm' style={{ float: 'right' }}>
                               <Whisper placement='bottom' speaker={<Tooltip>Use 50ms Protection Switch Text</Tooltip>}>
@@ -1784,8 +1768,8 @@ const Maintenance = props => {
                         </FormGroup>
                       </Col>
                       <Col sm={12} xs={24}>
-                        <FormGroup>
-                          <ControlLabel htmlFor='location'>Location</ControlLabel>
+                        <FormGroup style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', height: '70px' }}>
+                          <ControlLabel htmlFor='location' style={{ marginBottom: '10px' }}>Location</ControlLabel>
                           <Input onBlur={() => handleTextInputBlur('location')} id='location' name='location' type='text' onChange={handleLocationChange} value={maintenance.location || ''} />
                         </FormGroup>
                       </Col>
@@ -1802,7 +1786,7 @@ const Maintenance = props => {
                             onBlur={() => handleTextInputBlur('reason')}
                             onChange={handleReasonChange}
                             type='text'
-                            value={maintenance.reason && decodeURIComponent(maintenance.reason)}
+                            value={maintenance.reason ? decodeURIComponent(maintenance.reason) : ''}
                           />
                         </FormGroup>
                       </Col>
@@ -1824,7 +1808,7 @@ const Maintenance = props => {
                             onBlur={() => handleTextInputBlur('maintNote')}
                             onChange={handleMaintNoteChange}
                             type='text'
-                            value={maintenance.maintNote && decodeURIComponent(maintenance.maintNote) || ''}
+                            value={maintenance.maintNote ? decodeURIComponent(maintenance.maintNote) : ''}
                           />
                         </FormGroup>
                       </Col>
@@ -2303,8 +2287,10 @@ export async function getServerSideProps ({ req, query }) {
   }
   if (query.id === 'NEW') {
     return {
-      jsonData: { profile: req.query },
-      session
+      props: {
+        jsonData: { profile: query },
+        session
+      }
     }
   } else {
     const pageRequest = `${protocol}//${host}/api/maintenances/${query.id}`

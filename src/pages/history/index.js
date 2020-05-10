@@ -156,7 +156,7 @@ const History = props => {
     }
   }
 
-  const gridApi = useRef();
+  const gridApi = useRef()
 
   const [openNewModal, setOpenNewModal] = useState(false)
   const [selectedNewCompany, setSelectedNewCompany] = useState('')
@@ -166,7 +166,7 @@ const History = props => {
   const [idToDelete, setIdToDelete] = useState('')
 
   const handleGridReady = params => {
-    gridApi.current = params.api;  // <== this is how you save it
+    gridApi.current = params.api
   }
 
   const onFirstDataRendered = params => {
@@ -229,14 +229,9 @@ const History = props => {
     setOpenConfirmDeleteModal(!openConfirmDeleteModal)
   }
 
-  const onSearchSelection = selection => {
-    const newLocation = `/maintenance?id=${selection.id}`
-    Router.push(newLocation)
-  }
-
   const handleSelectOpen = () => {
     if (newMaintenanceInfo.length === 0) {
-      fetch(`/api/companies/select`, {
+      fetch('/api/companies/select', {
         method: 'get'
       })
         .then(resp => resp.json())
@@ -338,7 +333,7 @@ const History = props => {
             show={openNewModal}
             onHide={handleToggleNewModal}
             cancelAction={handleToggleNewModal}
-            confirmAction={() => createNewMaintenance(selectedNewCompany.value)}
+            confirmAction={() => createNewMaintenance(selectedNewCompany)}
           />
         )}
       </Layout>
