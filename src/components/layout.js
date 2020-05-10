@@ -92,35 +92,12 @@ const Layout = ({ session, children }) => {
     })
   }
 
-  const onSignOutSubmit = (event) => {
-    event.preventDefault()
-    NextAuth.signout()
-      .then(() => {
-        Router.push('/')
-      })
-      .catch(err => {
-        process.env.NODE_ENV === 'development' && console.err(err)
-        Router.push('/')
-      })
-  }
-
-  const onToggleNight = () => {
-    if (night) {
-      document.documentElement.setAttribute('data-theme', 'light')
-      window.localStorage.setItem('night', false)
-    } else {
-      document.documentElement.setAttribute('data-theme', 'dark')
-      window.localStorage.setItem('night', true)
-    }
-    setNight(!night)
-  }
-
   return (
     <div>
       <KeyboardShortcuts>
         <UnreadFavicon count={store.get('count')} />
         <Container>
-          <MaintHeader unread={store.get('count')} night={night} session={session} toggleNight={onToggleNight} signOut={onSignOutSubmit} />
+          <MaintHeader unread={store.get('count')} night={night} />
           <Content>
             <FlexboxGrid justify='center'>
               <FlexboxGrid.Item colspan={23} style={{ marginTop: '20px' }}>

@@ -21,7 +21,6 @@ export default class ErrorBoundary extends React.Component {
 
   render () {
     if (this.state.error) {
-      console.log(this.props.session)
       return (
         <Container>
           <Content>

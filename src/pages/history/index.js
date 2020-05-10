@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react'
+import NextAuth from 'next-auth/client'
 import './history.css'
 import Layout from '../../components/layout'
 import { AgGridReact } from 'ag-grid-react'
@@ -8,7 +9,6 @@ import fetch from 'isomorphic-unfetch'
 import Link from 'next/link'
 import moment from 'moment-timezone'
 import Router from 'next/router'
-import { NextAuth } from 'next-auth/client'
 import RequireLogin from '../../components/require-login'
 import EditBtn from '../../components/ag-grid/edit-btn'
 import StartDateTime from '../../components/ag-grid/startdatetime'
@@ -161,7 +161,7 @@ const History = props => {
   const [openNewModal, setOpenNewModal] = useState(false)
   const [selectedNewCompany, setSelectedNewCompany] = useState('')
   const [openConfirmDeleteModal, setOpenConfirmDeleteModal] = useState(false)
-  const [rowData, setRowData] = useState(props.jsonData.maintenances)
+  const [rowData, setRowData] = useState(props.data.maintenances)
   const [newMaintenanceInfo, setNewMaintenanceInfo] = useState([])
   const [idToDelete, setIdToDelete] = useState('')
 
@@ -323,22 +323,22 @@ const History = props => {
         </MaintPanel>
         {openConfirmDeleteModal && (
           <ConfirmModal
-           header='Confirm Delete'
-           content={`Are you sure you want to delete maintenance #${idToDelete}`}
-           show={openConfirmDeleteModal}
-           onHide={toggleConfirmDelete}
-           cancelAction={toggleConfirmDelete}
-           confirmAction={handleDelete}
+            header='Confirm Delete'
+            content={`Are you sure you want to delete maintenance #${idToDelete}`}
+            show={openConfirmDeleteModal}
+            onHide={toggleConfirmDelete}
+            cancelAction={toggleConfirmDelete}
+            confirmAction={handleDelete}
           />
         )}
         {openNewModal && (
           <ConfirmModal
-           header='New Maintenance'
-           content={<NewMaintenanceSelect />}
-           show={openNewModal}
-           onHide={handleToggleNewModal}
-           cancelAction={handleToggleNewModal}
-           confirmAction={() => createNewMaintenance(selectedNewCompany.value)}
+            header='New Maintenance'
+            content={<NewMaintenanceSelect />}
+            show={openNewModal}
+            onHide={handleToggleNewModal}
+            cancelAction={handleToggleNewModal}
+            confirmAction={() => createNewMaintenance(selectedNewCompany.value)}
           />
         )}
       </Layout>
@@ -350,7 +350,23 @@ const History = props => {
   }
 }
 
-History.getInitialProps = async ({ req, query }) => {
+// History.getInitialProps = async ({ req, query }) => {
+//   const host = req ? req.headers['x-forwarded-host'] : window.location.hostname
+//   const protocol = 'https:'
+//   if (host.indexOf('localhost') > -1) {
+//     protocol = 'http:'
+//   }
+//   const pageRequest = `${protocol}//${host}/api/maintenances`
+//   const res = await fetch(pageRequest)
+//   const json = await res.json()
+//   return {
+//     jsonData: json,
+//     // night: query.night,
+//     session: await NextAuth.init({ req })
+//   }
+// }
+export async function getServerSideProps ({ req }) {
+  const session = await NextAuth.session({ req })
   const host = req ? req.headers['x-forwarded-host'] : window.location.hostname
   const protocol = 'https:'
   if (host.indexOf('localhost') > -1) {
@@ -358,11 +374,12 @@ History.getInitialProps = async ({ req, query }) => {
   }
   const pageRequest = `${protocol}//${host}/api/maintenances`
   const res = await fetch(pageRequest)
-  const json = await res.json()
+  const data = await res.json()
   return {
-    jsonData: json,
-    // night: query.night,
-    session: await NextAuth.init({ req })
+    props: {
+      data,
+      session
+    }
   }
 }
 

@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react'
+import NextAuth from 'next-auth/client'
 import Layout from '../../components/layout'
 import fetch from 'isomorphic-unfetch'
 import RequireLogin from '../../components/require-login'
-import { NextAuth } from 'next-auth/client'
 import './maintenance.css'
 import Select from 'react-select'
 import CreatableSelect from 'react-select/creatable'
@@ -2296,73 +2296,26 @@ const Maintenance = props => {
   }
 }
 
-// Maintenance.getInitialProps = async ({ req }) => {
-//   const host = req ? req.headers['x-forwarded-host'] : window.location.hostname
-//   let protocol = 'https:'
-//   if (host.indexOf('localhost') > -1) {
-//     protocol = 'http:'
-//   }
-//   const pageRequest2 = `${protocol}//${host}/v1/api/count`
-//   const res2 = await fetch(pageRequest2)
-//   const count = await res2.json()
-//   let display
-//   if (count === 'No unread emails') {
-//     display = 0
-//   } else {
-//     display = count.count
-//   }
-//   if (req && req.query.id === 'NEW') {
-//     return {
-//       jsonData: { profile: req.query },
-//       unread: display,
-//       // night: query.night,
-//       session: await NextAuth.init({ req })
-//     }
-//   } else {
-//     console.log('query', req ? req.query : 0)
-//     const pageRequest = `${protocol}//${host}/api/maintenances/${req ? req.query.id : 0}`
-//     const res = await fetch(pageRequest)
-//     const json = await res.json()
-//     return {
-//       jsonData: json,
-//       unread: display,
-//       session: await NextAuth.init({ req })
-//     }
-//   }
-// }
-
-export async function getServerSideProps({ req }) {
+export async function getServerSideProps ({ req, query }) {
+  const session = await NextAuth.session({ req })
   const host = req ? req.headers['x-forwarded-host'] : window.location.hostname
   let protocol = 'https:'
   if (host.indexOf('localhost') > -1) {
     protocol = 'http:'
   }
-  const pageRequest2 = `${protocol}//${host}/v1/api/count`
-  const res2 = await fetch(pageRequest2)
-  const count = await res2.json()
-  let display
-  if (count === 'No unread emails') {
-    display = 0
-  } else {
-    display = count.count
-  }
-  if (req && req.query.id === 'NEW') {
+  if (query.id === 'NEW') {
     return {
       jsonData: { profile: req.query },
-      unread: display,
-      // night: query.night,
-      session: await NextAuth.init({ req })
+      session
     }
   } else {
-    console.log('query', req ? req.query : 0)
-    const pageRequest = `${protocol}//${host}/api/maintenances/${req ? req.query.id : 0}`
+    const pageRequest = `${protocol}//${host}/api/maintenances/${query.id}`
     const res = await fetch(pageRequest)
     const json = await res.json()
     return {
       props: {
         jsonData: json,
-        unread: display,
-        session: await NextAuth.init({ req })
+        session
       }
     }
   }

@@ -7,8 +7,6 @@ import {
   Panel,
   Content,
   Button,
-  IconButton,
-  Icon,
   Col
 } from 'rsuite'
 
@@ -27,7 +25,7 @@ const RequireLogin = () => {
                   You must be signed-in to view this content.
               </p>
               <p>
-                <Link href='/auth'>
+                <Link href='/api/auth/signin'>
                   <Button id='signin-btn' type='submit' appearance='primary' block>Sign in</Button>
                 </Link>
               </p>

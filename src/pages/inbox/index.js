@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
+import NextAuth from 'next-auth/client'
 import Layout from '../../components/layout'
 import RequireLogin from '../../components/require-login'
 import fetch from 'isomorphic-unfetch'
-import { NextAuth } from 'next-auth/client'
 import useSWR from 'swr'
 import MaintPanel from '../../components/panel'
 import InboxItem from '../../components/inboxitem'
@@ -232,25 +232,47 @@ const Inbox = props => {
   }
 }
 
-Inbox.getInitialProps = async ({ req }) => {
-    const host = req ? req.headers['x-forwarded-host'] : window.location.hostname
-    const protocol = 'https:'
-    if (host.indexOf('localhost') > -1) {
-      protocol = 'http:'
+// Inbox.getInitialProps = async ({ req }) => {
+//   const host = req ? req.headers['x-forwarded-host'] : window.location.hostname
+//   const protocol = 'https:'
+//   if (host.indexOf('localhost') > -1) {
+//     protocol = 'http:'
+//   }
+//   const pageRequest = `${protocol}//${host}/v1/api/inbox`
+//   const res = await fetch(pageRequest, {
+//     mode: 'cors',
+//     headers: {
+//       'Access-Control-Allow-Origin': '*'
+//     }
+//   })
+//   const inboxContent = await res.json()
+//   return {
+//     inboxItems: inboxContent === 'No unread emails' ? [] : inboxContent,
+//     session: await NextAuth.init({ req })
+//   }
+// }
+
+export async function getServerSideProps ({ req }) {
+  const session = await NextAuth.session({ req })
+  const host = req ? req.headers['x-forwarded-host'] : window.location.hostname
+  const protocol = 'https:'
+  if (host.indexOf('localhost') > -1) {
+    protocol = 'http:'
+  }
+  const pageRequest = `${protocol}//${host}/v1/api/inbox`
+  const res = await fetch(pageRequest, {
+    mode: 'cors',
+    headers: {
+      'Access-Control-Allow-Origin': '*'
     }
-    const pageRequest = `${protocol}//${host}/v1/api/inbox`
-    const res = await fetch(pageRequest, {
-      mode: 'cors',
-      headers: {
-        'Access-Control-Allow-Origin': '*'
-      }
-    })
-    const inboxContent = await res.json()
-    return {
+  })
+  const inboxContent = await res.json()
+  return {
+    props: {
+      session,
       inboxItems: inboxContent === 'No unread emails' ? [] : inboxContent,
-      session: await NextAuth.init({ req })
     }
   }
-
+}
 
 export default Inbox

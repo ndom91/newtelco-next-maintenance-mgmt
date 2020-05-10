@@ -1,4 +1,5 @@
 import React from 'react'
+import NextAuth from 'next-auth/client'
 import Link from 'next/link'
 import Store from '../store'
 // import DarkmodeSwitch from '../darkmode'
@@ -27,15 +28,17 @@ const NextLink = React.forwardRef((props, ref) => {
 const NavLink = props => <Dropdown.Item componentClass={NextLink} {...props} />
 
 const MaintHeader = props => {
+  const [session, loading] = NextAuth.useSession()
   const store = Store.useStore()
   const count = store.get('count')
-  // this session is empty
-  const session = store.get('session')
 
-  let avatarPath = `https://api.adorable.io/avatars/128/${props.session.user.email}.png`
-  const username = props.session.user.email.match(/^([^@]*)@/)[1]
-  if (['alissitsin', 'fwaleska', 'ndomino', 'kmoeller', 'nchachua'].includes(username)) {
-    avatarPath = `/static/images/avatars/${username}.png`
+  let avatarPath
+  if (!loading) {
+    avatarPath = `https://api.adorable.io/avatars/128/${session.user.name}.png`
+    const username = session.user.email.match(/^([^@]*)@/)[1]
+    if (['alissitsin', 'fwaleska', 'ndomino', 'kmoeller', 'nchachua'].includes(username)) {
+      avatarPath = `/static/images/avatars/${username}.png`
+    }
   }
 
   return (
@@ -126,7 +129,7 @@ const MaintHeader = props => {
               icon={<Avatar size='md' circle src={avatarPath} style={{ border: '2px solid #67b246' }} />}
             >
               <NavLink icon={<Icon icon='cog' />} href={{ pathname: '/settings', query: { tab: 'companies' } }}>Settings</NavLink>
-              <Dropdown.Item icon={<Icon icon='sign-out' />} onClick={(e) => props.signOut(e)}>Logout</Dropdown.Item>
+              <Dropdown.Item icon={<Icon icon='sign-out' />} href='/api/auth/signout'>Logout</Dropdown.Item>
             </Dropdown>
           </Nav>
         </Navbar.Body>

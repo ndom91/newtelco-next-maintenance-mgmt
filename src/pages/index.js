@@ -2,8 +2,7 @@ import React from 'react'
 import Layout from '../components/layout'
 import dynamic from 'next/dynamic'
 import RequireLogin from '../components/require-login'
-import { NextAuth } from 'next-auth/client'
-import Router from 'next/router'
+import NextAuth from 'next-auth/client'
 import MaintPanel from '../components/panel'
 import UnreadBadge from '../components/unread'
 import Store from '../components/store'
@@ -25,17 +24,12 @@ const Heatmap = dynamic(() => import('../components/homepage/heatmap'))
 const PerPerson = dynamic(() => import('../components/homepage/perperson'))
 const ActiveMaintenances = dynamic(() => import('../components/homepage/active'))
 
-const Index = props => {
+const Index = ({ session }) => {
   const store = Store.useStore()
 
-  const onSearchSelection = selection => {
-    const newLocation = `/maintenance?id=${selection.id}`
-    Router.push(newLocation)
-  }
-
-  if (props.session.user) {
+  if (session) {
     return (
-      <Layout night={props.night} handleSearchSelection={onSearchSelection} session={props.session}>
+      <Layout session={session}>
         <MaintPanel header='Maintenance'>
           <div className='grid-container'>
             <div className='unread'>
@@ -64,20 +58,12 @@ const Index = props => {
   }
 }
 
-Index.getInitialProps = async ({ req, res }) => {
-  if (req && !req.user) {
-    if (res) {
-      res.writeHead(302, {
-        Location: '/auth'
-      })
-      res.end()
-    } else {
-      Router.push('/auth')
-    }
-  }
+export async function getServerSideProps ({ req }) {
+  const session = await NextAuth.session({ req })
   return {
-    // night: req.query.night,
-    session: await NextAuth.init({ req })
+    props: {
+      session
+    }
   }
 }
 

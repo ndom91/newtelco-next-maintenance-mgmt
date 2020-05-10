@@ -1,5 +1,5 @@
 import React from 'react'
-import { NextAuth } from 'next-auth/client'
+import NextAuth from 'next-auth/client'
 import Link from 'next/link'
 import { withRouter } from 'next/router'
 import RequireLogin from '../../components/require-login'
@@ -66,9 +66,12 @@ const Settings = ({ session, router }) => {
   }
 }
 
-Settings.getInitialProps = async ({ req }) => {
+export async function getServerSideProps ({ req }) {
+  const session = await NextAuth.session({ req })
   return {
-    session: await NextAuth.init({ req })
+    props: {
+      session
+    }
   }
 }
 
