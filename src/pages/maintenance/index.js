@@ -2296,7 +2296,42 @@ const Maintenance = props => {
   }
 }
 
-Maintenance.getInitialProps = async ({ req }) => {
+// Maintenance.getInitialProps = async ({ req }) => {
+//   const host = req ? req.headers['x-forwarded-host'] : window.location.hostname
+//   let protocol = 'https:'
+//   if (host.indexOf('localhost') > -1) {
+//     protocol = 'http:'
+//   }
+//   const pageRequest2 = `${protocol}//${host}/v1/api/count`
+//   const res2 = await fetch(pageRequest2)
+//   const count = await res2.json()
+//   let display
+//   if (count === 'No unread emails') {
+//     display = 0
+//   } else {
+//     display = count.count
+//   }
+//   if (req && req.query.id === 'NEW') {
+//     return {
+//       jsonData: { profile: req.query },
+//       unread: display,
+//       // night: query.night,
+//       session: await NextAuth.init({ req })
+//     }
+//   } else {
+//     console.log('query', req ? req.query : 0)
+//     const pageRequest = `${protocol}//${host}/api/maintenances/${req ? req.query.id : 0}`
+//     const res = await fetch(pageRequest)
+//     const json = await res.json()
+//     return {
+//       jsonData: json,
+//       unread: display,
+//       session: await NextAuth.init({ req })
+//     }
+//   }
+// }
+
+export async function getServerSideProps({ req }) {
   const host = req ? req.headers['x-forwarded-host'] : window.location.hostname
   let protocol = 'https:'
   if (host.indexOf('localhost') > -1) {
@@ -2311,7 +2346,7 @@ Maintenance.getInitialProps = async ({ req }) => {
   } else {
     display = count.count
   }
-  if (req.query && req.query.id === 'NEW') {
+  if (req && req.query.id === 'NEW') {
     return {
       jsonData: { profile: req.query },
       unread: display,
@@ -2319,13 +2354,16 @@ Maintenance.getInitialProps = async ({ req }) => {
       session: await NextAuth.init({ req })
     }
   } else {
-    const pageRequest = `${protocol}//${host}/api/maintenances/${req.query.id}`
+    console.log('query', req ? req.query : 0)
+    const pageRequest = `${protocol}//${host}/api/maintenances/${req ? req.query.id : 0}`
     const res = await fetch(pageRequest)
     const json = await res.json()
     return {
-      jsonData: json,
-      unread: display,
-      session: await NextAuth.init({ req })
+      props: {
+        jsonData: json,
+        unread: display,
+        session: await NextAuth.init({ req })
+      }
     }
   }
 }
