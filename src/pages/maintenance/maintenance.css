@@ -94,6 +94,65 @@
   margin-left: 15px;
 }
 
+.mail-read-header {
+  padding: 20px 20px 0px 20px !important;
+}
+
+.mail-read-header .modal-textbox {
+  pointer-events: none;
+}
+
+.mail-read-header:hover {
+  cursor: grab;
+}
+.mail-read-header:active {
+  cursor: grabbing
+}
+
+.modal-attachment-header-text:hover {
+  cursor: grab;
+}
+
+.modal-attachment-header-text:active {
+  cursor: grabbing
+}
+
+.read-mail-body {
+  padding: 20px;
+  margin: 10px;
+  border: 1px solid var(--grey2);
+  border-radius: 5px;
+  overflow: scroll;
+}
+
+.read-mail-body::-webkit-scrollbar-track {
+  border-radius: 10px;
+  background-color: rgba(0,0,0,0);
+}
+.read-mail-body::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+  background-color: transparent;
+}
+.read-mail-body::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background-color: rgba(0,0,0,0.4);
+}
+
+textarea::-webkit-scrollbar-track {
+  border-radius: 10px;
+  background-color: rgba(0,0,0,0);
+}
+textarea::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+  background-color: transparent;
+}
+textarea::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background-color: rgba(0,0,0,0.4);
+}
+
 /* .rs-timeline-item {
   margin-bottom: 5px;
 }

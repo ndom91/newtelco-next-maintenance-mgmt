@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import Layout from '../../components/layout'
 import fetch from 'isomorphic-unfetch'
-import Footer from '../../components/cardFooter'
-import Attachment from '../../components/attachment'
 import RequireLogin from '../../components/require-login'
 import { NextAuth } from 'next-auth/client'
 import './maintenance.css'
@@ -20,7 +18,6 @@ import Flatpickr from 'react-flatpickr'
 import 'flatpickr/dist/themes/material_blue.css'
 import TimezoneSelector from '../../components/timezone'
 import { getUnique, convertDateTime } from '../../components/maintenance/helper'
-import { OutTable, ExcelRenderer } from 'react-excel-renderer'
 import ProtectedIcon from '../../components/ag-grid/protected'
 import SentIcon from '../../components/ag-grid/sent'
 import StartDateTime from '../../components/ag-grid/startdatetime'
@@ -28,43 +25,21 @@ import EndDateTime from '../../components/ag-grid/enddatetime'
 import sentBtn from '../../components/ag-grid/sentBtn'
 import sendMailBtns from '../../components/ag-grid/sendMailBtns'
 import { AgGridReact } from 'ag-grid-react'
-import PDF from 'react-pdf-js-infinite'
-import root from 'react-shadow'
 import dynamic from 'next/dynamic'
-import Popover from 'react-popover'
-import { saveAs } from 'file-saver'
+import ReadModal from '../../components/maintenance/readmodal'
 
 import MaintPanel from '../../components/panel'
 
 import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-material.css'
 
-// import 'react-tippy/dist/tippy.css'
-// import { Tooltip } from 'react-tippy'
-
 import Notify from '../../lib/notification'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
-  faPlusCircle,
   faPaperPlane,
-  faTimesCircle,
-  faMailBulk
+  faTimesCircle
 } from '@fortawesome/free-solid-svg-icons'
-import {
-  faCalendarAlt,
-  faClock
-} from '@fortawesome/free-regular-svg-icons'
-import {
-  Container,
-  CardFooter,
-  FormInput,
-  InputGroupText,
-  InputGroupAddon,
-  Modal,
-  ModalHeader,
-  ModalBody
-} from 'shards-react'
 
 import {
   Icon,
@@ -87,7 +62,9 @@ import {
   Row,
   Col,
   Loader,
-  Progress
+  Progress,
+  Modal,
+  Container
 } from 'rsuite'
 
 const animatedComponents = makeAnimated()
@@ -97,10 +74,7 @@ const Changelog = dynamic(
   { ssr: false }
 )
 
-const HALF_WIDTH = 600
-
 const Maintenance = props => {
-  const [width, setWidth] = useState(0)
   const [maintenance, setMaintenance] = useState({
     incomingAttachments: [],
     incomingBody: props.jsonData.profile.body,
@@ -118,33 +92,20 @@ const Maintenance = props => {
     calendarId: props.jsonData.profile.calendarId,
     maintNote: ''
   })
-  // const [attachmentModalSize, setAttachmentModalSize] = useState({
-  //   width: 673,
-  //   height: 400
-  // })
   const [frozenState, setFrozenState] = useState({
     recipient: '',
     cid: ''
   })
   const [frozenCompany, setFrozenCompany] = useState('')
-  const [attachmentHTMLContent, setAttachmentHtmlContent] = useState('')
-  const [currentAttachmentName, setCurrentAttachmentName] = useState('')
-  const [currentAttachment, setCurrentAttachment] = useState('')
-  const [attachmentDetails, setAttachmentDetails] = useState({})
   const [dateTimeWarning, setDateTimeWarning] = useState(false)
-  const [openAttachmentModal, setOpenAttachmentModal] = useState(false)
   const [openProtectionSwitchToggle, setOpenProtectionSwitchToggle] = useState(false)
   const [openUseImpactPlaceholderToggle, setOpenUseImpactPlaceholderToggle] = useState(false)
   const [openReadModal, setOpenReadModal] = useState(false)
   const [openPreviewModal, setOpenPreviewModal] = useState(false)
-  const [openHelpModal, setOpenHelpModal] = useState(false)
   const [openRescheduleModal, setOpenRescheduleModal] = useState(false)
   const [openConfirmDeleteModal, setOpenConfirmDeleteModal] = useState(false)
   const [openConfirmFreezeModal, setOpenConfirmFreezeModal] = useState(false)
   const [openMaintenanceChangelog, setOpenMaintenanceChangelog] = useState(false)
-  const [openDownloadPopup, setOpenDownloadPopup] = useState(false)
-  const [openedDownloadPopupId, setOpenedDownloadPopupId] = useState('')
-  const [attachmentPopoverBody, setAttachmentPopoverBody] = useState('')
   const [reschedule, setReschedule] = useState({
     startDateTime: null,
     endDateTime: null,
@@ -169,7 +130,6 @@ const Maintenance = props => {
   const [selectedLieferant, setSelectedLieferant] = useState([])
   const [incomingMailIsHtml, setIncomingMailIsHtml] = useState(false)
   const [sentProgress, setSentProgress] = useState(0)
-  const [readIconUrl, setReadIconUrl] = useState('')
 
   const gridApi = useRef()
   const gridColumnApi = useRef()
@@ -335,7 +295,6 @@ const Maintenance = props => {
 
   useEffect(() => {
     let lieferantDomain
-    setWidth(window.outerWidth)
     if (props.jsonData.profile.id === 'NEW') {
       // prepare NEW maintenance
       const username = props.session.user.email.substr(0, props.session.user.email.indexOf('@'))
@@ -1373,15 +1332,6 @@ const Maintenance = props => {
     } else {
       setOpenReadModal(!openReadModal)
     }
-    if (!readIconUrl) {
-      fetch(`/v1/api/favicon?d=${props.jsonData.profile.mailDomain}`, {
-        method: 'get'
-      })
-        .then(resp => resp.json())
-        .then(data => {
-          setReadIconUrl(data.icons)
-        })
-    }
   }
 
   function togglePreviewModal (recipient, customerCID, protection) {
@@ -1398,10 +1348,6 @@ const Maintenance = props => {
       setOpenPreviewModal(!openPreviewModal)
     }
     mailSubjectText()
-  }
-
-  const toggleHelpModal = () => {
-    setOpenHelpModal(!openHelpModal)
   }
 
   const toggleRescheduleModal = () => {
@@ -1544,10 +1490,6 @@ const Maintenance = props => {
     }
   }
 
-  const toggleDownloadPopover = () => {
-    setOpenedDownloadPopupId(null)
-  }
-
   const handleDeleteReschedule = () => {
     fetch(`/api/reschedule/delete?mid=${maintenance.id}&rcounter=${rescheduleToDelete.rcounter}&user=${encodeURIComponent(props.session.user.email)}`, {
       method: 'get'
@@ -1573,182 +1515,6 @@ const Maintenance = props => {
   //
   /// /////////////////////////////////////////////////////////
 
-  const showAttachments = (id, filename) => {
-    const fixBase64 = (binaryData) => {
-      var base64str = binaryData
-      var binary = atob(base64str.replace(/\s/g, ''))
-      var len = binary.length
-      var buffer = new ArrayBuffer(len)
-      var view = new Uint8Array(buffer)
-
-      for (var i = 0; i < len; i++) {
-        view[i] = binary.charCodeAt(i)
-      }
-      return view
-    }
-    const downloadFile = (base64, filename, mimeType) => {
-      const base64Fixed = fixBase64(base64)
-      const fileData = new Blob([base64Fixed], { type: mimeType })
-      saveAs(fileData, filename)
-    }
-    if (id !== null) {
-      let filetype = ''
-      const fileExt = filename.match(/\.[0-9a-z]+$/i)
-      switch (fileExt[0]) {
-        case '.xlsx':
-          filetype = 'excel'
-          break
-        case '.xls':
-          filetype = 'excel'
-          break
-        case '.pdf':
-          filetype = 'pdf'
-          break
-        case '.html':
-          filetype = 'html'
-          break
-      }
-      if (filetype === 'excel') {
-        const excelIndex = maintenance.incomingAttachments.findIndex(el => el.id === id)
-        const file = maintenance.incomingAttachments[excelIndex]
-        const filedata = file.data
-        const mime = file.mime
-        const filename = file.name
-        let base64 = (filedata).replace(/_/g, '/')
-        base64 = base64.replace(/-/g, '+')
-        const base64Fixed = fixBase64(base64)
-        var fileData = new Blob([base64Fixed], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;' })
-
-        ExcelRenderer(fileData, (err, resp) => {
-          if (err) {
-            console.log(err)
-          } else {
-            resp.cols.forEach(col => {
-              col.name = resp.rows[0][col.key]
-              col.key = col.key + 1
-            })
-            resp.cols.unshift({ key: 0, name: '' })
-            resp.rows.shift()
-            setAttachmentDetails({
-              filetype: filetype,
-              cols: resp.cols,
-              rows: resp.rows,
-              currentAttachmentName: filename,
-              currentAttachment: id || null,
-              openedDownloadPopupId: id,
-              attachmentPopoverBody:
-  <span>
-    <ButtonGroup>
-      <Button onClick={() => { setOpenAttachmentModal(!openAttachmentModal); setOpenedDownloadPopupId(null) }} outline size='sm'>Preview</Button>
-      <Button onClick={() => downloadFile(base64, filename, mime)} size='sm'>Download</Button>
-    </ButtonGroup>
-  </span>
-            })
-            // this.setState({
-            //   filetype: filetype,
-            //   cols: resp.cols,
-            //   rows: resp.rows,
-            //   currentAttachmentName: filename,
-            //   currentAttachment: id || null,
-            //   openedDownloadPopupId: id,
-            //   attachmentPopoverBody:
-            //   <span>
-            //     <ButtonGroup>
-            //       <Button onClick={() => this.setState({ openAttachmentModal: !openAttachmentModal, openedDownloadPopupId: null })} outline size='sm'>Preview</Button>
-            //       <Button onClick={() => downloadFile(base64, filename, mime)} size='sm'>Download</Button>
-            //     </ButtonGroup>
-            //   </span>
-            // })
-          }
-        })
-      } else if (filetype === 'pdf') {
-        const pdfIndex = maintenance.incomingAttachments.findIndex(el => el.id === id)
-        const file = maintenance.incomingAttachments[pdfIndex]
-        const filedata = file.data
-        const mime = file.mime
-        const filename = file.name
-        let base64 = (filedata).replace(/_/g, '/')
-        base64 = base64.replace(/-/g, '+')
-        const base64Fixed = fixBase64(base64)
-        const fileData = new Blob([base64Fixed], { type: 'application/pdf' })
-        setAttachmentDetails({
-          size: {
-            height: 800,
-            width: 950
-          },
-          filetype: filetype,
-          pdfid: id,
-          pdfB64: fileData,
-          currentAttachmentName: filename,
-          currentAttachment: id || null,
-          openedDownloadPopupId: id,
-          attachmentPopoverBody:
-  <span>
-    <ButtonGroup>
-      <Button onClick={() => { setOpenAttachmentModal(!openAttachmentModal); setOpenedDownloadPopupId(null) }} outline size='sm'>Preview</Button>
-      <Button onClick={() => downloadFile(base64, filename, mime)} size='sm'>Download</Button>
-    </ButtonGroup>
-  </span>
-        })
-      } else if (filetype === 'html') {
-        const fileIndex = maintenance.incomingAttachments.findIndex(el => el.id === id)
-        const file = maintenance.incomingAttachments[fileIndex]
-        const filedata = file.data
-        const filename = file.name
-        const mime = file.mime
-        let base64 = (filedata).replace(/_/g, '/')
-        base64 = base64.replace(/-/g, '+')
-        setAttachmentHtmlContent(window.atob(base64)),
-        setAttachmentDetails({
-          filetype: filetype,
-          currentAttachment: id || null,
-          currentAttachmentName: filename,
-          openedDownloadPopupId: id,
-          attachmentPopoverBody:
-  <span>
-    <ButtonGroup>
-      <Button onClick={() => { setOpenAttachmentModal(!openAttachmentModal); setOpenedDownloadPopupId(null) }} outline size='sm'>Preview</Button>
-      <Button onClick={() => downloadFile(base64, filename, mime)} size='sm'>Download</Button>
-    </ButtonGroup>
-  </span>
-        })
-      } else {
-        const fileIndex = maintenance.incomingAttachments.findIndex(el => el.id === id)
-        const file = maintenance.incomingAttachments[fileIndex]
-        const mime = file.mime
-        const rawData = file.data
-        let base64 = (rawData).replace(/_/g, '/')
-        base64 = base64.replace(/-/g, '+')
-        setAttachmentDetails({
-          attachmentPopoverBody:
-  <span>
-    <ButtonGroup>
-      <Button outline disabled size='sm'>
-        <Tooltip
-          title='Preview not available for this filetype'
-          position='bottom'
-          trigger='mouseenter'
-          delay='250'
-          distance='25'
-          interactiveBorder='15'
-          arrow
-          size='small'
-          theme='transparent'
-        >
-                  Preview
-        </Tooltip>
-      </Button>
-      <Button onClick={() => downloadFile(base64, filename, mime)} size='sm'>Download</Button>
-    </ButtonGroup>
-  </span>,
-          openedDownloadPopupId: id
-        })
-      }
-    } else {
-      setOpenAttachmentModal(!openAttachmentModal)
-      setCurrentAttachment(id || null)
-    }
-  }
 
   const handleProtectionSwitch = () => {
     setMaintenance({ ...maintenance, impact: '50ms protection switch' })
@@ -1820,12 +1586,6 @@ const Maintenance = props => {
     }
   }
 
-  const handleSearchSelect = (selection) => {
-    const cleanId = selection.id.replace(/[0-9]+/g, '')
-    const newLocation = `/maintenance?id=${cleanId}`
-    Router.push(newLocation)
-  }
-
   const mailSubjectText = () => {
     let text = rescheduleData.length !== 0 ? ' [RESCHEDULED]' : ''
     text += maintenance.emergency ? ' [EMERGENCY]' : ''
@@ -1849,11 +1609,6 @@ const Maintenance = props => {
   } else {
     maintenanceIdDisplay = `NT-${maintenance.id}`
   }
-
-  // let HALF_WIDTH = 500
-  // if (typeof window !== 'undefined') {
-  //   HALF_WIDTH = this.state.width !== 0 ? this.state.width / 2 : 500
-  // }
 
   if (props.session.user) {
     const HeaderLeft = () => {
@@ -2069,7 +1824,7 @@ const Maintenance = props => {
                             onBlur={() => handleTextInputBlur('maintNote')}
                             onChange={handleMaintNoteChange}
                             type='text'
-                            value={maintenance.maintNote && decodeURIComponent(maintenance.maintNote)}
+                            value={maintenance.maintNote && decodeURIComponent(maintenance.maintNote) || ''}
                           />
                         </FormGroup>
                       </Col>
@@ -2285,398 +2040,205 @@ const Maintenance = props => {
             </FlexboxGrid.Item>
           </FlexboxGrid>
         </MaintPanel>
-        {width < 500
-          ? (
-            <CardFooter className='card-footer'>
-              <ButtonGroup className='btn-group-2' size='md'>
-                <Button outline onClick={toggleRescheduleModal}>
-                  <FontAwesomeIcon icon={faClock} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
-                    Reschedule
+        {typeof window !== 'undefined' && openReadModal && (
+          <ReadModal
+            maintenance={maintenance}
+            openReadModal={openReadModal}
+            toggleReadModal={toggleReadModal}
+            incomingAttachments={maintenance.incomingAttachments}
+            jsonData={props.jsonData}
+          />
+        )}
+        {openPreviewModal && (
+          <Modal className='modal-preview-send' backdrop size='lg' show={openPreviewModal} onHide={togglePreviewModal}>
+            <Modal.Header>
+              <div className='modal-preview-text-wrapper'>
+                <InputGroup size='sm' className='mb-2'>
+                  <InputGroup.Addon style={{ height: '31px' }} size='sm' type='prepend'>
+                    To
+                  </InputGroup.Addon>
+                  <Input size='sm' disabled placeholder={mailPreviewHeaderText.toLowerCase()} />
+                </InputGroup>
+                <InputGroup size='sm' className='mb-2'>
+                  <InputGroup.Addon style={{ height: '31px' }} size='sm' type='prepend'>
+                    CC
+                  </InputGroup.Addon>
+                  <Input size='sm' disabled placeholder='service@newtelco.de' />
+                </InputGroup>
+                <InputGroup size='sm' className='mb-2'>
+                  <InputGroup.Addon style={{ height: '31px' }} type='prepend'>
+                    Subject
+                  </InputGroup.Addon>
+                  <Input size='sm' disabled placeholder={mailPreviewSubjectTextPreview} />
+                </InputGroup>
+              </div>
+              <ButtonGroup style={{ flexDirection: 'column' }}>
+                <Button style={{ borderRadius: '5px 5px 0 0' }} onClick={togglePreviewModal}>
+                  <FontAwesomeIcon width='1.5em' style={{ fontSize: '12px' }} className='modal-preview-send-icon' icon={faTimesCircle} />
                 </Button>
-                <Button onClick={handleCalendarCreate} outline>
-                  <FontAwesomeIcon icon={faCalendarAlt} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
-                      Calendar
+                <Button id='send-mail-btn' style={{ borderRadius: '0 0 5px 5px', padding: '0.9em 1.1em' }} onClick={() => sendMail(mailPreviewHeaderText, mailPreviewCustomerCID, mailPreviewSubjectText, mailBodyText, true)}>
+                  <FontAwesomeIcon width='1.5em' style={{ fontSize: '12px' }} className='modal-preview-send-icon modal-preview-paperplane-icon' icon={faPaperPlane} />
                 </Button>
-                {maintenance.id === 'NEW'
-                  ? (
-                    <Button disabled={maintenance.id !== 'NEW'} className='create-btn' onClick={handleCreateOnClick}>
-                      <FontAwesomeIcon icon={faPlusCircle} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
-                          Create
-                    </Button>
-                  ) : (
-                    <Button className='send-bulk' theme='primary' onClick={handleSendAll}>
-                      <FontAwesomeIcon icon={faMailBulk} width='1em' style={{ marginRight: '10px', color: 'secondary' }} />
-                        Send All
-                    </Button>
-                  )}
               </ButtonGroup>
-            </CardFooter>
-          ) : (
-            <Footer />
-          )}
-        {typeof window !== 'undefined'
-          ? (
-            <Rnd
-              default={{
-                x: window.outerWidth / 2,
-                y: 25,
-                width: (window.outerWidth / 2) * 0.8,
-                height: 610
-              }}
-              style={{
-                visibility: openReadModal ? 'visible' : 'hidden',
-                opacity: openReadModal ? 1 : 0,
-                background: 'var(--white)',
-                overflow: 'hidden',
-                borderRadius: '15px',
-                height: 'auto',
-                zIndex: '101',
-                boxShadow: '0px 0px 20px 1px var(--third-bg)'
-              }}
-              minWidth={700}
-              minHeight={590}
-              bounds='window'
-              dragHandleClassName='modal-read-header'
-              // onResize={(e, direction, ref, delta, position) => {
-              //   this.setState({
-              //     readHeight: ref.style.height,
-              //     readWidth: ref.style.width
-              //   })
-              // }}
-            >
-              <div style={{ borderRadius: '15px', position: 'relative' }}>
-                <ModalHeader
-                  style={{
-                    backgroundColor: 'var(--fourth-bg)',
-                    borderRadius: '0px'
-                  }}
-                  className='modal-read-header'
-                >
-                  <img className='mail-icon' alt='Logo' src={readIconUrl} />
-                  <div className='modal-incoming-header-text'>
-                    <InputGroup size='sm' className='mb-2'>
-                      <InputGroupAddon style={{ height: '31px' }} size='sm' type='prepend'>
-                        <InputGroupText size='sm'>From:</InputGroupText>
-                      </InputGroupAddon>
-                      <FormInput size='sm' disabled placeholder={maintenance.incomingFrom} />
-                    </InputGroup>
-                    <InputGroup size='sm' className='mb-2'>
-                      <InputGroupAddon style={{ height: '31px' }} size='sm' type='prepend'>
-                        <InputGroupText size='sm'>Subject:</InputGroupText>
-                      </InputGroupAddon>
-                      <FormInput size='sm' disabled placeholder={maintenance.incomingSubject} />
-                    </InputGroup>
-                    <InputGroup size='sm' className='mb-2'>
-                      <InputGroupAddon style={{ height: '31px' }} type='prepend'>
-                        <InputGroupText size='sm'>Date/Time:</InputGroupText>
-                      </InputGroupAddon>
-                      <FormInput size='sm' disabled placeholder={maintenance.incomingDate} />
-                    </InputGroup>
-                  </div>
-                  <ButtonGroup style={{ display: 'flex', flexDirection: 'column' }}>
-                    <Button outline className='close-read-modal-btn' theme='light' style={{ borderRadius: '5px 5px 0 0', padding: '0.7em 0.9em' }} onClick={toggleReadModal}>
-                      <FontAwesomeIcon
-                        className='close-read-modal-icon' width='1.5em' style={{ color: 'var(--light)', fontSize: '12px' }}
-                        icon={faTimesCircle}
-                      />
-                    </Button>
-                    {/* <Button theme='light' style={{ borderRadius: '0 0 5px 5px', padding: '0.7em 0.9em' }} onClick={handleTranslate.bind(this)}>
-                        <FontAwesomeIcon width='1.8em' style={{ fontSize: '12px' }} className='translate-icon' icon={faLanguage} />
-                      </Button> */}
-                  </ButtonGroup>
-                  <div style={{ flexGrow: Array.isArray(maintenance.incomingAttachments) ? '1' : '0', width: '100%', marginTop: '5px' }}>
-                    {Array.isArray(maintenance.incomingAttachments) && maintenance.incomingAttachments.length !== 0
-                      ? maintenance.incomingAttachments.map((attachment, index) => {
-                        return (
-                          <Popover
-                            isOpen={openedDownloadPopupId === attachment.id}
-                            onOuterAction={() => toggleDownloadPopover(false)}
-                            body={attachmentPopoverBody}
-                            key={index}
-                            tipSize={12}
-                            preferPlace='below'
-                          >
-                            <Button pill size='sm' onClick={() => showAttachments(attachment.id, attachment.name)} theme='primary' style={{ marginLeft: '10px' }}>
-                              {attachment.name}
-                            </Button>
-                          </Popover>
-                        )
-                      })
-                      : (
-                        null
-                      )}
-                  </div>
-                </ModalHeader>
-                <ModalBody className='mail-body' dangerouslySetInnerHTML={{ __html: maintenance.incomingBody }} />
-              </div>
-            </Rnd>
-          ) : (
-            null
-          )}
-        <Attachment night={false} incomingAttachments={maintenance.incomingAttachments} />
-        {typeof window !== 'undefined'
-          ? (
-            <Rnd
-              default={{
-                x: HALF_WIDTH,
-                y: 125,
-                width: 800,
-                height: 'auto'
-              }}
-              style={{
-                visibility: openAttachmentModal ? 'visible' : 'hidden',
-                opacity: openAttachmentModal ? 1 : 0,
-                backgroundColor: 'var(--primary-bg)',
-                overflow: 'hidden',
-                borderRadius: '15px',
-                zIndex: '101',
-                boxShadow: '0px 0px 20px 1px var(--dark)'
-              }}
-              bounds='window'
-              dragHandleClassName='modal-attachment-header-text'
-            >
-              <div style={{ borderRadius: '15px', position: 'relative' }}>
-                <ModalHeader
-                  className='modal-attachment-header-text'
-                  style={{
-                    background: 'var(--fourth-bg)',
-                    borderRadius: '0px',
-                    color: 'var(--white)',
-                    display: 'flex',
-                    justifyContent: 'space-between'
-                  }}
-                >
-                  {currentAttachmentName}
-                  <Button outline className='close-attachment-modal-btn' theme='light' style={{ borderRadius: '5px', padding: '0.7em 0.9em' }} onClick={() => showAttachments(null)}>
-                    <FontAwesomeIcon
-                      className='close-attachment-modal-icon' width='1.5em' style={{ color: 'var(--light)', fontSize: '12px' }}
-                      icon={faTimesCircle}
-                    />
-                  </Button>
-                </ModalHeader>
-                <ModalBody style={attachmentDetails.filetype === 'pdf' ? { overflow: 'scroll', padding: '0', height: '450px' } : null}>
-                  {attachmentDetails.filetype === 'excel'
-                  // rows && cols
-                    ? (
-                      <div className='attachment-body pdf'>
-                        <OutTable data={rows} columns={cols} tableClassName='ExcelTable2007' tableHeaderRowClass='heading' />
-                      </div>
-                    ) : (
-                      null
-                    )}
-                  {attachmentDetails.filetype === 'pdf'
-                    ? (
-                      <div className='attachment-body excel'>
-                        <PDF file={pdfB64} scale={1.75} />
-                      </div>
-                    ) : (
-                      null
-                    )}
-                  {attachmentDetails.filetype === 'html'
-                    ? (
-                      <root.div className='attachment-body html'>
-                        <div dangerouslySetInnerHTML={{ __html: attachmentHTMLContent }} />
-                      </root.div>
-                    ) : (
-                      null
-                    )}
-                </ModalBody>
-              </div>
-            </Rnd>
-          ) : (
-            null
-          )}
-        <Modal className='modal-preview-send' backdropClassName='modal-backdrop modal-preview-send-backdrop' animation backdrop size='lg' open={openPreviewModal} toggle={togglePreviewModal}>
-          <ModalHeader>
-            <div className='modal-preview-text-wrapper'>
-              <InputGroup size='sm' className='mb-2'>
-                <InputGroupAddon style={{ height: '31px' }} size='sm' type='prepend'>
-                  <InputGroupText size='sm'>To:</InputGroupText>
-                </InputGroupAddon>
-                <FormInput size='sm' disabled placeholder={mailPreviewHeaderText.toLowerCase()} />
-              </InputGroup>
-              <InputGroup size='sm' className='mb-2'>
-                <InputGroupAddon style={{ height: '31px' }} size='sm' type='prepend'>
-                  <InputGroupText size='sm'>Cc:</InputGroupText>
-                </InputGroupAddon>
-                <FormInput size='sm' disabled placeholder='service@newtelco.de' />
-              </InputGroup>
-              <InputGroup size='sm' className='mb-2'>
-                <InputGroupAddon style={{ height: '31px' }} type='prepend'>
-                  <InputGroupText size='sm'>Subject:</InputGroupText>
-                </InputGroupAddon>
-                <FormInput size='sm' disabled placeholder={mailPreviewSubjectTextPreview} />
-              </InputGroup>
-            </div>
-            <ButtonGroup style={{ flexDirection: 'column' }}>
-              <Button theme='light' style={{ borderRadius: '5px 5px 0 0' }} onClick={togglePreviewModal}>
-                <FontAwesomeIcon width='1.5em' style={{ fontSize: '12px' }} className='modal-preview-send-icon' icon={faTimesCircle} />
-              </Button>
-              <Button theme='light' outline id='send-mail-btn' style={{ borderRadius: '0 0 5px 5px', padding: '0.9em 1.1em' }} onClick={() => sendMail(mailPreviewHeaderText, mailPreviewCustomerCID, mailPreviewSubjectText, mailBodyText, true)}>
-                <FontAwesomeIcon width='1.5em' style={{ fontSize: '12px' }} className='modal-preview-send-icon modal-preview-paperplane-icon' icon={faPaperPlane} />
-              </Button>
-            </ButtonGroup>
-          </ModalHeader>
-          <ModalBody>
-            <TinyEditor
-              initialValue={mailBodyText}
-              apiKey='ttv2x1is9joc0fi7v6f6rzi0u98w2mpehx53mnc1277omr7s'
-              init={{
-                height: 500,
-                menubar: false,
-                statusbar: false,
-                plugins: [
-                  'advlist autolink lists link image print preview anchor',
-                  'searchreplace code',
-                  'insertdatetime table paste code help wordcount'
-                ],
-                toolbar:
-                      `undo redo | formatselect | bold italic backcolor | 
-                      alignleft aligncenter alignright alignjustify | 
-                      bullist numlist outdent indent | removeformat | help`,
-                content_style: 'html { color: #828282 }'
-              }}
-              onChange={handleEditorChange}
-            />
+            </Modal.Header>
+            <Modal.Body>
+              <TinyEditor
+                initialValue={mailBodyText}
+                apiKey='ttv2x1is9joc0fi7v6f6rzi0u98w2mpehx53mnc1277omr7s'
+                init={{
+                  height: 500,
+                  menubar: false,
+                  statusbar: false,
+                  plugins: [
+                    'advlist autolink lists link image print preview anchor',
+                    'searchreplace code',
+                    'insertdatetime table paste code help wordcount'
+                  ],
+                  toolbar:
+                        `undo redo | formatselect | bold italic backcolor | 
+                        alignleft aligncenter alignright alignjustify | 
+                        bullist numlist outdent indent | removeformat | help`,
+                  content_style: 'html { color: #828282 }'
+                }}
+                onChange={handleEditorChange}
+              />
 
-          </ModalBody>
-        </Modal>
-        {typeof window !== 'undefined'
-          ? (
-            <Rnd
-              default={{
-                x: HALF_WIDTH - (HALF_WIDTH / 1.5),
-                y: 25,
-                width: 600,
-                height: 565
-              }}
-              style={{
-                visibility: openRescheduleModal ? 'visible' : 'hidden',
-                opacity: openRescheduleModal ? 1 : 0,
-                backgroundColor: 'var(--primary-bg)',
-                overflow: 'hidden',
-                borderRadius: '15px',
-                height: 'auto',
-                zIndex: '101',
-                boxShadow: '0px 0px 20px 1px var(--dark)'
-              }}
-              bounds='window'
-              dragHandleClassName='reschedule-header'
-            >
-              <ModalHeader className='reschedule reschedule-header'>
-                <span style={{ flexGrow: '1' }}>
-                    Reschedule Maintenance
-                </span>
-                <Badge>
-                  {rescheduleData.length + 1}
-                </Badge>
-                <Button className='close-attachment-modal-btn' style={{ borderRadius: '5px', marginLeft: '15px', padding: '0.7em 0.9em' }} onClick={toggleRescheduleModal}>
-                  <FontAwesomeIcon
-                    className='close-attachment-modal-icon' width='1.5em' style={{ color: 'var(--light)', fontSize: '12px' }}
-                    icon={faTimesCircle}
-                  />
-                </Button>
-              </ModalHeader>
-              <ModalBody className='modal-body reschedule'>
-                <Container style={{ paddingTop: '0px !important' }} className='container-border'>
-                  <Col>
-                    <Row style={{ display: 'flex', flexWrap: 'nowrap' }}>
-                      <FormGroup style={{ margin: '0 15px', width: '100%' }}>
-                        <label htmlFor='supplier'>Timezone</label>
-                        <TimezoneSelector
-                          className='maint-select'
-                          value={{ value: reschedule.timezone, label: reschedule.timezoneLabel }}
-                          onChange={handleRescheduleTimezoneChange}
-                        />
-                      </FormGroup>
-                    </Row>
-                    <Row style={{ display: 'flex', flexWrap: 'nowrap' }}>
-                      <FormGroup style={{ margin: '0 15px' }}>
-                        <label>
-                            Start Date/Time
-                        </label>
-                        <Flatpickr
-                          data-enable-time
-                          options={{ time_24hr: 'true', allow_input: 'true' }}
-                          className='flatpickr end-date-time'
-                          value={reschedule.startDateTime || null}
-                          onChange={date => handleRescheduleStartDateTimeChange(date)}
-                        />
-                      </FormGroup>
-                      <FormGroup style={{ margin: '0 15px' }}>
-                        <label>
-                            End Date/Time
-                        </label>
-                        <Flatpickr
-                          data-enable-time
-                          options={{ time_24hr: 'true', allow_input: 'true' }}
-                          className='flatpickr end-date-time'
-                          value={reschedule.endDateTime || null}
-                          onChange={date => handleRescheduleEndDateTimeChange(date)}
-                        />
-                      </FormGroup>
-                    </Row>
-                    <Row>
-                      <FormGroup style={{ margin: '0px 15px', width: '100%', marginBottom: '10px !important' }}>
-                        <label htmlFor='resched-impact'>
-                            New Impact
-                        </label>
-                        <FormInput id='resched-impact' name='resched-impact' type='text' value={reschedule.impact} onChange={handleRescheduleImpactChange} />
-                      </FormGroup>
-                    </Row>
-                    <Row>
-                      <FormGroup style={{ margin: '0px 15px', width: '100%', marginBottom: '10px !important' }}>
-                        <label htmlFor='resched-reason'>
-                            Reason for Reschedule
-                        </label>
-                        <CreatableSelect
-                          isClearable
-                          menuPlacement='top'
-                          className='maint-select'
-                          value={reschedule.reason}
-                          onChange={handleRescheduleReasonChange}
-                          options={[
-                            {
-                              value: 'change_circuits',
-                              label: 'change in affected circuits'
-                            },
-                            {
-                              value: 'change_time',
-                              label: 'change in planned date/time'
-                            },
-                            {
-                              value: 'change_impact',
-                              label: 'change in impact duration'
-                            },
-                            {
-                              value: 'change_technical',
-                              label: 'change due to technical reasons'
-                            }
-                          ]}
-                          placeholder='Please select a reason for reschedule'
-                        />
-                      </FormGroup>
-                    </Row>
-                  </Col>
-                </Container>
-                <Row style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                  <Col>
-                    <Button onClick={handleRescheduleSave} style={{ width: '100%', marginTop: '15px' }} theme='primary'>
-                        Save
-                    </Button>
-                  </Col>
-                </Row>
-              </ModalBody>
-            </Rnd>
-          ) : (
-            null
-          )}
+            </Modal.Body>
+          </Modal>
+        )}
+        {typeof window !== 'undefined' && openRescheduleModal && (
+          <Rnd
+            default={{
+              x: window.outerWidth - (window.outerWidth / 1.5),
+              y: 25,
+              width: 600,
+              height: 565
+            }}
+            style={{
+              visibility: openRescheduleModal ? 'visible' : 'hidden',
+              opacity: openRescheduleModal ? 1 : 0,
+              backgroundColor: 'var(--primary-bg)',
+              overflow: 'hidden',
+              borderRadius: '15px',
+              height: 'auto',
+              zIndex: '101',
+              boxShadow: '0px 0px 20px 1px var(--dark)'
+            }}
+            bounds='window'
+            dragHandleClassName='reschedule-header'
+          >
+            <Modal.Header className='reschedule reschedule-header'>
+              <span style={{ flexGrow: '1' }}>
+                  Reschedule Maintenance
+              </span>
+              <Badge>
+                {rescheduleData.length + 1}
+              </Badge>
+              <Button className='close-attachment-modal-btn' style={{ borderRadius: '5px', marginLeft: '15px', padding: '0.7em 0.9em' }} onClick={toggleRescheduleModal}>
+                <FontAwesomeIcon
+                  className='close-attachment-modal-icon' width='1.5em' style={{ color: 'var(--light)', fontSize: '12px' }}
+                  icon={faTimesCircle}
+                />
+              </Button>
+            </Modal.Header>
+            <Modal.Body className='modal-body reschedule'>
+              <Container style={{ paddingTop: '0px !important' }} className='container-border'>
+                <Col>
+                  <Row style={{ display: 'flex', flexWrap: 'nowrap' }}>
+                    <FormGroup style={{ margin: '0 15px', width: '100%' }}>
+                      <label htmlFor='supplier'>Timezone</label>
+                      <TimezoneSelector
+                        className='maint-select'
+                        value={{ value: reschedule.timezone, label: reschedule.timezoneLabel }}
+                        onChange={handleRescheduleTimezoneChange}
+                      />
+                    </FormGroup>
+                  </Row>
+                  <Row style={{ display: 'flex', flexWrap: 'nowrap' }}>
+                    <FormGroup style={{ margin: '0 15px' }}>
+                      <label>
+                          Start Date/Time
+                      </label>
+                      <Flatpickr
+                        data-enable-time
+                        options={{ time_24hr: 'true', allow_input: 'true' }}
+                        className='flatpickr end-date-time'
+                        value={reschedule.startDateTime || null}
+                        onChange={date => handleRescheduleStartDateTimeChange(date)}
+                      />
+                    </FormGroup>
+                    <FormGroup style={{ margin: '0 15px' }}>
+                      <label>
+                          End Date/Time
+                      </label>
+                      <Flatpickr
+                        data-enable-time
+                        options={{ time_24hr: 'true', allow_input: 'true' }}
+                        className='flatpickr end-date-time'
+                        value={reschedule.endDateTime || null}
+                        onChange={date => handleRescheduleEndDateTimeChange(date)}
+                      />
+                    </FormGroup>
+                  </Row>
+                  <Row>
+                    <FormGroup style={{ margin: '0px 15px', width: '100%', marginBottom: '10px !important' }}>
+                      <label htmlFor='resched-impact'>
+                          New Impact
+                      </label>
+                      <Input id='resched-impact' name='resched-impact' type='text' value={reschedule.impact} onChange={handleRescheduleImpactChange} />
+                    </FormGroup>
+                  </Row>
+                  <Row>
+                    <FormGroup style={{ margin: '0px 15px', width: '100%', marginBottom: '10px !important' }}>
+                      <label htmlFor='resched-reason'>
+                          Reason for Reschedule
+                      </label>
+                      <CreatableSelect
+                        isClearable
+                        menuPlacement='top'
+                        className='maint-select'
+                        value={reschedule.reason}
+                        onChange={handleRescheduleReasonChange}
+                        options={[
+                          {
+                            value: 'change_circuits',
+                            label: 'change in affected circuits'
+                          },
+                          {
+                            value: 'change_time',
+                            label: 'change in planned date/time'
+                          },
+                          {
+                            value: 'change_impact',
+                            label: 'change in impact duration'
+                          },
+                          {
+                            value: 'change_technical',
+                            label: 'change due to technical reasons'
+                          }
+                        ]}
+                        placeholder='Please select a reason for reschedule'
+                      />
+                    </FormGroup>
+                  </Row>
+                </Col>
+              </Container>
+              <Row style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <Col>
+                  <Button onClick={handleRescheduleSave} style={{ width: '100%', marginTop: '15px' }}>
+                      Save
+                  </Button>
+                </Col>
+              </Row>
+            </Modal.Body>
+          </Rnd>
+        )}
         {openConfirmDeleteModal && (
           <Modal className='delete-modal' animation backdrop backdropClassName='modal-backdrop' open={openConfirmDeleteModal} size='md' toggle={toggleConfirmDeleteRescheduleModal}>
-            <ModalHeader className='modal-delete-header'>
+            <Modal.Header className='modal-delete-header'>
                 Confirm Delete Reschedule
-            </ModalHeader>
-            <ModalBody>
+            </Modal.Header>
+            <Modal.Body>
               <Container className='container-border'>
                 <Row>
                   <Col>
@@ -2687,24 +2249,24 @@ const Maintenance = props => {
               <Row style={{ marginTop: '20px' }}>
                 <Col>
                   <ButtonGroup style={{ width: '100%' }}>
-                    <Button style={{ color: 'var(font-color)' }} onClick={toggleConfirmDeleteRescheduleModal} outline theme='secondary'>
+                    <Button style={{ color: 'var(font-color)' }} onClick={toggleConfirmDeleteRescheduleModal}>
                         Cancel
                     </Button>
-                    <Button onClick={handleDeleteReschedule} theme='danger'>
+                    <Button onClick={handleDeleteReschedule}>
                         Confirm
                     </Button>
                   </ButtonGroup>
                 </Col>
               </Row>
-            </ModalBody>
+            </Modal.Body>
           </Modal>
         )}
         {openConfirmFreezeModal && (
           <Modal className='confirm-freeze-modal' animation backdrop backdropClassName='modal-backdrop' open={openConfirmFreezeModal} size='md' toggle={toggleConfirmFreezeModal}>
-            <ModalHeader className='modal-delete-header'>
+            <Modal.Header className='modal-delete-header'>
                 Confirm Freeze Send
-            </ModalHeader>
-            <ModalBody>
+            </Modal.Header>
+            <Modal.Body>
               <Container className='container-border'>
                 <Row>
                   <Col>
@@ -2715,16 +2277,16 @@ const Maintenance = props => {
               <Row style={{ marginTop: '20px' }}>
                 <Col>
                   <ButtonGroup style={{ width: '100%' }}>
-                    <Button style={{ color: 'var(font-color)' }} onClick={toggleConfirmFreezeModal} outline theme='secondary'>
+                    <Button style={{ color: 'var(font-color)' }} onClick={toggleConfirmFreezeModal}>
                         Cancel
                     </Button>
-                    <Button onClick={() => prepareDirectSend(frozenState.recipient, frozenState.cid, false)} theme='danger'>
+                    <Button onClick={() => prepareDirectSend(frozenState.recipient, frozenState.cid, false)}>
                         Confirm
                     </Button>
                   </ButtonGroup>
                 </Col>
               </Row>
-            </ModalBody>
+            </Modal.Body>
           </Modal>
         )}
       </Layout>

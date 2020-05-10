@@ -2,13 +2,13 @@ import React, { useState } from 'react'
 import Router from 'next/router'
 import { Modal } from 'rsuite'
 import { HotKeys } from 'react-hotkeys'
-
 import {
   Container,
   Row,
   Col,
+  Grid,
   Badge
-} from 'shards-react'
+} from 'rsuite'
 
 const KeyboardShortcuts = props => {
   const [showHelpModal, setHelpModal] = useState(false)

@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { NextAuth } from 'next-auth/client'
 import Link from 'next/link'
-import fetch from 'isomorphic-unfetch'
 import { withRouter } from 'next/router'
 import RequireLogin from '../../components/require-login'
 import Layout from '../../components/layout'
@@ -9,7 +8,7 @@ import Companies from '../../components/settings/companies'
 import CustomerCIDs from '../../components/settings/customercids'
 import SupplierCIDs from '../../components/settings/suppliercids'
 import Freeze from '../../components/settings/freeze'
-import Templates from '../../components/settings/templates'
+// import Templates from '../../components/settings/templates'
 import MaintPanel from '../../components/panel'
 import './settings.css'
 import {
@@ -56,7 +55,7 @@ const Settings = ({ session, router }) => {
             {tab === 'companies' && <Companies />}
             {tab === 'customercids' && <CustomerCIDs />}
             {tab === 'suppliercids' && <SupplierCIDs />}
-            {tab === 'templates' && <Templates />}
+            {/* {tab === 'templates' && <Templates />} */}
             {tab === 'freeze' && <Freeze />}
           </FlexboxGrid>
         </MaintPanel>

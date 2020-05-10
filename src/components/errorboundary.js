@@ -1,86 +1,53 @@
 import React from 'react'
-import Footer from './cardFooter'
 import {
   Container,
-  Button,
+  Content,
+  FlexboxGrid,
   ButtonGroup,
-  Card,
-  CardHeader,
-  CardBody
-} from 'shards-react'
+  Button,
+  Panel,
+  Col
+} from 'rsuite'
 
 export default class ErrorBoundary extends React.Component {
   constructor (props) {
     super(props)
-    this.state = { error: null }
+    this.state = { error: null, errorInfo: null }
   }
 
   componentDidCatch (error, errorInfo) {
-    this.setState({ error })
+    this.setState({ error, errorInfo })
   }
 
   render () {
     if (this.state.error) {
+      console.log(this.props.session)
       return (
-        <Card className='error-card'>
-          <CardHeader>
-            Newtelco Maintenance
-          </CardHeader>
-          <CardBody>
-            <Container className='container-border'>
-              <img style={{ marginBottom: '50px' }} width='500px' src='/static/images/error.svg' alt='error' />
-              <h4>Oops — something's gone wrong.</h4>
-              <p>If you would like to provide us more information, please select 'Report' below.</p>
-              <ButtonGroup style={{ width: '100%' }}>
-                <Button outline theme='secondary' onClick={() => console.error('TODO')}>
-                  Report
-                </Button>
-                <Button theme='primary' onClick={() => window.location.reload(true)}>
-                  Try Again
-                </Button>
-              </ButtonGroup>
-            </Container>
-          </CardBody>
-          <Footer />
-          <style jsx>{`
-            :global(body) {
-              background: none !important;
-            }
-            :global(.card-header) {
-              background: var(--light);
-              text-align: center;
-              font-size: 32px;
-              font-family: Poppins, Helvetica;
-              font-weight: 200;
-            }
-            :global(.card-footer) {
-              background: var(--light);
-            }
-            :global(.card-body) {
-              background: var(--white);
-            }
-            :global(.error-card) {
-              max-width: 800px;
-              margin: 0 auto;
-              margin-top: 50px;
-            }
-            :global(.container-border) {
-              display: flex;
-              flex-direction: column;
-              align-items: center;
-              flex-wrap: nowrap;
-              border: 1px solid var(--light);
-              border-radius: 0.325rem;
-              margin: 10px 0;
-              padding: 1.5rem;
-
-            }
-          `}
-          </style>
-        </Card>
+        <Container>
+          <Content>
+            <FlexboxGrid justify='center' align='middle' style={{ height: '70vh', flexDirection: 'column', marginTop: '30px' }}>
+              <FlexboxGrid.Item componentClass={Col} colspan={10} lg={12} md={14} sm={18} xs={20}>
+                <Panel header={<h4 style={{ textAlign: 'center' }}>Newtelco Maintenance</h4>} bordered shaded style={{ backgroundColor: '#fff', padding: '20px' }}>
+                  <Container className='container-border'>
+                    <img style={{ marginBottom: '50px' }} width='500px' src='/static/images/error.svg' alt='error' />
+                    <h4 style={{ textAlign: 'center', marginBottom: '10px' }}>Oops — something's gone wrong.</h4>
+                    <p>If you would like to provide us more information, please select 'Report' below.</p>
+                    <ButtonGroup justified style={{ marginTop: '20px', width: '100%' }}>
+                      <Button componentClass='a' href={`mailto:ndomino@newtelco.de?subject=${encodeURIComponent('Newtelco Maintenance - Error')}&body=${encodeURIComponent(this.state.error)}%0D%0A%0D%0A${encodeURIComponent(JSON.stringify(this.state.errorInfo))}%0D%0A%0D%0AThanks%0D%0A${this.props.user}`}>
+                        Report
+                      </Button>
+                      <Button appearance='primary' onClick={() => window.location.reload(true)}>
+                        Try Again
+                      </Button>
+                    </ButtonGroup>
+                  </Container>
+                </Panel>
+              </FlexboxGrid.Item>
+            </FlexboxGrid>
+          </Content>
+        </Container>
       )
     } else {
-      // when there's not an error, render children untouched
       return this.props.children
     }
   }

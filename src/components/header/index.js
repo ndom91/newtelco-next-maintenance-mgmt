@@ -125,7 +125,7 @@ const MaintHeader = props => {
               placement='bottomEnd'
               icon={<Avatar size='md' circle src={avatarPath} style={{ border: '2px solid #67b246' }} />}
             >
-              <NavLink icon={<Icon icon='cog' />} href={{ pathname: '/settings', query: { tab: 'companies' } }} >Settings</NavLink>
+              <NavLink icon={<Icon icon='cog' />} href={{ pathname: '/settings', query: { tab: 'companies' } }}>Settings</NavLink>
               <Dropdown.Item icon={<Icon icon='sign-out' />} onClick={(e) => props.signOut(e)}>Logout</Dropdown.Item>
             </Dropdown>
           </Nav>

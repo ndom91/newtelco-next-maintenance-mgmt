@@ -8,13 +8,13 @@ import {
   faCalendarAlt,
   faAt
 } from '@fortawesome/free-solid-svg-icons'
-import {
-  CardBody,
-  CardHeader,
-  Badge,
-  Button,
-  Container
-} from 'shards-react'
+// import {
+//   CardBody,
+//   CardHeader,
+//   Badge,
+//   Button,
+//   Container
+// } from 'shards-react'
 
 export default class Templates extends React.Component {
   static async getInitialProps ({ req, query }) {

@@ -18,8 +18,7 @@ import {
   InputGroup,
   Whisper,
   Tooltip,
-  FlexboxGrid,
-  Alert
+  FlexboxGrid
 } from 'rsuite'
 
 const Inbox = props => {

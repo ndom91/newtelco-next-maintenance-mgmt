@@ -2,17 +2,12 @@ import React from 'react'
 import App from 'next/app'
 import Head from 'next/head'
 import ErrorBoundary from '../components/errorboundary'
-
 import './style/app.css'
-import 'bootstrap/dist/css/bootstrap.min.css'
-import './style/shards.min.css'
-
 import './style/ntTheme.less'
-
 import 'algolia-react-autocomplete/build/css/index.css'
 import Store from '../components/store'
-
 const LogRocket = require('logrocket')
+
 export default class MyApp extends App {
   static async getInitialProps ({ Component, ctx }) {
     let pageProps = {}
@@ -35,7 +30,7 @@ export default class MyApp extends App {
     const { Component, pageProps, router } = this.props
 
     return (
-      <ErrorBoundary>
+      <ErrorBoundary user={pageProps.session.user.name}>
         <Head>
           <title>Newtelco Maintenance</title>
           <meta name='viewport' content='width=device-width, initial-scale=1' />
