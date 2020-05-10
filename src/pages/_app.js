@@ -58,7 +58,9 @@ export default class MyApp extends App {
           <link rel='manifest' href='/manifest.json' />
           <link rel='mask-icon' href='/static/icons/safari-pinned-tab.svg' color='#5bbad5' />
           <link rel='shortcut icon' id='favicon' href='/static/images/favicon/favicon.ico' />
+          <script src='https://analytics.newtelco.dev/ingress/7e406c80-f4f1-40f4-8407-1b0493dc86d1/script.js'></script>
         </Head>
+        <noscript><img src='https://analytics.newtelco.dev/ingress/7e406c80-f4f1-40f4-8407-1b0493dc86d1/pixel.gif'></img></noscript>
         <Store.Container>
           <Component {...pageProps} key={router.route} />
         </Store.Container>

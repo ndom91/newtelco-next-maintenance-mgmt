@@ -12,19 +12,22 @@ const PerPerson = () => {
   )
 
   if (data) {
+    const Users = data.query.sort((a, b) => { return (a.value < b.value) ? -1 : 0 })
     return (
       <Panel bordered header={<div style={{ display: 'flex', justifyContent: 'space-between' }}>Totals<Icon icon='bar-chart' style={{ color: 'var(--primary)' }} size='lg' /></div>} style={{ height: '100%' }}>
         <Bar
-          width={400}
+          width={300}
           height={250}
           layout='horizontal'
-          margin={{ top: 26, right: 120, bottom: 26, left: 60 }}
-          data={data.query}
+          margin={{ top: 26, right: 20, bottom: 26, left: 60 }}
+          data={Users}
           keys={['value']}
           indexBy='person'
-          colors={{ scheme: 'nivo' }}
+          colors={{ scheme: 'yellow_green' }}
+          colorBy='index'
           enableGridX={false}
           enableGridY={false}
+          axisBottom={false}
           padding={0.3}
           labelTextColor={{ from: 'color', modifiers: [['darker', 1.4]] }}
           isInteractive={false}
