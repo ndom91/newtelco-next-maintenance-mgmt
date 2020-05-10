@@ -148,7 +148,7 @@ const Freeze = props => {
       .then(resp => resp.json())
       .then(data => {
         if (data.deleteFreezeQuery.affectedRows === 1) {
-          Notify('success', 'Delete Success')
+          Notify('success', `Freeze for ${freezeCompanyToDelete} Deleted`)
         } else {
           Notify('warning', 'Error', data.err)
         }
@@ -202,6 +202,7 @@ const Freeze = props => {
     const startdate = moment(params.data.startDateTime).format('YYYY.MM.DD HH:mm:ss')
     const enddate = moment(params.data.endDateTime).format('YYYY.MM.DD HH:mm:ss')
     const notes = params.data.notes
+    console.log(params.data)
 
     fetch(`/api/settings/edit/freeze?id=${id}&startdate=${encodeURIComponent(startdate)}&enddate=${encodeURIComponent(enddate)}&notes=${encodeURIComponent(notes)}`, {
       method: 'get'
@@ -209,7 +210,7 @@ const Freeze = props => {
       .then(resp => resp.json())
       .then(data => {
         if (data.updateFreezeQuery.affectedRows === 1) {
-          Notify('success', `Freeze ${id} Updated`)
+          Notify('success', `${params.data.name} Freeze Updated`)
         } else {
           Notify('warning', 'Error', data.err)
         }
@@ -289,38 +290,25 @@ const Freeze = props => {
                       options={companySelections}
                       noOptionsMessage={() => 'No Companies Available'}
                       placeholder='Please Select a Company'
+                      style={{ zIndex: '9999' }}
                     />
                   </FormGroup>
                   <FormGroup>
                     <ControlLabel>Start Date/Time (in GMT)</ControlLabel>
-                    {/* <Flatpickr
-                      data-enable-time
-                      options={{ time_24hr: 'true', allow_input: 'true' }}
-                      className='flatpickr end-date-time'
-                      value={newStartDateTime || null}
-                      onChange={date => handleNewStartChange(date)}
-                    /> */}
                     <DatePicker
-                      style={{ width: '300px'}}
+                      style={{ width: '300px' }}
                       hideSeconds
-                      format="YYYY-MM-DD HH:mm"
+                      format='YYYY-MM-DD HH:mm'
                       value={newStartDateTime || null}
                       onChange={date => handleNewStartChange(date)}
                     />
                   </FormGroup>
                   <FormGroup>
                     <ControlLabel>End Date/Time (in GMT)</ControlLabel>
-                    {/* <Flatpickr
-                      data-enable-time
-                      options={{ time_24hr: 'true', allow_input: 'true' }}
-                      className='flatpickr end-date-time'
-                      value={newEndDateTime || null}
-                      onChange={date => handleNewEndChange(date)}
-                    /> */}
                     <DatePicker
-                      style={{ width: '300px'}}
+                      style={{ width: '300px' }}
                       hideSeconds
-                      format="YYYY-MM-DD HH:mm"
+                      format='YYYY-MM-DD HH:mm'
                       value={newEndDateTime || null}
                       onChange={date => handleNewEndChange(date)}
                     />

@@ -155,7 +155,7 @@ const CustomerCIDs = props => {
       .then(resp => resp.json())
       .then(data => {
         if (data.deleteCustomerCidQuery.affectedRows === 1) {
-          Notify('success', 'Delete Success')
+          Notify('success', `${customerNameToDelete} Deleted`)
         } else {
           Notify('warning', 'Error', data.err)
         }
@@ -190,7 +190,7 @@ const CustomerCIDs = props => {
       .then(data => {
         const insertId = data.insertCustomerCidQuery.insertId
         if (data.insertCustomerCidQuery.affectedRows === 1 && data.insertCustomerCidQuery.warningCount === 0) {
-          Notify('success', `CID ${newNewtelcoCid} Added`)
+          Notify('success', `${newNewtelcoCid} Added`)
         } else {
           Notify('warning', 'Error', data.err)
         }
@@ -225,7 +225,7 @@ const CustomerCIDs = props => {
       .then(resp => resp.json())
       .then(data => {
         if (data.updateCustomerCidQuery.affectedRows === 1) {
-          Notify('success', `Customer CID ${newCustomerCid} Updated`)
+          Notify('success', `${newCustomerCid} Updated`)
         } else {
           Notify('warning', 'Error', data.err)
         }
@@ -235,21 +235,21 @@ const CustomerCIDs = props => {
 
   const Header = () => {
     return (
-        <FlexboxGrid justify='space-between' align='middle'>
-          <FlexboxGrid.Item>
-            Customer CIDs
-          </FlexboxGrid.Item>
-          <FlexboxGrid.Item>
-            <ButtonGroup>
-              <IconButton onClick={toggleCustomerCidAdd} icon={<Icon icon='plus-circle' />} appearance='ghost' placement='right'>
-                Add
-              </IconButton>
-              <IconButton onClick={toggleCustomerCidDeleteModal} icon={<Icon icon='trash' />} appearance='ghost' placement='right'>
-                Delete
-              </IconButton>
-            </ButtonGroup>
-          </FlexboxGrid.Item>
-        </FlexboxGrid>
+      <FlexboxGrid justify='space-between' align='middle'>
+        <FlexboxGrid.Item>
+          Customer CIDs
+        </FlexboxGrid.Item>
+        <FlexboxGrid.Item>
+          <ButtonGroup>
+            <IconButton onClick={toggleCustomerCidAdd} icon={<Icon icon='plus-circle' />} appearance='ghost' placement='right'>
+              Add
+            </IconButton>
+            <IconButton onClick={toggleCustomerCidDeleteModal} icon={<Icon icon='trash' />} appearance='ghost' placement='right'>
+              Delete
+            </IconButton>
+          </ButtonGroup>
+        </FlexboxGrid.Item>
+      </FlexboxGrid>
     )
   }
 
@@ -294,7 +294,7 @@ const CustomerCIDs = props => {
           <Modal.Header>
             New Customer CID
           </Modal.Header>
-          <Modal.Body>
+          <Modal.Body style={{ overflow: 'visible' }}>
             <FlexboxGrid justify='space-around' align='middle' style={{ flexDirection: 'column', height: '450px' }}>
               <FlexboxGrid.Item style={{ fontFamily: 'var(--font-body)', fontSize: '1.1rem' }}>
                 <Form>

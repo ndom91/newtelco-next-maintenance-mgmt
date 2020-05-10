@@ -105,7 +105,7 @@ const Companies = props => {
       .then(resp => resp.json())
       .then(data => {
         if (data.deleteCompanyQuery.affectedRows === 1) {
-          Notify('success', 'Delete Success')
+          Notify('success', `${companyToDelete.name} Deleted`)
         } else {
           Notify('warning', 'Error', data.err)
         }
@@ -139,7 +139,7 @@ const Companies = props => {
       .then(data => {
         const insertId = data.insertCompanyQuery.insertId
         if (data.insertCompanyQuery.affectedRows === 1 && data.insertCompanyQuery.warningCount === 0) {
-          Notify('success', `Company ${newName} Added`)
+          Notify('success', `${newName} Added`)
         } else {
           Notify('warning', 'Error', data.err)
         }
@@ -164,7 +164,7 @@ const Companies = props => {
       .then(resp => resp.json())
       .then(data => {
         if (data.updateCompanyQuery.affectedRows === 1) {
-          Notify('success', `Company ${newName} Updated`)
+          Notify('success', `${newName} Updated`)
         } else {
           Notify('warning', 'Error', data.err)
         }

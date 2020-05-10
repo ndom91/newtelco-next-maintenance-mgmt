@@ -112,7 +112,7 @@ const SupplierCIDs = props => {
       .then(resp => resp.json())
       .then(data => {
         if (data.deleteSupplierCidQuery.affectedRows === 1) {
-          Notify('success', 'Delete Success')
+          Notify('success', `${supplierCidToDelete.name} Deleted`)
         } else {
           Notify('warning', 'Error', data.err)
         }
@@ -146,7 +146,7 @@ const SupplierCIDs = props => {
       .then(data => {
         const insertId = data.insertSupplierCidQuery.insertId
         if (data.insertSupplierCidQuery.affectedRows === 1 && data.insertSupplierCidQuery.warningCount === 0) {
-          Notify('success', `Supplier CID ${newSupplierCid} Added`)
+          Notify('success', `${newSupplierCid} Added`)
         } else {
           Notify('warning', 'Error', data.err)
         }
@@ -169,7 +169,7 @@ const SupplierCIDs = props => {
       .then(resp => resp.json())
       .then(data => {
         if (data.updateSupplierCidQuery.affectedRows === 1) {
-          Notify('success', `Supplier CID ${newSupplierCid} Updated`)
+          Notify('success', `${newSupplierCid} Updated`)
         } else {
           Notify('warning', 'Error', data.err)
         }
@@ -238,7 +238,7 @@ const SupplierCIDs = props => {
           <Modal.Header>
             New Supplier CID
           </Modal.Header>
-          <Modal.Body>
+          <Modal.Body style={{ overflow: 'visible' }}>
             <FlexboxGrid justify='space-around' align='middle' style={{ flexDirection: 'column', height: '350px' }}>
               <FlexboxGrid.Item style={{ fontFamily: 'var(--font-body)', fontSize: '1.1rem' }}>
                 <Form>

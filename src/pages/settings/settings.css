@@ -14,3 +14,7 @@
   font-family: var(--font-body);
   font-size: 110%;
 }
+
+.company-select div:nth-of-type(2) {
+  z-index: 99;
+}
