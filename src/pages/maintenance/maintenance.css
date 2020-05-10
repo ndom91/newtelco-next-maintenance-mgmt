@@ -90,6 +90,10 @@
   margin-left: -13px;
 }
 
+.rs-timeline-item .rs-timeline-item-content {
+  margin-left: 15px;
+}
+
 /* .rs-timeline-item {
   margin-bottom: 5px;
 }

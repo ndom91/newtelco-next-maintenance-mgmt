@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import fetch from 'isomorphic-unfetch'
 import format from 'date-fns/format'
-// import Timeline from 'react-time-line'
 import {
   Loader,
   Timeline,
-  Icon,
-  Avatar
+  Icon
 } from 'rsuite'
 
 const Changelog = ({ maintId }) => {
@@ -32,13 +30,21 @@ const Changelog = ({ maintId }) => {
         {maintHistory.map(item => {
           let dot
           if (/.cid/.test(item.field)) {
-            dot = 'globe'
+            dot = 'realtime'
           } else if (!item.field && item.action === 'created') {
-            dot = 'plus'
+            dot = 'file-text-o'
+          } else if (item.field === 'supplier') {
+            dot = 'briefcase'
+          } else if (item.field === 'impact') {
+            dot = 'remind'
+          } else if (item.field === 'reason') {
+            dot = 'retention'
+          } else if (/calendar./.test(item.field)) {
+            dot = 'calendar-plus-o'
           } else if (item.field === 'timezone') {
-            dot = 'clock-o'
+            dot = 'globe'
           } else if (/.date\/time/.test(item.field)) {
-            dot = 'calendar'
+            dot = 'clock-o'
           } else if (item.field === 'cancelled') {
             dot = 'ban'
           } else if (item.field === 'emergency') {
@@ -55,8 +61,8 @@ const Changelog = ({ maintId }) => {
             dot = 'question'
           }
           return (
-            <Timeline.Item 
-              // time={format(new Date(item.datetime), 'LLL dd, HH:mm')} 
+            <Timeline.Item
+              key={item.id}
               dot={<Icon icon={dot} />}
             >
               <p>{format(new Date(item.datetime), 'LLL dd, HH:mm')}</p>
@@ -69,14 +75,14 @@ const Changelog = ({ maintId }) => {
   } else {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '150px' }}>
-      {fetching
-        ? (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '200px', width: '100%' }}>
-            <Loader />
-          </div>
-        ) : (
-          <h4 style={{ fontWeight: '100 !important', marginTop: '20px', color: 'var(--font-color)' }}>No History Available</h4>
-        )}
+        {fetching
+          ? (
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '200px', width: '100%' }}>
+              <Loader />
+            </div>
+          ) : (
+            <h4 style={{ fontWeight: '100 !important', marginTop: '20px', color: 'var(--font-color)' }}>No History Available</h4>
+          )}
       </div>
     )
   }
