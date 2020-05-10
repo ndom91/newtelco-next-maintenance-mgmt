@@ -21,15 +21,6 @@ const Changelog = ({ maintId }) => {
       .then(resp => resp.json())
       .then(data => {
         setMaintHistory(data.historyQuery)
-        // const currentHistory = maintHistory
-        // data.historyQuery.forEach(history => {
-        //   const user = history.user
-        //   const action = history.action
-        //   const field = history.field || ''
-        //   const datetime = history.datetime
-        //   currentHistory.push({ ts: datetime, text: `${user} - ${action} ${field}` })
-        // })
-        // setMaintHistory(currentHistory)
         setFetching(false)
       })
       .catch(err => console.error(err))
@@ -65,9 +56,10 @@ const Changelog = ({ maintId }) => {
           }
           return (
             <Timeline.Item 
-              time={format(new Date(item.datetime), 'LLL dd, HH:mm')} 
-              dot={<Avatar size='sm' circle><Icon icon={dot} /></Avatar>}
+              // time={format(new Date(item.datetime), 'LLL dd, HH:mm')} 
+              dot={<Icon icon={dot} />}
             >
+              <p>{format(new Date(item.datetime), 'LLL dd, HH:mm')}</p>
               <p>{item.user} {item.action || ''} {item.field || ''}</p>
             </Timeline.Item>
           )

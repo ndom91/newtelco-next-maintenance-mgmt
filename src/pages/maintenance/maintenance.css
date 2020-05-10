@@ -75,7 +75,22 @@
   margin-top: 20px !important;
 }
 
-.rs-timeline-item {
+.rs-timeline-item-custom-dot .rs-icon {
+  position: absolute;
+  background: #fff;
+  top: 0;
+  left: -2px;
+  border: 2px solid #ddd;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 18px;
+  padding-top: 9px;
+  color: #999;
+  margin-left: -13px;
+}
+
+/* .rs-timeline-item {
   margin-bottom: 5px;
 }
 
@@ -104,4 +119,4 @@
 
 .rs-avatar-sm > .rs-icon {
   font-size: 15px !important;
-}
+} */

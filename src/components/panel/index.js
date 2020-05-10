@@ -26,7 +26,7 @@ const MaintPanel = ({ children, header, buttons = null, center = null }) => {
     }
   }
   return (
-    <Panel header={Header()} bordered shaded bodyFill style={{ background: '#fff', margin: '50px 0 20px 0' }}>
+    <Panel className='maintpanel' header={Header()} bordered shaded bodyFill style={{ background: '#fff', margin: '50px 0 20px 0' }}>
       <FlexboxGrid justify='space-around' colSpan={23} style={{ padding: '20px', width: '100%' }}>
         {children}
       </FlexboxGrid>

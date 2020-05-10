@@ -10,7 +10,6 @@ import './style/shards.min.css'
 import './style/ntTheme.less'
 
 import 'algolia-react-autocomplete/build/css/index.css'
-import 'react-calendar-heatmap/dist/styles.css'
 import Store from '../components/store'
 
 const LogRocket = require('logrocket')

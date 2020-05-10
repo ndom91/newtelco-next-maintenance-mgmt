@@ -11,10 +11,10 @@ import {
 const options = {
   chart: {
     type: 'area',
-    height: 350,
+    height: 250,
     stacked: false,
     zoom: {
-      enabled: true
+      enabled: false
     },
     toolbar: {
       show: false
@@ -32,19 +32,16 @@ const options = {
   tooltip: {
     shared: true
   },
-  responsive: [{
-    breakpoint: 480,
-    options: {
-      legend: {
-        position: 'bottom',
-        offsetX: -10,
-        offsetY: 0
-      }
-    }
-  }],
-  plotOptions: {
-    bar: {
-      horizontal: false
+  grid: {
+    show: false,
+  },
+  fill: {
+    type: "gradient",
+    gradient: {
+      shadeIntensity: 1,
+      opacityFrom: 0.7,
+      opacityTo: 0.9,
+      stops: [0, 90, 100]
     }
   },
   yaxis: {
@@ -59,20 +56,8 @@ const options = {
       enabled: false
     }
   },
-  title: {
-    text: 'Maintenances Completed',
-    align: 'left',
-    offsetX: 14,
-    style: {
-      fontFamily: 'Fira Sans',
-      fontWeight: 200
-    }
-  },
   legend: {
-    show: false,
-    position: 'top',
-    horizontalAlign: 'right',
-    offsetY: -30
+    show: false
   },
   theme: {
     palette: 'palette4' // upto palette10
@@ -112,14 +97,14 @@ const BarChart = () => {
     })
 
     return (
-      <Panel header={null} bordered>
-        <Chart options={options} series={returnSeries} type='area' width={600} height={320} />
+      <Panel header='Completed' bordered>
+        <Chart options={options} series={returnSeries} type='area' width={400} height={220} />
       </Panel>
     )
   } else {
     return (
-      <div style={{ height: '377px', width: '642px' }}>
-        <Placeholder.Graph active height='377px' width='642px' style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Loader content='Loading...' /></Placeholder.Graph>
+      <div style={{ height: '447px', width: '327px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <Loader />
       </div>
     )
   }

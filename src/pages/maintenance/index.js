@@ -93,7 +93,7 @@ import {
 const animatedComponents = makeAnimated()
 
 const Changelog = dynamic(
-  () => import('../../components/timeline'),
+  () => import('../../components/maintenance/timeline'),
   { ssr: false }
 )
 
