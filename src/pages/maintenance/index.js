@@ -321,6 +321,7 @@ const Maintenance = props => {
         emergency,
         done
       } = props.jsonData.profile
+      console.table(props.jsonData.profile)
 
       const newMaintenance = {
         ...props.jsonData.profile,

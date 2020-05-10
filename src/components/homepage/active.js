@@ -1,5 +1,6 @@
 import React from 'react'
 import useSWR from 'swr'
+import Router from 'next/router'
 import format from 'date-fns/format'
 import {
   Loader,
@@ -9,9 +10,7 @@ import {
   Panel,
   Icon,
   IconButton,
-  Whisper,
-  Tooltip,
-  Badge
+  Dropdown
 } from 'rsuite'
 
 const ActiveMaintenances = () => {
@@ -24,7 +23,7 @@ const ActiveMaintenances = () => {
   if (data) {
     return (
       <Panel bordered header={<div style={{ display: 'flex', justifyContent: 'space-between' }}>Active<Icon icon='bolt' style={{ color: 'var(--primary)' }} size='lg' /></div>} style={{ height: '100%' }}>
-        <List>
+        <List style={{ overflow: 'visible' }}>
           {data.query.length > 0 ? (
             data.query.map(item => {
               return (
@@ -43,11 +42,17 @@ const ActiveMaintenances = () => {
                       </div>
                     </FlexboxGrid.Item>
                     <FlexboxGrid.Item colspan={3}>
-                      <Whisper placement='left' speaker={<Tooltip>Open Maintenance</Tooltip>}>
-                        <Badge content={item.maintId} maxCount={2000}>
-                          <IconButton appearance='ghost' circle icon={<Icon icon='frame' />} />
-                        </Badge>
-                      </Whisper>
+                      <Dropdown
+                        renderTitle={() => {
+                          return (
+                            <IconButton appearance='subtle' icon={<Icon icon='ellipsis-v' />} />
+                          )
+                        }}
+                        placement='bottomEnd'
+                      >
+                        <Dropdown.Item onClick={() => Router.push({ pathname: '/maintenance', query: { id: item.maintId } })}>View</Dropdown.Item>
+                        <Dropdown.Item target='_blank' href={`mailto:${item.maintenanceRecipient}?subject=${encodeURIComponent(`Newtelco - Regarding Maintenance NT-${item.maintId}`)}`}>Contact</Dropdown.Item>
+                      </Dropdown>
                     </FlexboxGrid.Item>
                   </FlexboxGrid>
                 </List.Item>
@@ -65,9 +70,11 @@ const ActiveMaintenances = () => {
     )
   } else {
     return (
-      <div style={{ height: '100%', width: '300px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-        <Loader />
-      </div>
+      <Panel bordered header={<div style={{ display: 'flex', justifyContent: 'space-between' }}>Active<Icon icon='bolt' style={{ color: 'var(--primary)' }} size='lg' /></div>} style={{ height: '100%' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '200px' }}>
+          <Loader />
+        </div>
+      </Panel>
     )
   }
 }

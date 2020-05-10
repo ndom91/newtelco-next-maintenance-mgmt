@@ -11,12 +11,21 @@
   text-align: center;
 }
 
+.unread-panel > .rs-panel-body {
+  flex-grow: 1;
+  display: flex;
+}
+
 .unread-count {
   padding: 30px;
   font-size: 8rem;
   font-weight: 700;
+  color: var(--grey3);
 }
 
+.unread-count:focus,
+.unread-count:active,
 .unread-count:hover {
-  cursor: pointer;
+  text-decoration: none;
+  color: var(--grey3);
 }

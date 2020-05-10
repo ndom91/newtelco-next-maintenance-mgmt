@@ -7,21 +7,25 @@ import MaintPanel from '../components/panel'
 import UnreadBadge from '../components/unread'
 import Store from '../components/store'
 import {
-  Loader
+  Loader,
+  Panel,
+  Icon
 } from 'rsuite'
 import './style/index.css'
 
-const BarChart = dynamic(() => import('../components/homepage/barchart'), {
+const AreaChart = dynamic(() => import('../components/homepage/areachart'), {
   ssr: false,
   loading: () => (
-    <div style={{ height: '342px', width: '327px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <Loader />
-    </div>
+    <Panel bordered header={<div style={{ display: 'flex', justifyContent: 'space-between' }}>Completed<Icon icon='bar-chart' style={{ color: 'var(--primary)' }} size='lg' /></div>} style={{ height: '100%' }}>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '200px' }}>
+        <Loader />
+      </div>
+    </Panel>
   )
 })
 
 const Heatmap = dynamic(() => import('../components/homepage/heatmap'))
-const PerPerson = dynamic(() => import('../components/homepage/perperson'))
+const BarChart = dynamic(() => import('../components/homepage/perperson'))
 const ActiveMaintenances = dynamic(() => import('../components/homepage/active'))
 
 const Index = ({ session }) => {
@@ -42,10 +46,10 @@ const Index = ({ session }) => {
               <ActiveMaintenances />
             </div>
             <div className='chart1'>
-              <BarChart />
+              <AreaChart />
             </div>
             <div className='chart2'>
-              <PerPerson />
+              <BarChart />
             </div>
           </div>
         </MaintPanel>

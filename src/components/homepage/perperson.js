@@ -4,7 +4,7 @@ import useSWR from 'swr'
 import { Bar } from '@nivo/bar'
 import { Panel, Loader, Icon } from 'rsuite'
 
-const PerPerson = () => {
+const BarChart = () => {
   const { data } = useSWR(
     '/api/homepage/perperson',
     (...args) => fetch(...args).then(res => res.json()),
@@ -39,11 +39,13 @@ const PerPerson = () => {
     )
   } else {
     return (
-      <div style={{ height: '342px', width: '449px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-        <Loader />
-      </div>
+      <Panel bordered header={<div style={{ display: 'flex', justifyContent: 'space-between' }}>Totals<Icon icon='bar-chart' style={{ color: 'var(--primary)' }} size='lg' /></div>} style={{ height: '100%' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '200px' }}>
+          <Loader />
+        </div>
+      </Panel>
     )
   }
 }
 
-export default PerPerson
+export default BarChart

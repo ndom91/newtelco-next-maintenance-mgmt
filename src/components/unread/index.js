@@ -16,7 +16,7 @@ const UnreadBadge = ({ count }) => {
   return (
     <Panel header='Unread' bordered className='unread-panel'>
       <Link href='/inbox' passHref>
-        <div className='unread-count'>{count}</div>
+        <a className='unread-count'>{count}</a>
       </Link>
     </Panel>
   )

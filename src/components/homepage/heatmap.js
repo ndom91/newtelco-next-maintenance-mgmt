@@ -34,9 +34,12 @@ const Heatmap = () => {
     )
   } else {
     return (
-      <div style={{ height: '492px', width: '1200px', maxWidth: '1300px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-        <Loader />
-      </div>
+      // <div style={{ height: '492px', width: '1200px', maxWidth: '1300px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+      <Panel bordered header={<div style={{ display: 'flex', justifyContent: 'space-between' }}>Calendar<Icon icon='calendar-o' style={{ color: 'var(--primary)' }} size='lg' /></div>} style={{ height: '100%' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '200px' }}>
+          <Loader />
+        </div>
+      </Panel>
     )
   }
 }

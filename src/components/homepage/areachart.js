@@ -64,7 +64,7 @@ const options = {
   }
 }
 
-const BarChart = () => {
+const AreaChart = () => {
   const { data } = useSWR(
     '/api/homepage/barchart',
     (...args) => fetch(...args).then(res => res.json()),
@@ -98,16 +98,18 @@ const BarChart = () => {
 
     return (
       <Panel bordered header={<div style={{ display: 'flex', justifyContent: 'space-between' }}>Completed<Icon icon='tasks' style={{ color: 'var(--primary)' }} size='lg' /></div>} style={{ height: '100%' }}>
-        <Chart options={options} series={returnSeries} type='area' width={400} height={220} />
+        <Chart options={options} series={returnSeries} type='area' width={300} height={220} />
       </Panel>
     )
   } else {
     return (
-      <div style={{ height: '342px', width: '327px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-        <Loader />
-      </div>
+      <Panel bordered header={<div style={{ display: 'flex', justifyContent: 'space-between' }}>Completed<Icon icon='bar-chart' style={{ color: 'var(--primary)' }} size='lg' /></div>} style={{ height: '100%' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '200px' }}>
+          <Loader />
+        </div>
+      </Panel>
     )
   }
 }
 
-export default BarChart
+export default AreaChart
