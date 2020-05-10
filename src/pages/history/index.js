@@ -350,25 +350,10 @@ const History = props => {
   }
 }
 
-// History.getInitialProps = async ({ req, query }) => {
-//   const host = req ? req.headers['x-forwarded-host'] : window.location.hostname
-//   const protocol = 'https:'
-//   if (host.indexOf('localhost') > -1) {
-//     protocol = 'http:'
-//   }
-//   const pageRequest = `${protocol}//${host}/api/maintenances`
-//   const res = await fetch(pageRequest)
-//   const json = await res.json()
-//   return {
-//     jsonData: json,
-//     // night: query.night,
-//     session: await NextAuth.init({ req })
-//   }
-// }
 export async function getServerSideProps ({ req }) {
   const session = await NextAuth.session({ req })
   const host = req ? req.headers['x-forwarded-host'] : window.location.hostname
-  const protocol = 'https:'
+  let protocol = 'https:'
   if (host.indexOf('localhost') > -1) {
     protocol = 'http:'
   }

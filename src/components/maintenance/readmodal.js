@@ -252,7 +252,7 @@ const ReadModal = ({ maintenance, openReadModal, toggleReadModal, incomingAttach
             height: 'auto'
           }}
           style={{
-            backgroundColor: 'var(--primary-bg)',
+            backgroundColor: 'var(--background)',
             overflow: 'hidden',
             borderRadius: '5px',
             zIndex: '101',
@@ -302,7 +302,7 @@ const ReadModal = ({ maintenance, openReadModal, toggleReadModal, incomingAttach
                 ? (
                   <ShadowDom>
                     <div className='attachment-body html'>
-                      <div style={this.props.night ? { color: '#6c757d' } : {}} dangerouslySetInnerHTML={{ __html: attachmentHTMLContent }} />
+                      <div dangerouslySetInnerHTML={{ __html: attachmentHTMLContent }} />
                     </div>
                   </ShadowDom>
                 ) : (

@@ -2,7 +2,6 @@ import React from 'react'
 import NextAuth from 'next-auth/client'
 import Link from 'next/link'
 import Store from '../store'
-// import DarkmodeSwitch from '../darkmode'
 import SearchInput from './search'
 import './header.css'
 import {
@@ -58,12 +57,7 @@ const MaintHeader = props => {
           <Nav>
             <Divider vertical />
             <Link
-              href={{
-                pathname: '/',
-                query: {
-                  night: props.night
-                }
-              }}
+              href='/'
               as='/'
               passHref
             >
@@ -72,12 +66,7 @@ const MaintHeader = props => {
               </Nav.Item>
             </Link>
             <Link
-              href={{
-                pathname: '/inbox',
-                query: {
-                  night: props.night
-                }
-              }}
+              href='/inbox'
               as='/inbox'
               passHref
             >
@@ -89,12 +78,7 @@ const MaintHeader = props => {
               </Nav.Item>
             </Link>
             <Link
-              href={{
-                pathname: '/history',
-                query: {
-                  night: props.night
-                }
-              }}
+              href='/history'
               as='/history'
               passHref
             >
@@ -103,12 +87,7 @@ const MaintHeader = props => {
               </Nav.Item>
             </Link>
             <Link
-              href={{
-                pathname: '/companies',
-                query: {
-                  night: props.night
-                }
-              }}
+              href='/companies'
               as='/companies'
               passHref
             >

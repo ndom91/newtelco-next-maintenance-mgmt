@@ -49,8 +49,8 @@
 div.ag-row-selected {
   background: repeating-linear-gradient(
     135deg,
-    var(--primary-bg),
-    var(--primary-bg) 10px,
+    var(--background),
+    var(--background) 10px,
     #67B24628 10px,
     #67B24628 20px
   );

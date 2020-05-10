@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "NODE_ENV=development next -p 4000",
-    "start": "NODE_ENV=production PORT=4000 node index.js",
+    "start": "NODE_ENV=production next start -p 4000",
     "build": "next build",
     "analyze": "cross-env ANALYZE=true next build",
     "analyze:dev": "cross-env ANALYZE=true NODE_ENV=development PORT=4000 node index.js",

@@ -8,7 +8,7 @@ import {
 
 import * as S from './styles'
 
-function DarkmodeSwitch ({ value, onChange }) {
+const DarkmodeSwitch = ({ value, onChange }) => {
   return (
     <ThemeProvider theme={{ clicked: value }}>
       <div style={{ display: 'flex', alignItems: 'flex-end' }}>

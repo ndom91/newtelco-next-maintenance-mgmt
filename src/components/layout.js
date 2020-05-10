@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import MaintHeader from './header'
 import useSWR from 'swr'
-import Router from 'next/router'
+import fetch from 'isomorphic-unfetch'
 import dynamic from 'next/dynamic'
 import KeyboardShortcuts from './keyboardShortcuts'
-import { NextAuth } from 'next-auth/client'
 import Store from './store'
 import Fonts from './fonts'
 import {
@@ -26,11 +25,10 @@ const UnreadFavicon = dynamic(
 const Layout = ({ session, children }) => {
   const [openA2HS, setOpenA2HS] = useState(false)
   const [deferredPrompt, setDeferredPrompt] = useState(null)
-  const [night, setNight] = useState(false)
   const store = Store.useStore()
 
   const { data } = useSWR(
-    `/v1/api/count`,
+    '/v1/api/count',
     url => fetch(url).then(res => res.json()),
     { refreshInterval: 30000, focusThrottleInterval: 10000 }
   )
@@ -42,8 +40,6 @@ const Layout = ({ session, children }) => {
   useEffect(() => {
     Fonts()
 
-    let nightStorage = window.localStorage.getItem('theme')
-    const mqNight = window.matchMedia('(prefers-color-scheme: dark)').matches
     const installAsk = window.localStorage.getItem('askA2HS') || 0
 
     if (window.outerWidth < 500 && installAsk < 3) {
@@ -54,18 +50,6 @@ const Layout = ({ session, children }) => {
         window.localStorage.setItem('askA2HS', parseInt(installAsk) + 1)
       })
     }
-
-    if (nightStorage === undefined && mqNight) {
-      nightStorage = 'dark'
-    } else {
-      nightStorage = 'light'
-    }
-
-    var el = document.querySelector('html')
-    el.setAttribute('data-theme', nightStorage)
-
-    setNight(nightStorage === 'dark')
-    store.set('night')(nightStorage === 'dark')
   }, [])
 
   const toggleA2HSModal = () => {
@@ -97,7 +81,7 @@ const Layout = ({ session, children }) => {
       <KeyboardShortcuts>
         <UnreadFavicon count={store.get('count')} />
         <Container>
-          <MaintHeader unread={store.get('count')} night={night} />
+          <MaintHeader unread={store.get('count')} />
           <Content>
             <FlexboxGrid justify='center'>
               <FlexboxGrid.Item colspan={23} style={{ marginTop: '20px' }}>

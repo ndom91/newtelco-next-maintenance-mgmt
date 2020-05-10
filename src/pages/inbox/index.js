@@ -154,7 +154,7 @@ const Inbox = props => {
 
   if (props.session.user) {
     return (
-      <Layout night={false} count={unread} session={props.session}>
+      <Layout count={unread} session={props.session}>
         <MaintPanel header='Inbox'>
           {inboxMails.length === 0 ? (
             <FlexboxGrid justify='center' align='middle' style={{ margin: '40px 0' }}>
@@ -232,30 +232,10 @@ const Inbox = props => {
   }
 }
 
-// Inbox.getInitialProps = async ({ req }) => {
-//   const host = req ? req.headers['x-forwarded-host'] : window.location.hostname
-//   const protocol = 'https:'
-//   if (host.indexOf('localhost') > -1) {
-//     protocol = 'http:'
-//   }
-//   const pageRequest = `${protocol}//${host}/v1/api/inbox`
-//   const res = await fetch(pageRequest, {
-//     mode: 'cors',
-//     headers: {
-//       'Access-Control-Allow-Origin': '*'
-//     }
-//   })
-//   const inboxContent = await res.json()
-//   return {
-//     inboxItems: inboxContent === 'No unread emails' ? [] : inboxContent,
-//     session: await NextAuth.init({ req })
-//   }
-// }
-
 export async function getServerSideProps ({ req }) {
   const session = await NextAuth.session({ req })
   const host = req ? req.headers['x-forwarded-host'] : window.location.hostname
-  const protocol = 'https:'
+  let protocol = 'https:'
   if (host.indexOf('localhost') > -1) {
     protocol = 'http:'
   }

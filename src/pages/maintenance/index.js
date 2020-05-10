@@ -669,7 +669,7 @@ const Maintenance = props => {
     if (convertBool(maintenance.emergency)) {
       subject = `[EMERGENCY] ${subject}`
     }
-    if (convertBool(cancelled)) {
+    if (convertBool(maintenance.cancelled)) {
       subject = `[CANCELLED] ${subject}`
     }
     if (rescheduleData.length !== 0) {
@@ -2115,14 +2115,12 @@ const Maintenance = props => {
               height: 565
             }}
             style={{
-              visibility: openRescheduleModal ? 'visible' : 'hidden',
-              opacity: openRescheduleModal ? 1 : 0,
-              backgroundColor: 'var(--primary-bg)',
+              backgroundColor: 'var(--background)',
               overflow: 'hidden',
-              borderRadius: '15px',
+              borderRadius: '5px',
               height: 'auto',
               zIndex: '101',
-              boxShadow: '0px 0px 20px 1px var(--dark)'
+              boxShadow: '0px 0px 10px 1px var(--grey3)'
             }}
             bounds='window'
             dragHandleClassName='reschedule-header'
