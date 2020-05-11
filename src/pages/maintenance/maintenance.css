@@ -34,7 +34,7 @@
   line-height: 1.5;
   color: var(--font-color);
   background-color: var(--input);
-  border: 1px solid #becad6;
+  border: 1px solid #e5e5ea;
   font-weight: 300;
   will-change: border-color,box-shadow;
   border-radius: 5px;

@@ -89,9 +89,8 @@ const MaintHeader = props => {
             </Link>
             {/* <Link
               href='/companies'
-              // as='/companies'
-              // passHref
-              onClick={e => e.preventDefault() && Notify('warning', 'Companies Page', 'Coming Soon')}
+              as='/companies'
+              passHref
             > */}
               <Nav.Item
                 onClick={() => Notify('warning', 'Companies Page', 'Coming Soon')}

@@ -4,9 +4,6 @@ import Layout from '../../components/layout'
 import fetch from 'isomorphic-unfetch'
 import RequireLogin from '../../components/require-login'
 import './maintenance.css'
-import Select from 'react-select'
-import CreatableSelect from 'react-select/creatable'
-import makeAnimated from 'react-select/animated'
 import Router from 'next/router'
 import { Helmet } from 'react-helmet'
 import { Editor as TinyEditor } from '@tinymce/tinymce-react'
@@ -36,12 +33,6 @@ import 'ag-grid-community/dist/styles/ag-theme-material.css'
 
 import Notify from '../../lib/notification'
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import {
-  faPaperPlane,
-  faTimesCircle
-} from '@fortawesome/free-solid-svg-icons'
-
 import {
   Icon,
   Form,
@@ -67,10 +58,10 @@ import {
   Modal,
   Container,
   Message,
-  Avatar
+  Avatar,
+  SelectPicker,
+  TagPicker
 } from 'rsuite'
-
-const animatedComponents = makeAnimated()
 
 const Changelog = dynamic(
   () => import('../../components/maintenance/timeline'),
@@ -102,8 +93,6 @@ const Maintenance = props => {
   })
   const [frozenCompany, setFrozenCompany] = useState('')
   const [dateTimeWarning, setDateTimeWarning] = useState(false)
-  const [openProtectionSwitchToggle, setOpenProtectionSwitchToggle] = useState(false)
-  const [openUseImpactPlaceholderToggle, setOpenUseImpactPlaceholderToggle] = useState(false)
   const [openReadModal, setOpenReadModal] = useState(false)
   const [openPreviewModal, setOpenPreviewModal] = useState(false)
   const [openRescheduleModal, setOpenRescheduleModal] = useState(false)
@@ -126,18 +115,16 @@ const Maintenance = props => {
   const [mailPreviewRecipients, setMailPreviewRecipients] = useState('')
   const [mailPreviewCustomerCID, setMailPreviewCustomerCid] = useState('')
   const [mailPreviewSubject, setMailPreviewSubject] = useState('')
-  const [lieferantcids, setLieferantcids] = useState({})
-  const [kundencids, setKundencids] = useState([])
+  const [customerCids, setCustomerCids] = useState([])
   const [suppliers, setSuppliers] = useState([])
+  const [supplierCids, setSupplierCids] = useState([])
   const [impactPlaceholder, setImpactPlaceholder] = useState([])
-  const [selectedLieferant, setSelectedLieferant] = useState([])
-  const [incomingMailIsHtml, setIncomingMailIsHtml] = useState(false)
+  const [selectedSupplierCids, setSelectedSupplierCids] = useState([])
   const [sentProgress, setSentProgress] = useState(0)
 
   const gridApi = useRef()
   const gridColumnApi = useRef()
   const rescheduleGridApi = useRef()
-  const rescheduleGridColumnApi = useRef()
 
   const rescheduleGridOptions = {
     defaultColDef: {
@@ -305,6 +292,14 @@ const Maintenance = props => {
   }, [impactPlaceholder])
 
   useEffect(() => {
+    gridApi?.current?.showLoadingOverlay()
+    selectedSupplierCids.forEach(id => {
+      fetchCustomerCids(id)
+    })
+    gridApi?.current?.hideOverlay()
+  }, [selectedSupplierCids])
+
+  useEffect(() => {
     let lieferantDomain
     let localMaint
     if (props.jsonData.profile.id === 'NEW') {
@@ -352,7 +347,7 @@ const Maintenance = props => {
     }
     // prepare to get available supplier CIDs for selected supplier
     if (props.jsonData.profile.lieferant) {
-      fetchLieferantCIDs(props.jsonData.profile.lieferant)
+      fetchSupplierCids(props.jsonData.profile.lieferant)
     } else {
       fetch(`/api/companies/domain?id=${lieferantDomain}`, {
         method: 'get'
@@ -360,7 +355,7 @@ const Maintenance = props => {
         .then(resp => resp.json())
         .then(data => {
           if (!data.companyResults[0]) {
-            fetchLieferantCIDs()
+            fetchSupplierCids()
             return
           }
           const companyId = data.companyResults[0].id
@@ -371,7 +366,7 @@ const Maintenance = props => {
             name: companyName,
             lieferant: companyId
           })
-          fetchLieferantCIDs(companyId)
+          fetchSupplierCids(companyId)
         })
         .catch(err => console.error(`Error - ${err}`))
     }
@@ -410,7 +405,7 @@ const Maintenance = props => {
 
   const handleGridReady = params => {
     gridApi.current = params.api
-    if (kundencids.length === 0) {
+    if (customerCids.length === 0) {
       gridApi.current.showLoadingOverlay()
     }
     gridColumnApi.current = params.gridColumnApi
@@ -423,9 +418,9 @@ const Maintenance = props => {
   /// /////////////////////////////////////////////////////////
 
   // fetch supplier CIDs
-  const fetchLieferantCIDs = lieferantId => {
+  const fetchSupplierCids = lieferantId => {
     if (!lieferantId) {
-      setLieferantcids([{ label: 'Invalid Supplier ID', value: '1' }])
+      setSupplierCids([{ label: 'Invalid Supplier ID', value: '1' }])
       return
     }
     fetch(`/api/lieferantcids?id=${lieferantId}`, {
@@ -434,45 +429,28 @@ const Maintenance = props => {
       .then(resp => resp.json())
       .then(data => {
         if (!data.lieferantCIDsResult) {
-          setLieferantcids([{ label: 'No CIDs available for this Supplier', value: '1' }])
+          setSupplierCids([{ label: 'No CIDs available for this Supplier', value: '1' }])
           return
         }
-        const derenCIDidField = props.jsonData.profile.derenCIDid
-        const commaRegex = new RegExp(',')
-        if (commaRegex.test(derenCIDidField)) {
-          // multiple CID string (comma separated)
-          setLieferantcids(data.lieferantCIDsResult)
-          fetch(`/api/lieferantcids/label?id=${derenCIDidField}`, {
-            method: 'get'
-          })
-            .then(resp => resp.json())
-            .then(data => {
-              data.respArray.forEach(respCid => {
-                fetchMailCIDs(respCid.value)
-              })
-              setSelectedLieferant(data.respArray)
+        setSupplierCids(data.lieferantCIDsResult)
+        const derenCIDids = props.jsonData.profile.derenCIDid
+        if (derenCIDids.includes(',')) {
+          let selectedCids = []
+          derenCIDids
+            .split(',')
+            .forEach(x => {
+              selectedCids.push(parseInt(x, 10))
             })
+          setSelectedSupplierCids(selectedCids)
         } else {
-          // Single CID String
-          const selectedLieferantCIDid = parseInt(derenCIDidField) || null
-          fetchMailCIDs(selectedLieferantCIDid)
-          const selectedLieferantCIDvalue = props.jsonData.profile.derenCID || null
-          if (selectedLieferantCIDid) {
-            setLieferantcids(data.lieferantCIDsResult)
-            setSelectedLieferant([{
-              label: selectedLieferantCIDvalue,
-              value: selectedLieferantCIDid
-            }])
-          } else {
-            setLieferantcids(data.lieferantCIDsResult)
-          }
+          setSelectedSupplierCids([parseInt(derenCIDids, 10)])
         }
       })
       .catch(err => console.error(`Error - ${err}`))
   }
 
   // fetch customer CIDs based on selected Supplier CID
-  const fetchMailCIDs = lieferantCidId => {
+  const fetchCustomerCids = lieferantCidId => {
     if (!lieferantCidId) {
       gridApi.current.hideOverlay()
       return
@@ -491,12 +469,12 @@ const Maintenance = props => {
           cid.sent = currentSentStatus
           cid.frozen = false
         })
-        // const newKundenCids = kundencids
-        // kundencids.forEach(cid => {
-        //   newKundenCids.push(cid)
-        // })
-        const uniqueKundenCids = getUnique(kundencids, 'kundenCID')
-        setKundencids(uniqueKundenCids)
+        const existingCustomerCids = customerCids
+        kundencids.forEach(cid => {
+          existingCustomerCids.push(cid)
+        })
+        const uniqueKundenCids = getUnique(existingCustomerCids, 'kundenCID')
+        setCustomerCids(uniqueKundenCids)
         gridApi.current.hideOverlay()
         uniqueKundenCids.forEach(cid => {
           checkFreezeStatus(cid)
@@ -516,11 +494,11 @@ const Maintenance = props => {
       .then(data => {
         if (data.freezeQuery.length !== 0) {
           const freezeEntry = data.freezeQuery[0]
-          const localKundenCids = kundencids
+          const localKundenCids = customerCids
           const frozenCidIndex = localKundenCids.findIndex(el => el.kunde === freezeEntry.companyId)
           Notify('error', 'CID Frozen', `${localKundenCids[frozenCidIndex].name} has an active network freeze at that time`)
           localKundenCids[frozenCidIndex].frozen = true
-          setKundencids(localKundenCids)
+          setCustomerCids(localKundenCids)
           if (gridApi.current) {
             gridApi.current.refreshCells()
           }
@@ -624,8 +602,6 @@ const Maintenance = props => {
         body = body + '<tr><td>Impact:</td><td>50ms Protection Switch</td></tr>'
       } else {
         const impactText = store.get('maintenance').impact || store.get('impactPlaceholder')
-        console.log('impactText', impactText)
-        console.log(store.get('maintenance').impact, store.get('impactPlaceholder'))
         body = body + '<tr><td>Impact:</td><td>' + impactText + '</td></tr>'
       }
     }
@@ -658,10 +634,8 @@ const Maintenance = props => {
 
   // send out the created mail
   const sendMail = (recipient, customerCid, subj, htmlBody, isFromPreview, isFromSendAll) => {
-    const activeRowIndex = kundencids.findIndex(el => el.kundenCID === customerCid)
-    console.log(activeRowIndex)
-    const kundenCidRow = kundencids[activeRowIndex]
-    console.log(kundenCidRow)
+    const activeRowIndex = customerCids.findIndex(el => el.kundenCID === customerCid)
+    const kundenCidRow = customerCids[activeRowIndex]
     if (kundenCidRow && kundenCidRow.frozen) {
       setFrozenCompany(kundenCidRow.name || '')
       setFrozenState({
@@ -704,19 +678,19 @@ const Maintenance = props => {
         const statusText = data.response.statusText
 
         if (status === 200 && statusText === 'OK') {
-          const activeRowIndex = kundencids.findIndex(el => el.kundenCID === customerCid)
-          const kundenCidRow = kundencids[activeRowIndex]
+          const activeRowIndex = customerCids.findIndex(el => el.kundenCID === customerCid)
+          const kundenCidRow = customerCids[activeRowIndex]
           if (maintenance.cancelled === true && maintenance.done === true) {
             kundenCidRow.sent = 2
           } else {
             kundenCidRow.sent = 1
           }
           const updatedKundenCids = [
-            ...kundencids,
+            ...customerCids,
             kundenCidRow
           ]
           const deduplicatedKundenCids = getUnique(updatedKundenCids, 'kundenCID')
-          setKundencids(deduplicatedKundenCids)
+          setCustomerCids(deduplicatedKundenCids)
           if (!isFromSendAll) {
             Notify('success', 'Mail Sent')
           }
@@ -765,14 +739,14 @@ const Maintenance = props => {
   }
 
   const updateSentProgress = () => {
-    if (kundencids.length !== 0) {
+    if (customerCids.length !== 0) {
       let progressSent = 0
-      kundencids.forEach(cid => {
+      customerCids.forEach(cid => {
         if (cid.sent === 1 || cid.sent === 2) {
           progressSent += 1
         }
       })
-      const result = (progressSent / kundencids.length) * 100
+      const result = (progressSent / customerCids.length) * 100
       setSentProgress(result)
     }
   }
@@ -783,13 +757,13 @@ const Maintenance = props => {
     const maintId = maintenance.id
 
     let derenCid = ''
-    selectedLieferant.forEach(cid => {
+    selectedSupplierCids.forEach(cid => {
       derenCid = derenCid + cid.label + ' '
     })
     derenCid = derenCid.trim()
 
     let cids = ''
-    kundencids.forEach(cid => {
+    customerCids.forEach(cid => {
       cids = cids + cid.kundenCID + ' '
     })
     cids = cids.trim()
@@ -832,13 +806,13 @@ const Maintenance = props => {
     const endDateTime = maintenance.endDateTime
 
     let derenCid = ''
-    selectedLieferant.forEach(cid => {
+    selectedSupplierCids.forEach(cid => {
       derenCid = derenCid + cid.label + ' '
     })
     derenCid = derenCid.trim()
 
     let cids = ''
-    kundencids.forEach(cid => {
+    customerCids.forEach(cid => {
       cids = cids + cid.kundenCID + ' '
     })
     cids = cids.trim()
@@ -905,13 +879,11 @@ const Maintenance = props => {
   }
 
   // react-select onChange - supplier CIDs
-  const handleSelectLieferantChange = selectedOption => {
+  const handleSelectSupplierChange = selectedOption => {
     if (selectedOption) {
-      setKundencids([])
-      selectedOption.forEach(option => {
-        fetchMailCIDs(option.value)
-      })
-      setSelectedLieferant(selectedOption)
+      setSelectedSupplierCids(selectedOption)
+    } else {
+      setSelectedSupplierCids([])
     }
   }
 
@@ -1003,7 +975,7 @@ const Maintenance = props => {
     if (element === 'done') {
       // save 'betroffeneCIDs'
       let impactedCIDs = ''
-      kundencids.forEach(cid => {
+      customerCids.forEach(cid => {
         impactedCIDs += cid.kundenCID + ' '
       })
 
@@ -1098,10 +1070,11 @@ const Maintenance = props => {
   }
 
   const handleSupplierChange = (selectedOption) => {
-    setMaintenance({ ...maintenance, lieferant: selectedOption.value, name: selectedOption.label })
-    setSelectedLieferant([])
-    setKundencids([])
-    fetchLieferantCIDs(selectedOption.value)
+    const selectedSupplier = suppliers.find(x => x.value === selectedOption)
+    setMaintenance({ ...maintenance, lieferant: selectedOption, name: selectedSupplier.label })
+    setSelectedSupplierCids([])
+    setCustomerCids([])
+    fetchSupplierCids(selectedOption)
   }
 
   /// /////////////////////////////////////////////////////////
@@ -1114,7 +1087,7 @@ const Maintenance = props => {
     Notify('success', 'Save Success')
   }
 
-  const handleCIDBlur = (ev) => {
+  const handleCIDBlur = () => {
     const postSelection = (id) => {
       let idParameter
       if (Array.isArray(id)) {
@@ -1122,17 +1095,16 @@ const Maintenance = props => {
       } else {
         idParameter = id
       }
-      if (idParameter === maintenance.derenCIDid) {
+      if (idParameter === props.jsonData.profile.derenCIDid) {
         return true
       }
-      const maintId = maintenance.id
-      if (maintId === 'NEW') {
+      if (maintenance.id === 'NEW') {
         Notify('error', 'Cannot Save', 'No CID Assigned')
         return
       }
       const activeUserEmail = props.session.user.email
       const activeUser = activeUserEmail.substring(0, activeUserEmail.lastIndexOf('@'))
-      fetch(`/api/maintenances/save/lieferant?maintId=${maintId}&cid=${idParameter}&updatedby=${activeUser}`, {
+      fetch(`/api/maintenances/save/lieferant?maintId=${maintenance.id}&cid=${idParameter}&updatedby=${activeUser}`, {
         method: 'get',
         headers: {
           'Access-Control-Allow-Origin': '*',
@@ -1150,18 +1122,7 @@ const Maintenance = props => {
         })
         .catch(err => console.error(err))
     }
-    const selectedSupplierCids = selectedLieferant
-    if (Array.isArray(selectedSupplierCids)) {
-      const arrayToSend = []
-      selectedSupplierCids.forEach(cid => {
-        const selectedId = cid.value
-        arrayToSend.push(selectedId)
-      })
-      postSelection(arrayToSend)
-    } else if (selectedSupplierCids && selectedSupplierCids.value) {
-      const selectedId = selectedSupplierCids.value
-      postSelection(selectedId)
-    }
+    postSelection(selectedSupplierCids)
   }
 
   const handleTimezoneBlur = () => {
@@ -1308,10 +1269,8 @@ const Maintenance = props => {
 
           if (htmlRegex.test(data.body)) {
             mailBody = data.body
-            setIncomingMailIsHtml(true)
           } else {
             mailBody = `<pre>${data.body}</pre>`
-            setIncomingMailIsHtml(false)
           }
           setMaintenance({
             ...maintenance,
@@ -1698,7 +1657,7 @@ const Maintenance = props => {
                         <FormGroup>
                           <ControlLabel htmlFor='supplier'>Timezone</ControlLabel>
                           <TimezoneSelector
-                            className='maint-select'
+                            style={{ borderColor: '#e5e5ea' }}
                             value={{ value: maintenance.timezone, label: maintenance.timezoneLabel }}
                             onChange={handleTimezoneChange}
                             onBlur={handleTimezoneBlur}
@@ -1708,14 +1667,14 @@ const Maintenance = props => {
                       <Col sm={12} xs={24}>
                         <FormGroup>
                           <ControlLabel htmlFor='supplier'>Supplier</ControlLabel>
-                          <Select
-                            className='maint-select'
-                            value={{ label: maintenance.name, value: maintenance.lieferant }}
+                          <SelectPicker
+                            style={{ width: '100%' }}
+                            value={maintenance.lieferant}
+                            // value={{ label: maintenance.name, value: maintenance.lieferant }}
                             onChange={handleSupplierChange}
-                            options={suppliers}
-                            noOptionsMessage={() => 'No Suppliers'}
+                            data={suppliers}
                             placeholder='Please select a Supplier'
-                            onBlur={handleSupplierBlur}
+                            onExit={handleSupplierBlur}
                           />
                         </FormGroup>
                       </Col>
@@ -1753,16 +1712,14 @@ const Maintenance = props => {
                       <Col sm={24}>
                         <FormGroup>
                           <ControlLabel htmlFor='their-cid'>{maintenance.name} CID</ControlLabel>
-                          <Select
-                            className='maint-select'
-                            value={selectedLieferant || undefined}
-                            onChange={handleSelectLieferantChange}
-                            options={lieferantcids}
-                            components={animatedComponents}
-                            isMulti
-                            noOptionsMessage={() => 'No CIDs for this Supplier'}
+                          <TagPicker
+                            block
+                            value={selectedSupplierCids || undefined}
+                            onChange={handleSelectSupplierChange}
+                            data={supplierCids}
+                            cleanable
                             placeholder='Please select a CID'
-                            onBlur={handleCIDBlur}
+                            onExit={handleCIDBlur}
                           />
                         </FormGroup>
                       </Col>
@@ -1984,7 +1941,7 @@ const Maintenance = props => {
                                       >
                                         <AgGridReact
                                           gridOptions={gridOptions}
-                                          rowData={kundencids}
+                                          rowData={customerCids}
                                           onGridReady={handleGridReady}
                                           pagination
                                           deltaRowDataMode
@@ -2147,12 +2104,7 @@ const Maintenance = props => {
               <Badge>
                 {rescheduleData.length + 1}
               </Badge>
-              <Button className='close-attachment-modal-btn' style={{ borderRadius: '5px', marginLeft: '15px', padding: '0.7em 0.9em' }} onClick={toggleRescheduleModal}>
-                <FontAwesomeIcon
-                  className='close-attachment-modal-icon' width='1.5em' style={{ color: 'var(--light)', fontSize: '12px' }}
-                  icon={faTimesCircle}
-                />
-              </Button>
+              <IconButton onClick={toggleRescheduleModal} icon={<Icon icon='close' />} />
             </Modal.Header>
             <Modal.Body className='modal-body reschedule'>
               <Container style={{ paddingTop: '0px !important' }} className='container-border'>
@@ -2161,7 +2113,7 @@ const Maintenance = props => {
                     <FormGroup style={{ margin: '0 15px', width: '100%' }}>
                       <label htmlFor='supplier'>Timezone</label>
                       <TimezoneSelector
-                        className='maint-select'
+                        style={{ borderColor: '#e5e5ea' }}
                         value={{ value: reschedule.timezone, label: reschedule.timezoneLabel }}
                         onChange={handleRescheduleTimezoneChange}
                       />
@@ -2206,13 +2158,14 @@ const Maintenance = props => {
                       <label htmlFor='resched-reason'>
                           Reason for Reschedule
                       </label>
-                      <CreatableSelect
-                        isClearable
-                        menuPlacement='top'
-                        className='maint-select'
+                      <SelectPicker
+                        cleanable
+                        placement='top'
+                        searchable={false}
                         value={reschedule.reason}
                         onChange={handleRescheduleReasonChange}
-                        options={[
+                        placeholder='Please select a reason for reschedule'
+                        data={[
                           {
                             value: 'change_circuits',
                             label: 'change in affected circuits'
@@ -2230,7 +2183,6 @@ const Maintenance = props => {
                             label: 'change due to technical reasons'
                           }
                         ]}
-                        placeholder='Please select a reason for reschedule'
                       />
                     </FormGroup>
                   </Row>
