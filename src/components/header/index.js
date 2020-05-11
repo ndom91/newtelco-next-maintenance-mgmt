@@ -14,6 +14,7 @@ import {
   Badge,
   Divider
 } from 'rsuite'
+import Notify from '../../lib/notification'
 
 const NextLink = React.forwardRef((props, ref) => {
   const { href, as, ...rest } = props
@@ -86,15 +87,18 @@ const MaintHeader = props => {
                 <span>History</span>
               </Nav.Item>
             </Link>
-            <Link
+            {/* <Link
               href='/companies'
-              as='/companies'
-              passHref
-            >
-              <Nav.Item>
+              // as='/companies'
+              // passHref
+              onClick={e => e.preventDefault() && Notify('warning', 'Companies Page', 'Coming Soon')}
+            > */}
+              <Nav.Item
+                onClick={() => Notify('warning', 'Companies Page', 'Coming Soon')}
+              >
                 <span>Companies</span>
               </Nav.Item>
-            </Link>
+            {/* </Link> */}
           </Nav>
           <Nav pullRight style={{ margin: '0px 20px' }}>
             <div style={{ width: '400px', height: '56px', display: 'inline-flex', alignItems: 'center' }}>

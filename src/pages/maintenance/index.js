@@ -123,10 +123,9 @@ const Maintenance = props => {
   })
   const [notesText, setNotesText] = useState(props.jsonData.profile.notes || '')
   const [mailBodyText, setMailBodyText] = useState('')
-  const [mailPreviewHeaderText, setMailPreviewHeaderText] = useState('')
-  const [mailPreviewSubjectText, setMailPreviewSubjectText] = useState('')
+  const [mailPreviewRecipients, setMailPreviewRecipients] = useState('')
   const [mailPreviewCustomerCID, setMailPreviewCustomerCid] = useState('')
-  const [mailPreviewSubjectTextPreview, setMailPreviewSubjectTextPreview] = useState('')
+  const [mailPreviewSubject, setMailPreviewSubject] = useState('')
   const [lieferantcids, setLieferantcids] = useState({})
   const [kundencids, setKundencids] = useState([])
   const [suppliers, setSuppliers] = useState([])
@@ -300,6 +299,10 @@ const Maintenance = props => {
   useEffect(() => {
     store.set('maintenance')(maintenance)
   }, [maintenance])
+
+  useEffect(() => {
+    store.set('impactPlaceholder')(impactPlaceholder)
+  }, [impactPlaceholder])
 
   useEffect(() => {
     let lieferantDomain
@@ -542,13 +545,17 @@ const Maintenance = props => {
       return
     }
     const HtmlBody = generateMail(customerCID)
-    const subject = `Planned Work Notification - NT-${maintenance.id}`
+    // const subject = `Planned Work Notification - NT-${maintenance.id}`
+    const subject = generateMailSubject()
     sendMail(recipient, customerCID, subject, HtmlBody, false)
   }
 
   // generate Mail contents
   const generateMail = (customerCID, protection) => {
-    if (!store.get('maintenance').id || !store.get('maintenance').startDateTime || !store.get('maintenance').endDateTime) {
+    console.log('store', !store.get('maintenance').id , !store.get('maintenance').startDateTime , !store.get('maintenance').endDateTime)
+    console.log('hook', maintenance.id , maintenance.startDateTime , maintenance.endDateTime)
+
+    if (store.get('maintenance').id === '' || store.get('maintenance').startDateTime === '' || store.get('maintenance').endDateTime === '') {
       Notify('warning', 'Missing Required Fields')
       return
     }
@@ -616,7 +623,9 @@ const Maintenance = props => {
       if (convertBool(protection)) {
         body = body + '<tr><td>Impact:</td><td>50ms Protection Switch</td></tr>'
       } else {
-        const impactText = store.get('maintenance').impact || impactPlaceholder
+        const impactText = store.get('maintenance').impact || store.get('impactPlaceholder')
+        console.log('impactText', impactText)
+        console.log(store.get('maintenance').impact, store.get('impactPlaceholder'))
         body = body + '<tr><td>Impact:</td><td>' + impactText + '</td></tr>'
       }
     }
@@ -650,8 +659,10 @@ const Maintenance = props => {
   // send out the created mail
   const sendMail = (recipient, customerCid, subj, htmlBody, isFromPreview, isFromSendAll) => {
     const activeRowIndex = kundencids.findIndex(el => el.kundenCID === customerCid)
+    console.log(activeRowIndex)
     const kundenCidRow = kundencids[activeRowIndex]
-    if (kundenCidRow.frozen) {
+    console.log(kundenCidRow)
+    if (kundenCidRow && kundenCidRow.frozen) {
       setFrozenCompany(kundenCidRow.name || '')
       setFrozenState({
         recipient: recipient,
@@ -661,8 +672,8 @@ const Maintenance = props => {
       return
     }
     const body = htmlBody || mailBodyText
-    let subject = subj || mailPreviewSubjectText
-    const to = recipient || mailPreviewHeaderText
+    let subject = subj || mailPreviewSubject
+    const to = recipient || mailPreviewRecipients
 
     if (convertBool(maintenance.emergency)) {
       subject = `[EMERGENCY] ${subject}`
@@ -696,9 +707,9 @@ const Maintenance = props => {
           const activeRowIndex = kundencids.findIndex(el => el.kundenCID === customerCid)
           const kundenCidRow = kundencids[activeRowIndex]
           if (maintenance.cancelled === true && maintenance.done === true) {
-            kundenCidRow.sent = '2'
+            kundenCidRow.sent = 2
           } else {
-            kundenCidRow.sent = '1'
+            kundenCidRow.sent = 1
           }
           const updatedKundenCids = [
             ...kundencids,
@@ -742,7 +753,8 @@ const Maintenance = props => {
     gridApi.current.forEachNode((node, index) => {
       setTimeout(() => {
         const HtmlBody = generateMail(node.data.kundenCID, node.data.protected)
-        const subject = `Planned Work Notification - NT-${maintenance.id}`
+        const subject = generateMailSubject()
+        // const subject = `Planned Work Notification - NT-${maintenance.id}`
         sendMail(node.data.maintenanceRecipient, node.data.kundenCID, subject, HtmlBody, false, true)
         Notify('success', `Mail Sent - ${node.data.name}`)
         if (index === rowCount) {
@@ -756,7 +768,7 @@ const Maintenance = props => {
     if (kundencids.length !== 0) {
       let progressSent = 0
       kundencids.forEach(cid => {
-        if (cid.sent === '1' || cid.sent === '2') {
+        if (cid.sent === 1 || cid.sent === 2) {
           progressSent += 1
         }
       })
@@ -1323,14 +1335,13 @@ const Maintenance = props => {
       const HtmlBody = generateMail(customerCID, protection)
       if (HtmlBody) {
         setMailBodyText(HtmlBody)
-        setMailPreviewHeaderText(recipient || mailPreviewHeaderText)
-        // setMailPreviewSubjectText(`Planned Work Notification - NT-${maintenance.id}`)
+        setMailPreviewRecipients(recipient || mailPreviewRecipients)
         setMailPreviewCustomerCid(customerCID)
-        mailSubjectText()
+        generateMailSubject()
         setOpenPreviewModal(!openPreviewModal)
       }
     } else {
-      mailSubjectText()
+      generateMailSubject()
       setOpenPreviewModal(!openPreviewModal)
     }
   }
@@ -1572,15 +1583,16 @@ const Maintenance = props => {
     }
   }
 
-  const mailSubjectText = () => {
+  const generateMailSubject = () => {
     let text = rescheduleData.length !== 0 ? ' [RESCHEDULED]' : ''
     text += maintenance.emergency ? ' [EMERGENCY]' : ''
     text += maintenance.cancelled ? ' [CANCELLED]' : ''
-    text += ' Planned Work Notification - NT-' + maintenance.id
+    text += ' Planned Work Notification - NT-' + store.get('maintenance').id
     if (rescheduleData.length !== 0) {
       text += rescheduleData.length !== 0 && '-' + rescheduleData[rescheduleData.length - 1].rcounter
     }
-    setMailPreviewSubjectTextPreview(text)
+    setMailPreviewSubject(text)
+    return text
   }
 
   /// /////////////////////////////////////////////////////////
@@ -1596,7 +1608,7 @@ const Maintenance = props => {
     maintenanceIdDisplay = `NT-${maintenance.id}`
   }
 
-  if (props.session.user) {
+  if (props?.session?.user) {
     const HeaderLeft = () => {
       return (
         <ButtonGroup size='md'>
@@ -2055,7 +2067,7 @@ const Maintenance = props => {
                       <InputGroup.Addon style={{ height: '31px' }} type='prepend'>
                         To
                       </InputGroup.Addon>
-                      <Input readOnly value={mailPreviewHeaderText.toLowerCase()} />
+                      <Input readOnly value={mailPreviewRecipients.toLowerCase()} />
                     </InputGroup>
                     <InputGroup className='modal-textbox' >
                       <InputGroup.Addon style={{ height: '31px' }} type='prepend'>
@@ -2067,14 +2079,14 @@ const Maintenance = props => {
                       <InputGroup.Addon style={{ height: '31px' }} type='prepend'>
                         Subject 
                       </InputGroup.Addon>
-                      <Input type='text' readOnly value={mailPreviewSubjectTextPreview} />
+                      <Input type='text' readOnly value={mailPreviewSubject} />
                     </InputGroup>
                   </div>
                 </FlexboxGrid.Item>
                 <FlexboxGrid.Item colspan={1} style={{ marginLeft: '30px' }}>
                   <Whisper speaker={<Tooltip>Send Mail</Tooltip>} placement='bottom'>
                     <IconButton
-                      onClick={() => sendMail(mailPreviewHeaderText, mailPreviewCustomerCID, mailPreviewSubjectText, mailBodyText, true)}
+                      onClick={() => sendMail(mailPreviewRecipients, mailPreviewCustomerCID, mailPreviewSubject, mailBodyText, true)}
                       appearance='ghost'
                       style={{ color: 'var(--grey4)' }}
                       size='lg'
