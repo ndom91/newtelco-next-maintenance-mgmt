@@ -1,26 +1,24 @@
 import React from 'react'
 import {
   Icon,
-  ButtonGroup,
-  IconButton
+  IconButton,
+  Dropdown
 } from 'rsuite'
 
 const sentBtn = props => {
   return (
-    <ButtonGroup>
-      <IconButton 
-        onClick={() => props.context.toggleRescheduleSentBtn(props.data.rcounter)} 
-        size='sm' 
-        appearance='ghost' 
-        icon={props.data.sent === 1 ? <Icon icon='check-circle' /> : <Icon icon='times-circle' />} 
-      />
-      <IconButton 
-        onClick={() => props.context.moveCalendarEntry(props.data.startDateTime, props.data.endDateTime, props.data.rcounter)} 
-        size='sm' 
-        appearance='ghost'
-        icon={<Icon icon='calendar' />}
-      />
-    </ButtonGroup>
+    <Dropdown
+      renderTitle={() => {
+        return (
+          <IconButton appearance='subtle' icon={<Icon icon='ellipsis-v' />} />
+        )
+      }}
+      placement='leftStart'
+    >
+      <Dropdown.Item onClick={() => props.context.toggleRescheduleSentBtn(props.data.rcounter)}>Toggle Sent</Dropdown.Item>
+      <Dropdown.Item onClick={() => props.context.moveCalendarEntry(props.data.startDateTime, props.data.endDateTime, props.data.rcounter)}>Move Calendar</Dropdown.Item>
+      <Dropdown.Item onClick={props.context.toggleRescheduleDelete}>Delete</Dropdown.Item>
+    </Dropdown>
   )
 }
 

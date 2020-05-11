@@ -109,6 +109,18 @@
   cursor: grabbing
 }
 
+.reschedule-header {
+  background: var(--grey1);
+  padding: 25px !important;
+}
+
+.reschedule-header:hover {
+  cursor: grab;
+}
+.reschedule-header:active {
+  cursor: grabbing
+}
+
 .modal-attachment-header-text:hover {
   cursor: grab;
 }
@@ -164,4 +176,8 @@ textarea::-webkit-scrollbar-thumb {
   to {
     box-shadow: 0 0 15px 15px rgba(102, 178, 70, 0.3);
   }
+}
+
+.tox-tinymce {
+  border-radius: 5px !important;
 }

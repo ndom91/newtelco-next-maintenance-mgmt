@@ -25,6 +25,7 @@ import { AgGridReact } from 'ag-grid-react'
 import dynamic from 'next/dynamic'
 import ReadModal from '../../components/maintenance/readmodal'
 import Store from '../../components/store'
+import ConfirmModal from '../../components/confirmmodal'
 
 import MaintPanel from '../../components/panel'
 
@@ -60,7 +61,8 @@ import {
   Message,
   Avatar,
   SelectPicker,
-  TagPicker
+  TagPicker,
+  Divider
 } from 'rsuite'
 
 const Changelog = dynamic(
@@ -110,7 +112,6 @@ const Maintenance = props => {
     id: null,
     rcounter: null
   })
-  const [notesText, setNotesText] = useState(props.jsonData.profile.notes || '')
   const [mailBodyText, setMailBodyText] = useState('')
   const [mailPreviewRecipients, setMailPreviewRecipients] = useState('')
   const [mailPreviewCustomerCID, setMailPreviewCustomerCid] = useState('')
@@ -140,21 +141,8 @@ const Maintenance = props => {
         field: 'rcounter',
         width: 80,
         editable: false,
-        hide: true,
+        hide: false,
         sort: { direction: 'asc', priority: 0 }
-      }, {
-        headerName: 'Sent',
-        field: 'sent',
-        cellRenderer: 'sentBtn',
-        width: 80,
-        sortable: false,
-        filter: false,
-        cellStyle: {
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '100%'
-        }
       }, {
         headerName: 'Start',
         field: 'startDateTime',
@@ -175,16 +163,38 @@ const Maintenance = props => {
         field: 'reason',
         width: 160,
         tooltipField: 'reason'
+      }, {
+        headerName: 'Sent',
+        field: 'sent',
+        width: 160,
+        tooltipField: 'reason',
+        cellRenderer: 'sentIcon'
+      }, {
+        headerName: '',
+        field: 'sent',
+        cellRenderer: 'sentBtn',
+        width: 60,
+        sortable: false,
+        filter: false,
+        pinned: 'right',
+        cellStyle: {
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100%',
+          overflow: 'visible'
+        }
       }
     ],
     rowSelection: 'single',
     paginationPageSize: 10,
     loadingOverlayComponent: 'customLoadingOverlay',
-    context: { moveCalendarEntry: moveCalendarEntry, toggleRescheduleSentBtn: toggleRescheduleSentBtn },
+    context: { moveCalendarEntry: moveCalendarEntry, toggleRescheduleSentBtn: toggleRescheduleSentBtn, toggleRescheduleDelete: toggleConfirmDeleteRescheduleModal },
     frameworkComponents: {
       startdateTime: StartDateTime,
       enddateTime: EndDateTime,
       sentBtn: sentBtn,
+      sentIcon: SentIcon,
       customLoadingOverlay: Loader
     }
   }
@@ -435,7 +445,7 @@ const Maintenance = props => {
         setSupplierCids(data.lieferantCIDsResult)
         const derenCIDids = props.jsonData.profile.derenCIDid
         if (derenCIDids.includes(',')) {
-          let selectedCids = []
+          const selectedCids = []
           derenCIDids
             .split(',')
             .forEach(x => {
@@ -523,7 +533,6 @@ const Maintenance = props => {
       return
     }
     const HtmlBody = generateMail(customerCID)
-    // const subject = `Planned Work Notification - NT-${maintenance.id}`
     const subject = generateMailSubject()
     sendMail(recipient, customerCID, subject, HtmlBody, false)
   }
@@ -1183,7 +1192,7 @@ const Maintenance = props => {
       .catch(err => console.error(err))
   }
 
-  const handleNotesBlur = () => {
+  const handleNotesBlur = value => {
     const newValue = maintenance.notes
     const originalValue = props.jsonData.profile.notes
     const activeUserEmail = props.session.user.email
@@ -1340,8 +1349,8 @@ const Maintenance = props => {
     setReschedule({ ...reschedule, endDateTime })
   }
 
-  const handleRescheduleImpactChange = (event) => {
-    setReschedule({ ...reschedule, impact: event.target.value })
+  const handleRescheduleImpactChange = (value) => {
+    setReschedule({ ...reschedule, impact: value })
   }
 
   const handleRescheduleReasonChange = (reason) => {
@@ -1433,7 +1442,7 @@ const Maintenance = props => {
     rescheduleGridApi.current.refreshCells()
   }
 
-  const toggleConfirmDeleteRescheduleModal = () => {
+  function toggleConfirmDeleteRescheduleModal () {
     if (rescheduleGridApi.current) {
       const row = rescheduleGridApi.current.getSelectedRows()
       const rescheduleId = `NT-${maintenance.id}-${row[0].rcounter}`
@@ -1833,9 +1842,10 @@ const Maintenance = props => {
                         <FormGroup>
                           <ControlLabel htmlFor='notes'>Private Notes</ControlLabel>
                           <TinyEditor
-                            initialValue={notesText}
-                            apiKey='ttv2x1is9joc0fi7v6f6rzi0u98w2mpehx53mnc1277omr7s'
+                            initialValue={maintenance.notes}
+                            onChange={handleNotesChange}
                             onBlur={handleNotesBlur}
+                            apiKey='ttv2x1is9joc0fi7v6f6rzi0u98w2mpehx53mnc1277omr7s'
                             init={{
                               height: 300,
                               menubar: false,
@@ -1851,7 +1861,6 @@ const Maintenance = props => {
                                   bullist numlist outdent indent | removeformat | help`,
                               content_style: 'html { color: #828282 }'
                             }}
-                            onChange={handleNotesChange}
                           />
                         </FormGroup>
                       </Col>
@@ -1931,7 +1940,7 @@ const Maintenance = props => {
                                     </Col>
                                   </Row>
                                   <Row>
-                                    <Col style={{ width: '100%', height: '600px' }}>
+                                    <Col style={{ width: '100%', height: '500px', padding: '20px' }}>
                                       <div
                                         className='ag-theme-material'
                                         style={{
@@ -1955,13 +1964,14 @@ const Maintenance = props => {
                                 </Container>
                                 {rescheduleData.length !== 0 && (
                                   <Container style={{ padding: '20px' }} className='maintenance-subcontainer'>
+                                    <Divider />
                                     <Row>
                                       <Col>
                                         <span style={{ color: 'var(--font-color)', fontWeight: '300 !important', fontSize: '1.5rem' }}>Reschedule</span>
                                       </Col>
                                     </Row>
                                     <Row>
-                                      <Col style={{ width: '100%', height: '600px' }}>
+                                      <Col style={{ width: '100%', height: '400px' }}>
                                         <div
                                           className='ag-theme-material'
                                           style={{
@@ -2014,7 +2024,7 @@ const Maintenance = props => {
                 <FlexboxGrid.Item colspan={2} style={{ display: 'flex', justifyContent: 'center' }}>
                   <Avatar
                     size='lg'
-                    src={'/v1/api/faviconUrl?d=newtelco.de'}
+                    src='/v1/api/faviconUrl?d=newtelco.de'
                     style={{ backgroundColor: 'transparent' }}
                   />
                 </FlexboxGrid.Item>
@@ -2081,36 +2091,37 @@ const Maintenance = props => {
         {typeof window !== 'undefined' && openRescheduleModal && (
           <Rnd
             default={{
-              x: window.outerWidth - (window.outerWidth / 1.5),
-              y: 25,
-              width: 600,
-              height: 565
+              x: window.outerWidth / 2,
+              y: 80,
+              width: 450,
+              height: 650
             }}
             style={{
-              backgroundColor: 'var(--background)',
+              background: 'var(--background)',
               overflow: 'hidden',
               borderRadius: '5px',
               height: 'auto',
-              zIndex: '101',
+              zIndex: '6',
               boxShadow: '0px 0px 10px 1px var(--grey3)'
             }}
             bounds='window'
             dragHandleClassName='reschedule-header'
           >
-            <Modal.Header className='reschedule reschedule-header'>
-              <span style={{ flexGrow: '1' }}>
-                  Reschedule Maintenance
-              </span>
-              <Badge>
-                {rescheduleData.length + 1}
-              </Badge>
-              <IconButton onClick={toggleRescheduleModal} icon={<Icon icon='close' />} />
+            <Modal.Header className='reschedule reschedule-header' onHide={toggleRescheduleModal}>
+              <FlexboxGrid justify='start' align='middle'>
+                <FlexboxGrid.Item colspan={20}>
+                  <h3>Reschedule Maintenance</h3> 
+                </FlexboxGrid.Item>
+                <FlexboxGrid.Item colspan={2}>
+                  <Button appearance='primary' disabled style={{ opacity: '0.9', fontSize: '1.3rem' }}>{rescheduleData.length + 1}</Button>
+                </FlexboxGrid.Item>
+              </FlexboxGrid>
             </Modal.Header>
-            <Modal.Body className='modal-body reschedule'>
-              <Container style={{ paddingTop: '0px !important' }} className='container-border'>
-                <Col>
-                  <Row style={{ display: 'flex', flexWrap: 'nowrap' }}>
-                    <FormGroup style={{ margin: '0 15px', width: '100%' }}>
+            <Modal.Body className='modal-body reschedule' style={{ marginTop: '0px', paddingBottom: '0px' }}>
+              <FlexboxGrid justify='space-around' align='middle' style={{ flexDirection: 'column', height: '510px' }}>
+                <FlexboxGrid.Item style={{ padding: '30px' }}>
+                  <Form>
+                    <FormGroup style={{ margin: '20px' }}>
                       <label htmlFor='supplier'>Timezone</label>
                       <TimezoneSelector
                         style={{ borderColor: '#e5e5ea' }}
@@ -2118,9 +2129,7 @@ const Maintenance = props => {
                         onChange={handleRescheduleTimezoneChange}
                       />
                     </FormGroup>
-                  </Row>
-                  <Row style={{ display: 'flex', flexWrap: 'nowrap' }}>
-                    <FormGroup style={{ margin: '0 15px' }}>
+                    <FormGroup style={{ margin: '20px' }}>
                       <label>
                           Start Date/Time
                       </label>
@@ -2132,7 +2141,7 @@ const Maintenance = props => {
                         onChange={date => handleRescheduleStartDateTimeChange(date)}
                       />
                     </FormGroup>
-                    <FormGroup style={{ margin: '0 15px' }}>
+                    <FormGroup style={{ margin: '20px' }}>
                       <label>
                           End Date/Time
                       </label>
@@ -2144,22 +2153,19 @@ const Maintenance = props => {
                         onChange={date => handleRescheduleEndDateTimeChange(date)}
                       />
                     </FormGroup>
-                  </Row>
-                  <Row>
-                    <FormGroup style={{ margin: '0px 15px', width: '100%', marginBottom: '10px !important' }}>
+                    <FormGroup style={{ margin: '20px' }}>
                       <label htmlFor='resched-impact'>
                           New Impact
                       </label>
                       <Input id='resched-impact' name='resched-impact' type='text' value={reschedule.impact} onChange={handleRescheduleImpactChange} />
                     </FormGroup>
-                  </Row>
-                  <Row>
-                    <FormGroup style={{ margin: '0px 15px', width: '100%', marginBottom: '10px !important' }}>
+                    <FormGroup style={{ margin: '20px' }}>
                       <label htmlFor='resched-reason'>
-                          Reason for Reschedule
+                          New Reason
                       </label>
                       <SelectPicker
                         cleanable
+                        style={{ width: '100%' }}
                         placement='top'
                         searchable={false}
                         value={reschedule.reason}
@@ -2168,91 +2174,58 @@ const Maintenance = props => {
                         data={[
                           {
                             value: 'change_circuits',
-                            label: 'change in affected circuits'
+                            label: 'Change in affected circuits'
                           },
                           {
                             value: 'change_time',
-                            label: 'change in planned date/time'
+                            label: 'Change in planned date/time'
                           },
                           {
                             value: 'change_impact',
-                            label: 'change in impact duration'
+                            label: 'Change in impact duration'
                           },
                           {
                             value: 'change_technical',
-                            label: 'change due to technical reasons'
+                            label: 'Change due to technical reasons'
                           }
                         ]}
                       />
                     </FormGroup>
-                  </Row>
-                </Col>
-              </Container>
-              <Row style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <Col>
-                  <Button onClick={handleRescheduleSave} style={{ width: '100%', marginTop: '15px' }}>
+                  </Form>
+                </FlexboxGrid.Item>
+                <FlexboxGrid.Item colspan={18}>
+                  <ButtonGroup justified>
+                    <Button appearance='sublte' onClick={toggleRescheduleModal}>
+                      Cancel
+                    </Button>
+                    <Button onClick={handleRescheduleSave}>
                       Save
-                  </Button>
-                </Col>
-              </Row>
+                    </Button>
+                  </ButtonGroup>
+                </FlexboxGrid.Item>
+              </FlexboxGrid>
             </Modal.Body>
           </Rnd>
         )}
         {openConfirmDeleteModal && (
-          <Modal className='delete-modal' animation backdrop backdropClassName='modal-backdrop' open={openConfirmDeleteModal} size='md' toggle={toggleConfirmDeleteRescheduleModal}>
-            <Modal.Header className='modal-delete-header'>
-                Confirm Delete Reschedule
-            </Modal.Header>
-            <Modal.Body>
-              <Container className='container-border'>
-                <Row>
-                  <Col>
-                      Are you sure you want to delete reschedule: <b style={{ fontWeight: '900' }}> {rescheduleToDelete.id}</b>
-                  </Col>
-                </Row>
-              </Container>
-              <Row style={{ marginTop: '20px' }}>
-                <Col>
-                  <ButtonGroup style={{ width: '100%' }}>
-                    <Button style={{ color: 'var(font-color)' }} onClick={toggleConfirmDeleteRescheduleModal}>
-                        Cancel
-                    </Button>
-                    <Button onClick={handleDeleteReschedule}>
-                        Confirm
-                    </Button>
-                  </ButtonGroup>
-                </Col>
-              </Row>
-            </Modal.Body>
-          </Modal>
+          <ConfirmModal
+            show={openConfirmDeleteModal}
+            onHide={toggleConfirmDeleteRescheduleModal}
+            header='Confirm Delete'
+            content={`Are you sure you want to delete ${rescheduleToDelete.id}`}
+            cancelAction={toggleConfirmDeleteRescheduleModal}
+            confirmAction={handleDeleteReschedule}
+          />
         )}
         {openConfirmFreezeModal && (
-          <Modal className='confirm-freeze-modal' animation backdrop backdropClassName='modal-backdrop' open={openConfirmFreezeModal} size='md' toggle={toggleConfirmFreezeModal}>
-            <Modal.Header className='modal-delete-header'>
-                Confirm Freeze Send
-            </Modal.Header>
-            <Modal.Body>
-              <Container className='container-border'>
-                <Row>
-                  <Col>
-                      There is a network freeze for <b>{frozenCompany || ''}</b>. Are you sure you want to send this mail?
-                  </Col>
-                </Row>
-              </Container>
-              <Row style={{ marginTop: '20px' }}>
-                <Col>
-                  <ButtonGroup style={{ width: '100%' }}>
-                    <Button style={{ color: 'var(font-color)' }} onClick={toggleConfirmFreezeModal}>
-                        Cancel
-                    </Button>
-                    <Button onClick={() => prepareDirectSend(frozenState.recipient, frozenState.cid, false)}>
-                        Confirm
-                    </Button>
-                  </ButtonGroup>
-                </Col>
-              </Row>
-            </Modal.Body>
-          </Modal>
+          <ConfirmModal
+            show={openConfirmFreezeModal}
+            onHide={toggleConfirmFreezeModal}
+            header='Confirm Freeze'
+            content={`There is a network freeze for <b>${frozenCompany || ''}</b>. Are you sure you want to send this mail?`}
+            cancelAction={toggleConfirmFreezeModal}
+            confirmAction={() => prepareDirectSend(frozenState.recipient, frozenState.cid, false)}
+          />
         )}
       </Layout>
     )
