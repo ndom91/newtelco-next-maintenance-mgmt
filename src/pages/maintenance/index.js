@@ -27,6 +27,7 @@ import sendMailBtns from '../../components/ag-grid/sendMailBtns'
 import { AgGridReact } from 'ag-grid-react'
 import dynamic from 'next/dynamic'
 import ReadModal from '../../components/maintenance/readmodal'
+import Store from '../../components/store'
 
 import MaintPanel from '../../components/panel'
 
@@ -65,7 +66,8 @@ import {
   Progress,
   Modal,
   Container,
-  Message
+  Message,
+  Avatar
 } from 'rsuite'
 
 const animatedComponents = makeAnimated()
@@ -76,6 +78,7 @@ const Changelog = dynamic(
 )
 
 const Maintenance = props => {
+  const store = Store.useStore()
   const [maintenance, setMaintenance] = useState({
     incomingAttachments: [],
     incomingBody: props.jsonData.profile.body,
@@ -295,6 +298,10 @@ const Maintenance = props => {
   }
 
   useEffect(() => {
+    store.set('maintenance')(maintenance)
+  }, [maintenance])
+
+  useEffect(() => {
     let lieferantDomain
     let localMaint
     if (props.jsonData.profile.id === 'NEW') {
@@ -384,6 +391,7 @@ const Maintenance = props => {
       const impactCalculation = formatDistance(parseISO(endDateTime), parseISO(startDateTime))
       setImpactPlaceholder(impactCalculation)
     }
+    store.set('maintenance')(maintenance)
   }, [])
 
   /// /////////////////////////////////////////////////////////
@@ -540,17 +548,14 @@ const Maintenance = props => {
 
   // generate Mail contents
   const generateMail = (customerCID, protection) => {
-    console.log(maintenance)
-
-    console.log(maintenance.id, maintenance.startDateTime, maintenance.endDateTime)
-    if (!maintenance.id || !maintenance.startDateTime || !maintenance.endDateTime) {
+    if (!store.get('maintenance').id || !store.get('maintenance').startDateTime || !store.get('maintenance').endDateTime) {
       Notify('warning', 'Missing Required Fields')
       return
     }
 
-    const timezoneValue = maintenance.timezone || 'Europe/Dublin'
-    const rawStart = moment.tz(maintenance.startDateTime, maintenance.timezoneValue)
-    const rawEnd = moment.tz(maintenance.endDateTime, timezoneValue)
+    const timezoneValue = store.get('maintenance').timezone || 'Europe/Dublin'
+    const rawStart = moment.tz(store.get('maintenance').startDateTime, store.get('maintenance').timezoneValue)
+    const rawEnd = moment.tz(store.get('maintenance').endDateTime, timezoneValue)
     const utcStart1 = rawStart.tz('GMT').format('YYYY-MM-DD HH:mm:ss')
     const utcEnd1 = rawEnd.tz('GMT').format('YYYY-MM-DD HH:mm:ss')
     const utcStart = props.jsonData.profile.startDateTime || utcStart1
@@ -560,9 +565,9 @@ const Maintenance = props => {
     const rescheduleText = ''
     const tzSuffixRAW = 'UTC / GMT+0:00'
 
-    const cancelled = convertBool(maintenance.cancelled)
+    const cancelled = convertBool(store.get('maintenance').cancelled)
     if (cancelled) {
-      maintenanceIntro = `We would like to inform you that these planned works (<b>NT-${id}</b>) have been <b>cancelled</b> with the following CID(s):`
+      maintenanceIntro = `We would like to inform you that these planned works (<b>NT-${store.get('maintenance').id}</b>) have been <b>cancelled</b> with the following CID(s):`
     }
 
     if (rescheduleData.length !== 0) {
@@ -573,9 +578,9 @@ const Maintenance = props => {
       const newReason = rescheduleData[latest].reason.toLowerCase()
       const rcounter = rescheduleData[latest].rcounter
       if (cancelled && rescheduleData[latest]) {
-        maintenanceIntro = `We would like to inform you that these rescheduled planned works (<b>NT-${id}-${rcounter}</b>) have been <b>cancelled</b>.<br><br>We are sorry for any inconveniences this may have caused.<br><footer>​<style>.sig{font-family:Century Gothic, sans-serif;font-size:9pt;color:#636266!important;}b.i{color:#4ca702;}.gray{color:#636266 !important;}a{text-decoration:none;color:#636266 !important;}</style><div class="sig"><div>Best regards <b class="i">|</b> Mit freundlichen Grüßen</div><br><div><b>Newtelco Maintenance Team</b></div><br><div>NewTelco GmbH <b class="i">|</b> Moenchhofsstr. 24 <b class="i">|</b> 60326 Frankfurt a.M. <b class="i">|</b> DE <br>www.newtelco.com <b class="i">|</b> 24/7 NOC  49 69 75 00 27 30 ​​<b class="i">|</b> <a style="color:#" href="mailto:service@newtelco.de">service@newtelco.de</a><br><br><div><img alt="sig" src="https://home.newtelco.de/sig.png" height="29" width="516"></div></div>​</footer><hr />`
+        maintenanceIntro = `We would like to inform you that these rescheduled planned works (<b>NT-${store.get('maintenance').id}-${rcounter}</b>) have been <b>cancelled</b>.<br><br>We are sorry for any inconveniences this may have caused.<br><footer>​<style>.sig{font-family:Century Gothic, sans-serif;font-size:9pt;color:#636266!important;}b.i{color:#4ca702;}.gray{color:#636266 !important;}a{text-decoration:none;color:#636266 !important;}</style><div class="sig"><div>Best regards <b class="i">|</b> Mit freundlichen Grüßen</div><br><div><b>Newtelco Maintenance Team</b></div><br><div>NewTelco GmbH <b class="i">|</b> Moenchhofsstr. 24 <b class="i">|</b> 60326 Frankfurt a.M. <b class="i">|</b> DE <br>www.newtelco.com <b class="i">|</b> 24/7 NOC  49 69 75 00 27 30 ​​<b class="i">|</b> <a style="color:#" href="mailto:service@newtelco.de">service@newtelco.de</a><br><br><div><img alt="sig" src="https://home.newtelco.de/sig.png" height="29" width="516"></div></div>​</footer><hr />`
       }
-      maintenanceIntro += `We regret to inform you that the planned works have been <b>rescheduled</b> on the following CID(s):\n\n<br><br><b>${customerCID}</b><br><br>The maintenance has been rescheduled due to ${newReason}.<br><br>The new details are as follows:<br><table border="0" cellspacing="2" cellpadding="2" width="775px"><tr><td style='width: 205px;'>Maintenance ID:</td><td><b>NT-${id}-${rcounter}</b></td></tr><tr><td>New Start date and time:</td><td><b>${newStart} (${tzSuffixRAW})</b></td></tr><tr><td>New Finish date and time:</td><td><b>${newEnd} (${tzSuffixRAW})</b></td></tr><tr><td>New Impact:</td><td><b>${newImpact}</b></td></tr></table><br>Thank you very much for your patience and cooperation.<br>`
+      maintenanceIntro += `We regret to inform you that the planned works have been <b>rescheduled</b> on the following CID(s):\n\n<br><br><b>${customerCID}</b><br><br>The maintenance has been rescheduled due to ${newReason}.<br><br>The new details are as follows:<br><table border="0" cellspacing="2" cellpadding="2" width="775px"><tr><td style='width: 205px;'>Maintenance ID:</td><td><b>NT-${store.get('maintenance').id}-${rcounter}</b></td></tr><tr><td>New Start date and time:</td><td><b>${newStart} (${tzSuffixRAW})</b></td></tr><tr><td>New Finish date and time:</td><td><b>${newEnd} (${tzSuffixRAW})</b></td></tr><tr><td>New Impact:</td><td><b>${newImpact}</b></td></tr></table><br>Thank you very much for your patience and cooperation.<br>`
 
       if (rescheduleData.length > 1) {
         maintenanceIntro += '<br><hr><br><b>Previous Reschedules:</b><br>'
@@ -600,41 +605,40 @@ const Maintenance = props => {
           const newImpact = i.impact
           const newReason = i.reason && i.reason.toLowerCase()
           const rcounter = i.rcounter
-          maintenanceIntro += `<br>This maintenance had been rescheduled due to ${newReason}.<br><br>The previous details were as follows:<br><table border="0" cellspacing="2" cellpadding="2" width="775px"><tr><td style='width: 205px;'>Maintenance ID:</td><td><b>NT-${id}-${rcounter}</b></td></tr><tr><td>Previous Start date and time:</td><td><b>${newStart} (${tzSuffixRAW})</b></td></tr><tr><td>Previous Finish date and time:</td><td><b>${newEnd} (${tzSuffixRAW})</b></td></tr><tr><td>Previous Impact:</td><td><b>${newImpact}</b></td></tr></table>`
+          maintenanceIntro += `<br>This maintenance had been rescheduled due to ${newReason}.<br><br>The previous details were as follows:<br><table border="0" cellspacing="2" cellpadding="2" width="775px"><tr><td style='width: 205px;'>Maintenance ID:</td><td><b>NT-${store.get('maintenance').id}-${rcounter}</b></td></tr><tr><td>Previous Start date and time:</td><td><b>${newStart} (${tzSuffixRAW})</b></td></tr><tr><td>Previous Finish date and time:</td><td><b>${newEnd} (${tzSuffixRAW})</b></td></tr><tr><td>Previous Impact:</td><td><b>${newImpact}</b></td></tr></table>`
         }
       }
       maintenanceIntro += '<br><hr><i><b>Original Planned Works:</b></i><br><br>Dear Colleagues,<br><br>We would like to inform you about planned work on the following CID(s):\n'
     }
 
-    let body = `<body style="color:#666666;">${rescheduleText} Dear Colleagues,​​<p><span>${maintenanceIntro}<br><br> <b>${customerCID}</b> <br><br>The maintenance work is with the following details:</span></p><table border="0" cellspacing="2" cellpadding="2" width="775px"><tr><td style='width: 205px;'>Maintenance ID:</td><td><b>NT-${id}</b></td></tr><tr><td>Start date and time:</td><td><b>${utcStart} (${tzSuffixRAW})</b></td></tr><tr><td>Finish date and time:</td><td><b>${utcEnd} (${tzSuffixRAW})</b></td></tr>`
-    if (maintenance.impact || maintenance.protection || impactPlaceholder) {
-      console.log(maintenance.impact, maintenance.protection, impactPlaceholder)
-      if (convertBool(maintenance.protection)) {
+    let body = `<body style="color:#666666;">${rescheduleText} Dear Colleagues,​​<p><span>${maintenanceIntro}<br><br> <b>${customerCID}</b> <br><br>The maintenance work is with the following details:</span></p><table border="0" cellspacing="2" cellpadding="2" width="775px"><tr><td style='width: 205px;'>Maintenance ID:</td><td><b>NT-${store.get('maintenance').id}</b></td></tr><tr><td>Start date and time:</td><td><b>${utcStart} (${tzSuffixRAW})</b></td></tr><tr><td>Finish date and time:</td><td><b>${utcEnd} (${tzSuffixRAW})</b></td></tr>`
+    if (store.get('maintenance').impact || protection || impactPlaceholder) {
+      if (convertBool(protection)) {
         body = body + '<tr><td>Impact:</td><td>50ms Protection Switch</td></tr>'
       } else {
-        const impactText = maintenance.impact || impactPlaceholder
+        const impactText = store.get('maintenance').impact || impactPlaceholder
         body = body + '<tr><td>Impact:</td><td>' + impactText + '</td></tr>'
       }
     }
 
-    if (maintenance.location) {
-      body = body + '<tr><td>Location:</td><td>' + location + '</td></tr>'
+    if (store.get('maintenance').location) {
+      body = body + '<tr><td>Location:</td><td>' + store.get('maintenance').location + '</td></tr>'
     }
 
-    if (maintenance.reason) {
-      if (maintenance.reason.includes('%20')) {
-        body = body + '<tr><td>Reason:</td><td>' + decodeURIComponent(maintenance.reason) + '</td></tr>'
+    if (store.get('maintenance').reason) {
+      if (store.get('maintenance').reason.includes('%20')) {
+        body = body + '<tr><td>Reason:</td><td>' + decodeURIComponent(store.get('maintenance').reason) + '</td></tr>'
       } else {
-        body = body + '<tr><td>Reason:</td><td>' + maintenance.reason + '</td></tr>'
+        body = body + '<tr><td>Reason:</td><td>' + store.get('maintenance').reason + '</td></tr>'
       }
     }
 
     let maintNoteBody = ''
-    if (maintenance.maintNote) {
-      if (maintenance.maintNote.includes('%20')) {
-        maintNoteBody = '<p>' + decodeURIComponent(maintenance.maintNote) + '</p>'
+    if (store.get('maintenance').maintNote) {
+      if (store.get('maintenance').maintNote.includes('%20')) {
+        maintNoteBody = '<p>' + decodeURIComponent(store.get('maintenance').maintNote) + '</p>'
       } else {
-        maintNoteBody = '<p>' + maintenance.maintNote + '</p>'
+        maintNoteBody = '<p>' + store.get('maintenance').maintNote + '</p>'
       }
     }
 
@@ -1318,16 +1322,17 @@ const Maintenance = props => {
     if (recipient && customerCID) {
       const HtmlBody = generateMail(customerCID, protection)
       if (HtmlBody) {
-        setOpenPreviewModal(!openPreviewModal)
         setMailBodyText(HtmlBody)
         setMailPreviewHeaderText(recipient || mailPreviewHeaderText)
-        setMailPreviewSubjectText(`Planned Work Notification - NT-${maintenance.id}`)
+        // setMailPreviewSubjectText(`Planned Work Notification - NT-${maintenance.id}`)
         setMailPreviewCustomerCid(customerCID)
+        mailSubjectText()
+        setOpenPreviewModal(!openPreviewModal)
       }
     } else {
+      mailSubjectText()
       setOpenPreviewModal(!openPreviewModal)
     }
-    mailSubjectText()
   }
 
   const toggleRescheduleModal = () => {
@@ -2036,34 +2041,48 @@ const Maintenance = props => {
         {openPreviewModal && (
           <Modal className='modal-preview-send' backdrop size='lg' show={openPreviewModal} onHide={togglePreviewModal}>
             <Modal.Header>
-              <div className='modal-preview-text-wrapper'>
-                <InputGroup size='sm' className='mb-2'>
-                  <InputGroup.Addon style={{ height: '31px' }} size='sm' type='prepend'>
-                    To
-                  </InputGroup.Addon>
-                  <Input size='sm' disabled placeholder={mailPreviewHeaderText.toLowerCase()} />
-                </InputGroup>
-                <InputGroup size='sm' className='mb-2'>
-                  <InputGroup.Addon style={{ height: '31px' }} size='sm' type='prepend'>
-                    CC
-                  </InputGroup.Addon>
-                  <Input size='sm' disabled placeholder='service@newtelco.de' />
-                </InputGroup>
-                <InputGroup size='sm' className='mb-2'>
-                  <InputGroup.Addon style={{ height: '31px' }} type='prepend'>
-                    Subject
-                  </InputGroup.Addon>
-                  <Input size='sm' disabled placeholder={mailPreviewSubjectTextPreview} />
-                </InputGroup>
-              </div>
-              <ButtonGroup style={{ flexDirection: 'column' }}>
-                <Button style={{ borderRadius: '5px 5px 0 0' }} onClick={togglePreviewModal}>
-                  <FontAwesomeIcon width='1.5em' style={{ fontSize: '12px' }} className='modal-preview-send-icon' icon={faTimesCircle} />
-                </Button>
-                <Button id='send-mail-btn' style={{ borderRadius: '0 0 5px 5px', padding: '0.9em 1.1em' }} onClick={() => sendMail(mailPreviewHeaderText, mailPreviewCustomerCID, mailPreviewSubjectText, mailBodyText, true)}>
-                  <FontAwesomeIcon width='1.5em' style={{ fontSize: '12px' }} className='modal-preview-send-icon modal-preview-paperplane-icon' icon={faPaperPlane} />
-                </Button>
-              </ButtonGroup>
+              <FlexboxGrid justify='start' align='middle' style={{ width: '100%' }}>
+                <FlexboxGrid.Item colspan={2} style={{ display: 'flex', justifyContent: 'center' }}>
+                  <Avatar
+                    size='lg'
+                    src={'/v1/api/faviconUrl?d=newtelco.de'}
+                    style={{ backgroundColor: 'transparent' }}
+                  />
+                </FlexboxGrid.Item>
+                <FlexboxGrid.Item colspan={20}>
+                  <div className='modal-preview-text-wrapper'>
+                    <InputGroup className='modal-textbox' >
+                      <InputGroup.Addon style={{ height: '31px' }} type='prepend'>
+                        To
+                      </InputGroup.Addon>
+                      <Input readOnly value={mailPreviewHeaderText.toLowerCase()} />
+                    </InputGroup>
+                    <InputGroup className='modal-textbox' >
+                      <InputGroup.Addon style={{ height: '31px' }} type='prepend'>
+                        CC
+                      </InputGroup.Addon>
+                      <Input type='text' readOnly value='service@newtelco.de' />
+                    </InputGroup>
+                    <InputGroup className='modal-textbox' >
+                      <InputGroup.Addon style={{ height: '31px' }} type='prepend'>
+                        Subject 
+                      </InputGroup.Addon>
+                      <Input type='text' readOnly value={mailPreviewSubjectTextPreview} />
+                    </InputGroup>
+                  </div>
+                </FlexboxGrid.Item>
+                <FlexboxGrid.Item colspan={1} style={{ marginLeft: '30px' }}>
+                  <Whisper speaker={<Tooltip>Send Mail</Tooltip>} placement='bottom'>
+                    <IconButton
+                      onClick={() => sendMail(mailPreviewHeaderText, mailPreviewCustomerCID, mailPreviewSubjectText, mailBodyText, true)}
+                      appearance='ghost'
+                      style={{ color: 'var(--grey4)' }}
+                      size='lg'
+                      icon={<Icon icon='send' />}
+                    />
+                  </Whisper>
+                </FlexboxGrid.Item>
+              </FlexboxGrid>
             </Modal.Header>
             <Modal.Body>
               <TinyEditor
