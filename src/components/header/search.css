@@ -47,6 +47,22 @@
   transition: width 250ms ease-in-out;
 }
 
+.search-small {
+  width: 40%;
+}
+
+.search-large {
+  width: 100% !important;
+}
+
 #aa-search-input:focus {
   width: 100%;
+}
+
+.hide-dropdown {
+  display: none;
+}
+
+.show-dropdown {
+  display: flex;
 }

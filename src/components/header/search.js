@@ -13,6 +13,8 @@ import {
 import {
   faClock as faClockRegular
 } from '@fortawesome/free-regular-svg-icons'
+import { DOMHelper } from 'rsuite';
+const { addClass, removeClass } = DOMHelper;
 
 
 const SearchInput = props => {
@@ -24,25 +26,37 @@ const SearchInput = props => {
   }
 
   const [showSuggestions, setShowSuggestions] = useState(false)
-  const [value, setValue] = useState('')
+  const [hide, setHide] = useState(false)
+
+  useEffect(() => {
+    window.addEventListener('mousedown', handleClickOutside);
+
+    return () => {
+      window.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [])
+
+  const handleClickOutside = (event) => {
+    if (searchInput && !searchInput.current.contains(event.target)) {
+      setHide(true)
+      addClass(document.querySelector('.aa-dropdown-menus'), 'hide-dropdown')
+      removeClass(document.querySelector('.aa-dropdown-menus'), 'show-dropdown')
+      addClass(document.getElementById('aa-search-input'), 'search-small')
+      removeClass(document.getElementById('aa-search-input'), 'search-large')
+    }
+  }
+
+  const restoreVisibility = () => {
+    removeClass(document.querySelector('.aa-dropdown-menus'), 'hide-dropdown')
+    addClass(document.querySelector('.aa-dropdown-menus'), 'show-dropdown')
+    removeClass(document.getElementById('aa-search-input'), 'search-small')
+    addClass(document.getElementById('aa-search-input'), 'search-large')
+  }
 
   const algoliaClient = algoliasearch(
     'O7K4XJKBHU',
     '769a2cd0f2b32f30d4dc9ab78a643c0d'
   )
-
-  const handleOuterClick = e => {
-    // console.log(e.target.value)
-    // console.log(searchInput.current)
-    if (searchInput && searchInput.current && !searchInput.current.contains(e.target)) {
-      // console.log(algoliaClient)
-      setValue('')
-    }
-  }
-
-  useEffect(() => {
-    document.addEventListener('click', handleOuterClick)
-  }, [])
 
   const indexes = [
     {
@@ -109,32 +123,25 @@ const SearchInput = props => {
     Router.push(newLocation)
   }
 
-  const handleSearchClear = () => {
-    setValue('')
-  }
 
   return (
-    <Autocomplete
-      indexes={indexes}
-      onSelectionChange={handleSearchSelection}
-      onSuggestionCleared={handleSearchClear}
-    >
-      <input
-        ref={searchInput}
-        key='input'
-        type='search'
-        id='aa-search-input'
-        className='rs-input'
-        placeholder='Search'
-        name='search'
-        autoComplete='off'
-        value={value}
-        // onChange={e => setValue(e.target.value)}
-        // onClick={this.selectSearchInput}
-        // onFocus={this.handleSearchFocus}
-        // onBlur={this.handleSearchBlur}
-      />
-    </Autocomplete>
+    <div ref={searchInput} style={{ width: '400px' }}>
+      <Autocomplete
+        indexes={indexes}
+        onSelectionChange={handleSearchSelection}
+      >
+        <input
+          key='input'
+          type='search'
+          id='aa-search-input'
+          className='rs-input'
+          placeholder='Search'
+          name='search'
+          autoComplete='off'
+          onFocus={restoreVisibility}
+        />
+      </Autocomplete>
+    </div>
   )
 }
 
