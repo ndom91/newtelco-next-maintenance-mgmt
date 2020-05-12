@@ -202,13 +202,13 @@ const ReadModal = ({ maintenance, openReadModal, toggleReadModal, incomingAttach
                     <InputGroup.Addon style={{ height: '31px' }} type='prepend'>
                       From
                     </InputGroup.Addon>
-                    <Input readOnly value={maintenance.incomingFrom} />
+                    <Input readOnly value={maintenance.incomingFrom || maintenance.from} />
                   </InputGroup>
                   <InputGroup className='modal-textbox'>
                     <InputGroup.Addon style={{ height: '31px' }} type='prepend'>
                       Subject
                     </InputGroup.Addon>
-                    <Input type='text' readOnly value={maintenance.incomingSubject} />
+                    <Input type='text' readOnly value={maintenance.incomingSubject || maintenance.subject} />
                   </InputGroup>
                 </div>
               </FlexboxGrid.Item>

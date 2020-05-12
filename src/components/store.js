@@ -4,5 +4,6 @@ export default createConnectedStore({
   count: 0,
   session: {},
   maintenance: {},
-  impactPlaceholder: ''
+  impactPlaceholder: '',
+  comments: []
 })

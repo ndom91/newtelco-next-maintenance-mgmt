@@ -26,6 +26,7 @@ import dynamic from 'next/dynamic'
 import ReadModal from '../../components/maintenance/readmodal'
 import Store from '../../components/store'
 import ConfirmModal from '../../components/confirmmodal'
+import CommentList from '../../components/maintenance/comments/list'
 
 import MaintPanel from '../../components/panel'
 
@@ -86,7 +87,7 @@ const Maintenance = props => {
     location: '',
     reason: '',
     mailId: 'NT',
-    calendarId: props.jsonData.profile.calendarId,
+    calendarId: props.jsonData.profile.calendarId || '',
     maintNote: ''
   })
   const [frozenState, setFrozenState] = useState({
@@ -313,6 +314,7 @@ const Maintenance = props => {
     let lieferantDomain
     let localMaint
     if (props.jsonData.profile.id === 'NEW') {
+      console.log(props.jsonData.profile.id)
       // prepare NEW maintenance
       const username = props.session.user.email.substr(0, props.session.user.email.indexOf('@'))
       const newMaint = {
@@ -1839,7 +1841,8 @@ const Maintenance = props => {
                     </Row>
                     <Row gutter={20} style={{ marginBottom: '20px' }}>
                       <Col>
-                        <FormGroup>
+                        <CommentList user={props.session.user.email} id={maintenance.id} />
+                        {/* <FormGroup>
                           <ControlLabel htmlFor='notes'>Private Notes</ControlLabel>
                           <TinyEditor
                             initialValue={maintenance.notes}
@@ -1862,7 +1865,7 @@ const Maintenance = props => {
                               content_style: 'html { color: #828282 }'
                             }}
                           />
-                        </FormGroup>
+                        </FormGroup> */}
                       </Col>
                     </Row>
                   </Grid>
@@ -2242,6 +2245,7 @@ export async function getServerSideProps ({ req, query }) {
     protocol = 'http:'
   }
   if (query.id === 'NEW') {
+    console.log(query)
     return {
       props: {
         jsonData: { profile: query },
