@@ -30,7 +30,7 @@ import MaintPanel from '../../components/panel'
 import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-material.css'
 import Notify from '../../lib/notification'
-import { Formik, Field, useFormikContext } from 'formik'
+import { Formik, FastField, Field, useFormikContext } from 'formik'
 import { timezones, tzi18n } from '../../components/maintenance/timezoneOptions'
 import Select from 'react-select'
 import debounce from 'just-debounce-it'
@@ -1706,6 +1706,7 @@ const Maintenance = props => {
           options={options}
           name={field.name}
           value={options ? options.find(option => option.value === field.value) : ''}
+          validateOnChange={false}
           onChange={(option) => form.setFieldValue(field.name, option.value)}
           onBlur={field.onBlur}
         />
@@ -1720,6 +1721,7 @@ const Maintenance = props => {
         <SelectPicker
           style={{ width: '100%' }}
           name={field.name}
+          validateOnChange={false}
           value={field.value}
           onChange={option => {
             fetch(`/api/lieferantcids?id=${option}`, {
@@ -1750,6 +1752,7 @@ const Maintenance = props => {
           name={field.name}
           value={field.value}
           data-enable-time
+          validateOnChange={false}
           onChange={option => form.setFieldValue(field.name, option)}
           options={{ time_24hr: 'true', allow_input: 'true' }}
           className='flatpickr end-date-time'
@@ -1757,25 +1760,44 @@ const Maintenance = props => {
       )
     }
 
-    const MyTagPicker = ({ field, form }) => {
+    const MyTagPicker = ({ field, form, onChange}) => {
+      console.log(field, form)
       return (
-                            // <TagPicker
-                            //   block
-                            //   value={selectedSupplierCids || undefined}
-                            //   onChange={handleSelectSupplierChange}
-                            //   data={supplierCids}
-                            //   cleanable
-                            //   placeholder='Please select a CID'
-                            //   onExit={handleCIDBlur}
-                            // />
         <TagPicker
           name={field.name}
           value={field.value}
           onChange={option => form.setFieldValue(field.name, option)}
           data={supplierCids}
+          validateOnChange={false}
+          // onBlur={field.onChange}
           block
           cleanable
           placeholder='Please select a CID'
+        />
+      )
+    }
+
+    const MyTextinput = ({ field, form, placeholder = '' }) => {
+      return (
+        <Input
+          name={field.name}
+          value={field.value}
+          placeholder={placeholder}
+          // onBlur={form.handleChange}
+          onChange={option => form.setFieldValue(field.name, option)}
+        />
+      )
+    }
+    const MyTextarea = ({ field, form }) => {
+      return (
+        <Input
+          rows={3}
+          type='text'
+          componentClass='textarea'
+          name={field.name}
+          value={field.value}
+          // onBlur={form.handleChange}
+          onChange={option => form.setFieldValue(field.name, option)}
         />
       )
     }
@@ -1792,225 +1814,202 @@ const Maintenance = props => {
           <FlexboxGrid justify='space-around' align='top' style={{ width: '100%' }}>
             <FlexboxGrid.Item colspan={11} style={{ margin: '0 10px' }}>
               <Panel bordered>
-                <Formik
-                  innerRef={formRef}
-                  initialValues={{
-                    timezone: props.jsonData.profile.timezone,
-                    supplier: props.jsonData.profile.lieferant,
-                    startDateTime: props.jsonData.profile.startDateTime,
-                    endDateTime: props.jsonData.profile.endDateTime,
-                    supplierCids: selectedSupplierCids,
-                    impact: props.jsonData.profile.impact,
-                    location: props.jsonData.profile.location,
-                    reason: props.jsonData.profile.reason,
-                    note: props.jsonData.profile.maintNote,
-                    cancelled: props.jsonData.profile.cancelled,
-                    emergency: props.jsonData.profile.emergency,
-                    done: props.jsonData.profile.done
-                  }}
-                  onSubmit={async (values, formikHelpers) => {
-                    console.log(values)
-                    try {
-                      await fetch('/api/maintenances/saveAll', {
-                        method: 'post',
-                        body: JSON.stringify({
-                          id: maintenance.id,
-                          values: values
-                        }),
-                        headers: {
-                          'Content-Type': 'application/json'
-                        }
-                      })
-                    } catch (e) {
-                      formikHelpers.setErrors({ error: e })
-                    } finally {
-                      formikHelpers.setSubmitting(false)
-                    }
-                  }}
-                  onChange={data => {
-                    console.log(data)
-                  }}
-                >
-                  {({ values, handleChange, handleBlur, handleSubmit }) => (
-                    <Grid fluid>
-                      <Row gutter={20} style={{ marginBottom: '20px' }}>
-                        <Col sm={24} xs={24}>
-                          <AutoSave debounceMs={300} />
-                        </Col>
-                      </Row>
-                      <Row gutter={20} style={{ marginBottom: '20px' }}>
-                        <Col sm={12} xs={24}>
-                          <FormGroup>
-                            <ControlLabel htmlFor='edited-by'>Created By</ControlLabel>
-                            <Input tabIndex='-1' readOnly id='edited-by-input' name='edited-by' type='text' value={maintenance.bearbeitetvon} />
-                          </FormGroup>
-                        </Col>
-                        <Col sm={12} xs={24}>
-                          <FormGroup>
-                            <ControlLabel htmlFor='maileingang'>Mail Arrived</ControlLabel>
-                            <Input tabIndex='-1' readOnly id='maileingang-input' name='maileingang' type='text' value={convertDateTime(maintenance.maileingang)} />
-                          </FormGroup>
-                        </Col>
-                      </Row>
-                      <Row gutter={20} style={{ marginBottom: '20px' }}>
-                        <Col sm={12} xs={24}>
-                          <FormGroup>
-                            <ControlLabel htmlFor='supplier'>Timezone</ControlLabel>
-                            <Field name='timezone' component={TimezoneSelector} />
-                          </FormGroup>
-                        </Col>
-                        <Col sm={12} xs={24}>
-                          <FormGroup>
-                            <ControlLabel htmlFor='supplier'>Supplier</ControlLabel>
-                            <Field name='supplier' component={SupplierSelector} />
-                          </FormGroup>
-                        </Col>
-                      </Row>
-                      <Row gutter={20} style={{ marginBottom: '20px' }}>
-                        <Col sm={12} xs={24}>
-                          <FormGroup>
-                            <ControlLabel htmlFor='start-datetime'>Start Date/Time</ControlLabel>
-                            <Field name='startDateTime' component={MyDateTime} />
-                          </FormGroup>
-                        </Col>
-                        <Col sm={12} xs={24}>
-                          <FormGroup>
-                            <ControlLabel htmlFor='end-datetime'>End Date/Time</ControlLabel>
-                            <Field name='endDateTime' component={MyDateTime} />
-                          </FormGroup>
-                        </Col>
-                      </Row>
-                      <Row gutter={20} style={{ marginBottom: '20px' }}>
-                        <Col sm={24}>
-                          <FormGroup>
-                            <ControlLabel htmlFor='their-cid'>{maintenance.name} CID</ControlLabel>
-                            <Field name='supplierCids' component={MyTagPicker} />
-                            {/* <TagPicker
-                              block
-                              value={selectedSupplierCids || undefined}
-                              onChange={handleSelectSupplierChange}
-                              data={supplierCids}
-                              cleanable
-                              placeholder='Please select a CID'
-                              onExit={handleCIDBlur}
-                            /> */}
-                          </FormGroup>
-                        </Col>
-                      </Row>
-                      <Row gutter={20} style={{ marginBottom: '20px' }}>
-                        <Col sm={12} xs={24}>
-                          <FormGroup>
-                            <ControlLabel htmlFor='impact' style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            Impact
-                              <ButtonGroup size='sm' style={{ float: 'right' }}>
-                                <Whisper placement='bottom' speaker={<Tooltip>Use 50ms Protection Switch Text</Tooltip>}>
-                                  <IconButton id='protectionswitchtext' onClick={handleProtectionSwitch} size='sm' icon={<Icon icon='clock-o' />} />
-                                </Whisper>
-                                <Whisper placement='bottom' speaker={<Tooltip>Use Time Difference Text</Tooltip>}>
-                                  <IconButton id='impactplaceholdertext' onClick={useImpactPlaceholder} size='sm' icon={<Icon icon='history' />} />
-                                </Whisper>
-                              </ButtonGroup>
-                            </ControlLabel>
-                            <Input onBlur={() => handleTextInputBlur('impact')} id='impact' name='impact' type='text' onChange={handleImpactChange} placeholder={impactPlaceholder} value={maintenance.impact || ''} />
-                          </FormGroup>
-                        </Col>
-                        <Col sm={12} xs={24}>
-                          <FormGroup style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', height: '70px' }}>
-                            <ControlLabel htmlFor='location' style={{ marginBottom: '10px' }}>Location</ControlLabel>
-                            <Input onBlur={() => handleTextInputBlur('location')} id='location' name='location' type='text' onChange={handleLocationChange} value={maintenance.location || ''} />
-                          </FormGroup>
-                        </Col>
-                      </Row>
-                      <Row gutter={20} style={{ marginBottom: '20px' }}>
-                        <Col sm={24}>
-                          <FormGroup>
-                            <ControlLabel htmlFor='reason'>Reason</ControlLabel>
-                            <Input
-                              id='reason'
-                              name='reason'
-                              componentClass='textarea'
-                              rows={3}
-                              onBlur={() => handleTextInputBlur('reason')}
-                              onChange={handleReasonChange}
-                              type='text'
-                              value={maintenance.reason ? decodeURIComponent(maintenance.reason) : ''}
-                            />
-                          </FormGroup>
-                        </Col>
-                      </Row>
-                      <Row gutter={20} style={{ marginBottom: '20px' }}>
-                        <Col sm={24}>
-                          <FormGroup>
-                            <ControlLabel htmlFor='maintNote'>
-                            Note
-                              <HelpBlock style={{ float: 'right' }} tooltip>
-                              This note will be included in the mail
-                              </HelpBlock>
-                            </ControlLabel>
-                            <Input
-                              componentClass='textarea'
-                              rows={3}
-                              id='maintNote'
-                              name='maintNote'
-                              onBlur={() => handleTextInputBlur('maintNote')}
-                              onChange={handleMaintNoteChange}
-                              type='text'
-                              value={maintenance.maintNote ? decodeURIComponent(maintenance.maintNote) : ''}
-                            />
-                          </FormGroup>
-                        </Col>
-                      </Row>
-                      <Row gutter={20} style={{ marginBottom: '20px' }}>
-                        <Col xs={8} style={{ display: 'flex', justifyContent: 'center' }}>
-                          <FormGroup style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                            <ControlLabel>
-                            Cancelled
-                            </ControlLabel>
-                            <Toggle
-                              size='lg'
-                              checkedChildren={<Icon icon='ban' inverse />}
-                              checked={maintenance.cancelled === 'false' ? false : !!maintenance.cancelled}
-                              onChange={(event) => handleToggleChange('cancelled', event)}
-                            />
-                          </FormGroup>
-                        </Col>
-                        <Col xs={8} style={{ display: 'flex', justifyContent: 'center' }}>
-                          <FormGroup style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                            <ControlLabel>
-                            Emergency
-                            </ControlLabel>
-                            <Toggle
-                              size='lg'
-                              checkedChildren={<Icon inverse icon='hospital-o' />}
-                              checked={maintenance.emergency === 'false' ? false : !!maintenance.emergency}
-                              onChange={(event) => handleToggleChange('emergency', event)}
-                            />
-                          </FormGroup>
-                        </Col>
-                        <Col xs={8} style={{ display: 'flex', justifyContent: 'center' }}>
-                          <FormGroup style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                            <ControlLabel>
-                            Done
-                            </ControlLabel>
-                            <Toggle
-                              size='lg'
-                              checkedChildren={<Icon inverse icon='check' />}
-                              checked={maintenance.done === 'false' ? false : !!maintenance.done}
-                              onChange={(event) => handleToggleChange('done', event)}
-                            />
-                          </FormGroup>
-                        </Col>
-                      </Row>
-                      <Row gutter={20} style={{ marginBottom: '20px' }}>
-                        <Col>
-                          {maintenance.id && (
-                            <CommentList user={props.session.user.email} id={maintenance.id} />
-                          )}
-                        </Col>
-                      </Row>
-                    </Grid>
-                  )}
-                </Formik>
+                <Grid fluid>
+                  <Formik
+                    innerRef={formRef}
+                    validateOnChange={false}
+                    validateOnBlur={false}
+                    initialValues={{
+                      timezone: props.jsonData.profile.timezone,
+                      supplier: props.jsonData.profile.lieferant,
+                      startDateTime: props.jsonData.profile.startDateTime,
+                      endDateTime: props.jsonData.profile.endDateTime,
+                      supplierCids: selectedSupplierCids,
+                      impact: props.jsonData.profile.impact,
+                      location: props.jsonData.profile.location,
+                      reason: props.jsonData.profile.reason,
+                      note: props.jsonData.profile.maintNote,
+                      cancelled: props.jsonData.profile.cancelled,
+                      emergency: props.jsonData.profile.emergency,
+                      done: props.jsonData.profile.done
+                    }}
+                    onSubmit={async (values, formikHelpers) => {
+                      console.log(values)
+                      try {
+                        await fetch('/api/maintenances/saveAll', {
+                          method: 'post',
+                          body: JSON.stringify({
+                            id: maintenance.id,
+                            values: values
+                          }),
+                          headers: {
+                            'Content-Type': 'application/json'
+                          }
+                        })
+                      } catch (e) {
+                        formikHelpers.setErrors({ error: e })
+                      } finally {
+                        formikHelpers.setSubmitting(false)
+                      }
+                    }}
+                    onChange={data => {
+                      console.log(data)
+                    }}
+                  >
+                    {({ values, handleChange, handleBlur, handleSubmit }) => (
+                      <>
+                        <Row gutter={20} style={{ marginBottom: '20px' }}>
+                          <Col sm={24} xs={24}>
+                            <AutoSave debounceMs={1000} />
+                          </Col>
+                        </Row>
+                        <Row gutter={20} style={{ marginBottom: '20px' }}>
+                          <Col sm={12} xs={24}>
+                            <FormGroup>
+                              <ControlLabel htmlFor='edited-by'>Created By</ControlLabel>
+                              <Input tabIndex='-1' readOnly id='edited-by-input' name='edited-by' type='text' value={maintenance.bearbeitetvon} />
+                            </FormGroup>
+                          </Col>
+                          <Col sm={12} xs={24}>
+                            <FormGroup>
+                              <ControlLabel htmlFor='maileingang'>Mail Arrived</ControlLabel>
+                              <Input tabIndex='-1' readOnly id='maileingang-input' name='maileingang' type='text' value={convertDateTime(maintenance.maileingang)} />
+                            </FormGroup>
+                          </Col>
+                        </Row>
+                        <Row gutter={20} style={{ marginBottom: '20px' }}>
+                          <Col sm={12} xs={24}>
+                            <FormGroup>
+                              <ControlLabel htmlFor='supplier'>Timezone</ControlLabel>
+                              <FastField name='timezone' component={TimezoneSelector} />
+                            </FormGroup>
+                          </Col>
+                          <Col sm={12} xs={24}>
+                            <FormGroup>
+                              <ControlLabel htmlFor='supplier'>Supplier</ControlLabel>
+                              <FastField name='supplier' component={SupplierSelector} />
+                            </FormGroup>
+                          </Col>
+                        </Row>
+                        <Row gutter={20} style={{ marginBottom: '20px' }}>
+                          <Col sm={12} xs={24}>
+                            <FormGroup>
+                              <ControlLabel htmlFor='start-datetime'>Start Date/Time</ControlLabel>
+                              <FastField name='startDateTime' component={MyDateTime} />
+                            </FormGroup>
+                          </Col>
+                          <Col sm={12} xs={24}>
+                            <FormGroup>
+                              <ControlLabel htmlFor='end-datetime'>End Date/Time</ControlLabel>
+                              <FastField name='endDateTime' component={MyDateTime} />
+                            </FormGroup>
+                          </Col>
+                        </Row>
+                        <Row gutter={20} style={{ marginBottom: '20px' }}>
+                          <Col sm={24}>
+                            <FormGroup>
+                              <ControlLabel htmlFor='their-cid'>{maintenance.name} CID</ControlLabel>
+                              <Field name='supplierCids' component={MyTagPicker} />
+                            </FormGroup>
+                          </Col>
+                        </Row>
+                        <Row gutter={20} style={{ marginBottom: '20px' }}>
+                          <Col sm={12} xs={24}>
+                            <FormGroup>
+                              <ControlLabel htmlFor='impact' style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                              Impact
+                                <ButtonGroup size='sm' style={{ float: 'right' }}>
+                                  <Whisper placement='bottom' speaker={<Tooltip>Use 50ms Protection Switch Text</Tooltip>}>
+                                    <IconButton id='protectionswitchtext' onClick={handleProtectionSwitch} size='sm' icon={<Icon icon='clock-o' />} />
+                                  </Whisper>
+                                  <Whisper placement='bottom' speaker={<Tooltip>Use Time Difference Text</Tooltip>}>
+                                    <IconButton id='impactplaceholdertext' onClick={useImpactPlaceholder} size='sm' icon={<Icon icon='history' />} />
+                                  </Whisper>
+                                </ButtonGroup>
+                              </ControlLabel>
+                              <FastField name='impact' component={MyTextinput} placeholder={impactPlaceholder} />
+                            </FormGroup>
+                          </Col>
+                          <Col sm={12} xs={24}>
+                            <FormGroup style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', height: '70px' }}>
+                              <ControlLabel htmlFor='location' style={{ marginBottom: '10px' }}>Location</ControlLabel>
+                              <FastField name='location' component={MyTextinput} />
+                            </FormGroup>
+                          </Col>
+                        </Row>
+                        <Row gutter={20} style={{ marginBottom: '20px' }}>
+                          <Col sm={24}>
+                            <FormGroup>
+                              <ControlLabel htmlFor='reason'>Reason</ControlLabel>
+                              <FastField name='reason' component={MyTextarea} />
+                            </FormGroup>
+                          </Col>
+                        </Row>
+                        <Row gutter={20} style={{ marginBottom: '20px' }}>
+                          <Col sm={24}>
+                            <FormGroup>
+                              <ControlLabel htmlFor='maintNote'>
+                              Note
+                                <HelpBlock style={{ float: 'right' }} tooltip>
+                                This note will be included in the mail
+                                </HelpBlock>
+                              </ControlLabel>
+                              <FastField name='maintNote' component={MyTextarea} />
+                            </FormGroup>
+                          </Col>
+                        </Row>
+                        <Row gutter={20} style={{ marginBottom: '20px' }}>
+                          <Col xs={8} style={{ display: 'flex', justifyContent: 'center' }}>
+                            <FormGroup style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                              <ControlLabel>
+                              Cancelled
+                              </ControlLabel>
+                              <Toggle
+                                size='lg'
+                                checkedChildren={<Icon icon='ban' inverse />}
+                                checked={maintenance.cancelled === 'false' ? false : !!maintenance.cancelled}
+                                onChange={(event) => handleToggleChange('cancelled', event)}
+                              />
+                            </FormGroup>
+                          </Col>
+                          <Col xs={8} style={{ display: 'flex', justifyContent: 'center' }}>
+                            <FormGroup style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                              <ControlLabel>
+                              Emergency
+                              </ControlLabel>
+                              <Toggle
+                                size='lg'
+                                checkedChildren={<Icon inverse icon='hospital-o' />}
+                                checked={maintenance.emergency === 'false' ? false : !!maintenance.emergency}
+                                onChange={(event) => handleToggleChange('emergency', event)}
+                              />
+                            </FormGroup>
+                          </Col>
+                          <Col xs={8} style={{ display: 'flex', justifyContent: 'center' }}>
+                            <FormGroup style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                              <ControlLabel>
+                              Done
+                              </ControlLabel>
+                              <Toggle
+                                size='lg'
+                                checkedChildren={<Icon inverse icon='check' />}
+                                checked={maintenance.done === 'false' ? false : !!maintenance.done}
+                                onChange={(event) => handleToggleChange('done', event)}
+                              />
+                            </FormGroup>
+                          </Col>
+                        </Row>
+                      </>
+                    )}
+                  </Formik>
+                  <Row gutter={20} style={{ marginBottom: '20px' }}>
+                    <Col>
+                      {maintenance.id && (
+                        <CommentList user={props.session.user.email} id={maintenance.id} />
+                      )}
+                    </Col>
+                  </Row>
+                </Grid>
               </Panel>
             </FlexboxGrid.Item>
             <FlexboxGrid.Item colspan={11} style={{ margin: '0 10px' }}>
