@@ -69,14 +69,8 @@ const Companies = props => {
   const [openConfirmDeleteModal, setOpenConfirmDeleteModal] = useState(false)
   const [companyToDelete, setCompanyToDelete] = useState('')
 
-  const [formValue, setFormValue] = useState({
-    name: '',
-    domain: '',
-    recipients: ''
-  })
-
   useEffect(() => {
-    fetch(`/api/companies`, {
+    fetch('/api/companies', {
       method: 'get'
     })
       .then(resp => resp.json())
@@ -174,21 +168,21 @@ const Companies = props => {
 
   const Header = () => {
     return (
-        <FlexboxGrid justify='space-between' align='middle'>
-          <FlexboxGrid.Item>
-            Companies
-          </FlexboxGrid.Item>
-          <FlexboxGrid.Item>
-            <ButtonGroup>
-              <IconButton onClick={toggleCompanyAdd} icon={<Icon icon='plus-circle' />} appearance='ghost' placement='right'>
-                Add
-              </IconButton>
-              <IconButton onClick={toggleCompanyDeleteModal} icon={<Icon icon='trash' />} appearance='ghost' placement='right'>
-                Delete
-              </IconButton>
-            </ButtonGroup>
-          </FlexboxGrid.Item>
-        </FlexboxGrid>
+      <FlexboxGrid justify='space-between' align='middle'>
+        <FlexboxGrid.Item>
+          Companies
+        </FlexboxGrid.Item>
+        <FlexboxGrid.Item>
+          <ButtonGroup>
+            <IconButton onClick={toggleCompanyAdd} icon={<Icon icon='plus-circle' />} appearance='ghost' placement='right'>
+              Add
+            </IconButton>
+            <IconButton onClick={toggleCompanyDeleteModal} icon={<Icon icon='trash' />} appearance='ghost' placement='right'>
+              Delete
+            </IconButton>
+          </ButtonGroup>
+        </FlexboxGrid.Item>
+      </FlexboxGrid>
     )
   }
 
@@ -270,7 +264,7 @@ const Companies = props => {
 
 Companies.getInitialProps = async ({ req, query }) => {
   const host = req ? req.headers['x-forwarded-host'] : window.location.hostname
-  const protocol = 'https:'
+  let protocol = 'https:'
   if (host.indexOf('localhost') > -1) {
     protocol = 'http:'
   }

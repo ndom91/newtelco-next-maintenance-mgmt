@@ -1,29 +1,41 @@
 import React from 'react'
 import {
   Avatar,
-  Panel,
-  FlexboxGrid
+  FlexboxGrid,
+  Dropdown,
+  Icon,
+  IconButton
 } from 'rsuite'
 
-const Comment = ({ data }) => {
+const Comment = ({ data, handleDelete }) => {
   const username = data.user.match(/^([^@]*)@/)[1]
+
   return (
     <FlexboxGrid>
-      <FlexboxGrid.Item colspan={22}>
-        <Panel
-          border
-          header={<span style={{ color: 'var(--grey2)', fontSize: '0.8rem' }}>{data.datetime}</span>}
-          style={{ display: 'flex', flexDirection: 'column-reverse' }}
-        >
-          {data.body}
-        </Panel>
-      </FlexboxGrid.Item>
-      <FlexboxGrid.Item colspan={2}>
+      <FlexboxGrid.Item colspan={3} style={{ marginTop: '10px' }}>
         <Avatar
           src={`/static/images/avatars/${username}.png`}
           circle
-          style={{ color: 'var(--primary)' }}
+          style={{ color: 'var(--primary)', border: '2px solid var(--primary)' }}
         />
+      </FlexboxGrid.Item>
+      <FlexboxGrid.Item colspan={19}>
+        <div
+          style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start' }}
+        >
+          <span style={{ color: 'var(--grey2)', fontSize: '0.8rem', marginBottom: '20px' }}>{data.datetime}</span>
+          <span style={{ marginBottom: '10px' }}>{data.body}</span>
+        </div>
+      </FlexboxGrid.Item>
+      <FlexboxGrid.Item colspan={2}>
+        <Dropdown
+          placement='bottomEnd'
+          renderTitle={() => {
+            return <IconButton appearance='subtle' icon={<Icon icon='ellipsis-v' />} />
+          }}
+        >
+          <Dropdown.Item onClick={() => handleDelete(data.id)} icon={<Icon icon='trash' />}>Delete</Dropdown.Item>
+        </Dropdown>
       </FlexboxGrid.Item>
     </FlexboxGrid>
   )

@@ -24,7 +24,6 @@ import {
 const Inbox = props => {
   const store = Store.useStore()
   const unread = store.get('count')
-  const [isHtml, setIsHtml] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
   const [modalInfo, setModalInfo] = useState({})
   const [isTranslated, setIsTranslated] = useState(false)
@@ -52,15 +51,14 @@ const Inbox = props => {
             .then(resp => resp.json())
             .then(data => {
               const iconUrl = data.icons
+              let newInboxMails = inboxMails
               if (data.icons.substr(0, 4) !== 'http') {
                 mail.faviconUrl = `https://${iconUrl}`
-                inboxMails[index] = mail
+                newInboxMails[index] = mail
                 setInboxMails(inboxMails)
               } else {
                 mail.faviconUrl = iconUrl
-                inboxMails[index] = mail
-                // const newInboxMails = inboxMails
-                // newInboxMails[index].faviconUrl = iconUrl
+                newInboxMails[index] = mail
                 setInboxMails(newInboxMails)
               }
             })
@@ -80,10 +78,8 @@ const Inbox = props => {
       // const htmlRegex3 = new RegExp('<meta .*>', 'gi')
 
       if (htmlRegex.test(mailBody)) {
-        setIsHtml(true)
       } else {
         mailBody = `<pre>${mailBody}</pre>`
-        setIsHtml(false)
       }
       const modalInfo = {
         subject: inboxMails[activeMail].subject,
@@ -105,7 +101,7 @@ const Inbox = props => {
       setModalInfo({...modalInfo, body: ogModalBody })
       setIsTranslated(!isTranslated)
     } else {
-      fetch(`/v1/api/translate`, {
+      fetch('/v1/api/translate', {
         method: 'post',
         body: JSON.stringify({ q: modalBody }),
         mode: 'cors',
@@ -126,7 +122,7 @@ const Inbox = props => {
   }
 
   const onDelete = (mailId) => {
-    fetch(`/v1/api/inbox/delete`, {
+    fetch('/v1/api/inbox/delete', {
       method: 'post',
       body: JSON.stringify({ m: mailId }),
       mode: 'cors',
@@ -152,7 +148,7 @@ const Inbox = props => {
       .catch(err => console.error(`Error - ${err}`))
   }
 
-  if (props.session.user) {
+  if (props?.session?.user) {
     return (
       <Layout count={unread} session={props.session}>
         <MaintPanel header='Inbox'>

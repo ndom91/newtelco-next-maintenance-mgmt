@@ -37,6 +37,7 @@
     "date-fns-tz": "^1.0.7",
     "dom-parser": "^0.1.6",
     "dotenv-webpack": "^1.7.0",
+    "draft-js": "^0.11.5",
     "express-session": "^1.16.2",
     "file-saver": "^2.0.2",
     "fontfaceobserver": "^2.1.0",

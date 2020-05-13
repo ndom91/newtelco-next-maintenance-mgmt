@@ -314,7 +314,6 @@ const Maintenance = props => {
     let lieferantDomain
     let localMaint
     if (props.jsonData.profile.id === 'NEW') {
-      console.log(props.jsonData.profile.id)
       // prepare NEW maintenance
       const username = props.session.user.email.substr(0, props.session.user.email.indexOf('@'))
       const newMaint = {
@@ -902,9 +901,9 @@ const Maintenance = props => {
     setMailBodyText(data.level.content)
   }
 
-  const handleNotesChange = (data) => {
-    setMaintenance({ ...maintenance, notes: data.level.content })
-  }
+  // const handleNotesChange = (data) => {
+  //   setMaintenance({ ...maintenance, notes: data.level.content })
+  // }
 
   const saveDateTime = (maintId, element, newValue) => {
     let newISOTime = moment.tz(newValue, maintenance.timezone)
@@ -1841,31 +1840,9 @@ const Maintenance = props => {
                     </Row>
                     <Row gutter={20} style={{ marginBottom: '20px' }}>
                       <Col>
-                        <CommentList user={props.session.user.email} id={maintenance.id} />
-                        {/* <FormGroup>
-                          <ControlLabel htmlFor='notes'>Private Notes</ControlLabel>
-                          <TinyEditor
-                            initialValue={maintenance.notes}
-                            onChange={handleNotesChange}
-                            onBlur={handleNotesBlur}
-                            apiKey='ttv2x1is9joc0fi7v6f6rzi0u98w2mpehx53mnc1277omr7s'
-                            init={{
-                              height: 300,
-                              menubar: false,
-                              statusbar: false,
-                              plugins: [
-                                'advlist autolink lists link image print preview anchor',
-                                'searchreplace code',
-                                'insertdatetime table paste code help wordcount'
-                              ],
-                              toolbar:
-                                  `undo redo | formatselect | bold italic backcolor | 
-                                  alignleft aligncenter alignright alignjustify | 
-                                  bullist numlist outdent indent | removeformat | help`,
-                              content_style: 'html { color: #828282 }'
-                            }}
-                          />
-                        </FormGroup> */}
+                        {maintenance.id && (
+                          <CommentList user={props.session.user.email} id={maintenance.id} />
+                        )}
                       </Col>
                     </Row>
                   </Grid>
@@ -2245,7 +2222,6 @@ export async function getServerSideProps ({ req, query }) {
     protocol = 'http:'
   }
   if (query.id === 'NEW') {
-    console.log(query)
     return {
       props: {
         jsonData: { profile: query },

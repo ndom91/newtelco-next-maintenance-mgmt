@@ -16,21 +16,30 @@ const InboxItem = ({ toggle, mail, index, handleDelete }) => {
   const [faviconUrl, setFaviconUrl] = useState('')
 
   useEffect(() => {
-    fetch(`/v1/api/favicon?d=${mail.domain}`, {
-      method: 'get'
-    })
-      .then(resp => resp.json())
-      .then(data => {
-        const iconUrl = data.icons
-        if (data.icons.substr(0, 4) !== 'http') {
-          const newInboxMails = this.state.inboxMails
-          setFaviconUrl(`https://${iconUrl}`)
-        } else {
-          setFaviconUrl(iconUrl)
-        }
+    try {
+      fetch(`/v1/api/favicon?d=${mail.domain}`, {
+        method: 'get'
       })
-      .catch(err => console.error(err))
+        .then(resp => resp.json())
+        .then(data => {
+          const iconUrl = data.icons
+          if (data.icons.substr(0, 4) !== 'http') {
+            setFaviconUrl(`https://${iconUrl}`)
+          } else {
+            setFaviconUrl(iconUrl)
+          }
+          setLoading(false)
+        })
+        // .catch(err => console.error(err))
+    } catch {
+      setFaviconUrl('/static/images/office-building.png')
+    }
   }, [mail])
+
+  // const handleError = () => {
+  //   setLoading(false)
+  //   setFaviconUrl('/static/images/office-building.png')
+  // }
 
   return (
     <Panel key={mail.id}>
@@ -44,11 +53,11 @@ const InboxItem = ({ toggle, mail, index, handleDelete }) => {
             icon={
               <Avatar
                 alt='Icon'
+                src={faviconUrl || ''}
                 size='lg'
-                src={faviconUrl}
-                style={{ backgroundColor: 'transparent' }}
+                // style={{ backgroundColor: 'transparent', height: '60px', width: '60px', display: 'inline-flex', justifyContent: 'center', alignItems: 'center' }}
                 onLoad={() => setLoading(false)}
-                onError={() => setLoading(false)}
+                // onError={handleError}
               />
             }
           />

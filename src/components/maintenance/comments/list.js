@@ -1,38 +1,99 @@
 import React, { useState, useEffect } from 'react'
 import fetch from 'isomorphic-unfetch'
-import useSWR from 'swr'
 import Store from '../../store'
 import Comment from './comment'
-import CommentInput from './input'
+import Notify from '../../../lib/notification'
 import {
   List,
   FlexboxGrid,
   Loader,
-  Divider
+  Divider,
+  Input,
+  IconButton,
+  Icon
 } from 'rsuite'
 
 const CommentList = ({ user, id }) => {
   const store = Store.useStore()
-  const [comments, setComments] = useState([])
-
-  const maintId = id
-  const { data } = useSWR(
-    `/api/comments?m=${maintId}`,
-    (...args) => fetch(...args).then(res => res.json()),
-    { revalidateOnFocus: false }
-  )
+  const [comment, setComment] = useState('')
+  const [comments, setComments] = useState(null)
 
   useEffect(() => {
-    store.set('comments')(data)
-  }, [data])
+    fetch(`/api/comments?m=${id}`, {
+      method: 'get'
+    })
+      .then(resp => resp.json())
+      .then(data => {
+        const newComments = reverseArrayInPlace(data.comments)
+        setComments(newComments)
+      })
+      .catch(err => console.error(err))
+  }, [id])
 
   const reverseArrayInPlace = (arr) => {
     for (var i = 0; i <= (arr.length / 2); i++) {
-      let el = arr[i]
+      const el = arr[i]
       arr[i] = arr[arr.length - 1 - i]
       arr[arr.length - 1 - i] = el
     }
     return arr
+  }
+
+  const submitComment = () => {
+    if (!comment) return Notify('error', 'No Comment')
+
+    fetch('/api/comments/post', {
+      method: 'post',
+      body: JSON.stringify({
+        body: comment,
+        user: user,
+        maintId: store.get('maintenance').id
+      }),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+      .then(r => r.json())
+      .then(resp => {
+        if (resp.comments.affectedRows === 1) {
+          const newComments = comments
+          const now = new Date()
+          newComments.unshift({
+            user: user,
+            datetime: now.toISOString(),
+            body: comment
+          })
+          setComments(newComments)
+          setComment('')
+          Notify('success', 'Comment Posted')
+        }
+      })
+      .catch(err => {
+        Notify('error', 'Post Error', err)
+      })
+  }
+
+  const deleteComment = commentId => {
+    fetch('/api/comments/delete', {
+      method: 'post',
+      body: JSON.stringify({
+        id: commentId
+      }),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+      .then(r => r.json())
+      .then(resp => {
+        if (resp.comments.affectedRows === 1) {
+          const newComments = comments.filter(el => el.id !== commentId)
+          setComments(newComments)
+          Notify('success', 'Comment Deleted')
+        }
+      })
+      .catch(err => {
+        Notify('error', 'Delete Error', err)
+      })
   }
 
   return (
@@ -44,22 +105,33 @@ const CommentList = ({ user, id }) => {
         <div style={{ fontSize: '1.5rem', fontWeight: '100', fontFamily: 'var(--font-body)' }}>Comments</div>
       </FlexboxGrid.Item>
       <FlexboxGrid.Item colspan={22}>
-        <CommentInput user={user} />
+        <FlexboxGrid justify='space-between' align='middle'>
+          <FlexboxGrid.Item colspan={21}>
+            <Input value={comment} onChange={e => setComment(e)} />
+          </FlexboxGrid.Item>
+          <FlexboxGrid.Item colspan={2} style={{ marginLeft: '5px' }}>
+            <IconButton icon={<Icon icon='send' />} onClick={submitComment} />
+          </FlexboxGrid.Item>
+        </FlexboxGrid>
       </FlexboxGrid.Item>
       <FlexboxGrid.Item colspan={22}>
         <List style={{ marginTop: '15px' }} hover bordered>
-          {!data ? (
+          {!comments ? (
             <div style={{ width: '100%', height: '100px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
               <Loader />
             </div>
           ) : (
-            data.comments.length && reverseArrayInPlace(data.comments).map(comment => {
-              return (
-                <List.Item key={comment.id}>
-                  <Comment data={comment} />
-                </List.Item>
-              )
-            })
+            comments.length > 0 ? (
+              comments.map(comm => {
+                return (
+                  <List.Item key={comm.id}>
+                    <Comment data={comm} handleDelete={deleteComment} />
+                  </List.Item>
+                )
+              })
+            ) : (
+              <List.Item>No Comments Yet</List.Item>
+            )
           )}
         </List>
       </FlexboxGrid.Item>
