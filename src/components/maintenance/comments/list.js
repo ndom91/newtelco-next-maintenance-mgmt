@@ -100,7 +100,6 @@ const CommentList = ({ user, id }) => {
       })
   }
 
-  console.log(comments && comments.length)
   return (
     <FlexboxGrid style={{ flexDirection: 'column' }} alignItems='middle'>
       <FlexboxGrid.Item colspan={22}>
