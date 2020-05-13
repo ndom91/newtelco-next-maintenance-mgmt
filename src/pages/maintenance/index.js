@@ -1723,7 +1723,7 @@ const Maintenance = props => {
           name={field.name}
           validateOnChange={false}
           value={field.value}
-          onChange={option => {
+          onBlur={option => {
             fetch(`/api/lieferantcids?id=${option}`, {
               method: 'get'
             })
@@ -1739,9 +1739,9 @@ const Maintenance = props => {
             form.setFieldValue(field.name, option)
             form.setFieldValue('supplierCids', [])
           }}
+          onChange={option => form.setFieldValue(field.name, option)}
           data={suppliers}
           placeholder='Please select a Supplier'
-          // onExit={handleSupplierBlur}
         />
       )
     }
@@ -1801,6 +1801,18 @@ const Maintenance = props => {
         />
       )
     }
+    const MyToggle = ({ field, form, checkedChildren = '' }) => {
+      return (
+        <Toggle
+          size='lg'
+          checkedChildren={checkedChildren}
+          value={maintenance.cancelled === 'false' ? false : !!maintenance.cancelled}
+          name={field.name}
+          // onBlur={form.handleChange}
+          onChange={option => form.setFieldValue(field.name, option)}
+        />
+      )
+    }
 
     return (
       <Layout count={props.unread} session={props.session}>
@@ -1851,9 +1863,6 @@ const Maintenance = props => {
                       } finally {
                         formikHelpers.setSubmitting(false)
                       }
-                    }}
-                    onChange={data => {
-                      console.log(data)
                     }}
                   >
                     {({ values, handleChange, handleBlur, handleSubmit }) => (
@@ -1964,12 +1973,13 @@ const Maintenance = props => {
                               <ControlLabel>
                               Cancelled
                               </ControlLabel>
-                              <Toggle
+                              <Field name='cancelled' component={MyToggle} checkedChildren={<Icon icon='ban' inverse />} />
+                              {/* <Toggle
                                 size='lg'
                                 checkedChildren={<Icon icon='ban' inverse />}
                                 checked={maintenance.cancelled === 'false' ? false : !!maintenance.cancelled}
                                 onChange={(event) => handleToggleChange('cancelled', event)}
-                              />
+                              /> */}
                             </FormGroup>
                           </Col>
                           <Col xs={8} style={{ display: 'flex', justifyContent: 'center' }}>
@@ -1977,12 +1987,13 @@ const Maintenance = props => {
                               <ControlLabel>
                               Emergency
                               </ControlLabel>
-                              <Toggle
+                              <Field name='emergency' component={MyToggle} checkedChildren={<Icon icon='hospital-o' inverse />} />
+                              {/* <Toggle
                                 size='lg'
                                 checkedChildren={<Icon inverse icon='hospital-o' />}
                                 checked={maintenance.emergency === 'false' ? false : !!maintenance.emergency}
                                 onChange={(event) => handleToggleChange('emergency', event)}
-                              />
+                              /> */}
                             </FormGroup>
                           </Col>
                           <Col xs={8} style={{ display: 'flex', justifyContent: 'center' }}>
@@ -1990,12 +2001,13 @@ const Maintenance = props => {
                               <ControlLabel>
                               Done
                               </ControlLabel>
-                              <Toggle
+                              <Field name='done' component={MyToggle} checkedChildren={<Icon icon='check' inverse />} />
+                              {/* <Toggle
                                 size='lg'
                                 checkedChildren={<Icon inverse icon='check' />}
                                 checked={maintenance.done === 'false' ? false : !!maintenance.done}
                                 onChange={(event) => handleToggleChange('done', event)}
-                              />
+                              /> */}
                             </FormGroup>
                           </Col>
                         </Row>
