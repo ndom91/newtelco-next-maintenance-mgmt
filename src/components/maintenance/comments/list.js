@@ -24,8 +24,12 @@ const CommentList = ({ user, id }) => {
     })
       .then(resp => resp.json())
       .then(data => {
-        const newComments = reverseArrayInPlace(data.comments)
-        setComments(newComments)
+        if (data.comments.length > 0) {
+          const newComments = reverseArrayInPlace(data.comments)
+          setComments(newComments)
+        } else {
+          setComments([])
+        }
       })
       .catch(err => console.error(err))
   }, [id])
@@ -96,6 +100,7 @@ const CommentList = ({ user, id }) => {
       })
   }
 
+  console.log(comments && comments.length)
   return (
     <FlexboxGrid style={{ flexDirection: 'column' }} alignItems='middle'>
       <FlexboxGrid.Item colspan={22}>
