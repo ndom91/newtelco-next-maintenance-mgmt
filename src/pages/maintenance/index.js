@@ -76,7 +76,7 @@ const AutoSave = ({ debounceMs }) => {
   const debouncedSubmit = React.useCallback(
     debounce(
       () =>
-        formik.submitForm().then(() => setLastSaved(new Date().toISOString())),
+        formik.submitForm().then(() => setLastSaved(new Date().toLocaleString('de-DE'))),
       debounceMs
     ),
     [debounceMs, formik.submitForm]
@@ -95,7 +95,7 @@ const AutoSave = ({ debounceMs }) => {
   } else if (lastSaved !== null) {
     result = `Last Saved: ${lastSaved}`
   }
-  return <p style={{ color: 'var(--grey3)' }}>{result}</p>
+  return <p style={{ color: 'var(--grey2)' }}>{result}</p>
 }
 
 const Maintenance = props => {
@@ -498,8 +498,14 @@ const Maintenance = props => {
       gridApi.current.hideOverlay()
       return
     }
-    fetch(`/api/customercids/${lieferantCidId}`, {
-      method: 'get'
+    fetch('/api/customercids/maint', {
+      method: 'post',
+      body: JSON.stringify({
+        cids: lieferantCidId
+      }),
+      headers: {
+        'Content-Type': 'application/json'
+      }
     })
       .then(resp => resp.json())
       .then(data => {
@@ -1513,15 +1519,19 @@ const Maintenance = props => {
   //
   /// /////////////////////////////////////////////////////////
 
-  const handleProtectionSwitch = () => {
-    setMaintenance({ ...maintenance, impact: '50ms protection switch' })
-    handleTextInputBlur('impact')
-  }
+  // const handleProtectionSwitch = () => {
+  //   const { values, setFormikState } = useFormikContext()
+  //   setFormikState({ ...values, impact: '50ms protection switch' })
+  //   // setMaintenance({ ...maintenance, impact: '50ms protection switch' })
+  //   // handleTextInputBlur('impact')
+  // }
 
-  const useImpactPlaceholder = () => {
-    setMaintenance({ ...maintenance, impact: impactPlaceholder })
-    handleTextInputBlur('impact')
-  }
+  // const useImpactPlaceholder = () => {
+  //   const { values, setFormikState } = useFormikContext()
+  //   setFormikState({ ...values, impact: impactPlaceholder })
+  //   // setMaintenance({ ...maintenance, impact: impactPlaceholder })
+  //   // handleTextInputBlur('impact')
+  // }
 
   const handleCreateOnClick = (event) => {
     const {
@@ -1695,7 +1705,8 @@ const Maintenance = props => {
           validateOnChange={false}
           validateOnBlur={false}
           value={field.value}
-          onBlur={option => {
+          onChange={option => {
+            console.log(option)
             fetch(`/api/lieferantcids?id=${option}`, {
               method: 'get'
             })
@@ -1705,13 +1716,17 @@ const Maintenance = props => {
                   setSupplierCids([{ label: 'No CIDs available for this Supplier', value: '1' }])
                   return
                 }
+                setMaintenance({
+                  ...maintenance,
+                  lieferant: option,
+                  name: suppliers.find(options => options.value === option).label
+                })
                 setSupplierCids(data.lieferantCIDsResult)
               })
               .catch(err => console.error(err))
             form.setFieldValue(field.name, option)
             form.setFieldValue('supplierCids', [])
           }}
-          onChange={option => form.setFieldValue(field.name, option)}
           data={suppliers}
           placeholder='Please select a Supplier'
         />
@@ -1738,9 +1753,14 @@ const Maintenance = props => {
         <TagPicker
           name={field.name}
           value={field.value}
-          onChange={option => form.setFieldValue(field.name, option)}
+          onClose={option => {
+            fetchCustomerCids(option)
+            form.setFieldValue(field.name, option)
+          }}
+          onClean={() => {
+            setCustomerCids([])
+          }}
           data={supplierCids}
-          // onBlur={field.onChange}
           block
           cleanable
           validateOnChange={false}
@@ -1758,7 +1778,6 @@ const Maintenance = props => {
           placeholder={placeholder}
           validateOnChange={false}
           validateOnBlur={false}
-          // onBlur={form.handleChange}
           onChange={option => form.setFieldValue(field.name, option)}
         />
       )
@@ -1773,7 +1792,6 @@ const Maintenance = props => {
           value={field.value}
           validateOnChange={false}
           validateOnBlur={false}
-          // onBlur={form.handleChange}
           onChange={option => form.setFieldValue(field.name, option)}
         />
       )
@@ -1844,7 +1862,7 @@ const Maintenance = props => {
                       }
                     }}
                   >
-                    {({ values, handleChange, handleBlur, handleSubmit }) => (
+                    {({ values, handleChange, handleBlur, handleSubmit, setFieldValue }) => (
                       <>
                         <Row gutter={20} style={{ marginBottom: '20px' }}>
                           <Col sm={24} xs={24}>
@@ -1908,10 +1926,10 @@ const Maintenance = props => {
                               Impact
                                 <ButtonGroup size='sm' style={{ float: 'right' }}>
                                   <Whisper placement='bottom' speaker={<Tooltip>Use 50ms Protection Switch Text</Tooltip>}>
-                                    <IconButton id='protectionswitchtext' onClick={handleProtectionSwitch} size='sm' icon={<Icon icon='clock-o' />} />
+                                    <IconButton id='protectionswitchtext' onClick={() => setFieldValue('impact', '50ms protection switch')} size='sm' icon={<Icon icon='clock-o' />} />
                                   </Whisper>
                                   <Whisper placement='bottom' speaker={<Tooltip>Use Time Difference Text</Tooltip>}>
-                                    <IconButton id='impactplaceholdertext' onClick={useImpactPlaceholder} size='sm' icon={<Icon icon='history' />} />
+                                    <IconButton id='impactplaceholdertext' onClick={() => setFieldValue('impact', impactPlaceholder)} size='sm' icon={<Icon icon='history' />} />
                                   </Whisper>
                                 </ButtonGroup>
                               </ControlLabel>
@@ -1953,12 +1971,6 @@ const Maintenance = props => {
                               Cancelled
                               </ControlLabel>
                               <Field name='cancelled' component={MyToggle} checkedChildren={<Icon icon='ban' inverse />} />
-                              {/* <Toggle
-                                size='lg'
-                                checkedChildren={<Icon icon='ban' inverse />}
-                                checked={maintenance.cancelled === 'false' ? false : !!maintenance.cancelled}
-                                onChange={(event) => handleToggleChange('cancelled', event)}
-                              /> */}
                             </FormGroup>
                           </Col>
                           <Col xs={8} style={{ display: 'flex', justifyContent: 'center' }}>
@@ -1967,12 +1979,6 @@ const Maintenance = props => {
                               Emergency
                               </ControlLabel>
                               <Field name='emergency' component={MyToggle} checkedChildren={<Icon icon='hospital-o' inverse />} />
-                              {/* <Toggle
-                                size='lg'
-                                checkedChildren={<Icon inverse icon='hospital-o' />}
-                                checked={maintenance.emergency === 'false' ? false : !!maintenance.emergency}
-                                onChange={(event) => handleToggleChange('emergency', event)}
-                              /> */}
                             </FormGroup>
                           </Col>
                           <Col xs={8} style={{ display: 'flex', justifyContent: 'center' }}>
@@ -1981,12 +1987,6 @@ const Maintenance = props => {
                               Done
                               </ControlLabel>
                               <Field name='done' component={MyToggle} checkedChildren={<Icon icon='check' inverse />} />
-                              {/* <Toggle
-                                size='lg'
-                                checkedChildren={<Icon inverse icon='check' />}
-                                checked={maintenance.done === 'false' ? false : !!maintenance.done}
-                                onChange={(event) => handleToggleChange('done', event)}
-                              /> */}
                             </FormGroup>
                           </Col>
                         </Row>

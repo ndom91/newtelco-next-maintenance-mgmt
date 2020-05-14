@@ -1,13 +1,13 @@
 import React, { useEffect } from 'react'
 // import App from 'next/app'
+import './style/app.css'
+import './style/ntTheme.less'
+import 'algolia-react-autocomplete/build/css/index.css'
 import Head from 'next/head'
 import ErrorBoundary from '@/newtelco/errorboundary'
 import Store from '@/newtelco/store'
 import NextAuth from 'next-auth/client'
 const LogRocket = require('logrocket')
-import './style/app.css'
-import './style/ntTheme.less'
-import 'algolia-react-autocomplete/build/css/index.css'
 
 // export default class MaintApp extends App {
 //   static async getInitialProps ({ Component, pageProps }) {
@@ -41,8 +41,7 @@ export default ({ Component, pageProps }) => {
           email: pageProps.session.user.email
         })
       }
-      }
-
+    }
   }, [])
 
   return (
@@ -85,4 +84,10 @@ export default ({ Component, pageProps }) => {
       </ConditionalWrap>
     </NextAuth.Provider>
   )
+}
+
+export function reportWebVitals (metric) {
+  if (process.env.NEXT_PUBLIC_ENV === 'development') {
+    console.table('metrics', metric.name, metric.value)
+  }
 }
