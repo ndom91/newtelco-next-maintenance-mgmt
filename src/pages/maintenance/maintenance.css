@@ -181,3 +181,7 @@ textarea::-webkit-scrollbar-thumb {
 .tox-tinymce {
   border-radius: 5px !important;
 }
+
+.timezone-select > div:nth-of-type(2) {
+  z-index: 99;
+}

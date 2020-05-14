@@ -1,36 +1,56 @@
-import React from 'react'
-import App from 'next/app'
+import React, { useEffect } from 'react'
+// import App from 'next/app'
 import Head from 'next/head'
 import ErrorBoundary from '../components/errorboundary'
+import Store from '../components/store'
+import NextAuth from 'next-auth/client'
+const LogRocket = require('logrocket')
 import './style/app.css'
 import './style/ntTheme.less'
 import 'algolia-react-autocomplete/build/css/index.css'
-import Store from '../components/store'
-const LogRocket = require('logrocket')
 
-export default class MaintApp extends App {
-  static async getInitialProps ({ Component, ctx }) {
-    let pageProps = {}
+// export default class MaintApp extends App {
+//   static async getInitialProps ({ Component, pageProps }) {
+//     // let pageProps = {}
 
-    if (Component.getInitialProps) {
-      pageProps = await Component.getInitialProps(ctx)
-    }
-    if (process.browser && pageProps.session && pageProps.session.user) {
-      LogRocket.init('ui2vht/next-maintenance')
-      LogRocket.identify(pageProps.session.user.id, {
-        name: pageProps.session.user.name,
-        email: pageProps.session.user.email
-      })
-    }
+//     // if (Component.getInitialProps) {
+//     //   pageProps = await Component.getInitialProps(ctx)
+//     // }
+//     if (process.browser && pageProps.session && pageProps.session.user) {
+//       LogRocket.init('ui2vht/next-maintenance')
+//       LogRocket.identify(pageProps.session.user.id, {
+//         name: pageProps.session.user.name,
+//         email: pageProps.session.user.email
+//       })
+//     }
 
-    return { pageProps }
-  }
+//     // return { pageProps }
+//   }
 
-  render () {
-    const { Component, pageProps, router } = this.props
+export default ({ Component, pageProps }) => {
+  const ConditionalWrap = ({ condition, wrap, children }) => (
+    condition ? wrap(children) : children
+  )
 
-    return (
-      <ErrorBoundary>
+  useEffect(() => {
+    if (process.env.NEXT_PUBLIC_ENV === 'production') {
+      if (process.browser && pageProps.session && pageProps.session.user) {
+        LogRocket.init('ui2vht/next-maintenance')
+        LogRocket.identify(pageProps.session.user.id, {
+          name: pageProps.session.user.name,
+          email: pageProps.session.user.email
+        })
+      }
+      }
+
+  }, [])
+
+  return (
+    <NextAuth.Provider>
+      <ConditionalWrap
+        condition={process.env.NEXT_PUBLIC_ENV === 'production'}
+        wrap={children => (<ErrorBoundary>{children}</ErrorBoundary>)}
+      >
         <Head>
           <title>Newtelco Maintenance</title>
           <meta name='viewport' content='width=device-width, initial-scale=1' />
@@ -53,13 +73,12 @@ export default class MaintApp extends App {
           <link rel='manifest' href='/manifest.json' />
           <link rel='mask-icon' href='/static/icons/safari-pinned-tab.svg' color='#5bbad5' />
           <link rel='shortcut icon' id='favicon' href='/static/images/favicon/favicon.ico' />
-          {/* <script src='https://analytics.newtelco.dev/ingress/7e406c80-f4f1-40f4-8407-1b0493dc86d1/script.js'></script> */}
         </Head>
         <img src='https://analytics.newtelco.dev/ingress/7e406c80-f4f1-40f4-8407-1b0493dc86d1/pixel.gif' />
         <Store.Container>
-          <Component {...pageProps} key={router.route} />
+          <Component {...pageProps} />
         </Store.Container>
-      </ErrorBoundary>
-    )
-  }
+      </ConditionalWrap>
+    </NextAuth.Provider>
+  )
 }

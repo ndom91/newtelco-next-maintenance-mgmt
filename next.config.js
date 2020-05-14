@@ -2,14 +2,14 @@ const { parsed: localEnv } = require('dotenv').config({ path: './.env' })
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true'
 })
-const dev = process.env.NODE_ENV !== 'production'
+const dev = process.env.NEXT_PUBLIC_ENV !== 'production'
+const path = require('path')
 const webpack = require('webpack')
 const withCSS = require('@zeit/next-css')
 const withLess = require('@zeit/next-less')
-require('dotenv').config()
-const path = require('path')
-const Dotenv = require('dotenv-webpack')
 const withPWA = require('next-pwa')
+const Dotenv = require('dotenv-webpack')
+require('dotenv').config()
 
 function HACK_removeMinimizeOptionFromCssLoaders (config) {
   // console.warn(
@@ -135,11 +135,6 @@ const nextConfig = {
       }
     }]
   },
-  // exportPathMap: function () {
-  //   return {
-  //     '/': { page: '/' }
-  //   }
-  // },
   lessLoaderOptions: {
     javascriptEnabled: true
   },

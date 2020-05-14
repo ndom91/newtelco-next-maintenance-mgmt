@@ -1,11 +1,11 @@
 import React from 'react'
-import Layout from '../components/layout'
+import Layout from '@/newtelco/layout'
 import dynamic from 'next/dynamic'
-import RequireLogin from '../components/require-login'
+import RequireLogin from '@/newtelco/require-login'
 import NextAuth from 'next-auth/client'
-import MaintPanel from '../components/panel'
-import UnreadBadge from '../components/unread'
-import Store from '../components/store'
+import MaintPanel from '@/newtelco/panel'
+import UnreadBadge from '@/newtelco/unread'
+import Store from '@/newtelco/store'
 import {
   Loader,
   Panel,

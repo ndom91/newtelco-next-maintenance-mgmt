@@ -1,4 +1,6 @@
-export const timezones = [
+import moment from 'moment-timezone'
+
+const timezones = [
   'Etc/GMT+12',
   'Pacific/Midway',
   'Pacific/Honolulu',
@@ -77,7 +79,7 @@ export const timezones = [
   'Pacific/Tongatapu'
 ]
 
-export const tzi18n = {
+const tzi18n = {
   'Etc/GMT+12': 'International Date Line West',
   'Pacific/Midway': 'Midway Island, Samoa',
   'Pacific/Honolulu': 'Hawaii',
@@ -155,3 +157,36 @@ export const tzi18n = {
   'Pacific/Auckland': 'Auckland, Wellington',
   'Pacific/Tongatapu': "Nuku'alofa"
 }
+
+const _t = (s) => {
+  if (tzi18n !== null && tzi18n[s]) {
+    return tzi18n[s]
+  }
+
+  return s
+}
+
+const tzOptions = []
+
+moment.tz.names()
+  .filter(tz => {
+    return timezones.includes(tz)
+  })
+  .reduce((memo, tz) => {
+    memo.push({
+      name: tz,
+      offset: moment.tz(tz).utcOffset()
+    })
+
+    return memo
+  }, [])
+  .sort((a, b) => {
+    return a.offset - b.offset
+  })
+  .reduce((memo, tz) => {
+    const timezone = tz.offset ? moment.tz(tz.name).format('Z') : ''
+
+    tzOptions.push({ value: tz.name, label: `(GMT${timezone}) ${_t(tz.name)}` })
+  }, '')
+
+export default tzOptions

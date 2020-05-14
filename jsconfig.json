@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/newtelco/*": [
+        "/src/components/*"
+      ]
+    }
+  }
+}

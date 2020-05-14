@@ -31,7 +31,7 @@ import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-material.css'
 import Notify from '../../lib/notification'
 import { Formik, FastField, Field, useFormikContext } from 'formik'
-import { timezones, tzi18n } from '../../components/maintenance/timezoneOptions'
+import tzOptions from '../../components/maintenance/timezoneOptions'
 import Select from 'react-select'
 import debounce from 'just-debounce-it'
 
@@ -89,8 +89,8 @@ const AutoSave = ({ debounceMs }) => {
 
   let result = null
 
-  if (!!formik.isSubmitting) {
-    result = "Saving..."
+  if (formik.isSubmitting) {
+    result = 'Saving...'
   } else if (Object.keys(formik.errors).length > 0) {
     result = `Error: ${formik.errors.error}`
   } else if (lastSaved !== null) {
@@ -1672,43 +1672,15 @@ const Maintenance = props => {
       field,
       form
     }) => {
-      const _t = (s) => {
-        if (tzi18n !== null && tzi18n[s]) {
-          return tzi18n[s]
-        }
-
-        return s
-      }
-      const options = []
-      moment.tz.names()
-        .filter(tz => {
-          return timezones.includes(tz)
-        })
-        .reduce((memo, tz) => {
-          memo.push({
-            name: tz,
-            offset: moment.tz(tz).utcOffset()
-          })
-
-          return memo
-        }, [])
-        .sort((a, b) => {
-          return a.offset - b.offset
-        })
-        .reduce((memo, tz) => {
-          const timezone = tz.offset ? moment.tz(tz.name).format('Z') : ''
-
-          options.push({ value: tz.name, label: `(GMT${timezone}) ${_t(tz.name)}` })
-        }, '')
- 
       return (
         <Select
-          options={options}
+          options={tzOptions}
           name={field.name}
-          value={options ? options.find(option => option.value === field.value) : ''}
+          value={tzOptions ? tzOptions.find(option => option.value === field.value) : ''}
           validateOnChange={false}
+          validateOnBlur={false}
           onChange={(option) => form.setFieldValue(field.name, option.value)}
-          onBlur={field.onBlur}
+          className='timezone-select'
         />
       )
     }
@@ -1722,6 +1694,7 @@ const Maintenance = props => {
           style={{ width: '100%' }}
           name={field.name}
           validateOnChange={false}
+          validateOnBlur={false}
           value={field.value}
           onBlur={option => {
             fetch(`/api/lieferantcids?id=${option}`, {
@@ -1753,6 +1726,7 @@ const Maintenance = props => {
           value={field.value}
           data-enable-time
           validateOnChange={false}
+          validateOnBlur={false}
           onChange={option => form.setFieldValue(field.name, option)}
           options={{ time_24hr: 'true', allow_input: 'true' }}
           className='flatpickr end-date-time'
@@ -1760,18 +1734,18 @@ const Maintenance = props => {
       )
     }
 
-    const MyTagPicker = ({ field, form, onChange}) => {
-      console.log(field, form)
+    const MyTagPicker = ({ field, form }) => {
       return (
         <TagPicker
           name={field.name}
           value={field.value}
           onChange={option => form.setFieldValue(field.name, option)}
           data={supplierCids}
-          validateOnChange={false}
           // onBlur={field.onChange}
           block
           cleanable
+          validateOnChange={false}
+          validateOnBlur={false}
           placeholder='Please select a CID'
         />
       )
@@ -1783,6 +1757,8 @@ const Maintenance = props => {
           name={field.name}
           value={field.value}
           placeholder={placeholder}
+          validateOnChange={false}
+          validateOnBlur={false}
           // onBlur={form.handleChange}
           onChange={option => form.setFieldValue(field.name, option)}
         />
@@ -1796,6 +1772,8 @@ const Maintenance = props => {
           componentClass='textarea'
           name={field.name}
           value={field.value}
+          validateOnChange={false}
+          validateOnBlur={false}
           // onBlur={form.handleChange}
           onChange={option => form.setFieldValue(field.name, option)}
         />
@@ -1805,6 +1783,8 @@ const Maintenance = props => {
       return (
         <Toggle
           size='lg'
+          validateOnChange={false}
+          validateOnBlur={false}
           checkedChildren={checkedChildren}
           value={maintenance.cancelled === 'false' ? false : !!maintenance.cancelled}
           name={field.name}
