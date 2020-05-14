@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState }from 'react'
-import fetch from 'isomorphic-unfetch'
 import { AgGridReact } from 'ag-grid-react'
 import Select from 'react-select'
 import StartDateTime from '../ag-grid/startdatetime'

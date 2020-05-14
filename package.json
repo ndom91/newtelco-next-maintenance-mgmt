@@ -42,7 +42,6 @@
     "file-saver": "^2.0.2",
     "fontfaceobserver": "^2.1.0",
     "formik": "^2.1.4",
-    "isomorphic-unfetch": "^3.0.0",
     "just-debounce-it": "^1.1.0",
     "less": "^3.11.1",
     "logrocket": "^1.0.7",

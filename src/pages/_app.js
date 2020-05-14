@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react'
 // import App from 'next/app'
 import Head from 'next/head'
-import ErrorBoundary from '../components/errorboundary'
-import Store from '../components/store'
+import ErrorBoundary from '@/newtelco/errorboundary'
+import Store from '@/newtelco/store'
 import NextAuth from 'next-auth/client'
 const LogRocket = require('logrocket')
 import './style/app.css'
@@ -49,7 +49,12 @@ export default ({ Component, pageProps }) => {
     <NextAuth.Provider>
       <ConditionalWrap
         condition={process.env.NEXT_PUBLIC_ENV === 'production'}
-        wrap={children => (<ErrorBoundary>{children}</ErrorBoundary>)}
+        wrap={children => (
+          <ErrorBoundary>
+            {children}
+            <img src='https://analytics.newtelco.dev/ingress/7e406c80-f4f1-40f4-8407-1b0493dc86d1/pixel.gif' />
+          </ErrorBoundary>
+        )}
       >
         <Head>
           <title>Newtelco Maintenance</title>
@@ -74,7 +79,6 @@ export default ({ Component, pageProps }) => {
           <link rel='mask-icon' href='/static/icons/safari-pinned-tab.svg' color='#5bbad5' />
           <link rel='shortcut icon' id='favicon' href='/static/images/favicon/favicon.ico' />
         </Head>
-        <img src='https://analytics.newtelco.dev/ingress/7e406c80-f4f1-40f4-8407-1b0493dc86d1/pixel.gif' />
         <Store.Container>
           <Component {...pageProps} />
         </Store.Container>

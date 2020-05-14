@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import fetch from 'isomorphic-unfetch'
 import format from 'date-fns/format'
 import {
   Loader,

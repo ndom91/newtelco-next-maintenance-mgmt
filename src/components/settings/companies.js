@@ -1,5 +1,4 @@
 import React, { useRef, useEffect, useState } from 'react'
-import fetch from 'isomorphic-unfetch'
 import { AgGridReact } from 'ag-grid-react'
 import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-material.css'

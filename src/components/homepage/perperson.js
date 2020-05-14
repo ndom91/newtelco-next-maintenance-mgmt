@@ -1,5 +1,4 @@
 import React from 'react'
-import fetch from 'isomorphic-unfetch'
 import useSWR from 'swr'
 import { Bar } from '@nivo/bar'
 import { Panel, Loader, Icon } from 'rsuite'

@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import Notify from '../../../lib/notification'
 import Store from '../../store'
-import fetch from 'isomorphic-unfetch'
 import {
   Input,
   Icon,

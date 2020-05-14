@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import MaintHeader from './header'
 import useSWR from 'swr'
-import fetch from 'isomorphic-unfetch'
 import dynamic from 'next/dynamic'
 import KeyboardShortcuts from './keyboardShortcuts'
 import Store from './store'

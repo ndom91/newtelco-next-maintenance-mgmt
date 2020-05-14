@@ -1,8 +1,7 @@
 import React, { useCallback, useState, useEffect, useRef } from 'react'
 import NextAuth from 'next-auth/client'
-import Layout from '../../components/layout'
-import fetch from 'isomorphic-unfetch'
-import RequireLogin from '../../components/require-login'
+import Layout from '@/newtelco/layout'
+import RequireLogin from '@/newtelco/require-login'
 import './maintenance.css'
 import Router from 'next/router'
 import { Helmet } from 'react-helmet'
@@ -13,25 +12,25 @@ import { Rnd } from 'react-rnd'
 import { CSSTransition } from 'react-transition-group'
 import Flatpickr from 'react-flatpickr'
 import 'flatpickr/dist/themes/material_blue.css'
-import { getUnique, convertDateTime } from '../../components/maintenance/helper'
-import ProtectedIcon from '../../components/ag-grid/protected'
-import SentIcon from '../../components/ag-grid/sent'
-import StartDateTime from '../../components/ag-grid/startdatetime'
-import EndDateTime from '../../components/ag-grid/enddatetime'
-import sentBtn from '../../components/ag-grid/sentBtn'
-import sendMailBtns from '../../components/ag-grid/sendMailBtns'
+import { getUnique, convertDateTime } from '@/newtelco/maintenance/helper'
+import ProtectedIcon from '@/newtelco/ag-grid/protected'
+import SentIcon from '@/newtelco/ag-grid/sent'
+import StartDateTime from '@/newtelco/ag-grid/startdatetime'
+import EndDateTime from '@/newtelco/ag-grid/enddatetime'
+import sentBtn from '@/newtelco/ag-grid/sentBtn'
+import sendMailBtns from '@/newtelco/ag-grid/sendMailBtns'
 import { AgGridReact } from 'ag-grid-react'
 import dynamic from 'next/dynamic'
-import ReadModal from '../../components/maintenance/readmodal'
-import Store from '../../components/store'
-import ConfirmModal from '../../components/confirmmodal'
-import CommentList from '../../components/maintenance/comments/list'
-import MaintPanel from '../../components/panel'
+import ReadModal from '@/newtelco/maintenance/readmodal'
+import Store from '@/newtelco/store'
+import ConfirmModal from '@/newtelco/confirmmodal'
+import CommentList from '@/newtelco/maintenance/comments/list'
+import MaintPanel from '@/newtelco/panel'
 import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-material.css'
 import Notify from '../../lib/notification'
 import { Formik, FastField, Field, useFormikContext } from 'formik'
-import tzOptions from '../../components/maintenance/timezoneOptions'
+import tzOptions from '@/newtelco/maintenance/timezoneOptions'
 import Select from 'react-select'
 import debounce from 'just-debounce-it'
 
@@ -67,7 +66,7 @@ import {
 } from 'rsuite'
 
 const Changelog = dynamic(
-  () => import('../../components/maintenance/timeline'),
+  () => import('@/newtelco/maintenance/timeline'),
   { ssr: false }
 )
 
@@ -96,7 +95,7 @@ const AutoSave = ({ debounceMs }) => {
   } else if (lastSaved !== null) {
     result = `Last Saved: ${lastSaved}`
   }
-  return <p style={{ color: 'var(--grey3)'}}>{result}</p>
+  return <p style={{ color: 'var(--grey3)' }}>{result}</p>
 }
 
 const Maintenance = props => {

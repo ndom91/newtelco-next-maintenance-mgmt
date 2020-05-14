@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react'
-import fetch from 'isomorphic-unfetch'
 import { AgGridReact } from 'ag-grid-react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Select from 'react-select'

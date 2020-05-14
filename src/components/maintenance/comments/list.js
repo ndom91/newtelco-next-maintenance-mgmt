@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import fetch from 'isomorphic-unfetch'
 import Store from '../../store'
 import Comment from './comment'
 import Notify from '../../../lib/notification'

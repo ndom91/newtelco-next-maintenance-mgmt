@@ -1,5 +1,4 @@
 import React from 'react'
-import fetch from 'isomorphic-unfetch'
 import useSWR from 'swr'
 import { Panel, Loader, Icon } from 'rsuite'
 import { ResponsiveCalendarCanvas } from '@nivo/calendar'
