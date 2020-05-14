@@ -484,9 +484,6 @@ const Maintenance = props => {
             .forEach(x => {
               selectedCids.push(parseInt(x, 10))
             })
-          // setSelectedSupplierCids(selectedCids)
-        } else {
-          // setSelectedSupplierCids([parseInt(derenCIDids, 10)])
         }
       })
       .catch(err => console.error(`Error - ${err}`))
@@ -518,11 +515,7 @@ const Maintenance = props => {
           cid.sent = currentSentStatus
           cid.frozen = false
         })
-        const existingCustomerCids = customerCids
-        kundencids.forEach(cid => {
-          existingCustomerCids.push(cid)
-        })
-        const uniqueKundenCids = getUnique(existingCustomerCids, 'kundenCID')
+        const uniqueKundenCids = getUnique(kundencids, 'kundenCID')
         setCustomerCids(uniqueKundenCids)
         gridApi.current.hideOverlay()
         uniqueKundenCids.forEach(cid => {
@@ -1753,9 +1746,11 @@ const Maintenance = props => {
         <TagPicker
           name={field.name}
           value={field.value}
-          onClose={option => {
-            fetchCustomerCids(option)
+          onChange={option => {
             form.setFieldValue(field.name, option)
+          }}
+          onClose={() => {
+            fetchCustomerCids(field.value)
           }}
           onClean={() => {
             setCustomerCids([])
