@@ -506,6 +506,7 @@ const Maintenance = props => {
     })
       .then(resp => resp.json())
       .then(data => {
+        gridApi.current.showLoadingOverlay()
         let currentSentStatus = 0
         if (maintenance.done) {
           currentSentStatus = 1
@@ -518,23 +519,54 @@ const Maintenance = props => {
         const uniqueKundenCids = getUnique(kundencids, 'kundenCID')
         setCustomerCids(uniqueKundenCids)
         gridApi.current.hideOverlay()
-        uniqueKundenCids.forEach(cid => {
-          checkFreezeStatus(cid)
-        })
+        checkFreezeStatus(uniqueKundenCids)
+        // uniqueKundenCids.forEach(cid => {
+        //   checkFreezeStatus(cid)
+        // })
       })
       .catch(err => console.error(`Error - ${err}`))
   }
 
-  const checkFreezeStatus = async (cid) => {
+  const checkFreezeStatus = async (cids) => {
+    console.log('cfs', cids)
     const startDate = maintenance.startDateTime
     const endDate = maintenance.endDateTime
 
-    await fetch(`/api/maintenances/freeze?companyid=${cid.kunde}&startDate=${startDate}&endDate=${endDate}`, {
-      method: 'get'
+    // TODO: get unique companyIds out of `cids`
+    // 
+    // 0:
+    // frozen: false
+    // kunde: 59
+    // kundenCID: "010907"
+    // lieferantCID: 21
+    // maintenanceRecipient: "CUSTOMER.CARE@BICS.COM"
+    // name: "Bics"
+    // protected: "0"
+    // sent: 0
+    // 1:
+    // frozen: false
+    // kunde: 59
+    // kundenCID: "010925"
+    // lieferantCID: 30
+    // maintenanceRecipient: "CUSTOMER.CARE@BICS.COM"
+    // name: "Bics"
+    // protected: "0"
+    // sent: 0
+    await fetch('/api/maintenances/freeze', {
+      method: 'get',
+      body: JSON.stringify({
+        companys: cids,
+        startDate: startDate,
+        endDate: endDate
+      }),
+      headers: {
+        'Content-Type': 'application/json'
+      }
     })
       .then(resp => resp.json())
       .then(data => {
         if (data.freezeQuery.length !== 0) {
+          console.log(data.freezeQuery)
           const freezeEntry = data.freezeQuery[0]
           const localKundenCids = customerCids
           const frozenCidIndex = localKundenCids.findIndex(el => el.kunde === freezeEntry.companyId)
@@ -1748,9 +1780,16 @@ const Maintenance = props => {
           value={field.value}
           onChange={option => {
             form.setFieldValue(field.name, option)
+            if (!option.length && customerCids.length) {
+              setCustomerCids([])
+            }
           }}
           onClose={() => {
-            fetchCustomerCids(field.value)
+            if (field?.value.length) {
+              fetchCustomerCids(field.value)
+            } else if (customerCids.length) {
+              setCustomerCids([])
+            }
           }}
           onClean={() => {
             setCustomerCids([])

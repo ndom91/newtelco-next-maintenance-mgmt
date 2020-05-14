@@ -17,20 +17,22 @@ import {
   InputGroup,
   Whisper,
   Tooltip,
-  FlexboxGrid
+  FlexboxGrid,
+  Loader
 } from 'rsuite'
 
 const Inbox = props => {
   const store = Store.useStore()
   const unread = store.get('count')
   const [isOpen, setIsOpen] = useState(false)
+  const [faviconLoading, setFaviconLoading] = useState(false)
   const [modalInfo, setModalInfo] = useState({})
   const [isTranslated, setIsTranslated] = useState(false)
   const [ogModalBody, setOgModalBody] = useState('')
   // cleanup whether SWR gets inbox items initally or getInitialProps, or what
-  const [ inboxMails, setInboxMails ] = useState(props.inboxItems)
+  const [inboxMails, setInboxMails] = useState(props.inboxItems)
   const { data } = useSWR(
-    '/v1/api/inbox', 
+    '/v1/api/inbox',
     url => fetch(url).then(res => res.json()),
     { refreshInterval: 30000, focusThrottleInterval: 10000, initialData: props.inboxItems }
   )
@@ -50,7 +52,7 @@ const Inbox = props => {
             .then(resp => resp.json())
             .then(data => {
               const iconUrl = data.icons
-              let newInboxMails = inboxMails
+              const newInboxMails = inboxMails
               if (data.icons.substr(0, 4) !== 'http') {
                 mail.faviconUrl = `https://${iconUrl}`
                 newInboxMails[index] = mail
@@ -65,7 +67,6 @@ const Inbox = props => {
       })
     }
   }, [])
-
 
   const toggle = (mailId) => {
     if (mailId) {
@@ -87,6 +88,7 @@ const Inbox = props => {
         body: mailBody
       }
       setIsOpen(!isOpen)
+      setFaviconLoading(true) 
       setModalInfo(modalInfo)
     } else {
       setIsOpen(!isOpen)
@@ -113,7 +115,7 @@ const Inbox = props => {
         .then(data => {
           const text = data.translatedText
           setOgModalBody(modalBody)
-          setModalInfo({...modalInfo, body: text })
+          setModalInfo({ ...modalInfo, body: text })
           setIsTranslated(!isTranslated)
         })
         .catch(err => console.error(`Error - ${err}`))
@@ -180,10 +182,14 @@ const Inbox = props => {
             <Modal.Header>
               <FlexboxGrid justify='start' align='middle' style={{ width: '100%' }}>
                 <FlexboxGrid.Item colspan={2} style={{ display: 'flex', justifyContent: 'center' }}>
+                  {faviconLoading && (
+                    <Loader />
+                  )}
                   <Avatar
                     size='lg'
                     src={modalInfo.favicon}
-                    style={{ backgroundColor: 'transparent' }}
+                    style={{ backgroundColor: 'transparent', display: faviconLoading ? 'none' : 'block' }}
+                    onLoad={() => setFaviconLoading(false)}
                   />
                 </FlexboxGrid.Item>
                 <FlexboxGrid.Item colspan={20}>
@@ -206,8 +212,8 @@ const Inbox = props => {
                   <Whisper speaker={<Tooltip>Translate</Tooltip>} placement='bottom'>
                     <IconButton
                       onClick={handleTranslate}
-                      appearance='ghost'
-                      style={{ color: 'var(--grey4)' }}
+                      appearance='default'
+                      style={{ color: 'var(--grey3)' }}
                       size='lg'
                       icon={<Icon icon='globe' />}
                     />
