@@ -272,7 +272,7 @@ const History = props => {
               if (newMaintenanceInfo.length === 0) {
                 return (
                   <div style={{ marginTop: '100px' }} >
-                    <Loader center/>
+                    <Loader center />
                   </div>
                 )
               } else {
@@ -285,11 +285,11 @@ const History = props => {
     )
   }
 
-  if (props.session.user) {
+  if (props.session?.user) {
     return (
       <Layout session={props.session}>
-        <MaintPanel 
-          header='History' 
+        <MaintPanel
+          header='History'
           buttons={
             <ButtonGroup>
               <IconButton appearance='default' style={{ border: '1px solid var(--grey3)', color: 'var(--grey4)' }} onClick={handleToggleNewModal} icon={<Icon icon='plus' />}>
@@ -344,7 +344,7 @@ const History = props => {
   }
 }
 
-export async function getServerSideProps ({ req }) {
+export async function getServerSideProps({ req }) {
   const session = await NextAuth.session({ req })
   const host = req ? req.headers['x-forwarded-host'] : window.location.hostname
   let protocol = 'https:'

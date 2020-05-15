@@ -27,7 +27,7 @@ const Settings = ({ session, router }) => {
             <a>Companies</a>
           </Link>
         </Nav.Item>
-        <Nav.Item componentClass='div'  active={tab === 'customercids'}>
+        <Nav.Item componentClass='div' active={tab === 'customercids'}>
           <Link href={{ pathname: '/settings', query: { tab: 'customercids' } }}>
             <a>Customer CIDs</a>
           </Link>
@@ -47,7 +47,7 @@ const Settings = ({ session, router }) => {
     )
   }
 
-  if (session.user) {
+  if (session?.user) {
     return (
       <Layout session={session}>
         <MaintPanel header='Settings' buttons={<SettingsNav />}>
@@ -66,7 +66,7 @@ const Settings = ({ session, router }) => {
   }
 }
 
-export async function getServerSideProps ({ req }) {
+export async function getServerSideProps({ req }) {
   const session = await NextAuth.session({ req })
   return {
     props: {

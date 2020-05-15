@@ -88,7 +88,7 @@ const Inbox = props => {
         body: mailBody
       }
       setIsOpen(!isOpen)
-      setFaviconLoading(true) 
+      setFaviconLoading(true)
       setModalInfo(modalInfo)
     } else {
       setIsOpen(!isOpen)
@@ -99,7 +99,7 @@ const Inbox = props => {
     const modalBody = modalInfo.body
 
     if (isTranslated) {
-      setModalInfo({...modalInfo, body: ogModalBody })
+      setModalInfo({ ...modalInfo, body: ogModalBody })
       setIsTranslated(!isTranslated)
     } else {
       fetch('/v1/api/translate', {
@@ -161,21 +161,21 @@ const Inbox = props => {
               </FlexboxGrid.Item>
             </FlexboxGrid>
           ) : (
-            <List bordered style={{ width: '100%' }}>
-              {Array.isArray(inboxMails) && inboxMails.map((mail, index) => {
-                return (
-                  <List.Item key={index}>
-                    <InboxItem
-                      mail={mail}
-                      index={index}
-                      handleDelete={onDelete}
-                      toggle={toggle}
-                    />
-                  </List.Item>
-                )
-              })}
-            </List>
-          )}
+              <List bordered style={{ width: '100%' }}>
+                {Array.isArray(inboxMails) && inboxMails.map((mail, index) => {
+                  return (
+                    <List.Item key={index}>
+                      <InboxItem
+                        mail={mail}
+                        index={index}
+                        handleDelete={onDelete}
+                        toggle={toggle}
+                      />
+                    </List.Item>
+                  )
+                })}
+              </List>
+            )}
         </MaintPanel>
         {isOpen && (
           <Modal className='mail-modal-body' autoFocus backdrop show={isOpen} size='lg' onHide={() => toggle(null)} full>
@@ -233,7 +233,7 @@ const Inbox = props => {
   }
 }
 
-export async function getServerSideProps ({ req }) {
+export async function getServerSideProps({ req }) {
   const session = await NextAuth.session({ req })
   const host = req ? req.headers['x-forwarded-host'] : window.location.hostname
   let protocol = 'https:'

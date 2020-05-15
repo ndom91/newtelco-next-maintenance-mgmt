@@ -92,11 +92,11 @@ const MaintHeader = props => {
               as='/companies'
               passHref
             > */}
-              <Nav.Item
-                onClick={() => Notify('warning', 'Companies Page', 'Coming Soon')}
-              >
-                <span>Companies</span>
-              </Nav.Item>
+            <Nav.Item
+              onClick={() => Notify('warning', 'Companies', 'Coming Soon')}
+            >
+              <span>Companies</span>
+            </Nav.Item>
             {/* </Link> */}
           </Nav>
           <Nav pullRight style={{ margin: '0px 20px' }}>

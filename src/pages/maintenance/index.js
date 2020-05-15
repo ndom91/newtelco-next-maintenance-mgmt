@@ -326,17 +326,17 @@ const Maintenance = props => {
     store.set('maintenance')(maintenance)
   }, [maintenance])
 
-  useEffect(() => {
-    store.set('impactPlaceholder')(impactPlaceholder)
-  }, [impactPlaceholder])
+  // useEffect(() => {
+  //   store.set('impactPlaceholder')(impactPlaceholder)
+  // }, [impactPlaceholder])
 
-  useEffect(() => {
-    gridApi?.current?.showLoadingOverlay()
-    selectedSupplierCids.forEach(id => {
-      fetchCustomerCids(id)
-    })
-    gridApi?.current?.hideOverlay()
-  }, [selectedSupplierCids])
+  // useEffect(() => {
+  //   gridApi?.current?.showLoadingOverlay()
+  //   // selectedSupplierCids.forEach(id => {
+  //   //   fetchCustomerCids(id)
+  //   // })
+  //   gridApi?.current?.hideOverlay()
+  // }, [selectedSupplierCids])
 
   useEffect(() => {
     gridApi?.current?.hideOverlay()
@@ -586,7 +586,7 @@ const Maintenance = props => {
   /// /////////////////////////////////////////////////////////
 
   // prepare mail from direct-send button
-  function prepareDirectSend (recipient, customerCID, frozen, companyName) {
+  function prepareDirectSend(recipient, customerCID, frozen, companyName) {
     if (frozen) {
       setFrozenState({
         recipient: recipient,
@@ -824,7 +824,7 @@ const Maintenance = props => {
     }
   }
 
-  function moveCalendarEntry (startDateTime, endDateTime, rcounter) {
+  function moveCalendarEntry(startDateTime, endDateTime, rcounter) {
     const calId = maintenance.calendarId
     const company = maintenance.name
     const maintId = maintenance.id
@@ -951,14 +951,14 @@ const Maintenance = props => {
     setMailBodyText(editor.getContents())
   }
 
-  // react-select onChange - supplier CIDs
-  const handleSelectSupplierChange = selectedOption => {
-    if (selectedOption) {
-      setSelectedSupplierCids(selectedOption)
-    } else {
-      setSelectedSupplierCids([])
-    }
-  }
+  // // react-select onChange - supplier CIDs
+  // const handleSelectSupplierChange = selectedOption => {
+  //   if (selectedOption) {
+  //     setSelectedSupplierCids(selectedOption)
+  //   } else {
+  //     setSelectedSupplierCids([])
+  //   }
+  // }
 
   const handleEditorChange = (data) => {
     setMailBodyText(data.level.content)
@@ -968,188 +968,188 @@ const Maintenance = props => {
   //   setMaintenance({ ...maintenance, notes: data.level.content })
   // }
 
-  const saveDateTime = (maintId, element, newValue) => {
-    let newISOTime = moment.tz(newValue, maintenance.timezone)
-    if (maintId === 'NEW') {
-      Notify('error', 'Save Not Possible', 'No CID yet assigned.')
-      return
-    }
-    newISOTime = newISOTime.utc().format('YYYY-MM-DD HH:mm:ss')
-    const activeUserEmail = props.session.user.email
-    const activeUser = activeUserEmail.substring(0, activeUserEmail.lastIndexOf('@'))
-    fetch(`/api/maintenances/save/dateTime?maintId=${maintId}&element=${element}&value=${newISOTime}&updatedby=${activeUser}`, {
-      method: 'get',
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        _csrf: props.session.accessToken
-      }
-    })
-      .then(resp => resp.json())
-      .then(data => {
-        if (data.status !== 200) {
-          Notify('error', 'Datetime Not Saved')
-          console.warn(`DateTime Save Failed\n${element}\n${newValue}\n${newISOTime}`)
-        }
-      })
-      .catch(err => console.error(err))
-  }
+  // const saveDateTime = (maintId, element, newValue) => {
+  //   let newISOTime = moment.tz(newValue, maintenance.timezone)
+  //   if (maintId === 'NEW') {
+  //     Notify('error', 'Save Not Possible', 'No CID yet assigned.')
+  //     return
+  //   }
+  //   newISOTime = newISOTime.utc().format('YYYY-MM-DD HH:mm:ss')
+  //   const activeUserEmail = props.session.user.email
+  //   const activeUser = activeUserEmail.substring(0, activeUserEmail.lastIndexOf('@'))
+  //   fetch(`/api/maintenances/save/dateTime?maintId=${maintId}&element=${element}&value=${newISOTime}&updatedby=${activeUser}`, {
+  //     method: 'get',
+  //     headers: {
+  //       'Access-Control-Allow-Origin': '*',
+  //       _csrf: props.session.accessToken
+  //     }
+  //   })
+  //     .then(resp => resp.json())
+  //     .then(data => {
+  //       if (data.status !== 200) {
+  //         Notify('error', 'Datetime Not Saved')
+  //         console.warn(`DateTime Save Failed\n${element}\n${newValue}\n${newISOTime}`)
+  //       }
+  //     })
+  //     .catch(err => console.error(err))
+  // }
 
-  const handleStartDateChange = date => {
-    const startDate = moment(date[0]).format('YYYY-MM-DD HH:mm:ss')
+  // const handleStartDateChange = date => {
+  //   const startDate = moment(date[0]).format('YYYY-MM-DD HH:mm:ss')
 
-    setMaintenance({ ...maintenance, startDateTime: startDate })
-    saveDateTime(maintenance.id, 'start', startDate)
-    const startDateTime = maintenance.startDateTime
-    const endDateTime = maintenance.endDateTime
+  //   setMaintenance({ ...maintenance, startDateTime: startDate })
+  //   saveDateTime(maintenance.id, 'start', startDate)
+  //   const startDateTime = maintenance.startDateTime
+  //   const endDateTime = maintenance.endDateTime
 
-    if (startDateTime && endDateTime && isValid(parseISO(startDateTime)) && isValid(parseISO(endDateTime))) {
-      const impactCalculation = formatDistance(parseISO(endDateTime), parseISO(startDateTime))
-      setImpactPlaceholder(impactCalculation)
-    }
-  }
+  //   if (startDateTime && endDateTime && isValid(parseISO(startDateTime)) && isValid(parseISO(endDateTime))) {
+  //     const impactCalculation = formatDistance(parseISO(endDateTime), parseISO(startDateTime))
+  //     setImpactPlaceholder(impactCalculation)
+  //   }
+  // }
 
-  const handleEndDateChange = date => {
-    const endDate = moment(date[0]).format('YYYY-MM-DD HH:mm:ss')
+  // const handleEndDateChange = date => {
+  //   const endDate = moment(date[0]).format('YYYY-MM-DD HH:mm:ss')
 
-    setMaintenance({ ...maintenance, endDateTime: endDate })
-    saveDateTime(maintenance.id, 'end', endDate)
-    const startDateTime = maintenance.startDateTime
-    const endDateTime = maintenance.endDateTime
+  //   setMaintenance({ ...maintenance, endDateTime: endDate })
+  //   saveDateTime(maintenance.id, 'end', endDate)
+  //   const startDateTime = maintenance.startDateTime
+  //   const endDateTime = maintenance.endDateTime
 
-    if (startDateTime && endDateTime && isValid(parseISO(startDateTime)) && isValid(parseISO(endDateTime))) {
-      const dateCompare = compareAsc(parseISO(endDateTime), parseISO(startDateTime))
-      if (dateCompare !== 1) {
-        Notify('warning', 'End date is before start date!')
-        setDateTimeWarning(true)
-      } else {
-        if (dateTimeWarning) {
-          setDateTimeWarning(false)
-        }
-      }
-      const impactCalculation = formatDistance(parseISO(endDateTime), parseISO(startDateTime))
-      setImpactPlaceholder(impactCalculation)
-    }
-  }
+  //   if (startDateTime && endDateTime && isValid(parseISO(startDateTime)) && isValid(parseISO(endDateTime))) {
+  //     const dateCompare = compareAsc(parseISO(endDateTime), parseISO(startDateTime))
+  //     if (dateCompare !== 1) {
+  //       Notify('warning', 'End date is before start date!')
+  //       setDateTimeWarning(true)
+  //     } else {
+  //       if (dateTimeWarning) {
+  //         setDateTimeWarning(false)
+  //       }
+  //     }
+  //     const impactCalculation = formatDistance(parseISO(endDateTime), parseISO(startDateTime))
+  //     setImpactPlaceholder(impactCalculation)
+  //   }
+  // }
 
-  const handleToggleChange = (element, event) => {
-    const maintId = maintenance.id
-    const activeUserEmail = props.session.user.email
-    const activeUser = activeUserEmail.substring(0, activeUserEmail.lastIndexOf('@'))
-    let newValue = !eval(`maintenance.${element}`)
-    if (typeof newValue === 'string') {
-      if (newValue === 'false') {
-        newValue = false
-      } else if (newValue === 'true') {
-        newValue = true
-      }
-    }
-    setMaintenance({ ...maintenance, [element]: newValue })
+  // const handleToggleChange = (element, event) => {
+  //   const maintId = maintenance.id
+  //   const activeUserEmail = props.session.user.email
+  //   const activeUser = activeUserEmail.substring(0, activeUserEmail.lastIndexOf('@'))
+  //   let newValue = !eval(`maintenance.${element}`)
+  //   if (typeof newValue === 'string') {
+  //     if (newValue === 'false') {
+  //       newValue = false
+  //     } else if (newValue === 'true') {
+  //       newValue = true
+  //     }
+  //   }
+  //   setMaintenance({ ...maintenance, [element]: newValue })
 
-    if (element === 'done') {
-      // save 'betroffeneCIDs'
-      let impactedCIDs = ''
-      customerCids.forEach(cid => {
-        impactedCIDs += cid.kundenCID + ' '
-      })
+  //   if (element === 'done') {
+  //     // save 'betroffeneCIDs'
+  //     let impactedCIDs = ''
+  //     customerCids.forEach(cid => {
+  //       impactedCIDs += cid.kundenCID + ' '
+  //     })
 
-      impactedCIDs = impactedCIDs.trim()
+  //     impactedCIDs = impactedCIDs.trim()
 
-      setMaintenance({ ...maintenance, betroffeneCIDs: impactedCIDs, [element]: newValue })
+  //     setMaintenance({ ...maintenance, betroffeneCIDs: impactedCIDs, [element]: newValue })
 
-      if (maintenance.receivedmail !== 'NT') {
-        fetch('/v1/api/inbox/markcomplete', {
-          method: 'post',
-          body: JSON.stringify({ m: maintenance.receivedmail }),
-          mode: 'cors',
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Content-Type': 'application/json'
-          }
-        })
-          .then(resp => resp.json())
-          .then(data => {
-            if (data.id === 500) {
-              Notify('error', 'Error moving Mail to Complete Label')
-            }
-          })
-          .catch(err => console.error(`Error - ${err}`))
-      }
+  //     if (maintenance.receivedmail !== 'NT') {
+  //       fetch('/v1/api/inbox/markcomplete', {
+  //         method: 'post',
+  //         body: JSON.stringify({ m: maintenance.receivedmail }),
+  //         mode: 'cors',
+  //         headers: {
+  //           'Access-Control-Allow-Origin': '*',
+  //           'Content-Type': 'application/json'
+  //         }
+  //       })
+  //         .then(resp => resp.json())
+  //         .then(data => {
+  //           if (data.id === 500) {
+  //             Notify('error', 'Error moving Mail to Complete Label')
+  //           }
+  //         })
+  //         .catch(err => console.error(`Error - ${err}`))
+  //     }
 
-      fetch(`/api/maintenances/save/impactedcids?cids=${impactedCIDs}&maintId=${maintenance.id}&updatedby=${activeUser}`, {
-        method: 'get',
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-          _csrf: props.session.accessToken
-        }
-      })
-        .then(resp => resp.json())
-        .then(data => {
-          if (!data.status === 200) {
-            Notify('error', 'Impacted CIDs Not Saved')
-          }
-        })
-        .catch(err => console.error(`Error - ${err}`))
+  //     fetch(`/api/maintenances/save/impactedcids?cids=${impactedCIDs}&maintId=${maintenance.id}&updatedby=${activeUser}`, {
+  //       method: 'get',
+  //       headers: {
+  //         'Access-Control-Allow-Origin': '*',
+  //         _csrf: props.session.accessToken
+  //       }
+  //     })
+  //       .then(resp => resp.json())
+  //       .then(data => {
+  //         if (!data.status === 200) {
+  //           Notify('error', 'Impacted CIDs Not Saved')
+  //         }
+  //       })
+  //       .catch(err => console.error(`Error - ${err}`))
 
-      // TODO: Check whats up here
-      // update Algolia Index
-      // fetch('/v1/api/search/update', {
-      //   method: 'get'
-      // })
-    }
+  //     // TODO: Check whats up here
+  //     // update Algolia Index
+  //     // fetch('/v1/api/search/update', {
+  //     //   method: 'get'
+  //     // })
+  //   }
 
-    if (maintId === 'NEW') {
-      Notify('error', 'No CID Assigned', 'Cannot save updates.')
-      return
-    }
-    fetch(`/api/maintenances/save/toggle?maintId=${maintId}&element=${element}&value=${newValue}&updatedby=${activeUser}`, {
-      method: 'get',
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        _csrf: props.session.accessToken
-      }
-    })
-      .then(resp => resp.json())
-      .then(data => {
-        if (data.status === 200 && data.statusText === 'OK') {
-          Notify('success', 'Save Success')
-        } else {
-          Notify('error', 'Error Saving', data.err)
-        }
-      })
-      .catch(err => console.error(err))
-  }
+  //   if (maintId === 'NEW') {
+  //     Notify('error', 'No CID Assigned', 'Cannot save updates.')
+  //     return
+  //   }
+  //   fetch(`/api/maintenances/save/toggle?maintId=${maintId}&element=${element}&value=${newValue}&updatedby=${activeUser}`, {
+  //     method: 'get',
+  //     headers: {
+  //       'Access-Control-Allow-Origin': '*',
+  //       _csrf: props.session.accessToken
+  //     }
+  //   })
+  //     .then(resp => resp.json())
+  //     .then(data => {
+  //       if (data.status === 200 && data.statusText === 'OK') {
+  //         Notify('success', 'Save Success')
+  //       } else {
+  //         Notify('error', 'Error Saving', data.err)
+  //       }
+  //     })
+  //     .catch(err => console.error(err))
+  // }
 
-  const handleReasonChange = (value) => {
-    setMaintenance({ ...maintenance, reason: encodeURIComponent(value) })
-  }
+  // const handleReasonChange = (value) => {
+  //   setMaintenance({ ...maintenance, reason: encodeURIComponent(value) })
+  // }
 
-  const handleMaintNoteChange = (value) => {
-    setMaintenance({ ...maintenance, maintNote: encodeURIComponent(value) })
-  }
+  // const handleMaintNoteChange = (value) => {
+  //   setMaintenance({ ...maintenance, maintNote: encodeURIComponent(value) })
+  // }
 
-  const handleLocationChange = (value) => {
-    setMaintenance({ ...maintenance, location: value })
-  }
+  // const handleLocationChange = (value) => {
+  //   setMaintenance({ ...maintenance, location: value })
+  // }
 
-  const handleImpactChange = (value) => {
-    setMaintenance({ ...maintenance, impact: value })
-  }
+  // const handleImpactChange = (value) => {
+  //   setMaintenance({ ...maintenance, impact: value })
+  // }
 
-  const handleTimezoneChange = (selection) => {
-    const timezoneLabel = selection.label // 'Europe/Amsterdam'
-    const timezoneValue = selection.value // '(GMT+02:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna'
+  // const handleTimezoneChange = (selection) => {
+  //   const timezoneLabel = selection.label // 'Europe/Amsterdam'
+  //   const timezoneValue = selection.value // '(GMT+02:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna'
 
-    setMaintenance({ ...maintenance, timezone: timezoneValue, timezoneLabel: timezoneLabel })
-  }
+  //   setMaintenance({ ...maintenance, timezone: timezoneValue, timezoneLabel: timezoneLabel })
+  // }
 
-  const handleSupplierChange = (selectedOption) => {
-    // const selectedSupplier = suppliers.find(x => x.value === selectedOption)
-    // setMaintenance({ ...maintenance, lieferant: selectedOption, name: selectedSupplier.label })
-    // TODO: empty fields in Formik
-    // setSelectedSupplierCids([])
-    // setCustomerCids([])
-    // fetchSupplierCids(selectedOption)
-  }
+  // const handleSupplierChange = (selectedOption) => {
+  // const selectedSupplier = suppliers.find(x => x.value === selectedOption)
+  // setMaintenance({ ...maintenance, lieferant: selectedOption, name: selectedSupplier.label })
+  // TODO: empty fields in Formik
+  // setSelectedSupplierCids([])
+  // setCustomerCids([])
+  // fetchSupplierCids(selectedOption)
+  // }
 
   /// /////////////////////////////////////////////////////////
   //
@@ -1157,47 +1157,47 @@ const Maintenance = props => {
   //
   /// /////////////////////////////////////////////////////////
 
-  const handleDateTimeBlur = (element) => {
-    Notify('success', 'Save Success')
-  }
+  // const handleDateTimeBlur = (element) => {
+  //   Notify('success', 'Save Success')
+  // }
 
-  const handleCIDBlur = () => {
-    const postSelection = (id) => {
-      let idParameter
-      if (Array.isArray(id)) {
-        idParameter = id.join(',')
-      } else {
-        idParameter = id
-      }
-      if (idParameter === props.jsonData.profile.derenCIDid) {
-        return true
-      }
-      if (maintenance.id === 'NEW') {
-        Notify('error', 'Cannot Save', 'No CID Assigned')
-        return
-      }
-      const activeUserEmail = props.session.user.email
-      const activeUser = activeUserEmail.substring(0, activeUserEmail.lastIndexOf('@'))
-      fetch(`/api/maintenances/save/lieferant?maintId=${maintenance.id}&cid=${idParameter}&updatedby=${activeUser}`, {
-        method: 'get',
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-          _csrf: props.session.accessToken
-        }
-      })
-        .then(resp => resp.json())
-        .then(data => {
-          if (data.status === 200 && data.statusText === 'OK') {
-            Notify('success', 'Save Success')
-            setMaintenance({ ...maintenance, updatedBy: activeUser })
-          } else {
-            Notify('error', 'Error Saving', data.err)
-          }
-        })
-        .catch(err => console.error(err))
-    }
-    postSelection(selectedSupplierCids)
-  }
+  // const handleCIDBlur = () => {
+  //   const postSelection = (id) => {
+  //     let idParameter
+  //     if (Array.isArray(id)) {
+  //       idParameter = id.join(',')
+  //     } else {
+  //       idParameter = id
+  //     }
+  //     if (idParameter === props.jsonData.profile.derenCIDid) {
+  //       return true
+  //     }
+  //     if (maintenance.id === 'NEW') {
+  //       Notify('error', 'Cannot Save', 'No CID Assigned')
+  //       return
+  //     }
+  //     const activeUserEmail = props.session.user.email
+  //     const activeUser = activeUserEmail.substring(0, activeUserEmail.lastIndexOf('@'))
+  //     fetch(`/api/maintenances/save/lieferant?maintId=${maintenance.id}&cid=${idParameter}&updatedby=${activeUser}`, {
+  //       method: 'get',
+  //       headers: {
+  //         'Access-Control-Allow-Origin': '*',
+  //         _csrf: props.session.accessToken
+  //       }
+  //     })
+  //       .then(resp => resp.json())
+  //       .then(data => {
+  //         if (data.status === 200 && data.statusText === 'OK') {
+  //           Notify('success', 'Save Success')
+  //           setMaintenance({ ...maintenance, updatedBy: activeUser })
+  //         } else {
+  //           Notify('error', 'Error Saving', data.err)
+  //         }
+  //       })
+  //       .catch(err => console.error(err))
+  //   }
+  //   postSelection(selectedSupplierCids)
+  // }
 
   const handleTimezoneBlur = () => {
     const incomingTimezone = maintenance.timezone || 'Europe/Amsterdam'
@@ -1223,99 +1223,99 @@ const Maintenance = props => {
       .catch(err => console.error(err))
   }
 
-  const handleTextInputBlur = (element) => {
-    const newValue = eval(`maintenance.${element}`)
-    const originalValue = eval(`props.jsonData.profile.${element}`)
-    const maintId = maintenance.id
-    const activeUserEmail = props.session.user.email
-    const activeUser = activeUserEmail.substring(0, activeUserEmail.lastIndexOf('@'))
+  // const handleTextInputBlur = (element) => {
+  //   const newValue = eval(`maintenance.${element}`)
+  //   const originalValue = eval(`props.jsonData.profile.${element}`)
+  //   const maintId = maintenance.id
+  //   const activeUserEmail = props.session.user.email
+  //   const activeUser = activeUserEmail.substring(0, activeUserEmail.lastIndexOf('@'))
 
-    if (newValue === originalValue) {
-      return
-    }
+  //   if (newValue === originalValue) {
+  //     return
+  //   }
 
-    if (maintId === 'NEW') {
-      Notify('warning', 'Cannot Save', 'No CID Assigned')
-      return
-    }
-    fetch(`/api/maintenances/save/textinput?maintId=${maintId}&element=${element}&value=${newValue}&updatedby=${activeUser}`, {
-      method: 'get',
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        _csrf: props.session.accessToken
-      }
-    })
-      .then(resp => resp.json())
-      .then(data => {
-        if (data.status === 200 && data.statusText === 'OK') {
-          Notify('success', 'Save Success')
-          setMaintenance({ ...maintenance, updatedBy: activeUser })
-        } else {
-          Notify('error', 'Error Saving', data.err)
-        }
-      })
-      .catch(err => console.error(err))
-  }
+  //   if (maintId === 'NEW') {
+  //     Notify('warning', 'Cannot Save', 'No CID Assigned')
+  //     return
+  //   }
+  //   fetch(`/api/maintenances/save/textinput?maintId=${maintId}&element=${element}&value=${newValue}&updatedby=${activeUser}`, {
+  //     method: 'get',
+  //     headers: {
+  //       'Access-Control-Allow-Origin': '*',
+  //       _csrf: props.session.accessToken
+  //     }
+  //   })
+  //     .then(resp => resp.json())
+  //     .then(data => {
+  //       if (data.status === 200 && data.statusText === 'OK') {
+  //         Notify('success', 'Save Success')
+  //         setMaintenance({ ...maintenance, updatedBy: activeUser })
+  //       } else {
+  //         Notify('error', 'Error Saving', data.err)
+  //       }
+  //     })
+  //     .catch(err => console.error(err))
+  // }
 
-  const handleNotesBlur = value => {
-    const newValue = maintenance.notes
-    const originalValue = props.jsonData.profile.notes
-    const activeUserEmail = props.session.user.email
-    const activeUser = activeUserEmail.substring(0, activeUserEmail.lastIndexOf('@'))
-    if (newValue === originalValue) {
-      return
-    }
-    const maintId = maintenance.id
-    if (maintId === 'NEW') {
-      Notify('warning', 'Cannot Save', 'No CID Assigned')
-      return
-    }
-    fetch(`/api/maintenances/save/notes?maintId=${maintId}&value=${newValue}&updatedby=${activeUser}`, {
-      method: 'get',
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        _csrf: props.session.accessToken
-      }
-    })
-      .then(resp => resp.json())
-      .then(data => {
-        if (data.status === 200 && data.statusText === 'OK') {
-          Notify('success', 'Save Success')
-          setMaintenance({ ...maintenance, updatedBy: activeUser })
-        } else {
-          Notify('error', 'Error Saving', data.err)
-        }
-      })
-      .catch(err => console.error(err))
-  }
+  // const handleNotesBlur = value => {
+  //   const newValue = maintenance.notes
+  //   const originalValue = props.jsonData.profile.notes
+  //   const activeUserEmail = props.session.user.email
+  //   const activeUser = activeUserEmail.substring(0, activeUserEmail.lastIndexOf('@'))
+  //   if (newValue === originalValue) {
+  //     return
+  //   }
+  //   const maintId = maintenance.id
+  //   if (maintId === 'NEW') {
+  //     Notify('warning', 'Cannot Save', 'No CID Assigned')
+  //     return
+  //   }
+  //   fetch(`/api/maintenances/save/notes?maintId=${maintId}&value=${newValue}&updatedby=${activeUser}`, {
+  //     method: 'get',
+  //     headers: {
+  //       'Access-Control-Allow-Origin': '*',
+  //       _csrf: props.session.accessToken
+  //     }
+  //   })
+  //     .then(resp => resp.json())
+  //     .then(data => {
+  //       if (data.status === 200 && data.statusText === 'OK') {
+  //         Notify('success', 'Save Success')
+  //         setMaintenance({ ...maintenance, updatedBy: activeUser })
+  //       } else {
+  //         Notify('error', 'Error Saving', data.err)
+  //       }
+  //     })
+  //     .catch(err => console.error(err))
+  // }
 
-  const handleSupplierBlur = () => {
-    const newValue = maintenance.lieferant
-    const maintId = maintenance.id
-    const activeUserEmail = props.session.user.email
-    const activeUser = activeUserEmail.substring(0, activeUserEmail.lastIndexOf('@'))
-    if (maintId === 'NEW') {
-      Notify('warning', 'Cannot Save', 'No CID Assigned')
-      return
-    }
-    fetch(`/api/maintenances/save/supplier?maintId=${maintId}&value=${newValue}&updatedby=${activeUser}`, {
-      method: 'get',
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        _csrf: props.session.accessToken
-      }
-    })
-      .then(resp => resp.json())
-      .then(data => {
-        if (data.status === 200 && data.statusText === 'OK') {
-          Notify('success', 'Save Success')
-          setMaintenance({ ...maintenance, updatedBy: activeUser })
-        } else {
-          Notify('error', 'Error Saving', data.err)
-        }
-      })
-      .catch(err => console.error(err))
-  }
+  // const handleSupplierBlur = () => {
+  //   const newValue = maintenance.lieferant
+  //   const maintId = maintenance.id
+  //   const activeUserEmail = props.session.user.email
+  //   const activeUser = activeUserEmail.substring(0, activeUserEmail.lastIndexOf('@'))
+  //   if (maintId === 'NEW') {
+  //     Notify('warning', 'Cannot Save', 'No CID Assigned')
+  //     return
+  //   }
+  //   fetch(`/api/maintenances/save/supplier?maintId=${maintId}&value=${newValue}&updatedby=${activeUser}`, {
+  //     method: 'get',
+  //     headers: {
+  //       'Access-Control-Allow-Origin': '*',
+  //       _csrf: props.session.accessToken
+  //     }
+  //   })
+  //     .then(resp => resp.json())
+  //     .then(data => {
+  //       if (data.status === 200 && data.statusText === 'OK') {
+  //         Notify('success', 'Save Success')
+  //         setMaintenance({ ...maintenance, updatedBy: activeUser })
+  //       } else {
+  //         Notify('error', 'Error Saving', data.err)
+  //       }
+  //     })
+  //     .catch(err => console.error(err))
+  // }
 
   /// /////////////////////////////////////////////////////////
   //
@@ -1363,7 +1363,7 @@ const Maintenance = props => {
     }
   }
 
-  function togglePreviewModal (recipient, customerCID, protection) {
+  function togglePreviewModal(recipient, customerCID, protection) {
     if (recipient && customerCID) {
       const HtmlBody = generateMail(customerCID, protection)
       if (HtmlBody) {
@@ -1479,7 +1479,7 @@ const Maintenance = props => {
       .catch(err => console.error(`Reschedule Edit Error - ${err}`))
   }
 
-  function toggleRescheduleSentBtn (rcounter) {
+  function toggleRescheduleSentBtn(rcounter) {
     const newRescheduleData = rescheduleData
     const reschedIndex = newRescheduleData.findIndex(el => el.rcounter === rcounter)
     const currentSentStatus = newRescheduleData[reschedIndex].sent
@@ -1507,7 +1507,7 @@ const Maintenance = props => {
     rescheduleGridApi.current.refreshCells()
   }
 
-  function toggleConfirmDeleteRescheduleModal () {
+  function toggleConfirmDeleteRescheduleModal() {
     if (rescheduleGridApi.current) {
       const row = rescheduleGridApi.current.getSelectedRows()
       const rescheduleId = `NT-${maintenance.id}-${row[0].rcounter}`
@@ -1649,7 +1649,7 @@ const Maintenance = props => {
       return (
         <ButtonGroup size='md'>
           <IconButton appearance='ghost' onClick={() => Router.back()} icon={<Icon icon='chevron-left' />}>
-              Back
+            Back
           </IconButton>
           <Whisper placement='bottom' speaker={<Tooltip>Open Incoming Mail</Tooltip>}>
             <IconButton appearance='ghost' onClick={toggleReadModal} icon={<Icon icon='at' />}>
@@ -1845,6 +1845,17 @@ const Maintenance = props => {
       )
     }
 
+    // const initialSupplierCids = str => {
+    //   const r = []
+    //   const arr = str.split(',')
+    //   arr.forEach(item => {
+    //     item && r.push(parseInt(item, 10))
+    //   })
+    //   console.log(r)
+    //   return r
+    //   setSelectedSupplierCids(r)
+    // }
+
     return (
       <Layout count={props.unread} session={props.session}>
         {maintenance.id === 'NEW' && (
@@ -1867,7 +1878,7 @@ const Maintenance = props => {
                       supplier: props.jsonData.profile.lieferant,
                       startDateTime: props.jsonData.profile.startDateTime,
                       endDateTime: props.jsonData.profile.endDateTime,
-                      supplierCids: selectedSupplierCids,
+                      supplierCids: props.jsonData.profile.derenCIDid.split(',').map(Number),
                       impact: props.jsonData.profile.impact,
                       location: props.jsonData.profile.location,
                       reason: props.jsonData.profile.reason,
@@ -1878,6 +1889,9 @@ const Maintenance = props => {
                     }}
                     onSubmit={async (values, formikHelpers) => {
                       console.log(values)
+                      if (values.supplierCids && !customerCids.length) {
+                        fetchCustomerCids(values.supplierCids)
+                      }
                       try {
                         await fetch('/api/maintenances/saveAll', {
                           method: 'post',
@@ -1957,7 +1971,7 @@ const Maintenance = props => {
                           <Col sm={12} xs={24}>
                             <FormGroup>
                               <ControlLabel htmlFor='impact' style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                              Impact
+                                Impact
                                 <ButtonGroup size='sm' style={{ float: 'right' }}>
                                   <Whisper placement='bottom' speaker={<Tooltip>Use 50ms Protection Switch Text</Tooltip>}>
                                     <IconButton id='protectionswitchtext' onClick={() => setFieldValue('impact', '50ms protection switch')} size='sm' icon={<Icon icon='clock-o' />} />
@@ -1989,9 +2003,9 @@ const Maintenance = props => {
                           <Col sm={24}>
                             <FormGroup>
                               <ControlLabel htmlFor='maintNote'>
-                              Note
+                                Note
                                 <HelpBlock style={{ float: 'right' }} tooltip>
-                                This note will be included in the mail
+                                  This note will be included in the mail
                                 </HelpBlock>
                               </ControlLabel>
                               <FastField name='maintNote' component={MyTextarea} />
@@ -2002,7 +2016,7 @@ const Maintenance = props => {
                           <Col xs={8} style={{ display: 'flex', justifyContent: 'center' }}>
                             <FormGroup style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                               <ControlLabel>
-                              Cancelled
+                                Cancelled
                               </ControlLabel>
                               <Field name='cancelled' component={MyToggle} checkedChildren={<Icon icon='ban' inverse />} />
                             </FormGroup>
@@ -2010,7 +2024,7 @@ const Maintenance = props => {
                           <Col xs={8} style={{ display: 'flex', justifyContent: 'center' }}>
                             <FormGroup style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                               <ControlLabel>
-                              Emergency
+                                Emergency
                               </ControlLabel>
                               <Field name='emergency' component={MyToggle} checkedChildren={<Icon icon='hospital-o' inverse />} />
                             </FormGroup>
@@ -2018,7 +2032,7 @@ const Maintenance = props => {
                           <Col xs={8} style={{ display: 'flex', justifyContent: 'center' }}>
                             <FormGroup style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                               <ControlLabel>
-                              Done
+                                Done
                               </ControlLabel>
                               <Field name='done' component={MyToggle} checkedChildren={<Icon icon='check' inverse />} />
                             </FormGroup>
@@ -2245,7 +2259,7 @@ const Maintenance = props => {
                     'insertdatetime table paste code help wordcount'
                   ],
                   toolbar:
-                        `undo redo | formatselect | bold italic backcolor | 
+                    `undo redo | formatselect | bold italic backcolor | 
                         alignleft aligncenter alignright alignjustify | 
                         bullist numlist outdent indent | removeformat | help`,
                   content_style: 'html { color: #828282 }'
@@ -2299,7 +2313,7 @@ const Maintenance = props => {
                     </FormGroup>
                     <FormGroup style={{ margin: '20px' }}>
                       <label>
-                          Start Date/Time
+                        Start Date/Time
                       </label>
                       <Flatpickr
                         data-enable-time
@@ -2311,7 +2325,7 @@ const Maintenance = props => {
                     </FormGroup>
                     <FormGroup style={{ margin: '20px' }}>
                       <label>
-                          End Date/Time
+                        End Date/Time
                       </label>
                       <Flatpickr
                         data-enable-time
@@ -2323,13 +2337,13 @@ const Maintenance = props => {
                     </FormGroup>
                     <FormGroup style={{ margin: '20px' }}>
                       <label htmlFor='resched-impact'>
-                          New Impact
+                        New Impact
                       </label>
                       <Input id='resched-impact' name='resched-impact' type='text' value={reschedule.impact} onChange={handleRescheduleImpactChange} />
                     </FormGroup>
                     <FormGroup style={{ margin: '20px' }}>
                       <label htmlFor='resched-reason'>
-                          New Reason
+                        New Reason
                       </label>
                       <SelectPicker
                         cleanable
@@ -2402,7 +2416,7 @@ const Maintenance = props => {
   }
 }
 
-export async function getServerSideProps ({ req, query }) {
+export async function getServerSideProps({ req, query }) {
   const session = await NextAuth.session({ req })
   const host = req ? req.headers['x-forwarded-host'] : window.location.hostname
   let protocol = 'https:'

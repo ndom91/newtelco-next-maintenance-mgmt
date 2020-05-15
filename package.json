@@ -92,14 +92,19 @@
   ],
   "standard": {
     "parser": "babel-eslint",
-    "standard.validate": [
-      "javascript",
-      "javascriptreact",
-      {
-        "language": "html",
-        "autoFix": true
-      }
-    ],
+    "standard": {
+      "globals": [
+        "fetch"
+      ],
+      "validate": [
+        "javascript",
+        "javascriptreact",
+        {
+          "language": "html",
+          "autoFix": true
+        }
+      ]
+    },
     "ignore": [
       "node_modules/",
       "out",
