@@ -3,8 +3,8 @@ import { AgGridReact } from 'ag-grid-react'
 import Select from 'react-select'
 import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-material.css'
-import Notify from '../../lib/notification'
-import ConfirmModal from '../confirmmodal'
+import Notify from '@/newtelco-utils/notification'
+import ConfirmModal from '@/newtelco/confirmmodal'
 import {
   Panel,
   Button,

@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import NextAuth from 'next-auth/client'
-import Layout from '../../components/layout'
-import RequireLogin from '../../components/require-login'
+import Layout from '@/newtelco/layout'
+import RequireLogin from '@/newtelco/require-login'
 import useSWR from 'swr'
-import MaintPanel from '../../components/panel'
-import InboxItem from '../../components/inboxitem'
-import Notify from '../../lib/notification'
-import Store from '../../components/store'
+import MaintPanel from '@/newtelco/panel'
+import InboxItem from '@/newtelco/inboxitem'
+import Notify from '@/newtelco-utils/notification'
+import Store from '@/newtelco/store'
 import {
   List,
   Modal,

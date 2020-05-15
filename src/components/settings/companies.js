@@ -2,8 +2,8 @@ import React, { useRef, useEffect, useState } from 'react'
 import { AgGridReact } from 'ag-grid-react'
 import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-material.css'
-import Notify from '../../lib/notification'
-import ConfirmModal from '../confirmmodal'
+import Notify from '@/newtelco-utils/notification'
+import ConfirmModal from '@/newtelco/confirmmodal'
 import {
   Icon,
   Button,

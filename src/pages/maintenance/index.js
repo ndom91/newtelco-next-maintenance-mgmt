@@ -28,7 +28,7 @@ import CommentList from '@/newtelco/maintenance/comments/list'
 import MaintPanel from '@/newtelco/panel'
 import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-material.css'
-import Notify from '../../lib/notification'
+import Notify from '@/newtelco-utils/notification'
 import { Formik, FastField, Field, useFormikContext } from 'formik'
 import tzOptions from '@/newtelco/maintenance/timezoneOptions'
 import Select from 'react-select'
@@ -1844,17 +1844,6 @@ const Maintenance = ({ session, serverData, unread }) => {
         />
       )
     }
-
-    // const initialSupplierCids = str => {
-    //   const r = []
-    //   const arr = str.split(',')
-    //   arr.forEach(item => {
-    //     item && r.push(parseInt(item, 10))
-    //   })
-    //   console.log(r)
-    //   return r
-    //   setSelectedSupplierCids(r)
-    // }
 
     return (
       <Layout>

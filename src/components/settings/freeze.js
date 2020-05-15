@@ -1,15 +1,15 @@
-import React, { useEffect, useRef, useState }from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { AgGridReact } from 'ag-grid-react'
 import Select from 'react-select'
-import StartDateTime from '../ag-grid/startdatetime'
-import EndDateTime from '../ag-grid/enddatetime'
+import StartDateTime from '@/newtelco/ag-grid/startdatetime'
+import EndDateTime from '@/newtelco/ag-grid/enddatetime'
 // import Flatpickr from 'react-flatpickr'
 import moment from 'moment-timezone'
 import 'flatpickr/dist/themes/material_blue.css'
 import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-material.css'
-import Notify from '../../lib/notification'
-import ConfirmModal from '../confirmmodal'
+import Notify from '@/newtelco-utils/notification'
+import ConfirmModal from '@/newtelco/confirmmodal'
 import {
   Panel,
   Button,
@@ -27,7 +27,7 @@ import {
   Loader
 } from 'rsuite'
 
-const Freeze = props => { 
+const Freeze = props => {
   const gridApi = useRef()
   const [openFreezeAdd, setOpenFreezeAdd] = useState(false)
   const [openConfirmDeleteModal, setOpenConfirmDelete] = useState(false)

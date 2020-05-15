@@ -3,7 +3,10 @@ import NextAuth from 'next-auth'
 import Providers from 'next-auth/providers'
 import Adapters from 'next-auth/adapters'
 
-import adapterConfig from '../../../../adapter.config'
+const database = {
+  type: 'sqlite',
+  database: ':memory:',
+}
 
 const options = {
   site: process.env.SITE,
@@ -13,7 +16,7 @@ const options = {
       clientSecret: process.env.GOOGLE_SECRET
     })
   ],
-  adapter: Adapters.Default(adapterConfig),
+  adapter: Adapters.Default(database),
 }
 
 export default (req, res) => NextAuth(req, res, options)
