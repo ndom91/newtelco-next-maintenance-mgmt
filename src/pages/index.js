@@ -33,7 +33,7 @@ const Index = ({ session }) => {
 
   if (session) {
     return (
-      <Layout session={session}>
+      <Layout>
         <MaintPanel header='Maintenance'>
           <div className='grid-container'>
             <div className='unread'>
@@ -62,7 +62,7 @@ const Index = ({ session }) => {
   }
 }
 
-export async function getServerSideProps ({ req }) {
+export async function getServerSideProps({ req }) {
   const session = await NextAuth.session({ req })
   return {
     props: {

@@ -1,11 +1,10 @@
-import React, { useRef, useState, useEffect } from 'react'
+import React, { useRef, useState } from 'react'
 import NextAuth from 'next-auth/client'
 import './history.css'
 import Layout from '../../components/layout'
 import { AgGridReact } from 'ag-grid-react'
 import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-material.css'
-import Link from 'next/link'
 import moment from 'moment-timezone'
 import Router from 'next/router'
 import RequireLogin from '../../components/require-login'
@@ -23,16 +22,14 @@ import Notify from '../../lib/notification'
 import ConfirmModal from '../../components/confirmmodal'
 import {
   Icon,
-  Button,
   IconButton,
   ButtonGroup,
   FlexboxGrid,
-  Modal,
   SelectPicker,
   Loader
 } from 'rsuite'
 
-const History = props => {
+const History = ({ session, data }) => {
   const gridOptions = {
     defaultColDef: {
       resizable: true,
@@ -160,7 +157,7 @@ const History = props => {
   const [openNewModal, setOpenNewModal] = useState(false)
   const [selectedNewCompany, setSelectedNewCompany] = useState('')
   const [openConfirmDeleteModal, setOpenConfirmDeleteModal] = useState(false)
-  const [rowData, setRowData] = useState(props.data.maintenances)
+  const [rowData, setRowData] = useState(data.maintenances)
   const [newMaintenanceInfo, setNewMaintenanceInfo] = useState([])
   const [idToDelete, setIdToDelete] = useState('')
 
@@ -285,9 +282,9 @@ const History = props => {
     )
   }
 
-  if (props.session?.user) {
+  if (session) {
     return (
-      <Layout session={props.session}>
+      <Layout>
         <MaintPanel
           header='History'
           buttons={

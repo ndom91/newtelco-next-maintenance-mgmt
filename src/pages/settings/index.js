@@ -47,9 +47,9 @@ const Settings = ({ session, router }) => {
     )
   }
 
-  if (session?.user) {
+  if (session) {
     return (
-      <Layout session={session}>
+      <Layout>
         <MaintPanel header='Settings' buttons={<SettingsNav />}>
           <FlexboxGrid align='top' justify='center' style={{ width: '100%' }}>
             {tab === 'companies' && <Companies />}

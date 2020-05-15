@@ -98,23 +98,23 @@ const AutoSave = ({ debounceMs }) => {
   return <p style={{ color: 'var(--grey2)' }}>{result}</p>
 }
 
-const Maintenance = props => {
+const Maintenance = ({ session, serverData, unread }) => {
   const store = Store.useStore()
   const [maintenance, setMaintenance] = useState({
     incomingAttachments: [],
-    incomingBody: props.jsonData.profile.body,
+    incomingBody: serverData.profile.body,
     timezone: 'Europe/Amsterdam',
     timezoneLabel: '(GMT+02:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna',
     bearbeitetvon: '',
     maileingang: '',
     updatedAt: '',
-    updatedBy: props.jsonData.profile.updatedBy || '',
+    updatedBy: serverData.profile.updatedBy || '',
     name: '',
     impact: '',
     location: '',
     reason: '',
     mailId: 'NT',
-    calendarId: props.jsonData.profile.calendarId || '',
+    calendarId: serverData.profile.calendarId || '',
     maintNote: ''
   })
   const [frozenState, setFrozenState] = useState({
@@ -345,21 +345,21 @@ const Maintenance = props => {
   useEffect(() => {
     let lieferantDomain
     let localMaint
-    if (props.jsonData.profile.id === 'NEW') {
+    if (serverData.profile.id === 'NEW') {
       // prepare NEW maintenance
-      const username = props.session.user.email.substr(0, props.session.user.email.indexOf('@'))
+      const username = session.user.email.substr(0, session.user.email.indexOf('@'))
       const newMaint = {
         ...maintenance,
-        ...props.jsonData.profile,
+        ...serverData.profile,
         bearbeitetvon: username,
         updatedAt: format(new Date(), 'MM.dd.yyyy HH:mm')
       }
       setMaintenance(newMaint)
       localMaint = newMaint
-      lieferantDomain = props.jsonData.profile.name
+      lieferantDomain = serverData.profile.name
     } else {
       // prepare page for existing maintenance
-      fetch(`/api/reschedule?id=${props.jsonData.profile.id}`, {
+      fetch(`/api/reschedule?id=${serverData.profile.id}`, {
         method: 'get'
       })
         .then(resp => resp.json())
@@ -372,25 +372,25 @@ const Maintenance = props => {
         cancelled,
         emergency,
         done
-      } = props.jsonData.profile
+      } = serverData.profile
 
       const newMaintenance = {
-        ...props.jsonData.profile,
+        ...serverData.profile,
         cancelled: convertBool(cancelled),
         emergency: convertBool(emergency),
         done: convertBool(done),
         timezone: 'Europe/Amsterdam',
         timezoneLabel: '(GMT+01:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna',
-        startDateTime: moment.tz(props.jsonData.profile.startDateTime, 'GMT').tz('Etc/GMT-1').format('YYYY-MM-DD HH:mm:ss'),
-        endDateTime: moment.tz(props.jsonData.profile.endDateTime, 'GMT').tz('Etc/GMT-1').format('YYYY-MM-DD HH:mm:ss')
+        startDateTime: moment.tz(serverData.profile.startDateTime, 'GMT').tz('Etc/GMT-1').format('YYYY-MM-DD HH:mm:ss'),
+        endDateTime: moment.tz(serverData.profile.endDateTime, 'GMT').tz('Etc/GMT-1').format('YYYY-MM-DD HH:mm:ss')
       }
 
       setMaintenance(newMaintenance)
-      lieferantDomain = props.jsonData.profile.mailDomain
+      lieferantDomain = serverData.profile.mailDomain
     }
     // prepare to get available supplier CIDs for selected supplier
-    if (props.jsonData.profile.lieferant) {
-      fetchSupplierCids(props.jsonData.profile.lieferant)
+    if (serverData.profile.lieferant) {
+      fetchSupplierCids(serverData.profile.lieferant)
     } else {
       fetch(`/api/companies/domain?id=${lieferantDomain}`, {
         method: 'get'
@@ -425,8 +425,8 @@ const Maintenance = props => {
       .catch(err => console.error(`Error - ${err}`))
 
     // prepopulate impact placeholder
-    const startDateTime = props.jsonData.profile.startDateTime
-    const endDateTime = props.jsonData.profile.endDateTime
+    const startDateTime = serverData.profile.startDateTime
+    const endDateTime = serverData.profile.endDateTime
 
     if (startDateTime && endDateTime && isValid(parseISO(startDateTime)) && isValid(parseISO(endDateTime))) {
       const impactCalculation = formatDistance(parseISO(endDateTime), parseISO(startDateTime))
@@ -476,7 +476,7 @@ const Maintenance = props => {
           return
         }
         setSupplierCids(data.lieferantCIDsResult)
-        const derenCIDids = props.jsonData.profile.derenCIDid
+        const derenCIDids = serverData.profile.derenCIDid
         if (derenCIDids.includes(',')) {
           const selectedCids = []
           derenCIDids
@@ -616,8 +616,8 @@ const Maintenance = props => {
     const rawEnd = moment.tz(store.get('maintenance').endDateTime, timezoneValue)
     const utcStart1 = rawStart.tz('GMT').format('YYYY-MM-DD HH:mm:ss')
     const utcEnd1 = rawEnd.tz('GMT').format('YYYY-MM-DD HH:mm:ss')
-    const utcStart = props.jsonData.profile.startDateTime || utcStart1
-    const utcEnd = props.jsonData.profile.endDateTime || utcEnd1
+    const utcStart = serverData.profile.startDateTime || utcStart1
+    const utcEnd = serverData.profile.endDateTime || utcEnd1
 
     let maintenanceIntro = 'We would like to inform you about planned work on the following CID(s):'
     const rescheduleText = ''
@@ -774,7 +774,7 @@ const Maintenance = props => {
             gridApi.current.refreshCells()
           }
           const maintId = maintenance.id
-          const user = props.session.user.email
+          const user = session.user.email
           const action = 'sent to'
           const field = kundenCidRow.name
           updateSentProgress()
@@ -925,7 +925,7 @@ const Maintenance = props => {
             calendarId: calId
           })
 
-          fetch(`/api/maintenances/save/calendar?mid=${maintenance.id}&cid=${calId}&updatedby=${props.session.user.email}`, {
+          fetch(`/api/maintenances/save/calendar?mid=${maintenance.id}&cid=${calId}&updatedby=${session.user.email}`, {
             method: 'get'
           })
             .then(resp => resp.json())
@@ -975,13 +975,13 @@ const Maintenance = props => {
   //     return
   //   }
   //   newISOTime = newISOTime.utc().format('YYYY-MM-DD HH:mm:ss')
-  //   const activeUserEmail = props.session.user.email
+  //   const activeUserEmail = session.user.email
   //   const activeUser = activeUserEmail.substring(0, activeUserEmail.lastIndexOf('@'))
   //   fetch(`/api/maintenances/save/dateTime?maintId=${maintId}&element=${element}&value=${newISOTime}&updatedby=${activeUser}`, {
   //     method: 'get',
   //     headers: {
   //       'Access-Control-Allow-Origin': '*',
-  //       _csrf: props.session.accessToken
+  //       _csrf: session.accessToken
   //     }
   //   })
   //     .then(resp => resp.json())
@@ -1033,7 +1033,7 @@ const Maintenance = props => {
 
   // const handleToggleChange = (element, event) => {
   //   const maintId = maintenance.id
-  //   const activeUserEmail = props.session.user.email
+  //   const activeUserEmail = session.user.email
   //   const activeUser = activeUserEmail.substring(0, activeUserEmail.lastIndexOf('@'))
   //   let newValue = !eval(`maintenance.${element}`)
   //   if (typeof newValue === 'string') {
@@ -1079,7 +1079,7 @@ const Maintenance = props => {
   //       method: 'get',
   //       headers: {
   //         'Access-Control-Allow-Origin': '*',
-  //         _csrf: props.session.accessToken
+  //         _csrf: session.accessToken
   //       }
   //     })
   //       .then(resp => resp.json())
@@ -1105,7 +1105,7 @@ const Maintenance = props => {
   //     method: 'get',
   //     headers: {
   //       'Access-Control-Allow-Origin': '*',
-  //       _csrf: props.session.accessToken
+  //       _csrf: session.accessToken
   //     }
   //   })
   //     .then(resp => resp.json())
@@ -1169,20 +1169,20 @@ const Maintenance = props => {
   //     } else {
   //       idParameter = id
   //     }
-  //     if (idParameter === props.jsonData.profile.derenCIDid) {
+  //     if (idParameter === jsonData.profile.derenCIDid) {
   //       return true
   //     }
   //     if (maintenance.id === 'NEW') {
   //       Notify('error', 'Cannot Save', 'No CID Assigned')
   //       return
   //     }
-  //     const activeUserEmail = props.session.user.email
+  //     const activeUserEmail = session.user.email
   //     const activeUser = activeUserEmail.substring(0, activeUserEmail.lastIndexOf('@'))
   //     fetch(`/api/maintenances/save/lieferant?maintId=${maintenance.id}&cid=${idParameter}&updatedby=${activeUser}`, {
   //       method: 'get',
   //       headers: {
   //         'Access-Control-Allow-Origin': '*',
-  //         _csrf: props.session.accessToken
+  //         _csrf: session.accessToken
   //       }
   //     })
   //       .then(resp => resp.json())
@@ -1202,13 +1202,13 @@ const Maintenance = props => {
   const handleTimezoneBlur = () => {
     const incomingTimezone = maintenance.timezone || 'Europe/Amsterdam'
     const incomingTimezoneLabel = encodeURIComponent(maintenance.timezoneLabel || '(GMT+02:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna')
-    const activeUserEmail = props.session.user.email
+    const activeUserEmail = session.user.email
     const activeUser = activeUserEmail.substring(0, activeUserEmail.lastIndexOf('@'))
     fetch(`/api/maintenances/save/timezone?maintId=${maintenance.id}&timezone=${incomingTimezone}&timezoneLabel=${incomingTimezoneLabel}&updatedby=${activeUser}`, {
       method: 'get',
       headers: {
         'Access-Control-Allow-Origin': '*',
-        _csrf: props.session.accessToken
+        _csrf: session.accessToken
       }
     })
       .then(resp => resp.json())
@@ -1225,9 +1225,9 @@ const Maintenance = props => {
 
   // const handleTextInputBlur = (element) => {
   //   const newValue = eval(`maintenance.${element}`)
-  //   const originalValue = eval(`props.jsonData.profile.${element}`)
+  //   const originalValue = eval(`jsonData.profile.${element}`)
   //   const maintId = maintenance.id
-  //   const activeUserEmail = props.session.user.email
+  //   const activeUserEmail = session.user.email
   //   const activeUser = activeUserEmail.substring(0, activeUserEmail.lastIndexOf('@'))
 
   //   if (newValue === originalValue) {
@@ -1242,7 +1242,7 @@ const Maintenance = props => {
   //     method: 'get',
   //     headers: {
   //       'Access-Control-Allow-Origin': '*',
-  //       _csrf: props.session.accessToken
+  //       _csrf: session.accessToken
   //     }
   //   })
   //     .then(resp => resp.json())
@@ -1259,8 +1259,8 @@ const Maintenance = props => {
 
   // const handleNotesBlur = value => {
   //   const newValue = maintenance.notes
-  //   const originalValue = props.jsonData.profile.notes
-  //   const activeUserEmail = props.session.user.email
+  //   const originalValue = jsonData.profile.notes
+  //   const activeUserEmail = session.user.email
   //   const activeUser = activeUserEmail.substring(0, activeUserEmail.lastIndexOf('@'))
   //   if (newValue === originalValue) {
   //     return
@@ -1274,7 +1274,7 @@ const Maintenance = props => {
   //     method: 'get',
   //     headers: {
   //       'Access-Control-Allow-Origin': '*',
-  //       _csrf: props.session.accessToken
+  //       _csrf: session.accessToken
   //     }
   //   })
   //     .then(resp => resp.json())
@@ -1292,7 +1292,7 @@ const Maintenance = props => {
   // const handleSupplierBlur = () => {
   //   const newValue = maintenance.lieferant
   //   const maintId = maintenance.id
-  //   const activeUserEmail = props.session.user.email
+  //   const activeUserEmail = session.user.email
   //   const activeUser = activeUserEmail.substring(0, activeUserEmail.lastIndexOf('@'))
   //   if (maintId === 'NEW') {
   //     Notify('warning', 'Cannot Save', 'No CID Assigned')
@@ -1302,7 +1302,7 @@ const Maintenance = props => {
   //     method: 'get',
   //     headers: {
   //       'Access-Control-Allow-Origin': '*',
-  //       _csrf: props.session.accessToken
+  //       _csrf: session.accessToken
   //     }
   //   })
   //     .then(resp => resp.json())
@@ -1353,7 +1353,7 @@ const Maintenance = props => {
             incomingSubject: data.subject,
             incomingDate: data.date,
             incomingAttachments: data.attachments,
-            incomingDomain: props.jsonData.profile.mailDomain
+            incomingDomain: serverData.profile.mailDomain
           })
           setOpenReadModal(!openReadModal)
         })
@@ -1429,7 +1429,7 @@ const Maintenance = props => {
     const newStartDateTime = moment.tz(reschedule.startDateTime, timezone).utc().format('YYYY-MM-DD HH:mm:ss')
     const newEndDateTime = moment.tz(reschedule.endDateTime, timezone).utc().format('YYYY-MM-DD HH:mm:ss')
 
-    fetch(`/api/reschedule/save?mid=${maintenance.id}&impact=${encodeURIComponent(newImpact)}&sdt=${encodeURIComponent(newStartDateTime)}&edt=${encodeURIComponent(newEndDateTime)}&rcounter=${rescheduleData.length + 1}&user=${encodeURIComponent(props.session.user.email)}&reason=${encodeURIComponent(newReason)}`, {
+    fetch(`/api/reschedule/save?mid=${maintenance.id}&impact=${encodeURIComponent(newImpact)}&sdt=${encodeURIComponent(newStartDateTime)}&edt=${encodeURIComponent(newEndDateTime)}&rcounter=${rescheduleData.length + 1}&user=${encodeURIComponent(session.user.email)}&reason=${encodeURIComponent(newReason)}`, {
       method: 'get'
     })
       .then(resp => resp.json())
@@ -1467,7 +1467,7 @@ const Maintenance = props => {
     const newEndDateTime = moment(params.data.endDateTime).format('YYYY.MM.DD HH:mm:ss')
     const newImpact = params.data.impact
 
-    fetch(`/api/reschedule/edit?mid=${maintenance.id}&impact=${encodeURIComponent(newImpact)}&sdt=${encodeURIComponent(newStartDateTime)}&edt=${encodeURIComponent(newEndDateTime)}&rcounter=${rcounter}&user=${encodeURIComponent(props.session.user.email)}`, {
+    fetch(`/api/reschedule/edit?mid=${maintenance.id}&impact=${encodeURIComponent(newImpact)}&sdt=${encodeURIComponent(newStartDateTime)}&edt=${encodeURIComponent(newEndDateTime)}&rcounter=${rcounter}&user=${encodeURIComponent(session.user.email)}`, {
       method: 'get'
     })
       .then(resp => resp.json())
@@ -1493,7 +1493,7 @@ const Maintenance = props => {
     }
     setRescheduleData(newRescheduleData)
 
-    fetch(`/api/reschedule/sent?mid=${maintenance.id}&rcounter=${rcounter}&sent=${newSentStatus}&user=${encodeURIComponent(props.session.user.email)}`, {
+    fetch(`/api/reschedule/sent?mid=${maintenance.id}&rcounter=${rcounter}&sent=${newSentStatus}&user=${encodeURIComponent(session.user.email)}`, {
       method: 'get'
     })
       .then(resp => resp.json())
@@ -1520,7 +1520,7 @@ const Maintenance = props => {
   }
 
   const handleDeleteReschedule = () => {
-    fetch(`/api/reschedule/delete?mid=${maintenance.id}&rcounter=${rescheduleToDelete.rcounter}&user=${encodeURIComponent(props.session.user.email)}`, {
+    fetch(`/api/reschedule/delete?mid=${maintenance.id}&rcounter=${rescheduleToDelete.rcounter}&user=${encodeURIComponent(session.user.email)}`, {
       method: 'get'
     })
       .then(resp => resp.json())
@@ -1644,7 +1644,7 @@ const Maintenance = props => {
     maintenanceIdDisplay = `NT-${maintenance.id}`
   }
 
-  if (props?.session?.user) {
+  if (session?.user) {
     const HeaderLeft = () => {
       return (
         <ButtonGroup size='md'>
@@ -1857,7 +1857,7 @@ const Maintenance = props => {
     // }
 
     return (
-      <Layout count={props.unread} session={props.session}>
+      <Layout>
         {maintenance.id === 'NEW' && (
           <Message full showIcon type='warning' description='Remember to Save before continuing to work!' style={{ position: 'fixed', zIndex: '999' }} />
         )}
@@ -1874,18 +1874,18 @@ const Maintenance = props => {
                     validateOnChange={false}
                     validateOnBlur={false}
                     initialValues={{
-                      timezone: props.jsonData.profile.timezone,
-                      supplier: props.jsonData.profile.lieferant,
-                      startDateTime: props.jsonData.profile.startDateTime,
-                      endDateTime: props.jsonData.profile.endDateTime,
-                      supplierCids: props.jsonData.profile.derenCIDid.split(',').map(Number),
-                      impact: props.jsonData.profile.impact,
-                      location: props.jsonData.profile.location,
-                      reason: props.jsonData.profile.reason,
-                      note: props.jsonData.profile.maintNote,
-                      cancelled: props.jsonData.profile.cancelled,
-                      emergency: props.jsonData.profile.emergency,
-                      done: props.jsonData.profile.done
+                      timezone: serverData.profile.timezone,
+                      supplier: serverData.profile.lieferant,
+                      startDateTime: serverData.profile.startDateTime,
+                      endDateTime: serverData.profile.endDateTime,
+                      supplierCids: serverData.profile.derenCIDid.split(',').map(Number),
+                      impact: serverData.profile.impact,
+                      location: serverData.profile.location,
+                      reason: serverData.profile.reason,
+                      note: serverData.profile.maintNote,
+                      cancelled: serverData.profile.cancelled,
+                      emergency: serverData.profile.emergency,
+                      done: serverData.profile.done
                     }}
                     onSubmit={async (values, formikHelpers) => {
                       console.log(values)
@@ -2044,7 +2044,7 @@ const Maintenance = props => {
                   <Row gutter={20} style={{ marginBottom: '20px' }}>
                     <Col>
                       {maintenance.id && (
-                        <CommentList user={props.session.user.email} id={maintenance.id} />
+                        <CommentList user={session.user.email} id={maintenance.id} />
                       )}
                     </Col>
                   </Row>
@@ -2196,7 +2196,7 @@ const Maintenance = props => {
             openReadModal={openReadModal}
             toggleReadModal={toggleReadModal}
             incomingAttachments={maintenance.incomingAttachments}
-            jsonData={props.jsonData}
+            jsonData={serverData}
           />
         )}
         {openPreviewModal && (
@@ -2426,7 +2426,7 @@ export async function getServerSideProps({ req, query }) {
   if (query.id === 'NEW') {
     return {
       props: {
-        jsonData: { profile: query },
+        serverData: { profile: query },
         session
       }
     }
@@ -2436,7 +2436,7 @@ export async function getServerSideProps({ req, query }) {
     const json = await res.json()
     return {
       props: {
-        jsonData: json,
+        serverData: json,
         session
       }
     }

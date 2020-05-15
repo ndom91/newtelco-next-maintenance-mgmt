@@ -21,20 +21,19 @@ import {
   Loader
 } from 'rsuite'
 
-const Inbox = props => {
+const Inbox = ({ session, inboxItems }) => {
   const store = Store.useStore()
-  const unread = store.get('count')
   const [isOpen, setIsOpen] = useState(false)
   const [faviconLoading, setFaviconLoading] = useState(false)
   const [modalInfo, setModalInfo] = useState({})
   const [isTranslated, setIsTranslated] = useState(false)
   const [ogModalBody, setOgModalBody] = useState('')
   // cleanup whether SWR gets inbox items initally or getInitialProps, or what
-  const [inboxMails, setInboxMails] = useState(props.inboxItems)
+  const [inboxMails, setInboxMails] = useState(inboxItems)
   const { data } = useSWR(
     '/v1/api/inbox',
     url => fetch(url).then(res => res.json()),
-    { refreshInterval: 30000, focusThrottleInterval: 10000, initialData: props.inboxItems }
+    { refreshInterval: 30000, focusThrottleInterval: 10000, initialData: inboxItems }
   )
 
   useEffect(() => {
@@ -136,7 +135,7 @@ const Inbox = props => {
       .then(data => {
         if (data.status === 'complete') {
           Notify('success', 'Message Deleted')
-          const newUnread = unread - 1
+          const newUnread = store.get('count') - 1
           const array = inboxMails
           const index = inboxMails.findIndex(el => el.id === data.id)
           if (index !== -1) {
@@ -149,9 +148,9 @@ const Inbox = props => {
       .catch(err => console.error(`Error - ${err}`))
   }
 
-  if (props?.session?.user) {
+  if (session) {
     return (
-      <Layout count={unread} session={props.session}>
+      <Layout>
         <MaintPanel header='Inbox'>
           {inboxMails.length === 0 ? (
             <FlexboxGrid justify='center' align='middle' style={{ margin: '40px 0' }}>

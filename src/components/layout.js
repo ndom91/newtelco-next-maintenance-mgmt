@@ -21,7 +21,7 @@ const UnreadFavicon = dynamic(
   { ssr: false }
 )
 
-const Layout = ({ session, children }) => {
+const Layout = ({ children }) => {
   const [openA2HS, setOpenA2HS] = useState(false)
   const [deferredPrompt, setDeferredPrompt] = useState(null)
   const store = Store.useStore()
@@ -91,13 +91,13 @@ const Layout = ({ session, children }) => {
         </Container>
         <Modal className='a2hs-modal' backdrop='static' size='md' show={openA2HS} onHide={() => toggleA2HSModal} style={{ marginTop: '75px' }}>
           <Modal.Header className='keyboard-shortcut-header'>
-                Save Application
+            Save Application
           </Modal.Header>
           <Modal.Body className='keyboard-shortcut-body'>
             <Container className='keyboard-shortcut-container'>
-                Do you want to save this app to the homescreen?
+              Do you want to save this app to the homescreen?
               <Button style={{ width: '100%', marginTop: '20px' }} onClick={addToHomescreen} className='a2hs-btn'>
-                  Add to Homescreen
+                Add to Homescreen
               </Button>
             </Container>
           </Modal.Body>
