@@ -1,4 +1,4 @@
-import { createConnectedStore } from 'undux'
+import { createConnectedStore, withLogger } from 'undux'
 
 export default createConnectedStore({
   count: 0,
@@ -6,4 +6,4 @@ export default createConnectedStore({
   maintenance: {},
   impactPlaceholder: '',
   comments: []
-})
+}, withLogger)

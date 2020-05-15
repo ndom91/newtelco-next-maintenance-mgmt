@@ -2,14 +2,14 @@ import React from 'react'
 
 const ProtectedIcon = ({ node }) => {
   if (node && node.data) {
-    if (node.data.protected === '1' || node.data.protected === 'true') {
+    if (node.data.protected === '1' || node.data.protected === true) {
       // Lock Closed
       return (
         <div style={{ height: '32px', width: '32px' }}>
           <svg height='24' width='24' fill='var(--primary)' viewBox='0 0 20 20'><path d='M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z' clipRule='evenodd' fillRule='evenodd' /></svg>
         </div>
       )
-    } else if (node.data.protected === '0' || node.data.protected === 'false') {
+    } else if (node.data.protected === '0' || node.data.protected === false) {
       // Lock Open
       return (
         <div style={{ height: '32px', width: '32px' }}>
