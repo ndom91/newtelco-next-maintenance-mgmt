@@ -1,12 +1,6 @@
-
 import React from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Select from 'react-select'
 import { Editor as TinyEditor } from '@tinymce/tinymce-react'
-import {
-  faCalendarAlt,
-  faAt
-} from '@fortawesome/free-solid-svg-icons'
 
 export default class Templates extends React.Component {
   static async getInitialProps ({ req, query }) {
@@ -68,7 +62,7 @@ export default class Templates extends React.Component {
           <Container className='container-exterior'>
             <CardHeader className='container-header'>
               Maintenance Email
-              <FontAwesomeIcon width='1.125em' style={{ marginRight: '10px' }} icon={faAt} />
+              {/* <FontAwesomeIcon width='1.125em' style={{ marginRight: '10px' }} icon={faAt} /> */}
             </CardHeader>
             <Container className='container-border'>
               <TinyEditor
@@ -96,7 +90,7 @@ export default class Templates extends React.Component {
           <Container className='container-exterior'>
             <CardHeader className='container-header'>
               Maintenance Calendar
-              <FontAwesomeIcon width='1.125em' style={{ marginRight: '10px' }} icon={faCalendarAlt} />
+              {/* <FontAwesomeIcon width='1.125em' style={{ marginRight: '10px' }} icon={faCalendarAlt} /> */}
             </CardHeader>
             <Container className='container-border'>
               <TinyEditor

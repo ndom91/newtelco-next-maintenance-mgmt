@@ -2,20 +2,9 @@ import React, { useState, useRef, useEffect } from 'react'
 import Router from 'next/router'
 import algoliasearch from 'algoliasearch'
 import Autocomplete from 'algolia-react-autocomplete'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import './search.css'
-import {
-  faAngleRight,
-  faClock,
-  faEthernet,
-  faMapMarkerAlt
-} from '@fortawesome/free-solid-svg-icons'
-import {
-  faClock as faClockRegular
-} from '@fortawesome/free-regular-svg-icons'
-import { DOMHelper } from 'rsuite';
-const { addClass, removeClass } = DOMHelper;
-
+import { DOMHelper } from 'rsuite'
+const { addClass, removeClass } = DOMHelper
 
 const SearchInput = props => {
   const searchInput = useRef()
@@ -24,9 +13,6 @@ const SearchInput = props => {
       return ' ' + word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
     }).join('')
   }
-
-  const [showSuggestions, setShowSuggestions] = useState(false)
-  const [hide, setHide] = useState(false)
 
   useEffect(() => {
     window.addEventListener('mousedown', handleClickOutside);
@@ -38,7 +24,6 @@ const SearchInput = props => {
 
   const handleClickOutside = (event) => {
     if (searchInput && !searchInput.current.contains(event.target)) {
-      setHide(true)
       addClass(document.querySelector('.aa-dropdown-menus'), 'hide-dropdown')
       removeClass(document.querySelector('.aa-dropdown-menus'), 'show-dropdown')
       addClass(document.getElementById('aa-search-input'), 'search-small')
@@ -80,7 +65,7 @@ const SearchInput = props => {
                 </span>
                 {suggestion.location && (
                   <span>
-                    <FontAwesomeIcon icon={faMapMarkerAlt} className='search-list-icons' width='0.6em' style={{ color: 'secondary', margin: '0px 5px' }} />
+                    <svg fill="none" width='1.1em' style={{ marginBottom: '-3px', marginRight: '-2px' }} stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor" viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                     <span style={{ fontSize: '80%' }} dangerouslySetInnerHTML={{ __html: toCamelCase(suggestion.location) }} />
                   </span>
                 )}
@@ -88,24 +73,24 @@ const SearchInput = props => {
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '80%' }}>
                 {suggestion.startDateTime && (
                   <span>
-                    <FontAwesomeIcon icon={faClock} className='search-list-icons' width='0.8em' style={{ color: 'secondary', margin: '-2px 5px 0px 0px' }} />
+                    <svg fill="none" width="1.3em" style={{ marginBottom: '-3px', marginRight: '2px' }} stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     <span dangerouslySetInnerHTML={{ __html: suggestion.startDateTime.substr(0, suggestion.startDateTime.length - 3) }} />
                   </span>
                 )}
                 {suggestion.endDateTime && (
                   <span>
-                    <FontAwesomeIcon icon={faClockRegular} className='search-list-icons' width='0.8em' style={{ color: 'secondary', margin: '-2px 3px 0px 0px' }} />
+                    <svg fill="none" width="1.3em" style={{ marginBottom: '-3px', marginRight: '2px' }} stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     <span dangerouslySetInnerHTML={{ __html: suggestion.endDateTime.substr(0, suggestion.endDateTime.length - 3) }} />
                   </span>
                 )}
               </div>
               {suggestion.derenCID && (
                 <div style={{ fontSize: '80%', display: 'flex', alignItems: 'flex-start' }}>
-                  <FontAwesomeIcon icon={faEthernet} className='search-list-icons' width='0.8em' style={{ color: 'secondary', margin: '3px 5px 0px 0px' }} />
+                  <svg fill="none" width="1.3em" style={{ marginRight: '2px' }} stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor" viewBox="0 0 24 24"><path d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                   <span dangerouslySetInnerHTML={{ __html: suggestion.derenCID }} />
                   {suggestion.betroffeneCIDs && (
                     <>
-                      <FontAwesomeIcon icon={faAngleRight} className='search-icon' width='0.5em' style={{ color: 'secondary', margin: '2px 5px' }} />
+                      <svg fill="none" width="0.5em" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"></path></svg>
                       <span style={{ textOverflow: 'ellipsis', maxWidth: `calc( 300px - ${suggestion.derenCID.length}px * 4 )`, overflow: 'hidden', whiteSpace: 'nowrap', marginBottom: '-5px', display: 'inline-block' }} dangerouslySetInnerHTML={{ __html: newtelcoCID }} />
                     </>
                   )}
@@ -122,7 +107,6 @@ const SearchInput = props => {
     const newLocation = `/maintenance?id=${selection.id}`
     Router.push(newLocation)
   }
-
 
   return (
     <div ref={searchInput} style={{ width: '400px' }}>

@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { AgGridReact } from 'ag-grid-react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Select from 'react-select'
 import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-material.css'
