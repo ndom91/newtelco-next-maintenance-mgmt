@@ -6,6 +6,7 @@ import './maintenance.css'
 import Router from 'next/router'
 import { Helmet } from 'react-helmet'
 import { Editor as TinyEditor } from '@tinymce/tinymce-react'
+import MailEditor from '@/newtelco/maintenance/mailEditor'
 import { format, isValid, formatDistance, parseISO, compareAsc } from 'date-fns'
 import moment from 'moment-timezone'
 import { Rnd } from 'react-rnd'
@@ -1631,11 +1632,11 @@ const Maintenance = ({ session, serverData, unread }) => {
     let text = rescheduleData.length !== 0 ? ' [RESCHEDULED]' : ''
     text += formRef.current.values.emergency ? ' [EMERGENCY]' : ''
     text += formRef.current.values.cancelled ? ' [CANCELLED]' : ''
-    text += 'Planned Work Notification - NT-' + maintenance.id
+    text += ' Planned Work Notification - NT-' + maintenance.id
     if (rescheduleData.length !== 0) {
       text += rescheduleData.length !== 0 && '-' + rescheduleData[rescheduleData.length - 1].rcounter
     }
-    setMailPreviewSubject(text)
+    setMailPreviewSubject(text.trimStart().trimEnd())
     return text
   }
 
@@ -2211,7 +2212,7 @@ const Maintenance = ({ session, serverData, unread }) => {
             </FlexboxGrid.Item>
           </FlexboxGrid>
         </MaintPanel>
-        {typeof window !== 'undefined' && openReadModal && (
+        {openReadModal && (
           <ReadModal
             maintenance={maintenance}
             openReadModal={openReadModal}
@@ -2221,79 +2222,16 @@ const Maintenance = ({ session, serverData, unread }) => {
           />
         )}
         {openPreviewModal && (
-          <Modal className='modal-preview-send' backdrop size='lg' show={openPreviewModal} onHide={togglePreviewModal}>
-            <Modal.Header>
-              <FlexboxGrid justify='start' align='middle' style={{ width: '100%' }}>
-                <FlexboxGrid.Item colspan={3} style={{ display: 'flex', justifyContent: 'center' }}>
-                  {faviconLoading && (
-                    <Loader />
-                  )}
-                  <Avatar
-                    size='lg'
-                    src='/v1/api/faviconUrl?d=newtelco.de'
-                    style={{ backgroundColor: 'transparent', display: faviconLoading ? 'none' : 'block' }}
-                    onLoad={() => setFaviconLoading(false)}
-                  />
-                </FlexboxGrid.Item>
-                <FlexboxGrid.Item colspan={19}>
-                  <div className='modal-preview-text-wrapper'>
-                    <InputGroup className='modal-textbox' style={{ marginBottom: '2px' }}>
-                      <InputGroup.Addon style={{ height: '31px' }} type='prepend'>
-                        To
-                      </InputGroup.Addon>
-                      <Input readOnly value={mailPreviewRecipients.toLowerCase()} />
-                    </InputGroup>
-                    <InputGroup className='modal-textbox' style={{ marginBottom: '2px' }}>
-                      <InputGroup.Addon style={{ height: '31px' }} type='prepend'>
-                        CC
-                      </InputGroup.Addon>
-                      <Input type='text' readOnly value='service@newtelco.de' />
-                    </InputGroup>
-                    <InputGroup className='modal-textbox'>
-                      <InputGroup.Addon style={{ height: '31px' }} type='prepend'>
-                        Subject
-                      </InputGroup.Addon>
-                      <Input type='text' readOnly value={mailPreviewSubject} />
-                    </InputGroup>
-                  </div>
-                </FlexboxGrid.Item>
-                <FlexboxGrid.Item colspan={1} style={{ marginLeft: '30px' }}>
-                  <Whisper speaker={<Tooltip>Send Mail</Tooltip>} placement='bottom'>
-                    <IconButton
-                      onClick={() => sendMail(mailPreviewRecipients, mailPreviewCustomerCID, mailPreviewSubject, mailBodyText, true)}
-                      appearance='default'
-                      style={{ color: 'var(--grey3)' }}
-                      size='lg'
-                      icon={<Icon icon='send' />}
-                    />
-                  </Whisper>
-                </FlexboxGrid.Item>
-              </FlexboxGrid>
-            </Modal.Header>
-            <Modal.Body style={{ maxHeight: 'unset', paddingBottom: '0px' }}>
-              <TinyEditor
-                initialValue={mailBodyText}
-                apiKey='ttv2x1is9joc0fi7v6f6rzi0u98w2mpehx53mnc1277omr7s'
-                init={{
-                  height: 500,
-                  menubar: true,
-                  statusbar: false,
-                  plugins: [
-                    'advlist autolink lists link image print preview anchor',
-                    'searchreplace code',
-                    'insertdatetime table paste code help wordcount'
-                  ],
-                  toolbar:
-                    `undo redo | formatselect | bold italic backcolor | 
-                        alignleft aligncenter alignright alignjustify | 
-                        bullist numlist outdent indent | removeformat | help`,
-                  content_style: 'html { color: #828282 } body::-webkit-scrollbar-track { border-radius: 10px; background-color: rgba(0,0,0,0); } body::-webkit-scrollbar { width: 8px; height: 8px; background-color: transparent; } body::-webkit-scrollbar-thumb { border-radius: 10px; background-color: rgba(0,0,0,0.4); } '
-                }}
-                onChange={handleEditorChange}
-              />
-
-            </Modal.Body>
-          </Modal>
+          <MailEditor
+            open={openPreviewModal}
+            onHide={togglePreviewModal}
+            recipients={mailPreviewRecipients.toLowerCase()}
+            subject={mailPreviewSubject}
+            body={mailBodyText}
+            customerCid={mailPreviewCustomerCID}
+            sendMail={sendMail}
+            onEditorChange={handleEditorChange}
+          />
         )}
         {typeof window !== 'undefined' && openRescheduleModal && (
           <Rnd

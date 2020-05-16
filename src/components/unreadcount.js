@@ -47,7 +47,7 @@ const UnreadCount = () => {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const fav = getFavicon()
-      setFaviconEl(fav)
+      fav && setFaviconEl(fav)
     }
   }, [count])
 
