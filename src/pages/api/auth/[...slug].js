@@ -6,6 +6,7 @@ import Adapters from 'next-auth/adapters'
 const database = {
   type: 'sqlite',
   database: ':memory:',
+  synchronize: true
 }
 
 const options = {

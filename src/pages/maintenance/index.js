@@ -101,7 +101,7 @@ const AutoSave = ({ debounceMs }) => {
 }
 
 
-const Maintenance = ({ session, serverData, unread }) => {
+const Maintenance = ({ session, serverData, suppliers }) => {
   const store = Store.useStore()
   const [maintenance, setMaintenance] = useState(serverData.profile)
   // useState({
@@ -149,12 +149,11 @@ const Maintenance = ({ session, serverData, unread }) => {
   const [mailPreviewCustomerCID, setMailPreviewCustomerCid] = useState('')
   const [mailPreviewSubject, setMailPreviewSubject] = useState('')
   const [customerCids, setCustomerCids] = useState([])
-  const [suppliers, setSuppliers] = useState([])
+  // const [suppliers, setSuppliers] = useState([])
   const [supplierCids, setSupplierCids] = useState([])
   const [impactPlaceholder, setImpactPlaceholder] = useState([])
   const [selectedSupplierCids, setSelectedSupplierCids] = useState([])
   const [sentProgress, setSentProgress] = useState(0)
-  const [faviconLoading, setFaviconLoading] = useState(false)
 
   const formRef = useRef()
   const gridApi = useRef()
@@ -181,7 +180,6 @@ const Maintenance = ({ session, serverData, unread }) => {
   }
 
   const togglePreviewModal = (recipient, customerCID, protection) => {
-    setFaviconLoading(true)
     if (recipient && customerCID) {
       const HtmlBody = generateMail(customerCID, protection)
       if (HtmlBody) {
@@ -336,7 +334,6 @@ const Maintenance = ({ session, serverData, unread }) => {
     rowClass: 'row-class',
     rowClassRules: {
       'row-frozen': function (params) {
-        // const frozen = params.data.frozen
         if (params.data.frozen) {
           return true
         }
@@ -383,61 +380,15 @@ const Maintenance = ({ session, serverData, unread }) => {
   //   gridApi?.current?.hideOverlay()
   // }, [selectedSupplierCids])
 
-  useEffect(() => {
-    gridApi?.current?.hideOverlay()
-  }, [gridApi.current])
+  // useEffect(() => {
+  //   gridApi.current.hideOverlay()
+  // }, [gridApi.current])
 
   useEffect(() => {
-    let lieferantDomain
-    let localMaint
     if (serverData.profile.id === 'NEW') {
       // prepare NEW maintenance
       const username = session.user.email.substr(0, session.user.email.indexOf('@'))
-      const newMaint = {
-        ...maintenance,
-        ...serverData.profile,
-        bearbeitetvon: username,
-        updatedAt: format(new Date(), 'MM.dd.yyyy HH:mm')
-      }
-      setMaintenance(newMaint)
-      localMaint = newMaint
-      lieferantDomain = serverData.profile.name
-    } else {
-      // prepare page for existing maintenance
-      fetch(`/api/reschedule?id=${serverData.profile.id}`, {
-        method: 'get'
-      })
-        .then(resp => resp.json())
-        .then(data => {
-          setRescheduleData(data.reschedules)
-        })
-        .catch(err => console.error(`Error Loading Reschedules - ${err}`))
-
-      const {
-        cancelled,
-        emergency,
-        done
-      } = serverData.profile
-
-      const newMaintenance = {
-        ...serverData.profile,
-        cancelled: convertBool(cancelled),
-        emergency: convertBool(emergency),
-        done: convertBool(done),
-        timezone: 'Europe/Amsterdam',
-        timezoneLabel: '(GMT+01:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna',
-        startDateTime: moment.tz(serverData.profile.startDateTime, 'GMT').tz('Etc/GMT-1').format('YYYY-MM-DD HH:mm:ss'),
-        endDateTime: moment.tz(serverData.profile.endDateTime, 'GMT').tz('Etc/GMT-1').format('YYYY-MM-DD HH:mm:ss')
-      }
-
-      setMaintenance(newMaintenance)
-      lieferantDomain = serverData.profile.mailDomain
-    }
-    // prepare to get available supplier CIDs for selected supplier
-    if (serverData.profile.lieferant) {
-      fetchSupplierCids(serverData.profile.lieferant)
-    } else {
-      fetch(`/api/companies/domain?id=${lieferantDomain}`, {
+      fetch(`/api/companies/domain?id=${serverData.profile.name}`, {
         method: 'get'
       })
         .then(resp => resp.json())
@@ -449,35 +400,52 @@ const Maintenance = ({ session, serverData, unread }) => {
           const companyId = data.companyResults[0].id
           const companyName = data.companyResults[0].name
           setMaintenance({
-            ...maintenance,
-            ...localMaint,
+            ...serverData.profile,
             name: companyName,
-            lieferant: companyId
+            lieferant: companyId,
+            bearbeitetvon: username,
+            updatedAt: format(new Date(), 'MM.dd.yyyy HH:mm')
           })
           fetchSupplierCids(companyId)
         })
         .catch(err => console.error(`Error - ${err}`))
-    }
+    } else {
+      // prepare page for existing maintenance
+      const {
+        cancelled,
+        emergency,
+        done
+      } = serverData.profile
 
-    // get choices for company select
-    fetch('/api/companies/selectmaint', {
-      method: 'get'
-    })
-      .then(resp => resp.json())
-      .then(data => {
-        setSuppliers(data.companies)
+      setMaintenance({
+        ...serverData.profile,
+        cancelled: convertBool(cancelled),
+        emergency: convertBool(emergency),
+        done: convertBool(done),
+        timezone: 'Europe/Amsterdam',
+        timezoneLabel: '(GMT+01:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna',
+        startDateTime: moment.tz(serverData.profile.startDateTime, 'GMT').tz('Etc/GMT-1').format('YYYY-MM-DD HH:mm:ss'), // TODO: DONT HARDCORE TIMEZONE
+        endDateTime: moment.tz(serverData.profile.endDateTime, 'GMT').tz('Etc/GMT-1').format('YYYY-MM-DD HH:mm:ss') // TODO: DONT HARDCORE TIMEZONE
       })
-      .catch(err => console.error(`Error - ${err}`))
+      fetchSupplierCids(serverData.profile.lieferant)
 
-    // prepopulate impact placeholder
-    const startDateTime = serverData.profile.startDateTime
-    const endDateTime = serverData.profile.endDateTime
+      const startDateTime = serverData.profile.startDateTime
+      const endDateTime = serverData.profile.endDateTime
+      if (startDateTime && endDateTime && isValid(parseISO(startDateTime)) && isValid(parseISO(endDateTime))) {
+        const impactCalculation = formatDistance(parseISO(endDateTime), parseISO(startDateTime))
+        setImpactPlaceholder(impactCalculation)
+      }
 
-    if (startDateTime && endDateTime && isValid(parseISO(startDateTime)) && isValid(parseISO(endDateTime))) {
-      const impactCalculation = formatDistance(parseISO(endDateTime), parseISO(startDateTime))
-      setImpactPlaceholder(impactCalculation)
+      // TODO: potentially redesign customer cid / reschedule / changelog into tabbed area and push this call off to when reschedule tab gets selected instead of on load..
+      fetch(`/api/reschedule?id=${serverData.profile.id}`, {
+        method: 'get'
+      })
+        .then(resp => resp.json())
+        .then(data => {
+          setRescheduleData(data.reschedules)
+        })
+        .catch(err => console.error(`Error Loading Reschedules - ${err}`))
     }
-    store.set('maintenance')(maintenance)
   }, [])
 
   /// /////////////////////////////////////////////////////////
@@ -521,15 +489,15 @@ const Maintenance = ({ session, serverData, unread }) => {
           return
         }
         setSupplierCids(data.lieferantCIDsResult)
-        const derenCIDids = serverData.profile.derenCIDid
-        if (derenCIDids.includes(',')) {
-          const selectedCids = []
-          derenCIDids
-            .split(',')
-            .forEach(x => {
-              selectedCids.push(parseInt(x, 10))
-            })
-        }
+        // const derenCIDids = serverData.profile.derenCIDid
+        // if (derenCIDids.includes(',')) {
+        //   const selectedCids = []
+        //   derenCIDids
+        //     .split(',')
+        //     .forEach(x => {
+        //       selectedCids.push(parseInt(x, 10))
+        //     })
+        // }
       })
       .catch(err => console.error(`Error - ${err}`))
   }
@@ -652,7 +620,7 @@ const Maintenance = ({ session, serverData, unread }) => {
 
     const cancelled = convertBool(currentMaint.cancelled)
     if (cancelled) {
-      maintenanceIntro = `We would like to inform you that these planned works (<b>NT-${currentMaint.id}</b>) have been <b>cancelled</b> with the following CID(s):`
+      maintenanceIntro = `We would like to inform you that these planned works (<b>NT-${maintenance.id}</b>) have been <b>cancelled</b> with the following CID(s):`
     }
 
     if (rescheduleData.length !== 0) {
@@ -663,9 +631,9 @@ const Maintenance = ({ session, serverData, unread }) => {
       const newReason = rescheduleData[latest].reason.toLowerCase()
       const rcounter = rescheduleData[latest].rcounter
       if (cancelled && rescheduleData[latest]) {
-        maintenanceIntro = `We would like to inform you that these rescheduled planned works (<b>NT-${currentMaint.id}-${rcounter}</b>) have been <b>cancelled</b>.<br><br>We are sorry for any inconveniences this may have caused.<br><footer>​<style>.sig{font-family:Century Gothic, sans-serif;font-size:9pt;color:#636266!important;}b.i{color:#4ca702;}.gray{color:#636266 !important;}a{text-decoration:none;color:#636266 !important;}</style><div class="sig"><div>Best regards <b class="i">|</b> Mit freundlichen Grüßen</div><br><div><b>Newtelco Maintenance Team</b></div><br><div>NewTelco GmbH <b class="i">|</b> Moenchhofsstr. 24 <b class="i">|</b> 60326 Frankfurt a.M. <b class="i">|</b> DE <br>www.newtelco.com <b class="i">|</b> 24/7 NOC  49 69 75 00 27 30 ​​<b class="i">|</b> <a style="color:#" href="mailto:service@newtelco.de">service@newtelco.de</a><br><br><div><img alt="sig" src="https://home.newtelco.de/sig.png" height="29" width="516"></div></div>​</footer><hr />`
+        maintenanceIntro = `We would like to inform you that these rescheduled planned works (<b>NT-${maintenance.id}-${rcounter}</b>) have been <b>cancelled</b>.<br><br>We are sorry for any inconveniences this may have caused.<br><footer>​<style>.sig{font-family:Century Gothic, sans-serif;font-size:9pt;color:#636266!important;}b.i{color:#4ca702;}.gray{color:#636266 !important;}a{text-decoration:none;color:#636266 !important;}</style><div class="sig"><div>Best regards <b class="i">|</b> Mit freundlichen Grüßen</div><br><div><b>Newtelco Maintenance Team</b></div><br><div>NewTelco GmbH <b class="i">|</b> Moenchhofsstr. 24 <b class="i">|</b> 60326 Frankfurt a.M. <b class="i">|</b> DE <br>www.newtelco.com <b class="i">|</b> 24/7 NOC  49 69 75 00 27 30 ​​<b class="i">|</b> <a style="color:#" href="mailto:service@newtelco.de">service@newtelco.de</a><br><br><div><img alt="sig" src="https://home.newtelco.de/sig.png" height="29" width="516"></div></div>​</footer><hr />`
       }
-      maintenanceIntro += `We regret to inform you that the planned works have been <b>rescheduled</b> on the following CID(s):\n\n<br><br><b>${customerCID}</b><br><br>The maintenance has been rescheduled due to ${newReason}.<br><br>The new details are as follows:<br><table border="0" cellspacing="2" cellpadding="2" width="775px"><tr><td style='width: 205px;'>Maintenance ID:</td><td><b>NT-${currentMaint.id}-${rcounter}</b></td></tr><tr><td>New Start date and time:</td><td><b>${newStart} (${tzSuffixRAW})</b></td></tr><tr><td>New Finish date and time:</td><td><b>${newEnd} (${tzSuffixRAW})</b></td></tr><tr><td>New Impact:</td><td><b>${newImpact}</b></td></tr></table><br>Thank you very much for your patience and cooperation.<br>`
+      maintenanceIntro += `We regret to inform you that the planned works have been <b>rescheduled</b> on the following CID(s):\n\n<br><br><b>${customerCID}</b><br><br>The maintenance has been rescheduled due to ${newReason}.<br><br>The new details are as follows:<br><table border="0" cellspacing="2" cellpadding="2" width="775px"><tr><td style='width: 205px;'>Maintenance ID:</td><td><b>NT-${maintenance.id}-${rcounter}</b></td></tr><tr><td>New Start date and time:</td><td><b>${newStart} (${tzSuffixRAW})</b></td></tr><tr><td>New Finish date and time:</td><td><b>${newEnd} (${tzSuffixRAW})</b></td></tr><tr><td>New Impact:</td><td><b>${newImpact}</b></td></tr></table><br>Thank you very much for your patience and cooperation.<br>`
 
       if (rescheduleData.length > 1) {
         maintenanceIntro += '<br><hr><br><b>Previous Reschedules:</b><br>'
@@ -710,18 +678,18 @@ const Maintenance = ({ session, serverData, unread }) => {
       body = body + '<tr><td>Location:</td><td>' + currentMaint.location + '</td></tr>'
     }
 
-    console.log('reason', currentMaint.reason)
     if (currentMaint.reason) {
       body = body + '<tr><td>Reason:</td><td>' + currentMaint.reason + '</td></tr>'
     }
 
     let maintNoteBody = ''
     if (currentMaint.maintNote) {
-      if (currentMaint.maintNote.includes('%20')) {
-        maintNoteBody = '<p>' + decodeURIComponent(currentMaint.maintNote) + '</p>'
-      } else {
-        maintNoteBody = '<p>' + currentMaint.maintNote + '</p>'
-      }
+      maintNoteBody = '<p>' + currentMaint.maintNote + '</p>'
+      // if (currentMaint.maintNote.includes('%20')) {
+      //   maintNoteBody = '<p>' + decodeURIComponent(currentMaint.maintNote) + '</p>'
+      // } else {
+      //   maintNoteBody = '<p>' + currentMaint.maintNote + '</p>'
+      // }
     }
 
     body = body + `</table>${maintNoteBody}<p>We sincerely regret any inconvenience that may be caused by this and hope for further mutually advantageous cooperation.</p><p>If you have any questions feel free to contact us at maintenance@newtelco.de.</p></div>​​</body>​​<footer>​<style>.sig{font-family:Century Gothic, sans-serif;font-size:9pt;color:#636266!important;}b.i{color:#4ca702;}.gray{color:#636266 !important;}a{text-decoration:none;color:#636266 !important;}</style><div class="sig"><div>Best regards <b class="i">|</b> Mit freundlichen Grüßen</div><br><div><b>Newtelco Maintenance Team</b></div><br><div>NewTelco GmbH <b class="i">|</b> Moenchhofsstr. 24 <b class="i">|</b> 60326 Frankfurt a.M. <b class="i">|</b> DE <br>www.newtelco.com <b class="i">|</b> 24/7 NOC  49 69 75 00 27 30 ​​<b class="i">|</b> <a style="color:#" href="mailto:service@newtelco.de">service@newtelco.de</a><br><br><div><img alt="sig" src="https://home.newtelco.de/sig.png" height="29" width="516"></div></div>​</footer>`
@@ -971,9 +939,9 @@ const Maintenance = ({ session, serverData, unread }) => {
   /// /////////////////////////////////////////////////////////
 
   // mail preview modal change
-  const handleMailPreviewChange = (content, delta, source, editor) => {
-    setMailBodyText(editor.getContents())
-  }
+  // const handleMailPreviewChange = (content, delta, source, editor) => {
+  //   setMailBodyText(editor.getContents())
+  // }
 
   // // react-select onChange - supplier CIDs
   // const handleSelectSupplierChange = selectedOption => {
@@ -1223,29 +1191,29 @@ const Maintenance = ({ session, serverData, unread }) => {
   //   postSelection(selectedSupplierCids)
   // }
 
-  const handleTimezoneBlur = () => {
-    const incomingTimezone = maintenance.timezone || 'Europe/Amsterdam'
-    const incomingTimezoneLabel = encodeURIComponent(maintenance.timezoneLabel || '(GMT+02:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna')
-    const activeUserEmail = session.user.email
-    const activeUser = activeUserEmail.substring(0, activeUserEmail.lastIndexOf('@'))
-    fetch(`/api/maintenances/save/timezone?maintId=${maintenance.id}&timezone=${incomingTimezone}&timezoneLabel=${incomingTimezoneLabel}&updatedby=${activeUser}`, {
-      method: 'get',
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        _csrf: session.accessToken
-      }
-    })
-      .then(resp => resp.json())
-      .then(data => {
-        if (data.status === 200 && data.statusText === 'OK') {
-          Notify('success', 'Save Success')
-          setMaintenance({ ...maintenance, updatedBy: activeUser })
-        } else {
-          Notify('error', 'Error Saving', data.err)
-        }
-      })
-      .catch(err => console.error(err))
-  }
+  // const handleTimezoneBlur = () => {
+  //   const incomingTimezone = maintenance.timezone || 'Europe/Amsterdam'
+  //   const incomingTimezoneLabel = encodeURIComponent(maintenance.timezoneLabel || '(GMT+02:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna')
+  //   const activeUserEmail = session.user.email
+  //   const activeUser = activeUserEmail.substring(0, activeUserEmail.lastIndexOf('@'))
+  //   fetch(`/api/maintenances/save/timezone?maintId=${maintenance.id}&timezone=${incomingTimezone}&timezoneLabel=${incomingTimezoneLabel}&updatedby=${activeUser}`, {
+  //     method: 'get',
+  //     headers: {
+  //       'Access-Control-Allow-Origin': '*',
+  //       _csrf: session.accessToken
+  //     }
+  //   })
+  //     .then(resp => resp.json())
+  //     .then(data => {
+  //       if (data.status === 200 && data.statusText === 'OK') {
+  //         Notify('success', 'Save Success')
+  //         setMaintenance({ ...maintenance, updatedBy: activeUser })
+  //       } else {
+  //         Notify('error', 'Error Saving', data.err)
+  //       }
+  //     })
+  //     .catch(err => console.error(err))
+  // }
 
   // const handleTextInputBlur = (element) => {
   //   const newValue = eval(`maintenance.${element}`)
@@ -1584,6 +1552,7 @@ const Maintenance = ({ session, serverData, unread }) => {
     }
     const updatedAtFormatted = format(new Date(updatedAt), 'yyyy-MM-dd HH:mm:ss')
 
+    // TODO: refactor to POST
     fetch(`/api/maintenances/save/create?bearbeitetvon=${bearbeitetvon}&lieferant=${lieferant}&mailId=${mailId}&updatedAt=${updatedAtFormatted}&maileingang=${incomingFormatted}`, {
       method: 'get'
     })
@@ -1604,7 +1573,7 @@ const Maintenance = ({ session, serverData, unread }) => {
       })
       .catch(err => console.error(err))
 
-    // mark mail as unread as well
+    // mark mail as read in connected gmail inbox
     const incomingMailId = maintenance.mailId || maintenance.receivedmail
     if (incomingMailId !== 'NT') {
       fetch('/v1/api/inbox/delete', {
@@ -1646,13 +1615,6 @@ const Maintenance = ({ session, serverData, unread }) => {
   //
   /// /////////////////////////////////////////////////////////
 
-  let maintenanceIdDisplay
-  if (maintenance.id === 'NEW') {
-    maintenanceIdDisplay = maintenance.id
-  } else {
-    maintenanceIdDisplay = `NT-${maintenance.id}`
-  }
-
   if (session) {
     const HeaderLeft = () => {
       return (
@@ -1671,7 +1633,7 @@ const Maintenance = ({ session, serverData, unread }) => {
 
     const HeaderCenter = () => {
       return (
-        <Badge content={maintenanceIdDisplay} className='header-badge'>
+        <Badge content={maintenance.id === 'NEW' ? 'NEW' : `NT-${maintenance.id}`} className='header-badge'>
           <Button appearance='subtle' size='lg' style={{ fontSize: '1.1em', fontWeight: '200', border: '1px solid var(--grey2)' }}>
             {maintenance.name}
           </Button>
@@ -1709,7 +1671,6 @@ const Maintenance = ({ session, serverData, unread }) => {
         </ButtonGroup>
       )
     }
-
 
     const TimezoneSelector = ({
       field,
@@ -1753,7 +1714,7 @@ const Maintenance = ({ session, serverData, unread }) => {
                 setMaintenance({
                   ...maintenance,
                   lieferant: option,
-                  name: suppliers.find(options => options.value === option).label
+                  name: suppliers.companies.find(options => options.value === option).label
                 })
                 setSupplierCids(data.lieferantCIDsResult)
               })
@@ -1761,7 +1722,7 @@ const Maintenance = ({ session, serverData, unread }) => {
             form.setFieldValue(field.name, option)
             form.setFieldValue('supplierCids', [])
           }}
-          data={suppliers}
+          data={suppliers.companies}
           placeholder='Please select a Supplier'
         />
       )
@@ -2394,12 +2355,14 @@ export async function getServerSideProps({ req, query }) {
       }
     }
   } else {
-    const pageRequest = `${protocol}//${host}/api/maintenances/${query.id}`
-    const res = await fetch(pageRequest)
-    const json = await res.json()
+    const res = await fetch(`${protocol}//${host}/api/maintenances/${query.id}`)
+    const serverData = await res.json()
+    const res2 = await fetch(`${protocol}//${host}/api/companies/selectmaint`)
+    const suppliers = await res2.json()
     return {
       props: {
-        serverData: json,
+        serverData,
+        suppliers,
         session
       }
     }
