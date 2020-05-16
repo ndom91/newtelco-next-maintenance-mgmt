@@ -565,15 +565,11 @@ const Maintenance = ({ session, serverData, unread }) => {
         setCustomerCids(uniqueKundenCids)
         gridApi.current.hideOverlay()
         checkFreezeStatus(uniqueKundenCids)
-        // uniqueKundenCids.forEach(cid => {
-        //   checkFreezeStatus(cid)
-        // })
       })
       .catch(err => console.error(`Error - ${err}`))
   }
 
   const checkFreezeStatus = (cids) => {
-    console.log(cids)
     const startDate = maintenance.startDateTime
     const endDate = maintenance.endDateTime
     const uniqueCustomers = []
@@ -594,12 +590,10 @@ const Maintenance = ({ session, serverData, unread }) => {
       .then(resp => resp.json())
       .then(data => {
         if (data.freezeQuery.length !== 0) {
-          console.log(data.freezeQuery)
           const customerCidEntries = customerCids
           data.freezeQuery.forEach(freezeResult => {
             const frozenCidIndex = customerCidEntries.findIndex(el => el.kunde === freezeResult.companyId)
-            // do something with frozen row
-            Notify('error', 'CID Frozen', `${customerCidEntries[frozenCidIndex].name} has an active network freeze at that time`)
+            Notify('error', 'Network Freeze', `${freezeResult.name} has active freeze during this time period!`)
             customerCidEntries[frozenCidIndex].frozen = true
           })
           setCustomerCids(customerCidEntries)
@@ -1860,6 +1854,29 @@ const Maintenance = ({ session, serverData, unread }) => {
       )
     }
 
+    useEffect(() => {
+      const values = formRef.current.values
+      store.set('maintenance')({
+        ...store.get('maintenance'),
+        lieferant: values.supplier,
+        name: suppliers.length ? suppliers.find(options => options.value === values.supplier).label : '',
+        timezone: values.timezone,
+        derenCIDid: values.supplierCids,
+        startDateTime: values.startDateTime,
+        endDateTime: values.endDateTime,
+        notes: values.note,
+        updatedAt: new Date().toISOString(),
+        // betroffeneCIDs: values.,
+        done: values.done,
+        cancelled: values.cancelled,
+        emergency: values.emergency,
+        reason: values.reason,
+        impact: values.impact,
+        location: values.location,
+        updatedBy: session.user.email.match(/^([^@]*)@/)[1]
+      })
+    }, [formRef.current?.values])
+
     return (
       <Layout>
         {maintenance.id === 'NEW' && (
@@ -1892,26 +1909,7 @@ const Maintenance = ({ session, serverData, unread }) => {
                       done: !!+serverData.profile.done
                     }}
                     onSubmit={async (values, formikHelpers) => {
-                      console.log(values)
-                      setMaintenance({
-                        ...maintenance,
-                        lieferant: values.supplier,
-                        name: suppliers.find(options => options.value === values.supplier).label,
-                        timezone: values.timezone,
-                        derenCIDid: values.supplierCids,
-                        startDateTime: values.startDateTime,
-                        endDateTime: values.endDateTime,
-                        notes: values.note,
-                        updatedAt: new Date().toISOString(),
-                        // betroffeneCIDs: values.,
-                        done: values.done,
-                        cancelled: values.cancelled,
-                        emergency: values.emergency,
-                        reason: values.reason,
-                        impact: values.impact,
-                        location: values.location,
-                        updatedBy: session.user.email.match(/^([^@]*)@/)[1]
-                      })
+                      console.log('submitted: ', values)
                       if (values.supplierCids && !customerCids.length) {
                         fetchCustomerCids(values.supplierCids)
                       }
