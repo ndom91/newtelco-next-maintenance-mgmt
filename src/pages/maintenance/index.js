@@ -102,23 +102,24 @@ const AutoSave = ({ debounceMs }) => {
 
 const Maintenance = ({ session, serverData, unread }) => {
   const store = Store.useStore()
-  const [maintenance, setMaintenance] = useState({
-    incomingAttachments: [],
-    incomingBody: serverData.profile.body,
-    timezone: 'Europe/Amsterdam',
-    timezoneLabel: '(GMT+02:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna',
-    bearbeitetvon: '',
-    maileingang: '',
-    updatedAt: '',
-    updatedBy: serverData.profile.updatedBy || '',
-    name: '',
-    impact: '',
-    location: '',
-    reason: '',
-    mailId: 'NT',
-    calendarId: serverData.profile.calendarId || '',
-    maintNote: ''
-  })
+  const [maintenance, setMaintenance] = useState(serverData.profile)
+  // useState({
+  //   incomingAttachments: [],
+  //   incomingBody: serverData.profile.body,
+  //   timezone: 'Europe/Amsterdam',
+  //   timezoneLabel: '(GMT+02:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna',
+  //   bearbeitetvon: '',
+  //   maileingang: '',
+  //   updatedAt: '',
+  //   updatedBy: serverData.profile.updatedBy || '',
+  //   name: '',
+  //   impact: '',
+  //   location: '',
+  //   reason: '',
+  //   mailId: 'NT',
+  //   calendarId: serverData.profile.calendarId || '',
+  //   maintNote: ''
+  // })
   const [frozenState, setFrozenState] = useState({
     recipient: '',
     cid: ''
@@ -179,9 +180,8 @@ const Maintenance = ({ session, serverData, unread }) => {
   }
 
   const togglePreviewModal = (recipient, customerCID, protection) => {
-    // setFaviconLoading(true)
+    setFaviconLoading(true)
     if (recipient && customerCID) {
-      // console.log(recipient, customerCID, protection)
       const HtmlBody = generateMail(customerCID, protection)
       if (HtmlBody) {
         setMailBodyText(HtmlBody)
@@ -362,9 +362,9 @@ const Maintenance = ({ session, serverData, unread }) => {
     }
   }
 
-  useEffect(() => {
-    store.set('maintenance')(maintenance)
-  }, [maintenance])
+  // useEffect(() => {
+  //   store.set('maintenance')(maintenance)
+  // }, [maintenance])
 
   // store.on('maintenance').subscribe(maint => {
   //   console.log('subscription', maint)
@@ -627,12 +627,10 @@ const Maintenance = ({ session, serverData, unread }) => {
 
   // generate Mail contents
   const generateMail = (customerCID, protection) => {
-    console.log('store', store.get('maintenance').id, store.get('maintenance').startDateTime, store.get('maintenance').endDateTime)
-    console.log('hook', maintenance.id, maintenance.startDateTime, maintenance.endDateTime)
-
-    const currentMaint = maintenance
-    console.log('store', store.get('maintenance'))
-    console.log('hook', maintenance)
+    // TODO: everything that can be changed by form = currentMaint, everythign else =hook maintenance
+    const currentMaint = formRef.current.values
+    console.log('maintenancehook', maintenance)
+    console.log('currentMaint', formRef.current.values)
 
     if (currentMaint.id === '' || currentMaint.startDateTime === '' || currentMaint.endDateTime === '') {
       Notify('warning', 'Missing Required Fields')
@@ -691,13 +689,13 @@ const Maintenance = ({ session, serverData, unread }) => {
           const newImpact = i.impact
           const newReason = i.reason && i.reason.toLowerCase()
           const rcounter = i.rcounter
-          maintenanceIntro += `<br>This maintenance had been rescheduled due to ${newReason}.<br><br>The previous details were as follows:<br><table border="0" cellspacing="2" cellpadding="2" width="775px"><tr><td style='width: 205px;'>Maintenance ID:</td><td><b>NT-${currentMaint.id}-${rcounter}</b></td></tr><tr><td>Previous Start date and time:</td><td><b>${newStart} (${tzSuffixRAW})</b></td></tr><tr><td>Previous Finish date and time:</td><td><b>${newEnd} (${tzSuffixRAW})</b></td></tr><tr><td>Previous Impact:</td><td><b>${newImpact}</b></td></tr></table>`
+          maintenanceIntro += `<br>This maintenance had been rescheduled due to ${newReason}.<br><br>The previous details were as follows:<br><table border="0" cellspacing="2" cellpadding="2" width="775px"><tr><td style='width: 205px;'>Maintenance ID:</td><td><b>NT-${maintenance.id}-${rcounter}</b></td></tr><tr><td>Previous Start date and time:</td><td><b>${newStart} (${tzSuffixRAW})</b></td></tr><tr><td>Previous Finish date and time:</td><td><b>${newEnd} (${tzSuffixRAW})</b></td></tr><tr><td>Previous Impact:</td><td><b>${newImpact}</b></td></tr></table>`
         }
       }
       maintenanceIntro += '<br><hr><i><b>Original Planned Works:</b></i><br><br>Dear Colleagues,<br><br>We would like to inform you about planned work on the following CID(s):\n'
     }
 
-    let body = `<body style="color:#666666;">${rescheduleText} Dear Colleagues,​​<p><span>${maintenanceIntro}<br><br> <b>${customerCID}</b> <br><br>The maintenance work is with the following details:</span></p><table border="0" cellspacing="2" cellpadding="2" width="775px"><tr><td style='width: 205px;'>Maintenance ID:</td><td><b>NT-${currentMaint.id}</b></td></tr><tr><td>Start date and time:</td><td><b>${utcStart} (${tzSuffixRAW})</b></td></tr><tr><td>Finish date and time:</td><td><b>${utcEnd} (${tzSuffixRAW})</b></td></tr>`
+    let body = `<body style="color:#666666;">${rescheduleText} Dear Colleagues,​​<p><span>${maintenanceIntro}<br><br> <b>${customerCID}</b> <br><br>The maintenance work is with the following details:</span></p><table border="0" cellspacing="2" cellpadding="2" width="775px"><tr><td style='width: 205px;'>Maintenance ID:</td><td><b>NT-${maintenance.id}</b></td></tr><tr><td>Start date and time:</td><td><b>${utcStart} (${tzSuffixRAW})</b></td></tr><tr><td>Finish date and time:</td><td><b>${utcEnd} (${tzSuffixRAW})</b></td></tr>`
     if (currentMaint.impact || protection || impactPlaceholder) {
       if (protection) {
         body = body + '<tr><td>Impact:</td><td>50ms Protection Switch</td></tr>'
@@ -711,6 +709,7 @@ const Maintenance = ({ session, serverData, unread }) => {
       body = body + '<tr><td>Location:</td><td>' + currentMaint.location + '</td></tr>'
     }
 
+    console.log('reason', currentMaint.reason)
     if (currentMaint.reason) {
       body = body + '<tr><td>Reason:</td><td>' + currentMaint.reason + '</td></tr>'
     }
@@ -1630,9 +1629,9 @@ const Maintenance = ({ session, serverData, unread }) => {
 
   const generateMailSubject = () => {
     let text = rescheduleData.length !== 0 ? ' [RESCHEDULED]' : ''
-    text += store.get('maintenance').emergency ? ' [EMERGENCY]' : ''
-    text += store.get('maintenance').cancelled ? ' [CANCELLED]' : ''
-    text += 'Planned Work Notification - NT-' + store.get('maintenance').id
+    text += formRef.current.values.emergency ? ' [EMERGENCY]' : ''
+    text += formRef.current.values.cancelled ? ' [CANCELLED]' : ''
+    text += 'Planned Work Notification - NT-' + maintenance.id
     if (rescheduleData.length !== 0) {
       text += rescheduleData.length !== 0 && '-' + rescheduleData[rescheduleData.length - 1].rcounter
     }
@@ -1854,28 +1853,29 @@ const Maintenance = ({ session, serverData, unread }) => {
       )
     }
 
-    useEffect(() => {
-      const values = formRef.current.values
-      store.set('maintenance')({
-        ...store.get('maintenance'),
-        lieferant: values.supplier,
-        name: suppliers.length ? suppliers.find(options => options.value === values.supplier).label : '',
-        timezone: values.timezone,
-        derenCIDid: values.supplierCids,
-        startDateTime: values.startDateTime,
-        endDateTime: values.endDateTime,
-        notes: values.note,
-        updatedAt: new Date().toISOString(),
-        // betroffeneCIDs: values.,
-        done: values.done,
-        cancelled: values.cancelled,
-        emergency: values.emergency,
-        reason: values.reason,
-        impact: values.impact,
-        location: values.location,
-        updatedBy: session.user.email.match(/^([^@]*)@/)[1]
-      })
-    }, [formRef.current?.values])
+    // useEffect(() => {
+    //   const values = formRef.current.values
+    //   const oldMaint = store.get('maintenance')
+    //   store.set('maintenance')({
+    //     ...store.get('maintenance'),
+    //     lieferant: values.supplier,
+    //     name: suppliers.length ? suppliers.find(options => options.value === values.supplier).label : '',
+    //     timezone: values.timezone,
+    //     derenCIDid: values.supplierCids,
+    //     startDateTime: values.startDateTime,
+    //     endDateTime: values.endDateTime,
+    //     notes: values.note,
+    //     updatedAt: new Date().toISOString(),
+    //     // betroffeneCIDs: values.,
+    //     done: values.done,
+    //     cancelled: values.cancelled,
+    //     emergency: values.emergency,
+    //     reason: values.reason,
+    //     impact: values.impact,
+    //     location: values.location,
+    //     updatedBy: session.user.email.match(/^([^@]*)@/)[1]
+    //   })
+    // }, [formRef.current?.values])
 
     return (
       <Layout>
@@ -2220,81 +2220,81 @@ const Maintenance = ({ session, serverData, unread }) => {
             jsonData={serverData}
           />
         )}
-        {/* {openPreviewModal && ( */}
-        <Modal className='modal-preview-send' backdrop size='lg' show={openPreviewModal} onHide={togglePreviewModal}>
-          <Modal.Header>
-            <FlexboxGrid justify='start' align='middle' style={{ width: '100%' }}>
-              <FlexboxGrid.Item colspan={3} style={{ display: 'flex', justifyContent: 'center' }}>
-                {faviconLoading && (
-                  <Loader />
-                )}
-                <Avatar
-                  size='lg'
-                  src='/v1/api/faviconUrl?d=newtelco.de'
-                  style={{ backgroundColor: 'transparent', display: faviconLoading ? 'none' : 'block' }}
-                  onLoad={() => setFaviconLoading(false)}
-                />
-              </FlexboxGrid.Item>
-              <FlexboxGrid.Item colspan={19}>
-                <div className='modal-preview-text-wrapper'>
-                  <InputGroup className='modal-textbox' style={{ marginBottom: '2px' }}>
-                    <InputGroup.Addon style={{ height: '31px' }} type='prepend'>
-                      To
-                      </InputGroup.Addon>
-                    <Input readOnly value={mailPreviewRecipients.toLowerCase()} />
-                  </InputGroup>
-                  <InputGroup className='modal-textbox' style={{ marginBottom: '2px' }}>
-                    <InputGroup.Addon style={{ height: '31px' }} type='prepend'>
-                      CC
-                      </InputGroup.Addon>
-                    <Input type='text' readOnly value='service@newtelco.de' />
-                  </InputGroup>
-                  <InputGroup className='modal-textbox'>
-                    <InputGroup.Addon style={{ height: '31px' }} type='prepend'>
-                      Subject
-                      </InputGroup.Addon>
-                    <Input type='text' readOnly value={mailPreviewSubject} />
-                  </InputGroup>
-                </div>
-              </FlexboxGrid.Item>
-              <FlexboxGrid.Item colspan={1} style={{ marginLeft: '30px' }}>
-                <Whisper speaker={<Tooltip>Send Mail</Tooltip>} placement='bottom'>
-                  <IconButton
-                    onClick={() => sendMail(mailPreviewRecipients, mailPreviewCustomerCID, mailPreviewSubject, mailBodyText, true)}
-                    appearance='default'
-                    style={{ color: 'var(--grey3)' }}
+        {openPreviewModal && (
+          <Modal className='modal-preview-send' backdrop size='lg' show={openPreviewModal} onHide={togglePreviewModal}>
+            <Modal.Header>
+              <FlexboxGrid justify='start' align='middle' style={{ width: '100%' }}>
+                <FlexboxGrid.Item colspan={3} style={{ display: 'flex', justifyContent: 'center' }}>
+                  {faviconLoading && (
+                    <Loader />
+                  )}
+                  <Avatar
                     size='lg'
-                    icon={<Icon icon='send' />}
+                    src='/v1/api/faviconUrl?d=newtelco.de'
+                    style={{ backgroundColor: 'transparent', display: faviconLoading ? 'none' : 'block' }}
+                    onLoad={() => setFaviconLoading(false)}
                   />
-                </Whisper>
-              </FlexboxGrid.Item>
-            </FlexboxGrid>
-          </Modal.Header>
-          <Modal.Body style={{ maxHeight: 'unset', paddingBottom: '0px' }}>
-            <TinyEditor
-              initialValue={mailBodyText}
-              apiKey='ttv2x1is9joc0fi7v6f6rzi0u98w2mpehx53mnc1277omr7s'
-              init={{
-                height: 500,
-                menubar: true,
-                statusbar: false,
-                plugins: [
-                  'advlist autolink lists link image print preview anchor',
-                  'searchreplace code',
-                  'insertdatetime table paste code help wordcount'
-                ],
-                toolbar:
-                  `undo redo | formatselect | bold italic backcolor | 
+                </FlexboxGrid.Item>
+                <FlexboxGrid.Item colspan={19}>
+                  <div className='modal-preview-text-wrapper'>
+                    <InputGroup className='modal-textbox' style={{ marginBottom: '2px' }}>
+                      <InputGroup.Addon style={{ height: '31px' }} type='prepend'>
+                        To
+                      </InputGroup.Addon>
+                      <Input readOnly value={mailPreviewRecipients.toLowerCase()} />
+                    </InputGroup>
+                    <InputGroup className='modal-textbox' style={{ marginBottom: '2px' }}>
+                      <InputGroup.Addon style={{ height: '31px' }} type='prepend'>
+                        CC
+                      </InputGroup.Addon>
+                      <Input type='text' readOnly value='service@newtelco.de' />
+                    </InputGroup>
+                    <InputGroup className='modal-textbox'>
+                      <InputGroup.Addon style={{ height: '31px' }} type='prepend'>
+                        Subject
+                      </InputGroup.Addon>
+                      <Input type='text' readOnly value={mailPreviewSubject} />
+                    </InputGroup>
+                  </div>
+                </FlexboxGrid.Item>
+                <FlexboxGrid.Item colspan={1} style={{ marginLeft: '30px' }}>
+                  <Whisper speaker={<Tooltip>Send Mail</Tooltip>} placement='bottom'>
+                    <IconButton
+                      onClick={() => sendMail(mailPreviewRecipients, mailPreviewCustomerCID, mailPreviewSubject, mailBodyText, true)}
+                      appearance='default'
+                      style={{ color: 'var(--grey3)' }}
+                      size='lg'
+                      icon={<Icon icon='send' />}
+                    />
+                  </Whisper>
+                </FlexboxGrid.Item>
+              </FlexboxGrid>
+            </Modal.Header>
+            <Modal.Body style={{ maxHeight: 'unset', paddingBottom: '0px' }}>
+              <TinyEditor
+                initialValue={mailBodyText}
+                apiKey='ttv2x1is9joc0fi7v6f6rzi0u98w2mpehx53mnc1277omr7s'
+                init={{
+                  height: 500,
+                  menubar: true,
+                  statusbar: false,
+                  plugins: [
+                    'advlist autolink lists link image print preview anchor',
+                    'searchreplace code',
+                    'insertdatetime table paste code help wordcount'
+                  ],
+                  toolbar:
+                    `undo redo | formatselect | bold italic backcolor | 
                         alignleft aligncenter alignright alignjustify | 
                         bullist numlist outdent indent | removeformat | help`,
-                content_style: 'html { color: #828282 } body::-webkit-scrollbar-track { border-radius: 10px; background-color: rgba(0,0,0,0); } body::-webkit-scrollbar { width: 8px; height: 8px; background-color: transparent; } body::-webkit-scrollbar-thumb { border-radius: 10px; background-color: rgba(0,0,0,0.4); } '
-              }}
-              onChange={handleEditorChange}
-            />
+                  content_style: 'html { color: #828282 } body::-webkit-scrollbar-track { border-radius: 10px; background-color: rgba(0,0,0,0); } body::-webkit-scrollbar { width: 8px; height: 8px; background-color: transparent; } body::-webkit-scrollbar-thumb { border-radius: 10px; background-color: rgba(0,0,0,0.4); } '
+                }}
+                onChange={handleEditorChange}
+              />
 
-          </Modal.Body>
-        </Modal>
-        {/* )} */}
+            </Modal.Body>
+          </Modal>
+        )}
         {typeof window !== 'undefined' && openRescheduleModal && (
           <Rnd
             default={{
