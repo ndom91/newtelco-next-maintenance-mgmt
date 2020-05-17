@@ -95,16 +95,11 @@ const MailEditor = ({
           style={{ display: editorLoading ? 'none' : 'block' }}
           initialValue={body}
           apiKey={process.env.NEXT_PUBLIC_TINY_APIKEY}
-          // onInit={() => setEditorLoading(false)}
+          onInit={() => setEditorLoading(false)}
           init={{
             height: 500,
             menubar: true,
             statusbar: false,
-            setup: function (ed) {
-              ed.on('init', () => {
-                setEditorLoading(false)
-              })
-            },
             plugins: [
               'advlist autolink lists link image print preview anchor',
               'searchreplace code',

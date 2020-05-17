@@ -50,7 +50,7 @@ const CommentList = ({ user, id }) => {
       body: JSON.stringify({
         body: comment,
         user: user,
-        maintId: store.get('maintenance').id
+        maintId: id
       }),
       headers: {
         'Content-Type': 'application/json'
@@ -124,18 +124,18 @@ const CommentList = ({ user, id }) => {
               <Loader />
             </div>
           ) : (
-            comments.length > 0 ? (
-              comments.map(comm => {
-                return (
-                  <List.Item key={comm.id}>
-                    <Comment data={comm} handleDelete={deleteComment} />
-                  </List.Item>
+              comments.length > 0 ? (
+                comments.map(comm => {
+                  return (
+                    <List.Item key={comm.id}>
+                      <Comment data={comm} handleDelete={deleteComment} />
+                    </List.Item>
+                  )
+                })
+              ) : (
+                  <List.Item>No Comments Yet</List.Item>
                 )
-              })
-            ) : (
-              <List.Item>No Comments Yet</List.Item>
-            )
-          )}
+            )}
         </List>
       </FlexboxGrid.Item>
     </FlexboxGrid>
