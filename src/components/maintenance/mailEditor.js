@@ -26,10 +26,11 @@ const MailEditor = ({
   onEditorChange
 }) => {
   const [faviconLoading, setFaviconLoading] = useState(false)
-  const [editorLoading, setEditorLoading] = useState(true)
+  const [editorLoading, setEditorLoading] = useState(false)
 
   useEffect(() => {
     setFaviconLoading(true)
+    setEditorLoading(true)
   }, [])
 
   return (
@@ -94,11 +95,16 @@ const MailEditor = ({
           style={{ display: editorLoading ? 'none' : 'block' }}
           initialValue={body}
           apiKey={process.env.NEXT_PUBLIC_TINY_APIKEY}
-          onInit={() => setEditorLoading(false)}
+          // onInit={() => setEditorLoading(false)}
           init={{
             height: 500,
             menubar: true,
             statusbar: false,
+            setup: function (ed) {
+              ed.on('init', () => {
+                setEditorLoading(false)
+              })
+            },
             plugins: [
               'advlist autolink lists link image print preview anchor',
               'searchreplace code',
