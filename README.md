@@ -9,25 +9,21 @@
 - Google Calendar API - Create calendar entries from the application
 - Clean, professional, responsive UI
 - WYSIWYG Editor
-- Export history data to CSV
+- Export data to CSV
 - LogRocket error tracking
 - Keyboard Shortcuts
-- Darkmode 
-- SMTP Outbound Mail
 
-## Technology
+## Stack
 
 - Next.js / React
-- Custom Next.js Server (Express)
 - RSuite UI Library
 - MySQL
-- Passport Auth
 - Ag-Grid
 - Algolia Search
 
 ## Contributing
 
-There is an API part to this project contained in a sister repo (`ndom91/api-maintenance`) which must be running as well. 
+There is an API sister project to this one located in the following repo: (`ndom91/api-maintenance`). This must be running during dev / prod to get anything going.
 
 #### Prerequisites:
 1. MySQL DB
@@ -55,14 +51,10 @@ It is currently setup so that the host is dynamic, you can reverse proxy it out 
 
 ### Screenshots
 
-<img src="https://imgur.com/0TCYfJE.png" width="512" alt="screenshot 1">
+<img src="https://i.imgur.com/UJdRJs4.png" width="512" alt="screenshot 1">
 
-<img src="https://imgur.com/x1UW9Ox.png" width="512" alt="screenshot 2">
+<img src="https://i.imgur.com/2RFzi0Q.png" width="512" alt="screenshot 2">
 
-<img src="https://imgur.com/SK2DOuD.png" width="512" alt="screenshot 3">
-
-<img src="https://imgur.com/3QymwYQ.png" width="512" alt="screenshot 4">
-
-<img src="https://imgur.com/wz4LOzy.png" width="512" alt="screenshot 5">
+<img src="https://i.imgur.com/S0huKm2.png" width="512" alt="screenshot 3">
 
 **Internal Application used by NewTelco GmbH**
