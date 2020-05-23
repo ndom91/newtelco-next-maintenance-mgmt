@@ -37,8 +37,10 @@ module.exports = async (req, res) => {
     supplierCids: 'supplier cids',
     timezone: 'timezone'
   }
-  const updateHistory = await db.query(escape`INSERT INTO changelog (mid, user, action, field) VALUES (${maintId}, ${user}, 'changed', ${fieldName[field]});`)
-
+  let updateHistory
+  if (field) {
+    updateHistory = await db.query(escape`INSERT INTO changelog (mid, user, action, field) VALUES (${maintId}, ${user}, 'changed', ${fieldName[field]});`)
+  }
   res.status(200).json({
     saved: save.affectedRows === 1,
     insertHistory: updateHistory.affectedRows === 1,

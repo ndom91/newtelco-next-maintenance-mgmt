@@ -100,11 +100,11 @@ const CommentList = ({ user, id }) => {
   }
 
   return (
-    <FlexboxGrid style={{ flexDirection: 'column' }} alignItems='middle'>
+    <FlexboxGrid style={{ flexDirection: 'column', alignItems: 'center' }} alignItems='middle'>
       <FlexboxGrid.Item colspan={22}>
         <Divider />
       </FlexboxGrid.Item>
-      <FlexboxGrid.Item style={{ marginBottom: '10px' }}>
+      <FlexboxGrid.Item style={{ marginBottom: '10px' }} colspan={22}>
         <div style={{ fontSize: '1.5rem', fontWeight: '100', fontFamily: 'var(--font-body)' }}>Comments</div>
       </FlexboxGrid.Item>
       <FlexboxGrid.Item colspan={22}>

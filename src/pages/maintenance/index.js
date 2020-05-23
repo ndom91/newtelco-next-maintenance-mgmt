@@ -5,9 +5,8 @@ import RequireLogin from '@/newtelco/require-login'
 import './maintenance.css'
 import Router from 'next/router'
 import { Helmet } from 'react-helmet'
-import { Editor as TinyEditor } from '@tinymce/tinymce-react'
 import MailEditor from '@/newtelco/maintenance/mailEditor'
-import { format, isValid, formatDistance, parseISO, compareAsc } from 'date-fns'
+import { format, isValid, formatDistance, parseISO } from 'date-fns'
 import moment from 'moment-timezone'
 import { Rnd } from 'react-rnd'
 import { CSSTransition } from 'react-transition-group'
@@ -19,7 +18,6 @@ import SentIcon from '@/newtelco/ag-grid/sent'
 import StartDateTime from '@/newtelco/ag-grid/startdatetime'
 import EndDateTime from '@/newtelco/ag-grid/enddatetime'
 import sentBtn from '@/newtelco/ag-grid/sentBtn'
-// import sendMailBtns from '@/newtelco/ag-grid/sendMailBtns'
 import { AgGridReact } from 'ag-grid-react'
 import dynamic from 'next/dynamic'
 import ReadModal from '@/newtelco/maintenance/readmodal'
@@ -34,7 +32,6 @@ import { Formik, FastField, Field, useFormikContext } from 'formik'
 import tzOptions from '@/newtelco/maintenance/timezoneOptions'
 import Select from 'react-select'
 import debounce from 'just-debounce-it'
-
 import objDiff from '@/newtelco-utils/objdiff'
 
 import {
@@ -42,7 +39,6 @@ import {
   Form,
   FormGroup,
   Input,
-  InputGroup,
   ControlLabel,
   HelpBlock,
   Badge,
@@ -62,17 +58,17 @@ import {
   Modal,
   Container,
   Message,
-  Avatar,
   SelectPicker,
   TagPicker,
   Divider,
-  Dropdown
+  Nav
 } from 'rsuite'
 
 const Changelog = dynamic(
   () => import('@/newtelco/maintenance/timeline'),
   { ssr: false }
 )
+
 const MyTextarea = ({ field, form }) => {
   return (
     <Input
@@ -85,6 +81,21 @@ const MyTextarea = ({ field, form }) => {
       validateOnChange={false}
       validateOnBlur={false}
       onChange={option => form.setFieldValue(field.name, option)}
+    />
+  )
+}
+
+const MyDateTime = ({ field, form }) => {
+  return (
+    <Flatpickr
+      name={field.name}
+      value={field.value}
+      data-enable-time
+      validateOnChange={false}
+      validateOnBlur={false}
+      onChange={option => form.setFieldValue(field.name, option)}
+      options={{ time_24hr: 'true', allow_input: 'true' }}
+      className='flatpickr end-date-time'
     />
   )
 }
@@ -117,10 +128,28 @@ const AutoSave = ({ debounceMs }) => {
   return <div style={{ color: 'var(--grey2)', display: 'flex', alignItems: 'center' }}><svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='var(--grey2)' strokeWidth='2' strokeLinecap='round' strokeLinejoin='round'><path d='M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z' /><polyline points='17 21 17 13 7 13 7 21' /><polyline points='7 3 7 8 15 8' /></svg><span style={{ marginLeft: '5px' }}>{result}</span></div>
 }
 
-
 const Maintenance = ({ session, serverData, suppliers }) => {
   const store = Store.useStore()
+
   const [maintenance, setMaintenance] = useState(serverData.profile)
+  const [frozenCompany, setFrozenCompany] = useState('')
+  const [openReadModal, setOpenReadModal] = useState(false)
+  const [openPreviewModal, setOpenPreviewModal] = useState(false)
+  const [openRescheduleModal, setOpenRescheduleModal] = useState(false)
+  const [openConfirmDeleteModal, setOpenConfirmDeleteModal] = useState(false)
+  const [openConfirmFreezeModal, setOpenConfirmFreezeModal] = useState(false)
+  const [openMaintenanceChangelog, setOpenMaintenanceChangelog] = useState(false)
+  const [rescheduleData, setRescheduleData] = useState([])
+  const [mailBodyText, setMailBodyText] = useState('')
+  const [mailPreviewRecipients, setMailPreviewRecipients] = useState('')
+  const [mailPreviewCustomerCID, setMailPreviewCustomerCid] = useState('')
+  const [mailPreviewSubject, setMailPreviewSubject] = useState('')
+  const [customerCids, setCustomerCids] = useState([])
+  const [supplierCids, setSupplierCids] = useState([])
+  const [impactPlaceholder, setImpactPlaceholder] = useState([])
+  const [selectedSupplierCids, setSelectedSupplierCids] = useState([])
+  const [sentProgress, setSentProgress] = useState(0)
+  const [activeTab, setActiveTab] = useState('customer')
   const [maintHistory, setMaintHistory] = useState({
     timezone: serverData.profile.timezone,
     supplier: serverData.profile.lieferant,
@@ -135,39 +164,20 @@ const Maintenance = ({ session, serverData, suppliers }) => {
     emergency: !!+serverData.profile.emergency,
     done: !!+serverData.profile.done
   })
-  const [frozenState, setFrozenState] = useState({
-    recipient: '',
-    cid: ''
-  })
-  const [frozenCompany, setFrozenCompany] = useState('')
-  const [dateTimeWarning, setDateTimeWarning] = useState(false)
-  const [openReadModal, setOpenReadModal] = useState(false)
-  const [openPreviewModal, setOpenPreviewModal] = useState(false)
-  const [openRescheduleModal, setOpenRescheduleModal] = useState(false)
-  const [openConfirmDeleteModal, setOpenConfirmDeleteModal] = useState(false)
-  const [openConfirmFreezeModal, setOpenConfirmFreezeModal] = useState(false)
-  const [openMaintenanceChangelog, setOpenMaintenanceChangelog] = useState(false)
   const [reschedule, setReschedule] = useState({
     startDateTime: null,
     endDateTime: null,
     impact: '',
     reason: ''
   })
-  const [rescheduleData, setRescheduleData] = useState([])
+  const [frozenState, setFrozenState] = useState({
+    recipient: '',
+    cid: ''
+  })
   const [rescheduleToDelete, setRescheduleToDelete] = useState({
     id: null,
     rcounter: null
   })
-  const [mailBodyText, setMailBodyText] = useState('')
-  const [mailPreviewRecipients, setMailPreviewRecipients] = useState('')
-  const [mailPreviewCustomerCID, setMailPreviewCustomerCid] = useState('')
-  const [mailPreviewSubject, setMailPreviewSubject] = useState('')
-  const [customerCids, setCustomerCids] = useState([])
-  // const [suppliers, setSuppliers] = useState([])
-  const [supplierCids, setSupplierCids] = useState([])
-  const [impactPlaceholder, setImpactPlaceholder] = useState([])
-  const [selectedSupplierCids, setSelectedSupplierCids] = useState([])
-  const [sentProgress, setSentProgress] = useState(0)
 
   const formRef = useRef()
   const gridApi = useRef()
@@ -280,6 +290,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
       customLoadingOverlay: Loader
     }
   }
+
   const gridOptions = {
     defaultColDef: {
       resizable: true,
@@ -337,7 +348,6 @@ const Maintenance = ({ session, serverData, suppliers }) => {
       }
     ],
     loadingOverlayComponent: 'customLoadingOverlay',
-    // context: { prepareDirectSend: prepareDirectSend, togglePreviewModal: togglePreviewModal },
     frameworkComponents: {
       sendMailBtn: sendMailBtns,
       protectedIcon: ProtectedIcon,
@@ -355,48 +365,6 @@ const Maintenance = ({ session, serverData, suppliers }) => {
       }
     }
   }
-
-  const convertBool = (input) => {
-    if (input == '1' || input == '0') {
-      if (input == '1') {
-        return true
-      } else if (input == '0') {
-        return false
-      }
-    } else if (input === 'true' || input === 'false') {
-      if (input === 'true') {
-        return true
-      } else if (input === 'false') {
-        return false
-      }
-    } else {
-      return input
-    }
-  }
-
-  // useEffect(() => {
-  //   store.set('maintenance')(maintenance)
-  // }, [maintenance])
-
-  // store.on('maintenance').subscribe(maint => {
-  //   console.log('subscription', maint)
-  // })
-
-  // useEffect(() => {
-  //   store.set('impactPlaceholder')(impactPlaceholder)
-  // }, [impactPlaceholder])
-
-  // useEffect(() => {
-  //   gridApi?.current?.showLoadingOverlay()
-  //   // selectedSupplierCids.forEach(id => {
-  //   //   fetchCustomerCids(id)
-  //   // })
-  //   gridApi?.current?.hideOverlay()
-  // }, [selectedSupplierCids])
-
-  // useEffect(() => {
-  //   gridApi.current.hideOverlay()
-  // }, [gridApi.current])
 
   useEffect(() => {
     if (serverData.profile.id === 'NEW') {
@@ -433,9 +401,9 @@ const Maintenance = ({ session, serverData, suppliers }) => {
 
       setMaintenance({
         ...serverData.profile,
-        cancelled: convertBool(cancelled),
-        emergency: convertBool(emergency),
-        done: convertBool(done),
+        cancelled: !!+cancelled,
+        emergency: !!+emergency,
+        done: !!+done,
         timezone: 'Europe/Amsterdam',
         timezoneLabel: '(GMT+01:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna',
         startDateTime: moment.tz(serverData.profile.startDateTime, 'GMT').tz('Etc/GMT-1').format('YYYY-MM-DD HH:mm:ss'), // TODO: DONT HARDCORE TIMEZONE
@@ -503,15 +471,6 @@ const Maintenance = ({ session, serverData, suppliers }) => {
           return
         }
         setSupplierCids(data.lieferantCIDsResult)
-        // const derenCIDids = serverData.profile.derenCIDid
-        // if (derenCIDids.includes(',')) {
-        //   const selectedCids = []
-        //   derenCIDids
-        //     .split(',')
-        //     .forEach(x => {
-        //       selectedCids.push(parseInt(x, 10))
-        //     })
-        // }
       })
       .catch(err => console.error(`Error - ${err}`))
   }
@@ -632,7 +591,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
     const rescheduleText = ''
     const tzSuffixRAW = 'UTC / GMT+0:00'
 
-    const cancelled = convertBool(currentMaint.cancelled)
+    const cancelled = !!+currentMaint.cancelled
     if (cancelled) {
       maintenanceIntro = `We would like to inform you that these planned works (<b>NT-${maintenance.id}</b>) have been <b>cancelled</b> with the following CID(s):`
     }
@@ -696,15 +655,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
       body = body + '<tr><td>Reason:</td><td>' + currentMaint.reason + '</td></tr>'
     }
 
-    let maintNoteBody = ''
-    if (currentMaint.maintNote) {
-      maintNoteBody = '<p>' + currentMaint.maintNote + '</p>'
-      // if (currentMaint.maintNote.includes('%20')) {
-      //   maintNoteBody = '<p>' + decodeURIComponent(currentMaint.maintNote) + '</p>'
-      // } else {
-      //   maintNoteBody = '<p>' + currentMaint.maintNote + '</p>'
-      // }
-    }
+    let maintNoteBody = currentMaint.maintNote ? `<p>${currentMaint.maintNote}</p>` : ''
 
     body = body + `</table>${maintNoteBody}<p>We sincerely regret any inconvenience that may be caused by this and hope for further mutually advantageous cooperation.</p><p>If you have any questions feel free to contact us at maintenance@newtelco.de.</p></div>​​</body>​​<footer>​<style>.sig{font-family:Century Gothic, sans-serif;font-size:9pt;color:#636266!important;}b.i{color:#4ca702;}.gray{color:#636266 !important;}a{text-decoration:none;color:#636266 !important;}</style><div class="sig"><div>Best regards <b class="i">|</b> Mit freundlichen Grüßen</div><br><div><b>Newtelco Maintenance Team</b></div><br><div>NewTelco GmbH <b class="i">|</b> Moenchhofsstr. 24 <b class="i">|</b> 60326 Frankfurt a.M. <b class="i">|</b> DE <br>www.newtelco.com <b class="i">|</b> 24/7 NOC  49 69 75 00 27 30 ​​<b class="i">|</b> <a style="color:#" href="mailto:service@newtelco.de">service@newtelco.de</a><br><br><div><img alt="sig" src="https://home.newtelco.de/sig.png" height="29" width="516"></div></div>​</footer>`
 
@@ -728,10 +679,10 @@ const Maintenance = ({ session, serverData, suppliers }) => {
     let subject = subj || mailPreviewSubject
     const to = recipient || mailPreviewRecipients
 
-    if (convertBool(maintenance.emergency)) {
+    if (!!+maintenance.emergency) {
       subject = `[EMERGENCY] ${subject}`
     }
-    if (convertBool(maintenance.cancelled)) {
+    if (!!+maintenance.cancelled) {
       subject = `[CANCELLED] ${subject}`
     }
     if (rescheduleData.length !== 0) {
@@ -807,7 +758,6 @@ const Maintenance = ({ session, serverData, suppliers }) => {
       setTimeout(() => {
         const HtmlBody = generateMail(node.data.kundenCID, node.data.protected)
         const subject = generateMailSubject()
-        // const subject = `Planned Work Notification - NT-${maintenance.id}`
         sendMail(node.data.maintenanceRecipient, node.data.kundenCID, subject, HtmlBody, false, true)
         Notify('success', `Mail Sent - ${node.data.name}`)
         if (index === rowCount) {
@@ -836,6 +786,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
     const maintId = maintenance.id
 
     let derenCid = ''
+    // TODO: this still needs to be updated
     selectedSupplierCids.forEach(cid => {
       derenCid = derenCid + cid.label + ' '
     })
@@ -885,6 +836,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
     const endDateTime = maintenance.endDateTime
 
     let derenCid = ''
+    // TODO: this still needs to be updated
     selectedSupplierCids.forEach(cid => {
       derenCid = derenCid + cid.label + ' '
     })
@@ -952,376 +904,9 @@ const Maintenance = ({ session, serverData, suppliers }) => {
   //
   /// /////////////////////////////////////////////////////////
 
-  // mail preview modal change
-  // const handleMailPreviewChange = (content, delta, source, editor) => {
-  //   setMailBodyText(editor.getContents())
-  // }
-
-  // // react-select onChange - supplier CIDs
-  // const handleSelectSupplierChange = selectedOption => {
-  //   if (selectedOption) {
-  //     setSelectedSupplierCids(selectedOption)
-  //   } else {
-  //     setSelectedSupplierCids([])
-  //   }
-  // }
-
   const handleEditorChange = (data) => {
     setMailBodyText(data.level.content)
   }
-
-  // const handleNotesChange = (data) => {
-  //   setMaintenance({ ...maintenance, notes: data.level.content })
-  // }
-
-  // const saveDateTime = (maintId, element, newValue) => {
-  //   let newISOTime = moment.tz(newValue, maintenance.timezone)
-  //   if (maintId === 'NEW') {
-  //     Notify('error', 'Save Not Possible', 'No CID yet assigned.')
-  //     return
-  //   }
-  //   newISOTime = newISOTime.utc().format('YYYY-MM-DD HH:mm:ss')
-  //   const activeUserEmail = session.user.email
-  //   const activeUser = activeUserEmail.substring(0, activeUserEmail.lastIndexOf('@'))
-  //   fetch(`/api/maintenances/save/dateTime?maintId=${maintId}&element=${element}&value=${newISOTime}&updatedby=${activeUser}`, {
-  //     method: 'get',
-  //     headers: {
-  //       'Access-Control-Allow-Origin': '*',
-  //       _csrf: session.accessToken
-  //     }
-  //   })
-  //     .then(resp => resp.json())
-  //     .then(data => {
-  //       if (data.status !== 200) {
-  //         Notify('error', 'Datetime Not Saved')
-  //         console.warn(`DateTime Save Failed\n${element}\n${newValue}\n${newISOTime}`)
-  //       }
-  //     })
-  //     .catch(err => console.error(err))
-  // }
-
-  // const handleStartDateChange = date => {
-  //   const startDate = moment(date[0]).format('YYYY-MM-DD HH:mm:ss')
-
-  //   setMaintenance({ ...maintenance, startDateTime: startDate })
-  //   saveDateTime(maintenance.id, 'start', startDate)
-  //   const startDateTime = maintenance.startDateTime
-  //   const endDateTime = maintenance.endDateTime
-
-  //   if (startDateTime && endDateTime && isValid(parseISO(startDateTime)) && isValid(parseISO(endDateTime))) {
-  //     const impactCalculation = formatDistance(parseISO(endDateTime), parseISO(startDateTime))
-  //     setImpactPlaceholder(impactCalculation)
-  //   }
-  // }
-
-  // const handleEndDateChange = date => {
-  //   const endDate = moment(date[0]).format('YYYY-MM-DD HH:mm:ss')
-
-  //   setMaintenance({ ...maintenance, endDateTime: endDate })
-  //   saveDateTime(maintenance.id, 'end', endDate)
-  //   const startDateTime = maintenance.startDateTime
-  //   const endDateTime = maintenance.endDateTime
-
-  //   if (startDateTime && endDateTime && isValid(parseISO(startDateTime)) && isValid(parseISO(endDateTime))) {
-  //     const dateCompare = compareAsc(parseISO(endDateTime), parseISO(startDateTime))
-  //     if (dateCompare !== 1) {
-  //       Notify('warning', 'End date is before start date!')
-  //       setDateTimeWarning(true)
-  //     } else {
-  //       if (dateTimeWarning) {
-  //         setDateTimeWarning(false)
-  //       }
-  //     }
-  //     const impactCalculation = formatDistance(parseISO(endDateTime), parseISO(startDateTime))
-  //     setImpactPlaceholder(impactCalculation)
-  //   }
-  // }
-
-  // const handleToggleChange = (element, event) => {
-  //   const maintId = maintenance.id
-  //   const activeUserEmail = session.user.email
-  //   const activeUser = activeUserEmail.substring(0, activeUserEmail.lastIndexOf('@'))
-  //   let newValue = !eval(`maintenance.${element}`)
-  //   if (typeof newValue === 'string') {
-  //     if (newValue === 'false') {
-  //       newValue = false
-  //     } else if (newValue === 'true') {
-  //       newValue = true
-  //     }
-  //   }
-  //   setMaintenance({ ...maintenance, [element]: newValue })
-
-  //   if (element === 'done') {
-  //     // save 'betroffeneCIDs'
-  //     let impactedCIDs = ''
-  //     customerCids.forEach(cid => {
-  //       impactedCIDs += cid.kundenCID + ' '
-  //     })
-
-  //     impactedCIDs = impactedCIDs.trim()
-
-  //     setMaintenance({ ...maintenance, betroffeneCIDs: impactedCIDs, [element]: newValue })
-
-  //     if (maintenance.receivedmail !== 'NT') {
-  //       fetch('/v1/api/inbox/markcomplete', {
-  //         method: 'post',
-  //         body: JSON.stringify({ m: maintenance.receivedmail }),
-  //         mode: 'cors',
-  //         headers: {
-  //           'Access-Control-Allow-Origin': '*',
-  //           'Content-Type': 'application/json'
-  //         }
-  //       })
-  //         .then(resp => resp.json())
-  //         .then(data => {
-  //           if (data.id === 500) {
-  //             Notify('error', 'Error moving Mail to Complete Label')
-  //           }
-  //         })
-  //         .catch(err => console.error(`Error - ${err}`))
-  //     }
-
-  //     fetch(`/api/maintenances/save/impactedcids?cids=${impactedCIDs}&maintId=${maintenance.id}&updatedby=${activeUser}`, {
-  //       method: 'get',
-  //       headers: {
-  //         'Access-Control-Allow-Origin': '*',
-  //         _csrf: session.accessToken
-  //       }
-  //     })
-  //       .then(resp => resp.json())
-  //       .then(data => {
-  //         if (!data.status === 200) {
-  //           Notify('error', 'Impacted CIDs Not Saved')
-  //         }
-  //       })
-  //       .catch(err => console.error(`Error - ${err}`))
-
-  //     // TODO: Check whats up here
-  //     // update Algolia Index
-  //     // fetch('/v1/api/search/update', {
-  //     //   method: 'get'
-  //     // })
-  //   }
-
-  //   if (maintId === 'NEW') {
-  //     Notify('error', 'No CID Assigned', 'Cannot save updates.')
-  //     return
-  //   }
-  //   fetch(`/api/maintenances/save/toggle?maintId=${maintId}&element=${element}&value=${newValue}&updatedby=${activeUser}`, {
-  //     method: 'get',
-  //     headers: {
-  //       'Access-Control-Allow-Origin': '*',
-  //       _csrf: session.accessToken
-  //     }
-  //   })
-  //     .then(resp => resp.json())
-  //     .then(data => {
-  //       if (data.status === 200 && data.statusText === 'OK') {
-  //         Notify('success', 'Save Success')
-  //       } else {
-  //         Notify('error', 'Error Saving', data.err)
-  //       }
-  //     })
-  //     .catch(err => console.error(err))
-  // }
-
-  // const handleReasonChange = (value) => {
-  //   setMaintenance({ ...maintenance, reason: encodeURIComponent(value) })
-  // }
-
-  // const handleMaintNoteChange = (value) => {
-  //   setMaintenance({ ...maintenance, maintNote: encodeURIComponent(value) })
-  // }
-
-  // const handleLocationChange = (value) => {
-  //   setMaintenance({ ...maintenance, location: value })
-  // }
-
-  // const handleImpactChange = (value) => {
-  //   setMaintenance({ ...maintenance, impact: value })
-  // }
-
-  // const handleTimezoneChange = (selection) => {
-  //   const timezoneLabel = selection.label // 'Europe/Amsterdam'
-  //   const timezoneValue = selection.value // '(GMT+02:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna'
-
-  //   setMaintenance({ ...maintenance, timezone: timezoneValue, timezoneLabel: timezoneLabel })
-  // }
-
-  // const handleSupplierChange = (selectedOption) => {
-  // const selectedSupplier = suppliers.find(x => x.value === selectedOption)
-  // setMaintenance({ ...maintenance, lieferant: selectedOption, name: selectedSupplier.label })
-  // TODO: empty fields in Formik
-  // setSelectedSupplierCids([])
-  // setCustomerCids([])
-  // fetchSupplierCids(selectedOption)
-  // }
-
-  /// /////////////////////////////////////////////////////////
-  //
-  //                INPUTS: ONBLUR
-  //
-  /// /////////////////////////////////////////////////////////
-
-  // const handleDateTimeBlur = (element) => {
-  //   Notify('success', 'Save Success')
-  // }
-
-  // const handleCIDBlur = () => {
-  //   const postSelection = (id) => {
-  //     let idParameter
-  //     if (Array.isArray(id)) {
-  //       idParameter = id.join(',')
-  //     } else {
-  //       idParameter = id
-  //     }
-  //     if (idParameter === jsonData.profile.derenCIDid) {
-  //       return true
-  //     }
-  //     if (maintenance.id === 'NEW') {
-  //       Notify('error', 'Cannot Save', 'No CID Assigned')
-  //       return
-  //     }
-  //     const activeUserEmail = session.user.email
-  //     const activeUser = activeUserEmail.substring(0, activeUserEmail.lastIndexOf('@'))
-  //     fetch(`/api/maintenances/save/lieferant?maintId=${maintenance.id}&cid=${idParameter}&updatedby=${activeUser}`, {
-  //       method: 'get',
-  //       headers: {
-  //         'Access-Control-Allow-Origin': '*',
-  //         _csrf: session.accessToken
-  //       }
-  //     })
-  //       .then(resp => resp.json())
-  //       .then(data => {
-  //         if (data.status === 200 && data.statusText === 'OK') {
-  //           Notify('success', 'Save Success')
-  //           setMaintenance({ ...maintenance, updatedBy: activeUser })
-  //         } else {
-  //           Notify('error', 'Error Saving', data.err)
-  //         }
-  //       })
-  //       .catch(err => console.error(err))
-  //   }
-  //   postSelection(selectedSupplierCids)
-  // }
-
-  // const handleTimezoneBlur = () => {
-  //   const incomingTimezone = maintenance.timezone || 'Europe/Amsterdam'
-  //   const incomingTimezoneLabel = encodeURIComponent(maintenance.timezoneLabel || '(GMT+02:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna')
-  //   const activeUserEmail = session.user.email
-  //   const activeUser = activeUserEmail.substring(0, activeUserEmail.lastIndexOf('@'))
-  //   fetch(`/api/maintenances/save/timezone?maintId=${maintenance.id}&timezone=${incomingTimezone}&timezoneLabel=${incomingTimezoneLabel}&updatedby=${activeUser}`, {
-  //     method: 'get',
-  //     headers: {
-  //       'Access-Control-Allow-Origin': '*',
-  //       _csrf: session.accessToken
-  //     }
-  //   })
-  //     .then(resp => resp.json())
-  //     .then(data => {
-  //       if (data.status === 200 && data.statusText === 'OK') {
-  //         Notify('success', 'Save Success')
-  //         setMaintenance({ ...maintenance, updatedBy: activeUser })
-  //       } else {
-  //         Notify('error', 'Error Saving', data.err)
-  //       }
-  //     })
-  //     .catch(err => console.error(err))
-  // }
-
-  // const handleTextInputBlur = (element) => {
-  //   const newValue = eval(`maintenance.${element}`)
-  //   const originalValue = eval(`jsonData.profile.${element}`)
-  //   const maintId = maintenance.id
-  //   const activeUserEmail = session.user.email
-  //   const activeUser = activeUserEmail.substring(0, activeUserEmail.lastIndexOf('@'))
-
-  //   if (newValue === originalValue) {
-  //     return
-  //   }
-
-  //   if (maintId === 'NEW') {
-  //     Notify('warning', 'Cannot Save', 'No CID Assigned')
-  //     return
-  //   }
-  //   fetch(`/api/maintenances/save/textinput?maintId=${maintId}&element=${element}&value=${newValue}&updatedby=${activeUser}`, {
-  //     method: 'get',
-  //     headers: {
-  //       'Access-Control-Allow-Origin': '*',
-  //       _csrf: session.accessToken
-  //     }
-  //   })
-  //     .then(resp => resp.json())
-  //     .then(data => {
-  //       if (data.status === 200 && data.statusText === 'OK') {
-  //         Notify('success', 'Save Success')
-  //         setMaintenance({ ...maintenance, updatedBy: activeUser })
-  //       } else {
-  //         Notify('error', 'Error Saving', data.err)
-  //       }
-  //     })
-  //     .catch(err => console.error(err))
-  // }
-
-  // const handleNotesBlur = value => {
-  //   const newValue = maintenance.notes
-  //   const originalValue = jsonData.profile.notes
-  //   const activeUserEmail = session.user.email
-  //   const activeUser = activeUserEmail.substring(0, activeUserEmail.lastIndexOf('@'))
-  //   if (newValue === originalValue) {
-  //     return
-  //   }
-  //   const maintId = maintenance.id
-  //   if (maintId === 'NEW') {
-  //     Notify('warning', 'Cannot Save', 'No CID Assigned')
-  //     return
-  //   }
-  //   fetch(`/api/maintenances/save/notes?maintId=${maintId}&value=${newValue}&updatedby=${activeUser}`, {
-  //     method: 'get',
-  //     headers: {
-  //       'Access-Control-Allow-Origin': '*',
-  //       _csrf: session.accessToken
-  //     }
-  //   })
-  //     .then(resp => resp.json())
-  //     .then(data => {
-  //       if (data.status === 200 && data.statusText === 'OK') {
-  //         Notify('success', 'Save Success')
-  //         setMaintenance({ ...maintenance, updatedBy: activeUser })
-  //       } else {
-  //         Notify('error', 'Error Saving', data.err)
-  //       }
-  //     })
-  //     .catch(err => console.error(err))
-  // }
-
-  // const handleSupplierBlur = () => {
-  //   const newValue = maintenance.lieferant
-  //   const maintId = maintenance.id
-  //   const activeUserEmail = session.user.email
-  //   const activeUser = activeUserEmail.substring(0, activeUserEmail.lastIndexOf('@'))
-  //   if (maintId === 'NEW') {
-  //     Notify('warning', 'Cannot Save', 'No CID Assigned')
-  //     return
-  //   }
-  //   fetch(`/api/maintenances/save/supplier?maintId=${maintId}&value=${newValue}&updatedby=${activeUser}`, {
-  //     method: 'get',
-  //     headers: {
-  //       'Access-Control-Allow-Origin': '*',
-  //       _csrf: session.accessToken
-  //     }
-  //   })
-  //     .then(resp => resp.json())
-  //     .then(data => {
-  //       if (data.status === 200 && data.statusText === 'OK') {
-  //         Notify('success', 'Save Success')
-  //         setMaintenance({ ...maintenance, updatedBy: activeUser })
-  //       } else {
-  //         Notify('error', 'Error Saving', data.err)
-  //       }
-  //     })
-  //     .catch(err => console.error(err))
-  // }
 
   /// /////////////////////////////////////////////////////////
   //
@@ -1535,20 +1120,6 @@ const Maintenance = ({ session, serverData, suppliers }) => {
   //
   /// /////////////////////////////////////////////////////////
 
-  // const handleProtectionSwitch = () => {
-  //   const { values, setFormikState } = useFormikContext()
-  //   setFormikState({ ...values, impact: '50ms protection switch' })
-  //   // setMaintenance({ ...maintenance, impact: '50ms protection switch' })
-  //   // handleTextInputBlur('impact')
-  // }
-
-  // const useImpactPlaceholder = () => {
-  //   const { values, setFormikState } = useFormikContext()
-  //   setFormikState({ ...values, impact: impactPlaceholder })
-  //   // setMaintenance({ ...maintenance, impact: impactPlaceholder })
-  //   // handleTextInputBlur('impact')
-  // }
-
   const handleCreateOnClick = (event) => {
     const {
       bearbeitetvon,
@@ -1658,11 +1229,6 @@ const Maintenance = ({ session, serverData, suppliers }) => {
     const HeaderRight = () => {
       return (
         <ButtonGroup size='md'>
-          <Whisper placement='bottom' speaker={<Tooltip>Create New Reschedule</Tooltip>}>
-            <IconButton appearance='ghost' onClick={toggleRescheduleModal} icon={<Icon icon='clock-o' />}>
-              Reschedule
-            </IconButton>
-          </Whisper>
           <Whisper placement='bottom' speaker={<Tooltip>Create Calendar Entry</Tooltip>}>
             <IconButton appearance='ghost' onClick={handleCalendarCreate} icon={<Icon icon='calendar' />}>
               Create
@@ -1731,6 +1297,8 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                   name: suppliers.companies.find(options => options.value === option).label
                 })
                 setSupplierCids(data.lieferantCIDsResult)
+                setCustomerCids([])
+                gridApi.current.hideOverlay()
               })
               .catch(err => console.error(err))
             form.setFieldValue(field.name, option)
@@ -1738,21 +1306,6 @@ const Maintenance = ({ session, serverData, suppliers }) => {
           }}
           data={suppliers.companies}
           placeholder='Please select a Supplier'
-        />
-      )
-    }
-
-    const MyDateTime = ({ field, form }) => {
-      return (
-        <Flatpickr
-          name={field.name}
-          value={field.value}
-          data-enable-time
-          validateOnChange={false}
-          validateOnBlur={false}
-          onChange={option => form.setFieldValue(field.name, option)}
-          options={{ time_24hr: 'true', allow_input: 'true' }}
-          className='flatpickr end-date-time'
         />
       )
     }
@@ -1810,7 +1363,52 @@ const Maintenance = ({ session, serverData, suppliers }) => {
           checkedChildren={checkedChildren}
           checked={field.value}
           name={field.name}
-          onChange={option => form.setFieldValue(field.name, option)}
+          onChange={option => {
+            form.setFieldValue(field.name, option)
+
+            // Actions required on marking 'Done':
+            if (field.name === 'done' && option === true) {
+              // Set Mail as READ in Gmail Mailbox
+              if (maintenance.receivedmail !== 'NT') {
+                fetch('/v1/api/inbox/markcomplete', {
+                  method: 'post',
+                  body: JSON.stringify({ m: maintenance.receivedmail }),
+                  mode: 'cors',
+                  headers: {
+                    'Access-Control-Allow-Origin': '*',
+                    'Content-Type': 'application/json'
+                  }
+                })
+                  .then(resp => resp.json())
+                  .then(data => {
+                    if (data.id === 500) {
+                      Notify('error', 'Error', 'Cannot move mail to complete label.')
+                    }
+                  })
+                  .catch(err => console.error(`Error - ${err}`))
+              }
+              // Set 'impacted CIDs'
+              fetch(`/api/maintenances/save/impactedcids?cids=${impactedCIDs}&maintId=${maintenance.id}&updatedby=${activeUser}`, {
+                method: 'get',
+                headers: {
+                  'Access-Control-Allow-Origin': '*',
+                  _csrf: session.accessToken
+                }
+              })
+                .then(resp => resp.json())
+                .then(data => {
+                  if (!data.status === 200) {
+                    Notify('error', 'Impacted CIDs Not Saved')
+                  }
+                })
+                .catch(err => console.error(`Error - ${err}`))
+              // TODO: Check whats up here
+              // update Algolia Index
+              // fetch('/v1/api/search/update', {
+              //   method: 'get'
+              // })
+            }
+          }}
         />
       )
     }
@@ -1847,6 +1445,10 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                       done: !!+serverData.profile.done
                     }}
                     onSubmit={async (values, formikHelpers) => {
+                      if (maintenance.id === 'NEW') {
+                        Notify('error', 'Unable to Save', 'Not maintenance ID created yet.')
+                        return
+                      }
                       const diff = objDiff(maintHistory, values)
                       setMaintHistory(values)
                       if (values.supplierCids && !customerCids.length) {
@@ -2012,137 +1614,109 @@ const Maintenance = ({ session, serverData, suppliers }) => {
               </Panel>
             </FlexboxGrid.Item>
             <FlexboxGrid.Item colspan={11} style={{ margin: '0 10px' }}>
-              <Panel bordered>
+              <Panel bordered className='panel-right'>
+                <Nav justified appearance='tabs' reversed activeKey={activeTab} onSelect={key => setActiveTab(key)} style={{ marginTop: '-1px' }}>
+                  <Nav.Item eventKey="customer">Customer CIDs</Nav.Item>
+                  <Nav.Item eventKey="reschedule">Reschedule</Nav.Item>
+                  <Nav.Item eventKey="changelog">Changelog</Nav.Item>
+                </Nav>
                 <Grid fluid>
                   <Row>
                     <Col>
-                      {openMaintenanceChangelog
-                        ? (
-                          <CSSTransition
-                            timeout={500}
-                            classNames='flip-transition'
-                            in={openMaintenanceChangelog}
-                          >
-                            <Row>
-                              <Col>
-                                <Container style={{ padding: '20px' }}>
-                                  <Row>
-                                    <FlexboxGrid justify='space-between' align='middle'>
-                                      <FlexboxGrid.Item>
-                                        <span style={{ color: 'var(--grey4)', fontFamily: 'var(--font-body)', fontWeight: '100 !important', fontSize: '1.5rem' }}>Maintenance History</span>
-                                      </FlexboxGrid.Item>
-                                      <FlexboxGrid.Item>
-                                        <Whisper placement='left' speaker={<Tooltip>View Mails</Tooltip>}>
-                                          <IconButton
-                                            size='lg'
-                                            onClick={toggleHistoryView}
-                                            icon={<Icon icon='history' />}
-                                          />
-                                        </Whisper>
-                                      </FlexboxGrid.Item>
-                                    </FlexboxGrid>
-                                  </Row>
-                                  <Row>
-                                    <Col>
-                                      <Changelog maintId={maintenance.id} />
-                                    </Col>
-                                  </Row>
-                                </Container>
-                              </Col>
-                            </Row>
-                          </CSSTransition>
-                        ) : (
-                          <CSSTransition
-                            timeout={500}
-                            classNames='flip-transition'
-                            in={openMaintenanceChangelog}
-                          >
-                            <Row>
-                              <Col>
-                                <Container>
-                                  <Row>
-                                    <FlexboxGrid justify='space-between' align='middle' style={{ margin: '0px 20px 10px 20px' }}>
-                                      <FlexboxGrid.Item>
-                                        <span style={{ color: 'var(--grey4)', fontFamily: 'var(--font-body)', fontWeight: '100 !important', fontSize: '1.5rem' }}>Customer CIDs</span>
-                                      </FlexboxGrid.Item>
-                                      <FlexboxGrid.Item>
-                                        <Whisper placement='left' speaker={<Tooltip>View Changelog</Tooltip>}>
-                                          <IconButton
-                                            size='lg'
-                                            onClick={toggleHistoryView}
-                                            icon={<Icon icon='history' />}
-                                          />
-                                        </Whisper>
-                                      </FlexboxGrid.Item>
-                                    </FlexboxGrid>
-                                  </Row>
-                                  <Row>
-                                    <Col>
-                                      <Progress.Line percent={sentProgress} showInfo={false} />
-                                    </Col>
-                                  </Row>
-                                  <Row>
-                                    <Col style={{ width: '100%', height: '500px', padding: '20px' }}>
-                                      <div
-                                        className='ag-theme-material'
-                                        style={{
-                                          height: '100%',
-                                          width: '100%'
-                                        }}
-                                      >
-                                        <AgGridReact
-                                          gridOptions={gridOptions}
-                                          rowData={customerCids}
-                                          onGridReady={handleGridReady}
-                                          pagination
-                                          deltaRowDataMode
-                                          getRowNodeId={(data) => {
-                                            return data.kundenCID
-                                          }}
-                                        />
-                                      </div>
-                                    </Col>
-                                  </Row>
-                                </Container>
-                                {rescheduleData.length !== 0 && (
-                                  <Container style={{ padding: '20px' }} className='maintenance-subcontainer'>
-                                    <Divider />
-                                    <Row>
-                                      <Col>
-                                        <span style={{ color: 'var(--font-color)', fontWeight: '300 !important', fontSize: '1.5rem' }}>Reschedule</span>
-                                      </Col>
-                                    </Row>
-                                    <Row>
-                                      <Col style={{ width: '100%', height: '400px' }}>
-                                        <div
-                                          className='ag-theme-material'
-                                          style={{
-                                            height: '100%',
-                                            width: '100%'
-                                          }}
-                                        >
-                                          <AgGridReact
-                                            gridOptions={rescheduleGridOptions}
-                                            rowData={rescheduleData}
-                                            onGridReady={handleRescheduleGridReady}
-                                            pagination
-                                            onCellEditingStopped={handleRescheduleCellEdit}
-                                            animateRows
-                                            deltaRowDataMode
-                                            getRowNodeId={(data) => {
-                                              return data.rcounter
-                                            }}
-                                            stopEditingWhenGridLosesFocus
-                                          />
-                                        </div>
-                                      </Col>
-                                    </Row>
-                                  </Container>
-                                )}
-                              </Col>
-                            </Row>
-                          </CSSTransition>
-                        )}
+                      {activeTab === 'customer' && (
+                        <Row>
+                          <Col>
+                            <Container style={{ marginTop: '10px' }}>
+                              <Row>
+                                <Col>
+                                  <Progress.Line percent={sentProgress} showInfo={false} />
+                                </Col>
+                              </Row>
+                              <Row>
+                                <Col style={{ width: '100%', height: '500px', padding: '20px' }}>
+                                  <div
+                                    className='ag-theme-material'
+                                    style={{
+                                      height: '100%',
+                                      width: '100%'
+                                    }}
+                                  >
+                                    <AgGridReact
+                                      gridOptions={gridOptions}
+                                      rowData={customerCids}
+                                      onGridReady={handleGridReady}
+                                      pagination
+                                      deltaRowDataMode
+                                      getRowNodeId={(data) => {
+                                        return data.kundenCID
+                                      }}
+                                    />
+                                  </div>
+                                </Col>
+                              </Row>
+                            </Container>
+                          </Col>
+                        </Row>
+                      )}
+                      {activeTab === 'changelog' && (
+                        <Row>
+                          <Col>
+                            <Container style={{ padding: '20px' }}>
+                              <Row>
+                                <Col style={{ padding: '0 40px' }}>
+                                  <Changelog maintId={maintenance.id} />
+                                </Col>
+                              </Row>
+                            </Container>
+                          </Col>
+                        </Row>
+                      )}
+                      {activeTab === 'reschedule' && (
+                        <Row>
+                          <Col>
+                            <Container style={{ padding: '20px' }}>
+                              <Row>
+                                <FlexboxGrid justify='end'>
+                                  <FlexboxGrid.Item>
+                                    <Whisper placement='bottom' speaker={<Tooltip>Create New Reschedule</Tooltip>}>
+                                      <IconButton appearance='ghost' onClick={toggleRescheduleModal} icon={<Icon icon='clock-o' />}>
+                                        Reschedule
+                                      </IconButton>
+                                    </Whisper>
+                                  </FlexboxGrid.Item>
+                                </FlexboxGrid>
+                              </Row>
+                              <Row>
+                                {/* {rescheduleData.length !== 0 && ( */}
+                                <Col style={{ width: '100%', height: '400px' }}>
+                                  <div
+                                    className='ag-theme-material'
+                                    style={{
+                                      height: '100%',
+                                      width: '100%'
+                                    }}
+                                  >
+                                    <AgGridReact
+                                      gridOptions={rescheduleGridOptions}
+                                      rowData={rescheduleData}
+                                      onGridReady={handleRescheduleGridReady}
+                                      pagination
+                                      onCellEditingStopped={handleRescheduleCellEdit}
+                                      animateRows
+                                      deltaRowDataMode
+                                      getRowNodeId={(data) => {
+                                        return data.rcounter
+                                      }}
+                                      stopEditingWhenGridLosesFocus
+                                    />
+                                  </div>
+                                </Col>
+                                {/* )} */}
+                              </Row>
+                            </Container>
+                          </Col>
+                        </Row>
+                      )}
                     </Col>
                   </Row>
                 </Grid>
@@ -2150,167 +1724,177 @@ const Maintenance = ({ session, serverData, suppliers }) => {
             </FlexboxGrid.Item>
           </FlexboxGrid>
         </MaintPanel>
-        {openReadModal && (
-          <ReadModal
-            maintenance={maintenance}
-            openReadModal={openReadModal}
-            toggleReadModal={toggleReadModal}
-            incomingAttachments={maintenance.incomingAttachments}
-            jsonData={serverData}
-          />
-        )}
-        {openPreviewModal && (
-          <MailEditor
-            open={openPreviewModal}
-            onHide={togglePreviewModal}
-            recipients={mailPreviewRecipients.toLowerCase()}
-            subject={mailPreviewSubject}
-            body={mailBodyText}
-            customerCid={mailPreviewCustomerCID}
-            sendMail={sendMail}
-            onEditorChange={handleEditorChange}
-          />
-        )}
-        {typeof window !== 'undefined' && openRescheduleModal && (
-          <Rnd
-            default={{
-              x: window.outerWidth / 2,
-              y: 80,
-              width: 450,
-              height: 650
-            }}
-            style={{
-              background: 'var(--background)',
-              overflow: 'hidden',
-              borderRadius: '5px',
-              height: 'auto',
-              zIndex: '6',
-              boxShadow: '0px 0px 10px 1px var(--grey3)'
-            }}
-            bounds='window'
-            dragHandleClassName='reschedule-header'
-          >
-            <Modal.Header className='reschedule reschedule-header' onHide={toggleRescheduleModal}>
-              <FlexboxGrid justify='start' align='middle'>
-                <FlexboxGrid.Item colspan={20}>
-                  <h3>Reschedule Maintenance</h3>
-                </FlexboxGrid.Item>
-                <FlexboxGrid.Item colspan={2}>
-                  <Button appearance='primary' disabled style={{ opacity: '0.9', fontSize: '1.3rem' }}>{rescheduleData.length + 1}</Button>
-                </FlexboxGrid.Item>
-              </FlexboxGrid>
-            </Modal.Header>
-            <Modal.Body className='modal-body reschedule' style={{ marginTop: '0px', paddingBottom: '0px' }}>
-              <FlexboxGrid justify='space-around' align='middle' style={{ flexDirection: 'column', height: '510px' }}>
-                <FlexboxGrid.Item style={{ padding: '30px' }}>
-                  <Form>
-                    <FormGroup style={{ margin: '20px' }}>
-                      <label htmlFor='supplier'>Timezone</label>
-                      <TimezoneSelector
-                        style={{ borderColor: '#e5e5ea' }}
-                        value={{ value: reschedule.timezone, label: reschedule.timezoneLabel }}
-                        onChange={handleRescheduleTimezoneChange}
-                      />
-                    </FormGroup>
-                    <FormGroup style={{ margin: '20px' }}>
-                      <label>
-                        Start Date/Time
+        {
+          openReadModal && (
+            <ReadModal
+              maintenance={maintenance}
+              openReadModal={openReadModal}
+              toggleReadModal={toggleReadModal}
+              incomingAttachments={maintenance.incomingAttachments}
+              jsonData={serverData}
+            />
+          )
+        }
+        {
+          openPreviewModal && (
+            <MailEditor
+              open={openPreviewModal}
+              onHide={togglePreviewModal}
+              recipients={mailPreviewRecipients.toLowerCase()}
+              subject={mailPreviewSubject}
+              body={mailBodyText}
+              customerCid={mailPreviewCustomerCID}
+              sendMail={sendMail}
+              onEditorChange={handleEditorChange}
+            />
+          )
+        }
+        {
+          typeof window !== 'undefined' && openRescheduleModal && (
+            <Rnd
+              default={{
+                x: window.outerWidth / 2,
+                y: 80,
+                width: 450,
+                height: 650
+              }}
+              style={{
+                background: 'var(--background)',
+                overflow: 'hidden',
+                borderRadius: '5px',
+                height: 'auto',
+                zIndex: '6',
+                boxShadow: '0px 0px 10px 1px var(--grey3)'
+              }}
+              bounds='window'
+              dragHandleClassName='reschedule-header'
+            >
+              <Modal.Header className='reschedule reschedule-header' onHide={toggleRescheduleModal}>
+                <FlexboxGrid justify='start' align='middle'>
+                  <FlexboxGrid.Item colspan={20}>
+                    <h3>Reschedule Maintenance</h3>
+                  </FlexboxGrid.Item>
+                  <FlexboxGrid.Item colspan={2}>
+                    <Button appearance='primary' disabled style={{ opacity: '0.9', fontSize: '1.3rem' }}>{rescheduleData.length + 1}</Button>
+                  </FlexboxGrid.Item>
+                </FlexboxGrid>
+              </Modal.Header>
+              <Modal.Body className='modal-body reschedule' style={{ marginTop: '0px', paddingBottom: '0px' }}>
+                <FlexboxGrid justify='space-around' align='middle' style={{ flexDirection: 'column', height: '510px' }}>
+                  <FlexboxGrid.Item style={{ padding: '30px' }}>
+                    <Form>
+                      <FormGroup style={{ margin: '20px' }}>
+                        <label htmlFor='supplier'>Timezone</label>
+                        <TimezoneSelector
+                          style={{ borderColor: '#e5e5ea' }}
+                          value={{ value: reschedule.timezone, label: reschedule.timezoneLabel }}
+                          onChange={handleRescheduleTimezoneChange}
+                        />
+                      </FormGroup>
+                      <FormGroup style={{ margin: '20px' }}>
+                        <label>
+                          Start Date/Time
                       </label>
-                      <Flatpickr
-                        data-enable-time
-                        options={{ time_24hr: 'true', allow_input: 'true' }}
-                        className='flatpickr end-date-time'
-                        value={reschedule.startDateTime || null}
-                        onChange={date => handleRescheduleStartDateTimeChange(date)}
-                      />
-                    </FormGroup>
-                    <FormGroup style={{ margin: '20px' }}>
-                      <label>
-                        End Date/Time
+                        <Flatpickr
+                          data-enable-time
+                          options={{ time_24hr: 'true', allow_input: 'true' }}
+                          className='flatpickr end-date-time'
+                          value={reschedule.startDateTime || null}
+                          onChange={date => handleRescheduleStartDateTimeChange(date)}
+                        />
+                      </FormGroup>
+                      <FormGroup style={{ margin: '20px' }}>
+                        <label>
+                          End Date/Time
                       </label>
-                      <Flatpickr
-                        data-enable-time
-                        options={{ time_24hr: 'true', allow_input: 'true' }}
-                        className='flatpickr end-date-time'
-                        value={reschedule.endDateTime || null}
-                        onChange={date => handleRescheduleEndDateTimeChange(date)}
-                      />
-                    </FormGroup>
-                    <FormGroup style={{ margin: '20px' }}>
-                      <label htmlFor='resched-impact'>
-                        New Impact
+                        <Flatpickr
+                          data-enable-time
+                          options={{ time_24hr: 'true', allow_input: 'true' }}
+                          className='flatpickr end-date-time'
+                          value={reschedule.endDateTime || null}
+                          onChange={date => handleRescheduleEndDateTimeChange(date)}
+                        />
+                      </FormGroup>
+                      <FormGroup style={{ margin: '20px' }}>
+                        <label htmlFor='resched-impact'>
+                          New Impact
                       </label>
-                      <Input id='resched-impact' name='resched-impact' type='text' value={reschedule.impact} onChange={handleRescheduleImpactChange} />
-                    </FormGroup>
-                    <FormGroup style={{ margin: '20px' }}>
-                      <label htmlFor='resched-reason'>
-                        New Reason
+                        <Input id='resched-impact' name='resched-impact' type='text' value={reschedule.impact} onChange={handleRescheduleImpactChange} />
+                      </FormGroup>
+                      <FormGroup style={{ margin: '20px' }}>
+                        <label htmlFor='resched-reason'>
+                          New Reason
                       </label>
-                      <SelectPicker
-                        cleanable
-                        style={{ width: '100%' }}
-                        placement='top'
-                        searchable={false}
-                        value={reschedule.reason}
-                        onChange={handleRescheduleReasonChange}
-                        placeholder='Please select a reason for reschedule'
-                        data={[
-                          {
-                            value: 'change_circuits',
-                            label: 'Change in affected circuits'
-                          },
-                          {
-                            value: 'change_time',
-                            label: 'Change in planned date/time'
-                          },
-                          {
-                            value: 'change_impact',
-                            label: 'Change in impact duration'
-                          },
-                          {
-                            value: 'change_technical',
-                            label: 'Change due to technical reasons'
-                          }
-                        ]}
-                      />
-                    </FormGroup>
-                  </Form>
-                </FlexboxGrid.Item>
-                <FlexboxGrid.Item colspan={18}>
-                  <ButtonGroup justified>
-                    <Button appearance='sublte' onClick={toggleRescheduleModal}>
-                      Cancel
+                        <SelectPicker
+                          cleanable
+                          style={{ width: '100%' }}
+                          placement='top'
+                          searchable={false}
+                          value={reschedule.reason}
+                          onChange={handleRescheduleReasonChange}
+                          placeholder='Please select a reason for reschedule'
+                          data={[
+                            {
+                              value: 'change_circuits',
+                              label: 'Change in affected circuits'
+                            },
+                            {
+                              value: 'change_time',
+                              label: 'Change in planned date/time'
+                            },
+                            {
+                              value: 'change_impact',
+                              label: 'Change in impact duration'
+                            },
+                            {
+                              value: 'change_technical',
+                              label: 'Change due to technical reasons'
+                            }
+                          ]}
+                        />
+                      </FormGroup>
+                    </Form>
+                  </FlexboxGrid.Item>
+                  <FlexboxGrid.Item colspan={18}>
+                    <ButtonGroup justified>
+                      <Button appearance='sublte' onClick={toggleRescheduleModal}>
+                        Cancel
                     </Button>
-                    <Button onClick={handleRescheduleSave}>
-                      Save
+                      <Button onClick={handleRescheduleSave}>
+                        Save
                     </Button>
-                  </ButtonGroup>
-                </FlexboxGrid.Item>
-              </FlexboxGrid>
-            </Modal.Body>
-          </Rnd>
-        )}
-        {openConfirmDeleteModal && (
-          <ConfirmModal
-            show={openConfirmDeleteModal}
-            onHide={toggleConfirmDeleteRescheduleModal}
-            header='Confirm Delete'
-            content={`Are you sure you want to delete ${rescheduleToDelete.id}`}
-            cancelAction={toggleConfirmDeleteRescheduleModal}
-            confirmAction={handleDeleteReschedule}
-          />
-        )}
-        {openConfirmFreezeModal && (
-          <ConfirmModal
-            show={openConfirmFreezeModal}
-            onHide={toggleConfirmFreezeModal}
-            header='Confirm Freeze'
-            content={`There is a network freeze for <b>${frozenCompany || ''}</b>. Are you sure you want to send this mail?`}
-            cancelAction={toggleConfirmFreezeModal}
-            confirmAction={() => prepareDirectSend(frozenState.recipient, frozenState.cid, false)}
-          />
-        )}
-      </Layout>
+                    </ButtonGroup>
+                  </FlexboxGrid.Item>
+                </FlexboxGrid>
+              </Modal.Body>
+            </Rnd>
+          )
+        }
+        {
+          openConfirmDeleteModal && (
+            <ConfirmModal
+              show={openConfirmDeleteModal}
+              onHide={toggleConfirmDeleteRescheduleModal}
+              header='Confirm Delete'
+              content={`Are you sure you want to delete ${rescheduleToDelete.id}`}
+              cancelAction={toggleConfirmDeleteRescheduleModal}
+              confirmAction={handleDeleteReschedule}
+            />
+          )
+        }
+        {
+          openConfirmFreezeModal && (
+            <ConfirmModal
+              show={openConfirmFreezeModal}
+              onHide={toggleConfirmFreezeModal}
+              header='Confirm Freeze'
+              content={`There is a network freeze for <b>${frozenCompany || ''}</b>. Are you sure you want to send this mail?`}
+              cancelAction={toggleConfirmFreezeModal}
+              confirmAction={() => prepareDirectSend(frozenState.recipient, frozenState.cid, false)}
+            />
+          )
+        }
+      </Layout >
     )
   } else {
     return <RequireLogin />

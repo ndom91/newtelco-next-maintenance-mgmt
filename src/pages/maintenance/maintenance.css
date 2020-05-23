@@ -137,30 +137,20 @@
   overflow: scroll;
 }
 
+textarea::-webkit-scrollbar-track,
 .read-mail-body::-webkit-scrollbar-track {
   border-radius: 10px;
   background-color: rgba(0,0,0,0);
 }
+
+textarea::-webkit-scrollbar,
 .read-mail-body::-webkit-scrollbar {
   width: 8px;
   height: 8px;
   background-color: transparent;
 }
+textarea::-webkit-scrollbar-thumb,
 .read-mail-body::-webkit-scrollbar-thumb {
-  border-radius: 10px;
-  background-color: rgba(0,0,0,0.4);
-}
-
-textarea::-webkit-scrollbar-track {
-  border-radius: 10px;
-  background-color: rgba(0,0,0,0);
-}
-textarea::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-  background-color: transparent;
-}
-textarea::-webkit-scrollbar-thumb {
   border-radius: 10px;
   background-color: rgba(0,0,0,0.4);
 }
@@ -184,4 +174,16 @@ textarea::-webkit-scrollbar-thumb {
 
 .timezone-select > div:nth-of-type(2) {
   z-index: 99;
+}
+
+.panel-right .rs-panel-body {
+  padding-top: 0px;
+}
+
+.panel-right .rs-nav.rs-nav-horizontal {
+  margin-bottom: 15px;
+}
+
+.panel-right .rs-nav-reversed.rs-nav-tabs.rs-nav-horizontal .rs-nav-item > .rs-nav-item-content {
+  text-align: center;
 }

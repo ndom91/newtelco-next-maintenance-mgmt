@@ -52,7 +52,7 @@ const Changelog = ({ maintId }) => {
             dot = 'map-marker'
           } else if (item.field && item.action === 'sent to') {
             dot = 'at'
-          } else if (item.field === 'maintNote') {
+          } else if (item.field === 'notes' || item.field === 'maintNote') {
             dot = 'comment'
           } else if (item.field === 'done') {
             dot = 'check'
