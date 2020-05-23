@@ -35,6 +35,8 @@ import tzOptions from '@/newtelco/maintenance/timezoneOptions'
 import Select from 'react-select'
 import debounce from 'just-debounce-it'
 
+import objDiff from '@/newtelco-utils/objdiff'
+
 import {
   Icon,
   Form,
@@ -71,6 +73,21 @@ const Changelog = dynamic(
   () => import('@/newtelco/maintenance/timeline'),
   { ssr: false }
 )
+const MyTextarea = ({ field, form }) => {
+  return (
+    <Input
+      rows={3}
+      type='text'
+      key={field.name}
+      componentClass='textarea'
+      name={field.name}
+      value={field.value}
+      validateOnChange={false}
+      validateOnBlur={false}
+      onChange={option => form.setFieldValue(field.name, option)}
+    />
+  )
+}
 
 const AutoSave = ({ debounceMs }) => {
   const formik = useFormikContext()
@@ -104,23 +121,20 @@ const AutoSave = ({ debounceMs }) => {
 const Maintenance = ({ session, serverData, suppliers }) => {
   const store = Store.useStore()
   const [maintenance, setMaintenance] = useState(serverData.profile)
-  // useState({
-  //   incomingAttachments: [],
-  //   incomingBody: serverData.profile.body,
-  //   timezone: 'Europe/Amsterdam',
-  //   timezoneLabel: '(GMT+02:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna',
-  //   bearbeitetvon: '',
-  //   maileingang: '',
-  //   updatedAt: '',
-  //   updatedBy: serverData.profile.updatedBy || '',
-  //   name: '',
-  //   impact: '',
-  //   location: '',
-  //   reason: '',
-  //   mailId: 'NT',
-  //   calendarId: serverData.profile.calendarId || '',
-  //   maintNote: ''
-  // })
+  const [maintHistory, setMaintHistory] = useState({
+    timezone: serverData.profile.timezone,
+    supplier: serverData.profile.lieferant,
+    startDateTime: serverData.profile.startDateTime,
+    endDateTime: serverData.profile.endDateTime,
+    supplierCids: serverData.profile.derenCIDid.split(',').map(Number),
+    impact: serverData.profile.impact,
+    location: serverData.profile.location,
+    reason: serverData.profile.reason,
+    note: serverData.profile.maintNote,
+    cancelled: !!+serverData.profile.cancelled,
+    emergency: !!+serverData.profile.emergency,
+    done: !!+serverData.profile.done
+  })
   const [frozenState, setFrozenState] = useState({
     recipient: '',
     cid: ''
@@ -1787,20 +1801,6 @@ const Maintenance = ({ session, serverData, suppliers }) => {
         />
       )
     }
-    const MyTextarea = ({ field, form }) => {
-      return (
-        <Input
-          rows={3}
-          type='text'
-          componentClass='textarea'
-          name={field.name}
-          value={field.value}
-          validateOnChange={false}
-          validateOnBlur={false}
-          onChange={option => form.setFieldValue(field.name, option)}
-        />
-      )
-    }
     const MyToggle = ({ field, form, checkedChildren = '' }) => {
       return (
         <Toggle
@@ -1814,30 +1814,6 @@ const Maintenance = ({ session, serverData, suppliers }) => {
         />
       )
     }
-
-    // useEffect(() => {
-    //   const values = formRef.current.values
-    //   const oldMaint = store.get('maintenance')
-    //   store.set('maintenance')({
-    //     ...store.get('maintenance'),
-    //     lieferant: values.supplier,
-    //     name: suppliers.length ? suppliers.find(options => options.value === values.supplier).label : '',
-    //     timezone: values.timezone,
-    //     derenCIDid: values.supplierCids,
-    //     startDateTime: values.startDateTime,
-    //     endDateTime: values.endDateTime,
-    //     notes: values.note,
-    //     updatedAt: new Date().toISOString(),
-    //     // betroffeneCIDs: values.,
-    //     done: values.done,
-    //     cancelled: values.cancelled,
-    //     emergency: values.emergency,
-    //     reason: values.reason,
-    //     impact: values.impact,
-    //     location: values.location,
-    //     updatedBy: session.user.email.match(/^([^@]*)@/)[1]
-    //   })
-    // }, [formRef.current?.values])
 
     return (
       <Layout>
@@ -1865,13 +1841,14 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                       impact: serverData.profile.impact,
                       location: serverData.profile.location,
                       reason: serverData.profile.reason,
-                      note: serverData.profile.maintNote,
+                      maintNote: serverData.profile.maintNote,
                       cancelled: !!+serverData.profile.cancelled,
                       emergency: !!+serverData.profile.emergency,
                       done: !!+serverData.profile.done
                     }}
                     onSubmit={async (values, formikHelpers) => {
-                      console.log('submitted: ', values)
+                      const diff = objDiff(maintHistory, values)
+                      setMaintHistory(values)
                       if (values.supplierCids && !customerCids.length) {
                         fetchCustomerCids(values.supplierCids)
                       }
@@ -1880,7 +1857,9 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                           method: 'post',
                           body: JSON.stringify({
                             id: maintenance.id,
-                            values: values
+                            values: values,
+                            user: session.user.email.match(/^([^@]*)@/)[1],
+                            field: Object.keys(diff)[0]
                           }),
                           headers: {
                             'Content-Type': 'application/json'
@@ -1888,8 +1867,6 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                         })
                       } catch (e) {
                         formikHelpers.setErrors({ error: e })
-                      } finally {
-                        formikHelpers.setSubmitting(false)
                       }
                     }}
                   >
@@ -1991,7 +1968,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                                   This note will be included in the mail
                                 </HelpBlock>
                               </ControlLabel>
-                              <FastField name='maintNote' component={MyTextarea} />
+                              <FastField name='maintNote' key='maintNote' component={MyTextarea} />
                             </FormGroup>
                           </Col>
                         </Row>
