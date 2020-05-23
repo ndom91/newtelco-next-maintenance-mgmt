@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react'
-// import App from 'next/app'
 import './style/app.css'
 import './style/ntTheme.less'
 import 'algolia-react-autocomplete/build/css/index.css'
@@ -7,25 +6,8 @@ import Head from 'next/head'
 import ErrorBoundary from '@/newtelco/errorboundary'
 import Store from '@/newtelco/store'
 import NextAuth from 'next-auth/client'
-const LogRocket = require('logrocket')
-
-// export default class MaintApp extends App {
-//   static async getInitialProps ({ Component, pageProps }) {
-//     // let pageProps = {}
-
-//     // if (Component.getInitialProps) {
-//     //   pageProps = await Component.getInitialProps(ctx)
-//     // }
-//     if (process.browser && pageProps.session && pageProps.session.user) {
-//       LogRocket.init('ui2vht/next-maintenance')
-//       LogRocket.identify(pageProps.session.user.id, {
-//         name: pageProps.session.user.name,
-//         email: pageProps.session.user.email
-//       })
-//     }
-
-//     // return { pageProps }
-//   }
+// import * as Sentry from '@sentry/browser'
+// const LogRocket = require('logrocket')
 
 export default ({ Component, pageProps }) => {
   const ConditionalWrap = ({ condition, wrap, children }) => (
@@ -35,11 +17,16 @@ export default ({ Component, pageProps }) => {
   useEffect(() => {
     if (process.env.NEXT_PUBLIC_ENV === 'production') {
       if (process.browser && pageProps.session && pageProps.session.user) {
-        LogRocket.init('ui2vht/next-maintenance')
-        LogRocket.identify(pageProps.session.user.id, {
-          name: pageProps.session.user.name,
-          email: pageProps.session.user.email
-        })
+        // LogRocket.init('ui2vht/next-maintenance')
+        // LogRocket.identify(pageProps.session.user.id, {
+        //   name: pageProps.session.user.name,
+        //   email: pageProps.session.user.email
+        // })
+        // Sentry setup: https://github.com/zeit/next.js/blob/canary/examples/with-sentry-simple/
+        // Sentry.init({
+        //   enabled: process.env.NODE_ENV === 'production',
+        //   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+        // })
       }
     }
   }, [])
@@ -86,8 +73,8 @@ export default ({ Component, pageProps }) => {
   )
 }
 
-export function reportWebVitals (metric) {
-  if (process.env.NEXT_PUBLIC_ENV === 'development') {
+export function reportWebVitals(metric) {
+  if (process.env.NEXT_PUBLIC_VITALS) {
     console.table('metrics', metric.name, metric.value)
   }
 }

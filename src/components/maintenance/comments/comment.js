@@ -1,4 +1,5 @@
 import React from 'react'
+import NextAuth from 'next-auth/client'
 import {
   Avatar,
   FlexboxGrid,
@@ -8,6 +9,7 @@ import {
 } from 'rsuite'
 
 const Comment = ({ data, handleDelete }) => {
+  const [session, loading] = NextAuth.useSession()
   const username = data.user.match(/^([^@]*)@/)[1]
 
   return (
@@ -27,16 +29,18 @@ const Comment = ({ data, handleDelete }) => {
           <span style={{ marginBottom: '10px' }}>{data.body}</span>
         </div>
       </FlexboxGrid.Item>
-      <FlexboxGrid.Item colspan={2}>
-        <Dropdown
-          placement='bottomEnd'
-          renderTitle={() => {
-            return <IconButton appearance='subtle' icon={<Icon icon='ellipsis-v' />} />
-          }}
-        >
-          <Dropdown.Item onClick={() => handleDelete(data.id)} icon={<Icon icon='trash' />}>Delete</Dropdown.Item>
-        </Dropdown>
-      </FlexboxGrid.Item>
+      {!loading && session.user.email === data.user && (
+        <FlexboxGrid.Item colspan={2}>
+          <Dropdown
+            placement='bottomEnd'
+            renderTitle={() => {
+              return <IconButton appearance='subtle' icon={<Icon icon='ellipsis-v' />} />
+            }}
+          >
+            <Dropdown.Item onClick={() => handleDelete(data.id)} icon={<Icon icon='trash' />}>Delete</Dropdown.Item>
+          </Dropdown>
+        </FlexboxGrid.Item>
+      )}
     </FlexboxGrid>
   )
 }
