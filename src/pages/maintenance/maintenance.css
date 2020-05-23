@@ -137,18 +137,28 @@
   overflow: scroll;
 }
 
+.ag-horizontal-left-spacer::-webkit-scrollbar-track,
+.ag-horizontal-right-spacer::-webkit-scrollbar-track,
+.ag-body-horizontal-scroll-viewport::-webkit-scrollbar-track,
 textarea::-webkit-scrollbar-track,
 .read-mail-body::-webkit-scrollbar-track {
   border-radius: 10px;
   background-color: rgba(0,0,0,0);
 }
 
+.ag-horizontal-left-spacer::-webkit-scrollbar,
+.ag-horizontal-right-spacer::-webkit-scrollbar,
+.ag-body-horizontal-scroll-viewport::-webkit-scrollbar,
 textarea::-webkit-scrollbar,
 .read-mail-body::-webkit-scrollbar {
   width: 8px;
   height: 8px;
   background-color: transparent;
 }
+
+.ag-horizontal-left-spacer::-webkit-scrollbar-thumb,
+.ag-horizontal-right-spacer::-webkit-scrollbar-thumb,
+.ag-body-horizontal-scroll-viewport::-webkit-scrollbar-thumb,
 textarea::-webkit-scrollbar-thumb,
 .read-mail-body::-webkit-scrollbar-thumb {
   border-radius: 10px;

@@ -2,6 +2,15 @@ const db = require('../../../lib/db')
 const escape = require('sql-template-strings')
 
 module.exports = async (req, res) => {
+  const toSqlDatetime = (inputDate) => {
+    const date = new Date(inputDate)
+    const dateWithOffest = new Date(date.getTime() - (date.getTimezoneOffset() * 60000))
+    return dateWithOffest
+      .toISOString()
+      .slice(0, 19)
+      .replace('T', ' ')
+  }
+
   const maintId = req.body.id
   const values = req.body.values
   const user = req.body.user
@@ -12,8 +21,8 @@ module.exports = async (req, res) => {
       cancelled = ${values.cancelled},
       done = ${values.done},
       emergency = ${values.emergency},
-      startDateTime = ${values.startDateTime},
-      endDateTime = ${values.endDateTime},
+      startDateTime = ${toSqlDatetime(values.startDateTime)},
+      endDateTime = ${toSqlDatetime(values.endDateTime)},
       impact = ${values.impact},
       location = ${values.location},
       reason = ${values.reason},
@@ -23,7 +32,7 @@ module.exports = async (req, res) => {
       timezone = ${values.timezone}
     WHERE id LIKE ${maintId}
   `)
-  fieldName = {
+  const fieldName = {
     cancelled: 'cancelled',
     done: 'done',
     emergency: 'emergency',
@@ -42,8 +51,8 @@ module.exports = async (req, res) => {
     updateHistory = await db.query(escape`INSERT INTO changelog (mid, user, action, field) VALUES (${maintId}, ${user}, 'changed', ${fieldName[field]});`)
   }
   res.status(200).json({
-    saved: save.affectedRows === 1,
-    insertHistory: updateHistory.affectedRows === 1,
+    saved: save.affectedRows === 1 ? true : save,
+    insertHistory: updateHistory?.affectedRows === 1,
     maintId,
     values
   })

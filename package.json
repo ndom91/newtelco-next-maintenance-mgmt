@@ -70,7 +70,6 @@
     "react-pdf-js-infinite": "^1.2.0",
     "react-rnd": "^10.1.10",
     "react-select": "^3.1.0",
-    "react-transition-group": "^4.4.1",
     "rsuite": "^4.7.0",
     "serverless-mysql": "^1.5.4",
     "sql-template-strings": "^2.2.2",

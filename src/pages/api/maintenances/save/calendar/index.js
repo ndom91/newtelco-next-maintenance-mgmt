@@ -2,9 +2,9 @@ const db = require('../../../../../lib/db')
 const escape = require('sql-template-strings')
 
 module.exports = async (req, res) => {
-  const maintId = req.query.mid
-  const calId = req.query.cid
-  const updatedBy = req.query.updatedby
+  const maintId = req.body.mid
+  const calId = req.body.cid
+  const updatedBy = req.body.updatedBy
 
   const calIdUpdateQuery = await db.query(escape`
     UPDATE maintenancedb SET calendarId = ${calId} WHERE id = ${maintId}

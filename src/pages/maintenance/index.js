@@ -9,7 +9,6 @@ import MailEditor from '@/newtelco/maintenance/mailEditor'
 import { format, isValid, formatDistance, parseISO } from 'date-fns'
 import moment from 'moment-timezone'
 import { Rnd } from 'react-rnd'
-import { CSSTransition } from 'react-transition-group'
 import Flatpickr from 'react-flatpickr'
 import 'flatpickr/dist/themes/material_blue.css'
 import { getUnique, convertDateTime } from '@/newtelco/maintenance/helper'
@@ -784,17 +783,18 @@ const Maintenance = ({ session, serverData, suppliers }) => {
     const calId = maintenance.calendarId
     const company = maintenance.name
     const maintId = maintenance.id
+    const currentMaint = formRef.current.values
 
     let derenCid = ''
-    // TODO: this still needs to be updated
-    selectedSupplierCids.forEach(cid => {
-      derenCid = derenCid + cid.label + ' '
+    currentMaint.supplierCids.forEach(supp => {
+      const supplierLabel = supplierCids.filter(supplier => supplier.value === supp)
+      derenCid += ` ${supplierLabel[0].label}`
     })
     derenCid = derenCid.trim()
 
     let cids = ''
     customerCids.forEach(cid => {
-      cids = cids + cid.kundenCID + ' '
+      cids += ` ${cid.kundenCID}`
     })
     cids = cids.trim()
 
@@ -832,25 +832,26 @@ const Maintenance = ({ session, serverData, suppliers }) => {
   const handleCalendarCreate = () => {
     const company = maintenance.name
     const maintId = maintenance.id
-    const startDateTime = maintenance.startDateTime
-    const endDateTime = maintenance.endDateTime
+    const currentMaint = formRef.current.values
+    const startDateTime = currentMaint.startDateTime
+    const endDateTime = currentMaint.endDateTime
 
     let derenCid = ''
-    // TODO: this still needs to be updated
-    selectedSupplierCids.forEach(cid => {
-      derenCid = derenCid + cid.label + ' '
+    currentMaint.supplierCids.forEach(supp => {
+      const supplierLabel = supplierCids.filter(supplier => supplier.value === supp)
+      derenCid += ` ${supplierLabel[0].label}`
     })
     derenCid = derenCid.trim()
 
     let cids = ''
     customerCids.forEach(cid => {
-      cids = cids + cid.kundenCID + ' '
+      cids += ` ${cid.kundenCID}`
     })
     cids = cids.trim()
 
-    const startMoment = moment.tz(startDateTime, maintenance.timezone)
+    const startMoment = moment.tz(startDateTime, currentMaint.timezone)
     const startDE = startMoment.tz('Europe/Berlin').format()
-    const endMoment = moment.tz(endDateTime, maintenance.timezone)
+    const endMoment = moment.tz(endDateTime, currentMaint.timezone)
     const endDE = endMoment.tz('Europe/Berlin').format()
 
     fetch('/v1/api/calendar/create', {
@@ -861,9 +862,9 @@ const Maintenance = ({ session, serverData, suppliers }) => {
         supplierCID: derenCid,
         maintId: maintId,
         startDateTime: startDE,
-        endDateTime: endDE
+        endDateTime: endDE,
+        user: session.user.email
       }),
-      mode: 'cors',
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Content-Type': 'application/json'
@@ -880,11 +881,21 @@ const Maintenance = ({ session, serverData, suppliers }) => {
 
           setMaintenance({
             ...maintenance,
+            ...currentMaint,
             calendarId: calId
           })
 
-          fetch(`/api/maintenances/save/calendar?mid=${maintenance.id}&cid=${calId}&updatedby=${session.user.email}`, {
-            method: 'get'
+          fetch('/api/maintenances/save/calendar', {
+            method: 'post',
+            body: JSON.stringify({
+              mid: maintenance.id,
+              cid: calId,
+              updatedBy: session.user.email
+            }),
+            headers: {
+              'Access-Control-Allow-Origin': '*',
+              'Content-Type': 'application/json'
+            }
           })
             .then(resp => resp.json())
             .then(data => {
@@ -973,13 +984,6 @@ const Maintenance = ({ session, serverData, suppliers }) => {
   //
   /// /////////////////////////////////////////////////////////
 
-  const handleRescheduleTimezoneChange = (selection) => {
-    const timezoneLabel = selection.label // 'Europe/Amsterdam'
-    const timezoneValue = selection.value // '(GMT+02:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna'
-
-    setReschedule({ ...reschedule, timezone: timezoneValue, timezoneLabel: timezoneLabel })
-  }
-
   const handleRescheduleStartDateTimeChange = (date) => {
     const startDateTime = moment(date[0]).format('YYYY-MM-DD HH:mm:ss')
     setReschedule({ ...reschedule, startDateTime })
@@ -988,14 +992,6 @@ const Maintenance = ({ session, serverData, suppliers }) => {
   const handleRescheduleEndDateTimeChange = (date) => {
     const endDateTime = moment(date[0]).format('YYYY-MM-DD HH:mm:ss')
     setReschedule({ ...reschedule, endDateTime })
-  }
-
-  const handleRescheduleImpactChange = (value) => {
-    setReschedule({ ...reschedule, impact: value })
-  }
-
-  const handleRescheduleReasonChange = (reason) => {
-    setReschedule({ ...reschedule, reason })
   }
 
   const handleRescheduleSave = () => {
@@ -1483,13 +1479,13 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                           <Col sm={12} xs={24}>
                             <FormGroup>
                               <ControlLabel htmlFor='edited-by'>Created By</ControlLabel>
-                              <Input tabIndex='-1' readOnly id='edited-by-input' name='edited-by' type='text' value={maintenance.bearbeitetvon} />
+                              <Input tabIndex='-1' readOnly id='edited-by-input' name='edited-by' type='text' value={maintenance.bearbeitetvon} disabled />
                             </FormGroup>
                           </Col>
                           <Col sm={12} xs={24}>
                             <FormGroup>
                               <ControlLabel htmlFor='maileingang'>Mail Arrived</ControlLabel>
-                              <Input tabIndex='-1' readOnly id='maileingang-input' name='maileingang' type='text' value={convertDateTime(maintenance.maileingang)} />
+                              <Input tabIndex='-1' readOnly id='maileingang-input' name='maileingang' type='text' value={convertDateTime(maintenance.maileingang)} disabled />
                             </FormGroup>
                           </Col>
                         </Row>
@@ -1510,13 +1506,23 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                         <Row gutter={20} style={{ marginBottom: '20px' }}>
                           <Col sm={12} xs={24}>
                             <FormGroup>
-                              <ControlLabel htmlFor='start-datetime'>Start Date/Time</ControlLabel>
+                              <ControlLabel htmlFor='start-datetime' style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                Start Date/Time
+                                <HelpBlock style={{ float: 'right' }} tooltip>
+                                  Time in above selected Timezone
+                                </HelpBlock>
+                              </ControlLabel>
                               <FastField name='startDateTime' component={MyDateTime} />
                             </FormGroup>
                           </Col>
                           <Col sm={12} xs={24}>
                             <FormGroup>
-                              <ControlLabel htmlFor='end-datetime'>End Date/Time</ControlLabel>
+                              <ControlLabel htmlFor='end-datetime' style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                End Date/Time
+                                <HelpBlock style={{ float: 'right' }} tooltip>
+                                  Time in above selected Timezone
+                                </HelpBlock>
+                              </ControlLabel>
                               <FastField name='endDateTime' component={MyDateTime} />
                             </FormGroup>
                           </Col>
@@ -1687,7 +1693,6 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                                 </FlexboxGrid>
                               </Row>
                               <Row>
-                                {/* {rescheduleData.length !== 0 && ( */}
                                 <Col style={{ width: '100%', height: '400px' }}>
                                   <div
                                     className='ag-theme-material'
@@ -1711,7 +1716,6 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                                     />
                                   </div>
                                 </Col>
-                                {/* )} */}
                               </Row>
                             </Container>
                           </Col>
@@ -1785,10 +1789,12 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                     <Form>
                       <FormGroup style={{ margin: '20px' }}>
                         <label htmlFor='supplier'>Timezone</label>
-                        <TimezoneSelector
-                          style={{ borderColor: '#e5e5ea' }}
+                        <Select
+                          options={tzOptions}
+                          name='reschedule-timezone'
                           value={{ value: reschedule.timezone, label: reschedule.timezoneLabel }}
-                          onChange={handleRescheduleTimezoneChange}
+                          onChange={selection => setReschedule({ ...reschedule, timezone: selection.value, timezoneLabel: selection.label })}
+                          className='timezone-select'
                         />
                       </FormGroup>
                       <FormGroup style={{ margin: '20px' }}>
@@ -1819,7 +1825,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                         <label htmlFor='resched-impact'>
                           New Impact
                       </label>
-                        <Input id='resched-impact' name='resched-impact' type='text' value={reschedule.impact} onChange={handleRescheduleImpactChange} />
+                        <Input id='resched-impact' name='resched-impact' type='text' value={reschedule.impact} onChange={value => setReschedule({ ...reschedule, impact: value })} />
                       </FormGroup>
                       <FormGroup style={{ margin: '20px' }}>
                         <label htmlFor='resched-reason'>
@@ -1831,7 +1837,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                           placement='top'
                           searchable={false}
                           value={reschedule.reason}
-                          onChange={handleRescheduleReasonChange}
+                          onChange={value => setReschedule({ ...reschedule, reason: value })}
                           placeholder='Please select a reason for reschedule'
                           data={[
                             {
