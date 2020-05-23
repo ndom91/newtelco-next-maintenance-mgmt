@@ -160,21 +160,21 @@ const Inbox = ({ session, inboxItems }) => {
               </FlexboxGrid.Item>
             </FlexboxGrid>
           ) : (
-              <List bordered style={{ width: '100%' }}>
-                {Array.isArray(inboxMails) && inboxMails.map((mail, index) => {
-                  return (
-                    <List.Item key={index}>
-                      <InboxItem
-                        mail={mail}
-                        index={index}
-                        handleDelete={onDelete}
-                        toggle={toggle}
-                      />
-                    </List.Item>
-                  )
-                })}
-              </List>
-            )}
+            <List bordered style={{ width: '100%' }}>
+              {Array.isArray(inboxMails) && inboxMails.map((mail, index) => {
+                return (
+                  <List.Item key={index}>
+                    <InboxItem
+                      mail={mail}
+                      index={index}
+                      handleDelete={onDelete}
+                      toggle={toggle}
+                    />
+                  </List.Item>
+                )
+              })}
+            </List>
+          )}
         </MaintPanel>
         {isOpen && (
           <Modal className='mail-modal-body' autoFocus backdrop show={isOpen} size='lg' onHide={() => toggle(null)} full>
@@ -193,13 +193,13 @@ const Inbox = ({ session, inboxItems }) => {
                 </FlexboxGrid.Item>
                 <FlexboxGrid.Item colspan={20}>
                   <div className='modal-preview-text-wrapper'>
-                    <InputGroup className='modal-textbox' >
+                    <InputGroup className='modal-textbox'>
                       <InputGroup.Addon style={{ height: '31px' }} type='prepend'>
                         From
                       </InputGroup.Addon>
                       <Input readonly='readonly' value={modalInfo.from} />
                     </InputGroup>
-                    <InputGroup className='modal-textbox' >
+                    <InputGroup className='modal-textbox'>
                       <InputGroup.Addon style={{ height: '31px' }} type='prepend'>
                         Subject
                       </InputGroup.Addon>
@@ -232,7 +232,7 @@ const Inbox = ({ session, inboxItems }) => {
   }
 }
 
-export async function getServerSideProps({ req }) {
+export async function getServerSideProps ({ req }) {
   const session = await NextAuth.session({ req })
   const host = req ? req.headers['x-forwarded-host'] : window.location.hostname
   let protocol = 'https:'
@@ -250,7 +250,7 @@ export async function getServerSideProps({ req }) {
   return {
     props: {
       session,
-      inboxItems: inboxContent === 'No unread emails' ? [] : inboxContent,
+      inboxItems: inboxContent === 'No unread emails' ? [] : inboxContent
     }
   }
 }
