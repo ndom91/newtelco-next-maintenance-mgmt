@@ -34,10 +34,13 @@ const MaintHeader = props => {
 
   let avatarPath
   if (!loading) {
-    avatarPath = `https://api.adorable.io/avatars/128/${session.user.name}.png`
     const username = session.user.email.match(/^([^@]*)@/)[1]
-    if (['alissitsin', 'fwaleska', 'ndomino', 'kmoeller', 'nchachua'].includes(username)) {
+    if (session.user.image) {
+      avatarPath = session.user.image
+    } else if (['alissitsin', 'fwaleska', 'ndomino', 'kmoeller', 'nchachua'].includes(username)) {
       avatarPath = `/static/images/avatars/${username}.png`
+    } else {
+      avatarPath = `https://api.adorable.io/avatars/128/${session.user.name}.png`
     }
   }
 
