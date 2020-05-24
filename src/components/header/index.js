@@ -12,7 +12,8 @@ import {
   Dropdown,
   Avatar,
   Badge,
-  Divider
+  Divider,
+  Toggle
 } from 'rsuite'
 import Notify from '../../lib/notification'
 
@@ -31,6 +32,7 @@ const MaintHeader = props => {
   const [session, loading] = NextAuth.useSession()
   const store = Store.useStore()
   const count = store.get('count')
+  const night = store.get('night')
 
   let avatarPath
   if (!loading) {
@@ -42,6 +44,10 @@ const MaintHeader = props => {
     } else {
       avatarPath = `https://api.adorable.io/avatars/128/${session.user.name}.png`
     }
+  }
+
+  const toggleDark = e => {
+    store.set('night')(!store.get('night'))
   }
 
   return (
@@ -108,18 +114,29 @@ const MaintHeader = props => {
             </div>
             <Divider vertical />
             <Dropdown
+              trigger='click'
               className='header-dropdown'
               noCaret
               placement='bottomEnd'
               icon={<Avatar size='md' circle src={avatarPath} style={{ border: '2px solid #67b246' }} />}
             >
+              <Dropdown.Item panel style={{ padding: 10, textAlign: 'right' }}>
+                <p>Signed in as</p>
+                <strong>{!loading && session.user.email.match(/^([^@]*)@/)[1]}</strong>
+              </Dropdown.Item>
+              <Dropdown.Item divider />
+              <Dropdown.Item onSelect={(key, e) => e.preventDefault()} eventKey='1' onClick={toggleDark}>
+                <Toggle checked={night} checkedChildren={<Icon style={{ alignItems: 'center', color: '#fff' }} icon="moon-o" />} unCheckedChildren={<Icon icon="sun-o" />} onChange={toggleDark} size='sm' />
+                Darkmode
+              </Dropdown.Item>
+              <Dropdown.Item divider />
               <NavLink icon={<Icon icon='cog' />} href={{ pathname: '/settings', query: { tab: 'companies' } }}>Settings</NavLink>
-              <Dropdown.Item icon={<Icon icon='sign-out' />} href='/api/auth/signout'>Logout</Dropdown.Item>
+              <Dropdown.Item eventKey='2' icon={<Icon icon='sign-out' />} href='/api/auth/signout'>Logout</Dropdown.Item>
             </Dropdown>
           </Nav>
         </Navbar.Body>
       </Navbar>
-    </Header>
+    </Header >
   )
 }
 

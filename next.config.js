@@ -11,7 +11,7 @@ const withPWA = require('next-pwa')
 const Dotenv = require('dotenv-webpack')
 require('dotenv').config()
 
-function HACK_removeMinimizeOptionFromCssLoaders (config) {
+function HACK_removeMinimizeOptionFromCssLoaders(config) {
   // console.warn(
   //   'HACK: Removing `minimize` option from `css-loader` entries in Webpack config'
   // )
@@ -138,7 +138,7 @@ const nextConfig = {
   lessLoaderOptions: {
     javascriptEnabled: true
   },
-  webpack (config, { isServer, buildId, dev }) {
+  webpack(config, { isServer, buildId, dev }) {
     config.plugins.push(new webpack.EnvironmentPlugin(localEnv))
     HACK_removeMinimizeOptionFromCssLoaders(config)
     config.stats = { warningsFilter: warn => warn.indexOf('Conflicting order between:') > -1 }

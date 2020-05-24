@@ -12,3 +12,12 @@
   height: 2.3em;
   margin: 11px;
 }
+
+.header-dropdown .rs-dropdown-menu .rs-dropdown-item-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+ .header-dropdown .rs-dropdown-menu .rs-dropdown-item-content .rs-btn-toggle-sm {
+   margin-right: 10px;
+ }

@@ -5,6 +5,9 @@ import dynamic from 'next/dynamic'
 import KeyboardShortcuts from './keyboardShortcuts'
 import Store from './store'
 import Fonts from './fonts'
+import Helmet from 'react-helmet'
+import styled from 'styled-components'
+// import '../../public/static/css/rsuite-default.min.css'
 import {
   Container,
   Content,
@@ -21,9 +24,14 @@ const UnreadFavicon = dynamic(
   { ssr: false }
 )
 
+// const Wrapper = (props.content) = styled.div`
+//   ${content}
+// `;
+
 const Layout = ({ children }) => {
   const [openA2HS, setOpenA2HS] = useState(false)
   const [deferredPrompt, setDeferredPrompt] = useState(null)
+  const [style, setStyle] = useState('/static/css/rsuite-default.min.css')
   const store = Store.useStore()
 
   const { data } = useSWR(
@@ -36,8 +44,15 @@ const Layout = ({ children }) => {
     store.set('count')(data ? data.count : 0)
   }, [data])
 
+
   useEffect(() => {
     Fonts()
+
+    // fetch(store.get('night') ? '/static/css/rsuite-dark.min.css' : '/static/css/rsuite-default.min.css')
+    //   .then(response => response.text())
+    //   .then(data => {
+    //     setStyle(data)
+    //   })
 
     const installAsk = window.localStorage.getItem('askA2HS') || 0
 
@@ -75,8 +90,19 @@ const Layout = ({ children }) => {
     })
   }
 
+  store.on('night').subscribe(night => {
+    fetch(night ? '/static/css/rsuite-dark.min.css' : '/static/css/rsuite-default.min.css')
+      .then(response => response.text())
+      .then(data => {
+        setStyle(data)
+      })
+  })
+
   return (
     <div>
+      <style>
+        {style}
+      </style>
       <KeyboardShortcuts>
         <UnreadFavicon count={store.get('count')} />
         <Container>
