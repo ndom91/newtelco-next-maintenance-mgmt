@@ -8,15 +8,11 @@ import { Helmet } from 'react-helmet'
 import MailEditor from '@/newtelco/maintenance/mailEditor'
 import { format, isValid, formatDistance, parseISO } from 'date-fns'
 import moment from 'moment-timezone'
-import { Rnd } from 'react-rnd'
 import Flatpickr from 'react-flatpickr'
 import 'flatpickr/dist/themes/material_blue.css'
 import { getUnique, convertDateTime } from '@/newtelco/maintenance/helper'
 import ProtectedIcon from '@/newtelco/ag-grid/protected'
 import SentIcon from '@/newtelco/ag-grid/sent'
-import StartDateTime from '@/newtelco/ag-grid/startdatetime'
-import EndDateTime from '@/newtelco/ag-grid/enddatetime'
-import sentBtn from '@/newtelco/ag-grid/sentBtn'
 import { AgGridReact } from 'ag-grid-react'
 import dynamic from 'next/dynamic'
 import ReadModal from '@/newtelco/maintenance/readmodal'
@@ -32,10 +28,10 @@ import tzOptions from '@/newtelco/maintenance/timezoneOptions'
 import Select from 'react-select'
 import debounce from 'just-debounce-it'
 import objDiff from '@/newtelco-utils/objdiff'
+import RescheduleGrid from '@/newtelco/maintenance/reschedule'
 
 import {
   Icon,
-  Form,
   FormGroup,
   Input,
   ControlLabel,
@@ -54,12 +50,10 @@ import {
   Col,
   Loader,
   Progress,
-  Modal,
   Container,
   Message,
   SelectPicker,
   TagPicker,
-  Divider,
   Nav
 } from 'rsuite'
 
@@ -135,10 +129,8 @@ const Maintenance = ({ session, serverData, suppliers }) => {
   const [openReadModal, setOpenReadModal] = useState(false)
   const [openPreviewModal, setOpenPreviewModal] = useState(false)
   const [openRescheduleModal, setOpenRescheduleModal] = useState(false)
-  const [openConfirmDeleteModal, setOpenConfirmDeleteModal] = useState(false)
   const [openConfirmFreezeModal, setOpenConfirmFreezeModal] = useState(false)
   const [openMaintenanceChangelog, setOpenMaintenanceChangelog] = useState(false)
-  const [rescheduleData, setRescheduleData] = useState([])
   const [mailBodyText, setMailBodyText] = useState('')
   const [mailPreviewRecipients, setMailPreviewRecipients] = useState('')
   const [mailPreviewCustomerCID, setMailPreviewCustomerCid] = useState('')
@@ -146,7 +138,6 @@ const Maintenance = ({ session, serverData, suppliers }) => {
   const [customerCids, setCustomerCids] = useState([])
   const [supplierCids, setSupplierCids] = useState([])
   const [impactPlaceholder, setImpactPlaceholder] = useState([])
-  const [selectedSupplierCids, setSelectedSupplierCids] = useState([])
   const [sentProgress, setSentProgress] = useState(0)
   const [activeTab, setActiveTab] = useState('customer')
   const [maintHistory, setMaintHistory] = useState({
@@ -163,25 +154,14 @@ const Maintenance = ({ session, serverData, suppliers }) => {
     emergency: !!+serverData.profile.emergency,
     done: !!+serverData.profile.done
   })
-  const [reschedule, setReschedule] = useState({
-    startDateTime: null,
-    endDateTime: null,
-    impact: '',
-    reason: ''
-  })
   const [frozenState, setFrozenState] = useState({
     recipient: '',
     cid: ''
-  })
-  const [rescheduleToDelete, setRescheduleToDelete] = useState({
-    id: null,
-    rcounter: null
   })
 
   const formRef = useRef()
   const gridApi = useRef()
   const gridColumnApi = useRef()
-  const rescheduleGridApi = useRef()
 
   const sendMailBtns = ({ data: { maintenanceRecipient, kundenCID, frozen, name, protected: protection } }) => {
     return (
@@ -215,78 +195,6 @@ const Maintenance = ({ session, serverData, suppliers }) => {
     } else {
       generateMailSubject()
       setOpenPreviewModal(!openPreviewModal)
-    }
-  }
-
-  const rescheduleGridOptions = {
-    defaultColDef: {
-      resizable: true,
-      sortable: true,
-      filter: true,
-      editable: true,
-      selectable: true
-    },
-    columnDefs: [
-      {
-        headerName: 'ID',
-        field: 'rcounter',
-        width: 80,
-        editable: false,
-        hide: false,
-        sort: { direction: 'asc', priority: 0 }
-      }, {
-        headerName: 'Start',
-        field: 'startDateTime',
-        width: 170,
-        cellRenderer: 'startdateTime'
-      }, {
-        headerName: 'End',
-        field: 'endDateTime',
-        width: 170,
-        cellRenderer: 'enddateTime'
-      }, {
-        headerName: 'Impact',
-        field: 'impact',
-        width: 140,
-        tooltipField: 'impact'
-      }, {
-        headerName: 'Reason',
-        field: 'reason',
-        width: 160,
-        tooltipField: 'reason'
-      }, {
-        headerName: 'Sent',
-        field: 'sent',
-        width: 160,
-        tooltipField: 'reason',
-        cellRenderer: 'sentIcon'
-      }, {
-        headerName: '',
-        field: 'sent',
-        cellRenderer: 'sentBtn',
-        width: 60,
-        sortable: false,
-        filter: false,
-        pinned: 'right',
-        cellStyle: {
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '100%',
-          overflow: 'visible'
-        }
-      }
-    ],
-    rowSelection: 'single',
-    paginationPageSize: 10,
-    loadingOverlayComponent: 'customLoadingOverlay',
-    context: { moveCalendarEntry: moveCalendarEntry, toggleRescheduleSentBtn: toggleRescheduleSentBtn, toggleRescheduleDelete: toggleConfirmDeleteRescheduleModal },
-    frameworkComponents: {
-      startdateTime: StartDateTime,
-      enddateTime: EndDateTime,
-      sentBtn: sentBtn,
-      sentIcon: SentIcon,
-      customLoadingOverlay: Loader
     }
   }
 
@@ -416,16 +324,6 @@ const Maintenance = ({ session, serverData, suppliers }) => {
         const impactCalculation = formatDistance(parseISO(endDateTime), parseISO(startDateTime))
         setImpactPlaceholder(impactCalculation)
       }
-
-      // TODO: potentially redesign customer cid / reschedule / changelog into tabbed area and push this call off to when reschedule tab gets selected instead of on load..
-      fetch(`/api/reschedule?id=${serverData.profile.id}`, {
-        method: 'get'
-      })
-        .then(resp => resp.json())
-        .then(data => {
-          setRescheduleData(data.reschedules)
-        })
-        .catch(err => console.error(`Error Loading Reschedules - ${err}`))
     }
   }, [])
 
@@ -434,11 +332,6 @@ const Maintenance = ({ session, serverData, suppliers }) => {
   //                AG-GRID TABLE
   //
   /// /////////////////////////////////////////////////////////
-
-  const handleRescheduleGridReady = (params) => {
-    rescheduleGridApi.current = params.api
-    params.api.setRowData(rescheduleData)
-  }
 
   const handleGridReady = params => {
     gridApi.current = params.api
@@ -595,21 +488,21 @@ const Maintenance = ({ session, serverData, suppliers }) => {
       maintenanceIntro = `We would like to inform you that these planned works (<b>NT-${maintenance.id}</b>) have been <b>cancelled</b> with the following CID(s):`
     }
 
-    if (rescheduleData.length !== 0) {
-      const latest = rescheduleData.length - 1
-      const newStart = moment(rescheduleData[latest].startDateTime).format('YYYY-MM-DD HH:mm:ss')
-      const newEnd = moment(rescheduleData[latest].endDateTime).format('YYYY-MM-DD HH:mm:ss')
-      const newImpact = rescheduleData[latest].impact
-      const newReason = rescheduleData[latest].reason.toLowerCase()
-      const rcounter = rescheduleData[latest].rcounter
-      if (cancelled && rescheduleData[latest]) {
+    if (store.get('rescheduleData').length !== 0) {
+      const latest = store.get('rescheduleData').length - 1
+      const newStart = moment(store.get('rescheduleData')[latest].startDateTime).format('YYYY-MM-DD HH:mm:ss')
+      const newEnd = moment(store.get('rescheduleData')[latest].endDateTime).format('YYYY-MM-DD HH:mm:ss')
+      const newImpact = store.get('rescheduleData')[latest].impact
+      const newReason = store.get('rescheduleData')[latest].reason.toLowerCase()
+      const rcounter = store.get('rescheduleData')[latest].rcounter
+      if (cancelled && store.get('rescheduleData')[latest]) {
         maintenanceIntro = `We would like to inform you that these rescheduled planned works (<b>NT-${maintenance.id}-${rcounter}</b>) have been <b>cancelled</b>.<br><br>We are sorry for any inconveniences this may have caused.<br><footer>​<style>.sig{font-family:Century Gothic, sans-serif;font-size:9pt;color:#636266!important;}b.i{color:#4ca702;}.gray{color:#636266 !important;}a{text-decoration:none;color:#636266 !important;}</style><div class="sig"><div>Best regards <b class="i">|</b> Mit freundlichen Grüßen</div><br><div><b>Newtelco Maintenance Team</b></div><br><div>NewTelco GmbH <b class="i">|</b> Moenchhofsstr. 24 <b class="i">|</b> 60326 Frankfurt a.M. <b class="i">|</b> DE <br>www.newtelco.com <b class="i">|</b> 24/7 NOC  49 69 75 00 27 30 ​​<b class="i">|</b> <a style="color:#" href="mailto:service@newtelco.de">service@newtelco.de</a><br><br><div><img alt="sig" src="https://home.newtelco.de/sig.png" height="29" width="516"></div></div>​</footer><hr />`
       }
       maintenanceIntro += `We regret to inform you that the planned works have been <b>rescheduled</b> on the following CID(s):\n\n<br><br><b>${customerCID}</b><br><br>The maintenance has been rescheduled due to ${newReason}.<br><br>The new details are as follows:<br><table border="0" cellspacing="2" cellpadding="2" width="775px"><tr><td style='width: 205px;'>Maintenance ID:</td><td><b>NT-${maintenance.id}-${rcounter}</b></td></tr><tr><td>New Start date and time:</td><td><b>${newStart} (${tzSuffixRAW})</b></td></tr><tr><td>New Finish date and time:</td><td><b>${newEnd} (${tzSuffixRAW})</b></td></tr><tr><td>New Impact:</td><td><b>${newImpact}</b></td></tr></table><br>Thank you very much for your patience and cooperation.<br>`
 
-      if (rescheduleData.length > 1) {
+      if (store.get('rescheduleData').length > 1) {
         maintenanceIntro += '<br><hr><br><b>Previous Reschedules:</b><br>'
-        const oldReschedules = rescheduleData
+        const oldReschedules = store.get('rescheduleData')
         oldReschedules.pop()
         let index = oldReschedules.length
         const reversedReschedules = {
@@ -684,8 +577,8 @@ const Maintenance = ({ session, serverData, suppliers }) => {
     if (!!+maintenance.cancelled) {
       subject = `[CANCELLED] ${subject}`
     }
-    if (rescheduleData.length !== 0) {
-      subject = `[RESCHEDULED] ${subject}-${rescheduleData[rescheduleData.length - 1].rcounter}`
+    if (store.get('rescheduleData').length !== 0) {
+      subject = `[RESCHEDULED] ${subject}-${store.get('rescheduleData')[store.get('rescheduleData').length - 1].rcounter}`
     }
 
     fetch('/v1/api/mail/send', {
@@ -779,56 +672,6 @@ const Maintenance = ({ session, serverData, suppliers }) => {
     }
   }
 
-  function moveCalendarEntry(startDateTime, endDateTime, rcounter) {
-    const calId = maintenance.calendarId
-    const company = maintenance.name
-    const maintId = maintenance.id
-    const currentMaint = formRef.current.values
-
-    let derenCid = ''
-    currentMaint.supplierCids.forEach(supp => {
-      const supplierLabel = supplierCids.filter(supplier => supplier.value === supp)
-      derenCid += ` ${supplierLabel[0].label}`
-    })
-    derenCid = derenCid.trim()
-
-    let cids = ''
-    customerCids.forEach(cid => {
-      cids += ` ${cid.kundenCID}`
-    })
-    cids = cids.trim()
-
-    if (calId) {
-      fetch('/v1/api/calendar/reschedule', {
-        method: 'post',
-        body: JSON.stringify({
-          company: company,
-          cids: cids,
-          supplierCID: derenCid,
-          maintId: maintId,
-          calId: calId,
-          startDateTime: startDateTime,
-          endDateTime: endDateTime,
-          rcounter: rcounter
-        }),
-        mode: 'cors',
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Content-Type': 'application/json'
-        }
-      })
-        .then(resp => resp.json())
-        .then(data => {
-          if (data.status === 200 && data.statusText === 'OK') {
-            Notify('success', 'Calendar Entry Rescheduled')
-          }
-        })
-        .catch(err => console.error(err))
-    } else {
-      Notify('warning', 'No Calendar Entry ID Available!')
-    }
-  }
-
   const handleCalendarCreate = () => {
     const company = maintenance.name
     const maintId = maintenance.id
@@ -909,6 +752,56 @@ const Maintenance = ({ session, serverData, suppliers }) => {
       .catch(err => console.error(`Error - ${err}`))
   }
 
+  function handleCalendarUpdate(startDateTime, endDateTime, rcounter) {
+    const calId = maintenance.calendarId
+    const company = maintenance.name
+    const maintId = maintenance.id
+    const currentMaint = formRef.current.values
+
+    let derenCid = ''
+    currentMaint.supplierCids.forEach(supp => {
+      const supplierLabel = supplierCids.filter(supplier => supplier.value === supp)
+      derenCid += ` ${supplierLabel[0].label}`
+    })
+    derenCid = derenCid.trim()
+
+    let cids = ''
+    customerCids.forEach(cid => {
+      cids += ` ${cid.kundenCID}`
+    })
+    cids = cids.trim()
+
+    if (calId) {
+      fetch('/v1/api/calendar/reschedule', {
+        method: 'post',
+        body: JSON.stringify({
+          company: company,
+          cids: cids,
+          supplierCID: derenCid,
+          maintId: maintId,
+          calId: calId,
+          startDateTime: startDateTime,
+          endDateTime: endDateTime,
+          rcounter: rcounter
+        }),
+        mode: 'cors',
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Content-Type': 'application/json'
+        }
+      })
+        .then(resp => resp.json())
+        .then(data => {
+          if (data.status === 200 && data.statusText === 'OK') {
+            Notify('success', 'Calendar Entry Rescheduled')
+          }
+        })
+        .catch(err => console.error(err))
+    } else {
+      Notify('warning', 'No Calendar Entry ID Available!')
+    }
+  }
+
   /// /////////////////////////////////////////////////////////
   //
   //                INPUTS: ONCHANGE
@@ -980,138 +873,6 @@ const Maintenance = ({ session, serverData, suppliers }) => {
 
   /// /////////////////////////////////////////////////////////
   //
-  //                    RESCHEDULE
-  //
-  /// /////////////////////////////////////////////////////////
-
-  const handleRescheduleStartDateTimeChange = (date) => {
-    const startDateTime = moment(date[0]).format('YYYY-MM-DD HH:mm:ss')
-    setReschedule({ ...reschedule, startDateTime })
-  }
-
-  const handleRescheduleEndDateTimeChange = (date) => {
-    const endDateTime = moment(date[0]).format('YYYY-MM-DD HH:mm:ss')
-    setReschedule({ ...reschedule, endDateTime })
-  }
-
-  const handleRescheduleSave = () => {
-    const newImpact = reschedule.impact
-    const newReason = reschedule.reason.label
-    const timezone = reschedule.timezone
-    const newStartDateTime = moment.tz(reschedule.startDateTime, timezone).utc().format('YYYY-MM-DD HH:mm:ss')
-    const newEndDateTime = moment.tz(reschedule.endDateTime, timezone).utc().format('YYYY-MM-DD HH:mm:ss')
-
-    fetch(`/api/reschedule/save?mid=${maintenance.id}&impact=${encodeURIComponent(newImpact)}&sdt=${encodeURIComponent(newStartDateTime)}&edt=${encodeURIComponent(newEndDateTime)}&rcounter=${rescheduleData.length + 1}&user=${encodeURIComponent(session.user.email)}&reason=${encodeURIComponent(newReason)}`, {
-      method: 'get'
-    })
-      .then(resp => resp.json())
-      .then(data => {
-        if (data.insertRescheduleQuery.affectedRows === 1) {
-          setOpenRescheduleModal(!openRescheduleModal)
-          Notify('success', 'Reschedule Save Complete')
-          const newRescheduleData = rescheduleData
-          newRescheduleData.push({ rcounter: rescheduleData.length + 1, startDateTime: moment(newStartDateTime).format(), endDateTime: moment(newEndDateTime).format(), impact: newImpact, reason: newReason, sent: 0 })
-          setRescheduleData(newRescheduleData)
-          setReschedule({
-            impact: '',
-            reason: '',
-            startDateTime: null,
-            endDateTime: null
-          })
-          rescheduleGridApi.current.setRowData(newRescheduleData)
-        }
-      })
-      .catch(err => console.error(`Error Saving Reschedule - ${err}`))
-
-    fetch(`/api/reschedule/increment?id=${maintenance.id}`, {
-      method: 'get'
-    })
-      .then(resp => resp.json())
-      .then(data => {
-        // console.log(data.rescheduleInc)
-      })
-      .catch(err => console.error(`Error Incrementing Reschedule - ${err}`))
-  }
-
-  const handleRescheduleCellEdit = (params) => {
-    const rcounter = params.data.rcounter
-    const newStartDateTime = moment(params.data.startDateTime).format('YYYY.MM.DD HH:mm:ss')
-    const newEndDateTime = moment(params.data.endDateTime).format('YYYY.MM.DD HH:mm:ss')
-    const newImpact = params.data.impact
-
-    fetch(`/api/reschedule/edit?mid=${maintenance.id}&impact=${encodeURIComponent(newImpact)}&sdt=${encodeURIComponent(newStartDateTime)}&edt=${encodeURIComponent(newEndDateTime)}&rcounter=${rcounter}&user=${encodeURIComponent(session.user.email)}`, {
-      method: 'get'
-    })
-      .then(resp => resp.json())
-      .then(data => {
-        if (data.editRescheduleQuery.affectedRows === 1) {
-          Notify('success', 'Reschedule Edit Success')
-        }
-      })
-      .catch(err => console.error(`Reschedule Edit Error - ${err}`))
-  }
-
-  function toggleRescheduleSentBtn(rcounter) {
-    const newRescheduleData = rescheduleData
-    const reschedIndex = newRescheduleData.findIndex(el => el.rcounter === rcounter)
-    const currentSentStatus = newRescheduleData[reschedIndex].sent
-    let newSentStatus
-    if (currentSentStatus === 1) {
-      newRescheduleData[reschedIndex].sent = 0
-      newSentStatus = 0
-    } else if (currentSentStatus === 0) {
-      newRescheduleData[reschedIndex].sent = 1
-      newSentStatus = 1
-    }
-    setRescheduleData(newRescheduleData)
-
-    fetch(`/api/reschedule/sent?mid=${maintenance.id}&rcounter=${rcounter}&sent=${newSentStatus}&user=${encodeURIComponent(session.user.email)}`, {
-      method: 'get'
-    })
-      .then(resp => resp.json())
-      .then(data => {
-        if (data.editRescheduleQuery.affectedRows === 1) {
-          Notify('success', 'Reschedule Sent Change Success')
-        }
-      })
-      .catch(err => console.error(`Reschedule Sent Change Error - ${err}`))
-
-    rescheduleGridApi.current.refreshCells()
-  }
-
-  function toggleConfirmDeleteRescheduleModal() {
-    if (rescheduleGridApi.current) {
-      const row = rescheduleGridApi.current.getSelectedRows()
-      const rescheduleId = `NT-${maintenance.id}-${row[0].rcounter}`
-      setRescheduleToDelete({
-        id: rescheduleId,
-        rcounter: row[0].rcounter
-      })
-      setOpenConfirmDeleteModal(!openConfirmDeleteModal)
-    }
-  }
-
-  const handleDeleteReschedule = () => {
-    fetch(`/api/reschedule/delete?mid=${maintenance.id}&rcounter=${rescheduleToDelete.rcounter}&user=${encodeURIComponent(session.user.email)}`, {
-      method: 'get'
-    })
-      .then(resp => resp.json())
-      .then(data => {
-        if (data.deleteRescheduleQuery.affectedRows === 1) {
-          Notify('success', 'Reschedule Delete Success')
-          const newRescheduleData = rescheduleData.filter(resched => resched.rcounter !== rescheduleToDelete.rcounter)
-          rescheduleGridApi.current.setRowData(newRescheduleData)
-          setOpenConfirmDeleteModal(!openConfirmDeleteModal)
-          setRescheduleData(newRescheduleData)
-        } else {
-          Notify('error', 'Reschedule Delete Error')
-        }
-      })
-      .catch(err => console.error(`Reschedule Delete Error - ${err}`))
-  }
-
-  /// /////////////////////////////////////////////////////////
-  //
   //                    OTHER ACTIONS
   //
   /// /////////////////////////////////////////////////////////
@@ -1179,12 +940,13 @@ const Maintenance = ({ session, serverData, suppliers }) => {
   }
 
   const generateMailSubject = () => {
-    let text = rescheduleData.length !== 0 ? ' [RESCHEDULED]' : ''
+    const rData = store.get('rescheduleData')
+    let text = rData.length !== 0 ? ' [RESCHEDULED]' : ''
     text += formRef.current.values.emergency ? ' [EMERGENCY]' : ''
     text += formRef.current.values.cancelled ? ' [CANCELLED]' : ''
     text += ' Planned Work Notification - NT-' + maintenance.id
-    if (rescheduleData.length !== 0) {
-      text += rescheduleData.length !== 0 && '-' + rescheduleData[rescheduleData.length - 1].rcounter
+    if (rData.length !== 0) {
+      text += '-' + rData[rData.length - 1].rcounter + 1
     }
     setMailPreviewSubject(text.trimStart().trimEnd())
     return text
@@ -1612,7 +1374,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                   <Row gutter={20} style={{ marginBottom: '20px' }}>
                     <Col>
                       {maintenance.id && (
-                        <CommentList user={session.user.email} id={maintenance.id} />
+                        <CommentList user={session.user.email} id={maintenance.id} initialComment={serverData.profile.notes} />
                       )}
                     </Col>
                   </Row>
@@ -1680,44 +1442,11 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                       {activeTab === 'reschedule' && (
                         <Row>
                           <Col>
-                            <Container style={{ padding: '20px' }}>
-                              <Row>
-                                <FlexboxGrid justify='end'>
-                                  <FlexboxGrid.Item>
-                                    <Whisper placement='bottom' speaker={<Tooltip>Create New Reschedule</Tooltip>}>
-                                      <IconButton appearance='ghost' onClick={toggleRescheduleModal} icon={<Icon icon='clock-o' />}>
-                                        Reschedule
-                                      </IconButton>
-                                    </Whisper>
-                                  </FlexboxGrid.Item>
-                                </FlexboxGrid>
-                              </Row>
-                              <Row>
-                                <Col style={{ width: '100%', height: '400px' }}>
-                                  <div
-                                    className='ag-theme-material'
-                                    style={{
-                                      height: '100%',
-                                      width: '100%'
-                                    }}
-                                  >
-                                    <AgGridReact
-                                      gridOptions={rescheduleGridOptions}
-                                      rowData={rescheduleData}
-                                      onGridReady={handleRescheduleGridReady}
-                                      pagination
-                                      onCellEditingStopped={handleRescheduleCellEdit}
-                                      animateRows
-                                      deltaRowDataMode
-                                      getRowNodeId={(data) => {
-                                        return data.rcounter
-                                      }}
-                                      stopEditingWhenGridLosesFocus
-                                    />
-                                  </div>
-                                </Col>
-                              </Row>
-                            </Container>
+                            <RescheduleGrid
+                              maintId={maintenance.id}
+                              user={session.user.email}
+                              handleCalendarUpdate={handleCalendarUpdate}
+                            />
                           </Col>
                         </Row>
                       )}
@@ -1750,141 +1479,6 @@ const Maintenance = ({ session, serverData, suppliers }) => {
               customerCid={mailPreviewCustomerCID}
               sendMail={sendMail}
               onEditorChange={handleEditorChange}
-            />
-          )
-        }
-        {
-          typeof window !== 'undefined' && openRescheduleModal && (
-            <Rnd
-              default={{
-                x: window.outerWidth / 2,
-                y: 80,
-                width: 450,
-                height: 650
-              }}
-              style={{
-                background: 'var(--background)',
-                overflow: 'hidden',
-                borderRadius: '5px',
-                height: 'auto',
-                zIndex: '6',
-                boxShadow: '0px 0px 10px 1px var(--grey3)'
-              }}
-              bounds='window'
-              dragHandleClassName='reschedule-header'
-            >
-              <Modal.Header className='reschedule reschedule-header' onHide={toggleRescheduleModal}>
-                <FlexboxGrid justify='start' align='middle'>
-                  <FlexboxGrid.Item colspan={20}>
-                    <h3>Reschedule Maintenance</h3>
-                  </FlexboxGrid.Item>
-                  <FlexboxGrid.Item colspan={2}>
-                    <Button appearance='primary' disabled style={{ opacity: '0.9', fontSize: '1.3rem' }}>{rescheduleData.length + 1}</Button>
-                  </FlexboxGrid.Item>
-                </FlexboxGrid>
-              </Modal.Header>
-              <Modal.Body className='modal-body reschedule' style={{ marginTop: '0px', paddingBottom: '0px' }}>
-                <FlexboxGrid justify='space-around' align='middle' style={{ flexDirection: 'column', height: '510px' }}>
-                  <FlexboxGrid.Item style={{ padding: '30px' }}>
-                    <Form>
-                      <FormGroup style={{ margin: '20px' }}>
-                        <label htmlFor='supplier'>Timezone</label>
-                        <Select
-                          options={tzOptions}
-                          name='reschedule-timezone'
-                          value={{ value: reschedule.timezone, label: reschedule.timezoneLabel }}
-                          onChange={selection => setReschedule({ ...reschedule, timezone: selection.value, timezoneLabel: selection.label })}
-                          className='timezone-select'
-                        />
-                      </FormGroup>
-                      <FormGroup style={{ margin: '20px' }}>
-                        <label>
-                          Start Date/Time
-                      </label>
-                        <Flatpickr
-                          data-enable-time
-                          options={{ time_24hr: 'true', allow_input: 'true' }}
-                          className='flatpickr end-date-time'
-                          value={reschedule.startDateTime || null}
-                          onChange={date => handleRescheduleStartDateTimeChange(date)}
-                        />
-                      </FormGroup>
-                      <FormGroup style={{ margin: '20px' }}>
-                        <label>
-                          End Date/Time
-                      </label>
-                        <Flatpickr
-                          data-enable-time
-                          options={{ time_24hr: 'true', allow_input: 'true' }}
-                          className='flatpickr end-date-time'
-                          value={reschedule.endDateTime || null}
-                          onChange={date => handleRescheduleEndDateTimeChange(date)}
-                        />
-                      </FormGroup>
-                      <FormGroup style={{ margin: '20px' }}>
-                        <label htmlFor='resched-impact'>
-                          New Impact
-                      </label>
-                        <Input id='resched-impact' name='resched-impact' type='text' value={reschedule.impact} onChange={value => setReschedule({ ...reschedule, impact: value })} />
-                      </FormGroup>
-                      <FormGroup style={{ margin: '20px' }}>
-                        <label htmlFor='resched-reason'>
-                          New Reason
-                      </label>
-                        <SelectPicker
-                          cleanable
-                          style={{ width: '100%' }}
-                          placement='top'
-                          searchable={false}
-                          value={reschedule.reason}
-                          onChange={value => setReschedule({ ...reschedule, reason: value })}
-                          placeholder='Please select a reason for reschedule'
-                          data={[
-                            {
-                              value: 'change_circuits',
-                              label: 'Change in affected circuits'
-                            },
-                            {
-                              value: 'change_time',
-                              label: 'Change in planned date/time'
-                            },
-                            {
-                              value: 'change_impact',
-                              label: 'Change in impact duration'
-                            },
-                            {
-                              value: 'change_technical',
-                              label: 'Change due to technical reasons'
-                            }
-                          ]}
-                        />
-                      </FormGroup>
-                    </Form>
-                  </FlexboxGrid.Item>
-                  <FlexboxGrid.Item colspan={18}>
-                    <ButtonGroup justified>
-                      <Button appearance='sublte' onClick={toggleRescheduleModal}>
-                        Cancel
-                    </Button>
-                      <Button onClick={handleRescheduleSave}>
-                        Save
-                    </Button>
-                    </ButtonGroup>
-                  </FlexboxGrid.Item>
-                </FlexboxGrid>
-              </Modal.Body>
-            </Rnd>
-          )
-        }
-        {
-          openConfirmDeleteModal && (
-            <ConfirmModal
-              show={openConfirmDeleteModal}
-              onHide={toggleConfirmDeleteRescheduleModal}
-              header='Confirm Delete'
-              content={`Are you sure you want to delete ${rescheduleToDelete.id}`}
-              cancelAction={toggleConfirmDeleteRescheduleModal}
-              confirmAction={handleDeleteReschedule}
             />
           )
         }

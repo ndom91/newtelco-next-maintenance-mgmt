@@ -12,10 +12,10 @@ import {
   Icon
 } from 'rsuite'
 
-const CommentList = ({ user, id }) => {
+const CommentList = ({ user, id, initialComment }) => {
   const store = Store.useStore()
   const [comment, setComment] = useState('')
-  const [comments, setComments] = useState(null)
+  const [comments, setComments] = useState([])
 
   useEffect(() => {
     fetch(`/api/comments?m=${id}`, {
@@ -23,15 +23,36 @@ const CommentList = ({ user, id }) => {
     })
       .then(resp => resp.json())
       .then(data => {
+        let comments = data.comments
+        if (initialComment) {
+          comments.push({
+            user: 'ndomino@newtelco.de',
+            datetime: now.toISOString(),
+            body: initialComment
+          })
+        }
         if (data.comments.length > 0) {
-          const newComments = reverseArrayInPlace(data.comments)
+          const newComments = reverseArrayInPlace(comments)
           setComments(newComments)
         } else {
-          setComments([])
+          setComments(comments)
         }
       })
       .catch(err => console.error(err))
   }, [id])
+
+  useEffect(() => {
+    if (initialComment !== null) {
+      const newComments = comments
+      const now = new Date()
+      newComments.unshift({
+        user: 'ndomino@newtelco.de',
+        datetime: now.toISOString(),
+        body: initialComment
+      })
+      setComments(newComments)
+    }
+  }, [initialComment])
 
   const reverseArrayInPlace = (arr) => {
     for (var i = 0; i <= (arr.length / 2); i++) {

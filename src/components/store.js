@@ -5,5 +5,6 @@ export default createConnectedStore({
   session: {},
   maintenance: {},
   impactPlaceholder: '',
-  comments: []
+  comments: [],
+  rescheduleData: []
 }, withLogger)

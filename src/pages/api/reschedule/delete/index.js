@@ -2,9 +2,9 @@ const db = require('../../../../lib/db')
 const escape = require('sql-template-strings')
 
 module.exports = async (req, res) => {
-  const maintId = req.query.mid
-  const rcounter = req.query.rcounter
-  const user = req.query.user.substring(0, req.query.user.lastIndexOf('@'))
+  const maintId = req.body.mid
+  const rcounter = req.body.rcounter
+  const user = req.body.user.substring(0, req.body.user.lastIndexOf('@'))
   const deleteRescheduleQuery = await db.query(escape`
     DELETE FROM reschedule WHERE maintenanceid = ${maintId} AND rcounter = ${rcounter}
   `)
