@@ -2,11 +2,11 @@ const db = require('../../../../../lib/db')
 const escape = require('sql-template-strings')
 
 module.exports = async (req, res) => {
-  const bearbeitetvon = req.query.bearbeitetvon
-  const lieferant = req.query.lieferant
-  const mailId = req.query.mailId
-  const updatedAt = req.query.updatedAt
-  const incomingMailDate = req.query.maileingang
+  const bearbeitetvon = req.body.bearbeitetvon
+  const lieferant = req.body.lieferant
+  const mailId = req.body.mailId
+  const updatedAt = req.body.updatedAt
+  const incomingMailDate = req.body.maileingang
 
   const insertQuery = await db.query(escape`INSERT INTO maintenancedb (bearbeitetvon, receivedmail, lieferant, updatedAt, maileingang) VALUES (${bearbeitetvon}, ${mailId}, ${lieferant}, ${updatedAt}, ${incomingMailDate});`)
   const getLastInsertedID = await db.query('SELECT LAST_INSERT_ID();')

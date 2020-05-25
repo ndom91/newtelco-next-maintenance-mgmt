@@ -4,6 +4,7 @@ import Layout from '@/newtelco/layout'
 import RequireLogin from '@/newtelco/require-login'
 import './maintenance.css'
 import Router from 'next/router'
+import { useRouter } from 'next/router'
 import { Helmet } from 'react-helmet'
 import MailEditor from '@/newtelco/maintenance/mailEditor'
 import { format, isValid, formatDistance, parseISO } from 'date-fns'
@@ -93,7 +94,7 @@ const MyDateTime = ({ field, form }) => {
   )
 }
 
-const AutoSave = ({ debounceMs }) => {
+const AutoSave = ({ debounceMs, id }) => {
   const formik = useFormikContext()
   const [lastSaved, setLastSaved] = React.useState(null)
   const debouncedSubmit = React.useCallback(
@@ -106,7 +107,9 @@ const AutoSave = ({ debounceMs }) => {
   )
 
   React.useEffect(() => {
-    debouncedSubmit()
+    if (id !== 'NEW') {
+      debouncedSubmit()
+    }
   }, [debouncedSubmit, formik.values])
 
   let result = null
@@ -141,11 +144,11 @@ const Maintenance = ({ session, serverData, suppliers }) => {
   const [sentProgress, setSentProgress] = useState(0)
   const [activeTab, setActiveTab] = useState('customer')
   const [maintHistory, setMaintHistory] = useState({
-    timezone: serverData.profile.timezone,
+    timezone: serverData.profile.timezone || undefined,
     supplier: serverData.profile.lieferant,
     startDateTime: serverData.profile.startDateTime,
     endDateTime: serverData.profile.endDateTime,
-    supplierCids: serverData.profile.derenCIDid.split(',').map(Number),
+    supplierCids: serverData.profile.derenCIDid?.split(',').map(Number) || '',
     impact: serverData.profile.impact,
     location: serverData.profile.location,
     reason: serverData.profile.reason,
@@ -162,6 +165,8 @@ const Maintenance = ({ session, serverData, suppliers }) => {
   const formRef = useRef()
   const gridApi = useRef()
   const gridColumnApi = useRef()
+
+  const router = useRouter()
 
   const sendMailBtns = ({ data: { maintenanceRecipient, kundenCID, frozen, name, protected: protection } }) => {
     return (
@@ -293,9 +298,11 @@ const Maintenance = ({ session, serverData, suppliers }) => {
             name: companyName,
             lieferant: companyId,
             bearbeitetvon: username,
-            updatedAt: format(new Date(), 'MM.dd.yyyy HH:mm')
+            updatedAt: format(new Date(), 'MM.dd.yyyy HH:mm'),
           })
           fetchSupplierCids(companyId)
+          formRef.current.setFieldValue('supplier', companyId)
+          gridApi.current.hideOverlay()
         })
         .catch(err => console.error(`Error - ${err}`))
     } else {
@@ -325,7 +332,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
         setImpactPlaceholder(impactCalculation)
       }
     }
-  }, [])
+  }, [serverData.profile])
 
   /// /////////////////////////////////////////////////////////
   //
@@ -547,7 +554,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
       body = body + '<tr><td>Reason:</td><td>' + currentMaint.reason + '</td></tr>'
     }
 
-    let maintNoteBody = currentMaint.maintNote ? `<p>${currentMaint.maintNote}</p>` : ''
+    const maintNoteBody = currentMaint.maintNote ? `<p>${currentMaint.maintNote}</p>` : ''
 
     body = body + `</table>${maintNoteBody}<p>We sincerely regret any inconvenience that may be caused by this and hope for further mutually advantageous cooperation.</p><p>If you have any questions feel free to contact us at maintenance@newtelco.de.</p></div>​​</body>​​<footer>​<style>.sig{font-family:Century Gothic, sans-serif;font-size:9pt;color:#636266!important;}b.i{color:#4ca702;}.gray{color:#636266 !important;}a{text-decoration:none;color:#636266 !important;}</style><div class="sig"><div>Best regards <b class="i">|</b> Mit freundlichen Grüßen</div><br><div><b>Newtelco Maintenance Team</b></div><br><div>NewTelco GmbH <b class="i">|</b> Moenchhofsstr. 24 <b class="i">|</b> 60326 Frankfurt a.M. <b class="i">|</b> DE <br>www.newtelco.com <b class="i">|</b> 24/7 NOC  49 69 75 00 27 30 ​​<b class="i">|</b> <a style="color:#" href="mailto:service@newtelco.de">service@newtelco.de</a><br><br><div><img alt="sig" src="https://home.newtelco.de/sig.png" height="29" width="516"></div></div>​</footer>`
 
@@ -894,19 +901,28 @@ const Maintenance = ({ session, serverData, suppliers }) => {
     }
     const updatedAtFormatted = format(new Date(updatedAt), 'yyyy-MM-dd HH:mm:ss')
 
-    // TODO: refactor to POST
-    fetch(`/api/maintenances/save/create?bearbeitetvon=${bearbeitetvon}&lieferant=${lieferant}&mailId=${mailId}&updatedAt=${updatedAtFormatted}&maileingang=${incomingFormatted}`, {
-      method: 'get'
+    fetch(`/api/maintenances/save/create`, {
+      method: 'post',
+      body: JSON.stringify({
+        bearbeitetvon: bearbeitetvon,
+        lieferant: lieferant,
+        mailId: mailId,
+        updatedAt: updatedAtFormatted,
+        maileingang: incomingFormatted
+      }),
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json'
+      }
     })
       .then(resp => resp.json())
       .then(data => {
         const newId = data.newId['LAST_INSERT_ID()']
-        setMaintenance({
-          ...maintenance,
-          id: newId
-        })
+        const newMaint = { ...maintenance, id: newId }
+        setMaintenance(newMaint)
         const newLocation = `/maintenance?id=${newId}`
-        Router.push(newLocation, newLocation, { shallow: true })
+        router.push(newLocation, newLocation, { shallow: false })
+
         if (data.status === 200 && data.statusText === 'OK') {
           Notify('success', 'Create Success')
         } else {
@@ -921,7 +937,6 @@ const Maintenance = ({ session, serverData, suppliers }) => {
       fetch('/v1/api/inbox/delete', {
         method: 'post',
         body: JSON.stringify({ m: incomingMailId }),
-        mode: 'cors',
         headers: {
           'Access-Control-Allow-Origin': '*',
           'Content-Type': 'application/json'
@@ -937,6 +952,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
         })
         .catch(err => console.error(`Error - ${err}`))
     }
+
   }
 
   const generateMailSubject = () => {
@@ -1049,6 +1065,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                   setSupplierCids([{ label: 'No CIDs available for this Supplier', value: '1' }])
                   return
                 }
+                console.log('supplierSelect')
                 setMaintenance({
                   ...maintenance,
                   lieferant: option,
@@ -1062,7 +1079,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
             form.setFieldValue(field.name, option)
             form.setFieldValue('supplierCids', [])
           }}
-          data={suppliers.companies}
+          data={suppliers?.companies || []}
           placeholder='Please select a Supplier'
         />
       )
@@ -1193,7 +1210,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                       supplier: serverData.profile.lieferant,
                       startDateTime: serverData.profile.startDateTime,
                       endDateTime: serverData.profile.endDateTime,
-                      supplierCids: serverData.profile.derenCIDid.split(',').map(Number),
+                      supplierCids: serverData.profile.derenCIDid?.split(',').map(Number) || '',
                       impact: serverData.profile.impact,
                       location: serverData.profile.location,
                       reason: serverData.profile.reason,
@@ -1203,30 +1220,33 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                       done: !!+serverData.profile.done
                     }}
                     onSubmit={async (values, formikHelpers) => {
-                      if (maintenance.id === 'NEW') {
-                        Notify('error', 'Unable to Save', 'Not maintenance ID created yet.')
-                        return
-                      }
                       const diff = objDiff(maintHistory, values)
                       setMaintHistory(values)
                       if (values.supplierCids && !customerCids.length) {
                         fetchCustomerCids(values.supplierCids)
                       }
-                      try {
-                        await fetch('/api/maintenances/saveAll', {
-                          method: 'post',
-                          body: JSON.stringify({
-                            id: maintenance.id,
-                            values: values,
-                            user: session.user.email.match(/^([^@]*)@/)[1],
-                            field: Object.keys(diff)[0]
-                          }),
-                          headers: {
-                            'Content-Type': 'application/json'
-                          }
-                        })
-                      } catch (e) {
-                        formikHelpers.setErrors({ error: e })
+                      console.log(diff)
+                      if (Object.keys(diff).length) {
+                        if (maintenance.id === 'NEW') {
+                          Notify('error', 'Unable to Save', 'Not maintenance ID created yet.')
+                          return
+                        }
+                        try {
+                          await fetch('/api/maintenances/saveAll', {
+                            method: 'post',
+                            body: JSON.stringify({
+                              id: maintenance.id,
+                              values: values,
+                              user: session.user.email.match(/^([^@]*)@/)[1],
+                              field: Object.keys(diff)[0]
+                            }),
+                            headers: {
+                              'Content-Type': 'application/json'
+                            }
+                          })
+                        } catch (e) {
+                          formikHelpers.setErrors({ error: e })
+                        }
                       }
                     }}
                   >
@@ -1234,7 +1254,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                       <>
                         <Row gutter={20} style={{ marginBottom: '20px' }}>
                           <Col sm={24} xs={24}>
-                            <AutoSave debounceMs={1000} />
+                            <AutoSave debounceMs={1000} id={maintenance.id} />
                           </Col>
                         </Row>
                         <Row gutter={20} style={{ marginBottom: '20px' }}>
@@ -1384,9 +1404,9 @@ const Maintenance = ({ session, serverData, suppliers }) => {
             <FlexboxGrid.Item colspan={11} style={{ margin: '0 10px' }}>
               <Panel bordered className='panel-right'>
                 <Nav justified appearance='tabs' reversed activeKey={activeTab} onSelect={key => setActiveTab(key)} style={{ marginTop: '-1px' }}>
-                  <Nav.Item eventKey="customer">Customer CIDs</Nav.Item>
-                  <Nav.Item eventKey="reschedule">Reschedule</Nav.Item>
-                  <Nav.Item eventKey="changelog">Changelog</Nav.Item>
+                  <Nav.Item eventKey='customer'>Customer CIDs</Nav.Item>
+                  <Nav.Item eventKey='reschedule'>Reschedule</Nav.Item>
+                  <Nav.Item eventKey='changelog'>Changelog</Nav.Item>
                 </Nav>
                 <Grid fluid>
                   <Row>
@@ -1494,7 +1514,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
             />
           )
         }
-      </Layout >
+      </Layout>
     )
   } else {
     return <RequireLogin />
@@ -1508,18 +1528,20 @@ export async function getServerSideProps({ req, query }) {
   if (host.indexOf('localhost') > -1) {
     protocol = 'http:'
   }
+  console.log('query', query)
+  const res2 = await fetch(`${protocol}//${host}/api/companies/selectmaint`)
+  const suppliers = await res2.json()
   if (query.id === 'NEW') {
     return {
       props: {
         serverData: { profile: query },
+        suppliers,
         session
       }
     }
   } else {
     const res = await fetch(`${protocol}//${host}/api/maintenances/${query.id}`)
     const serverData = await res.json()
-    const res2 = await fetch(`${protocol}//${host}/api/companies/selectmaint`)
-    const suppliers = await res2.json()
     return {
       props: {
         serverData,

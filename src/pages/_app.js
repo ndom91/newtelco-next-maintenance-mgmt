@@ -73,6 +73,16 @@ export default ({ Component, pageProps }) => {
   )
 }
 
+// export async function getInitialProps({ Component, ctx }) {
+//   let pageProps = Component.getInitialProps ? await Component.getInitialProps(ctx) : {};
+//   if (Object.keys(pageProps).length > 0) {
+//     return { pageProps: pageProps }; // 1. IF YOU RETURN HERE LIKE THIS(named) WHEN PAGE 
+//     // PROPS IS EMPTY OBJECT aka length === 0
+//   } else {
+//     return {};
+//   }
+// }
+
 export function reportWebVitals(metric) {
   if (process.env.NEXT_PUBLIC_VITALS) {
     console.table('metrics', metric.name, metric.value)
