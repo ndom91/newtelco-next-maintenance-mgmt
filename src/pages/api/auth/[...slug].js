@@ -18,6 +18,12 @@ const options = {
     })
   ],
   adapter: Adapters.Default(database),
+  pages: {
+    signin: '/auth/signin',
+    // signout: 'https://example.com/signout',
+    // checkEmail: 'https://example.com/check-email',
+    // error: 'https://example.com/error'
+  }
 }
 
 export default (req, res) => NextAuth(req, res, options)
