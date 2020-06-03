@@ -201,7 +201,6 @@ const Freeze = props => {
     const startdate = moment(params.data.startDateTime).format('YYYY.MM.DD HH:mm:ss')
     const enddate = moment(params.data.endDateTime).format('YYYY.MM.DD HH:mm:ss')
     const notes = params.data.notes
-    console.log(params.data)
 
     fetch(`/api/settings/edit/freeze?id=${id}&startdate=${encodeURIComponent(startdate)}&enddate=${encodeURIComponent(enddate)}&notes=${encodeURIComponent(notes)}`, {
       method: 'get'
