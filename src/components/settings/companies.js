@@ -169,9 +169,6 @@ const Companies = props => {
     return (
       <FlexboxGrid justify='space-between' align='middle'>
         <FlexboxGrid.Item>
-          Companies
-        </FlexboxGrid.Item>
-        <FlexboxGrid.Item>
           <ButtonGroup>
             <IconButton onClick={toggleCompanyAdd} icon={<Icon icon='plus-circle' />} appearance='ghost' placement='right'>
               Add

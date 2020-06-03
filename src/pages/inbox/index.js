@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import NextAuth from 'next-auth/client'
 import Layout from '@/newtelco/layout'
 import RequireLogin from '@/newtelco/require-login'
+import Router form 'next/router'
 import useSWR from 'swr'
 import MaintPanel from '@/newtelco/panel'
 import InboxItem from '@/newtelco/inboxitem'
@@ -147,19 +148,22 @@ const Inbox = ({ session, inboxItems }) => {
       })
       .catch(err => console.error(`Error - ${err}`))
   }
+  if (!session) {
+    Router.push('/api/signin')
+  }
 
-  if (session) {
-    return (
-      <Layout>
-        <MaintPanel header='Inbox'>
-          {inboxMails.length === 0 ? (
-            <FlexboxGrid justify='center' align='middle' style={{ margin: '40px 0' }}>
-              <FlexboxGrid.Item>
-                <img src='/static/images/inbox0.svg' alt='Inbox' style={{ width: '400px' }} />
-                <h4 style={{ textAlign: 'center' }}>Congrats, nothing to do!</h4>
-              </FlexboxGrid.Item>
-            </FlexboxGrid>
-          ) : (
+  // if (session) {
+  return (
+    <Layout>
+      <MaintPanel header='Inbox'>
+        {inboxMails.length === 0 ? (
+          <FlexboxGrid justify='center' align='middle' style={{ margin: '40px 0' }}>
+            <FlexboxGrid.Item>
+              <img src='/static/images/inbox0.svg' alt='Inbox' style={{ width: '400px' }} />
+              <h4 style={{ textAlign: 'center' }}>Congrats, nothing to do!</h4>
+            </FlexboxGrid.Item>
+          </FlexboxGrid>
+        ) : (
             <List bordered style={{ width: '100%' }}>
               {Array.isArray(inboxMails) && inboxMails.map((mail, index) => {
                 return (
@@ -175,64 +179,65 @@ const Inbox = ({ session, inboxItems }) => {
               })}
             </List>
           )}
-        </MaintPanel>
-        {isOpen && (
-          <Modal className='mail-modal-body' autoFocus backdrop show={isOpen} size='lg' onHide={() => toggle(null)} full>
-            <Modal.Header>
-              <FlexboxGrid justify='start' align='middle' style={{ width: '100%' }}>
-                <FlexboxGrid.Item colspan={2} style={{ display: 'flex', justifyContent: 'center' }}>
-                  {faviconLoading && (
-                    <Loader />
-                  )}
-                  <Avatar
+      </MaintPanel>
+      {isOpen && (
+        <Modal className='mail-modal-body' autoFocus backdrop show={isOpen} size='lg' onHide={() => toggle(null)} full>
+          <Modal.Header>
+            <FlexboxGrid justify='start' align='middle' style={{ width: '100%' }}>
+              <FlexboxGrid.Item colspan={2} style={{ display: 'flex', justifyContent: 'center' }}>
+                {faviconLoading && (
+                  <Loader />
+                )}
+                <Avatar
+                  size='lg'
+                  src={modalInfo.favicon}
+                  style={{ backgroundColor: 'transparent', display: faviconLoading ? 'none' : 'block' }}
+                  onLoad={() => setFaviconLoading(false)}
+                />
+              </FlexboxGrid.Item>
+              <FlexboxGrid.Item colspan={20}>
+                <div className='modal-preview-text-wrapper'>
+                  <InputGroup className='modal-textbox'>
+                    <InputGroup.Addon style={{ height: '31px' }} type='prepend'>
+                      From
+                      </InputGroup.Addon>
+                    <Input readonly='readonly' value={modalInfo.from} />
+                  </InputGroup>
+                  <InputGroup className='modal-textbox'>
+                    <InputGroup.Addon style={{ height: '31px' }} type='prepend'>
+                      Subject
+                      </InputGroup.Addon>
+                    <Input type='text' readonly='readonly' value={modalInfo.subject} />
+                  </InputGroup>
+                </div>
+              </FlexboxGrid.Item>
+              <FlexboxGrid.Item colspan={1} style={{ marginLeft: '30px' }}>
+                <Whisper speaker={<Tooltip>Translate</Tooltip>} placement='bottom'>
+                  <IconButton
+                    onClick={handleTranslate}
+                    appearance='default'
+                    style={{ color: 'var(--grey3)' }}
                     size='lg'
-                    src={modalInfo.favicon}
-                    style={{ backgroundColor: 'transparent', display: faviconLoading ? 'none' : 'block' }}
-                    onLoad={() => setFaviconLoading(false)}
+                    icon={<Icon icon='globe' />}
                   />
-                </FlexboxGrid.Item>
-                <FlexboxGrid.Item colspan={20}>
-                  <div className='modal-preview-text-wrapper'>
-                    <InputGroup className='modal-textbox'>
-                      <InputGroup.Addon style={{ height: '31px' }} type='prepend'>
-                        From
-                      </InputGroup.Addon>
-                      <Input readonly='readonly' value={modalInfo.from} />
-                    </InputGroup>
-                    <InputGroup className='modal-textbox'>
-                      <InputGroup.Addon style={{ height: '31px' }} type='prepend'>
-                        Subject
-                      </InputGroup.Addon>
-                      <Input type='text' readonly='readonly' value={modalInfo.subject} />
-                    </InputGroup>
-                  </div>
-                </FlexboxGrid.Item>
-                <FlexboxGrid.Item colspan={1} style={{ marginLeft: '30px' }}>
-                  <Whisper speaker={<Tooltip>Translate</Tooltip>} placement='bottom'>
-                    <IconButton
-                      onClick={handleTranslate}
-                      appearance='default'
-                      style={{ color: 'var(--grey3)' }}
-                      size='lg'
-                      icon={<Icon icon='globe' />}
-                    />
-                  </Whisper>
-                </FlexboxGrid.Item>
-              </FlexboxGrid>
-            </Modal.Header>
-            <Modal.Body className='mail-body'>
-              <div dangerouslySetInnerHTML={{ __html: modalInfo.body }} style={{ padding: '20px' }} />
-            </Modal.Body>
-          </Modal>
-        )}
-      </Layout>
-    )
-  } else {
-    return <RequireLogin />
-  }
+                </Whisper>
+              </FlexboxGrid.Item>
+            </FlexboxGrid>
+          </Modal.Header>
+          <Modal.Body className='mail-body'>
+            <div dangerouslySetInnerHTML={{ __html: modalInfo.body }} style={{ padding: '20px' }} />
+          </Modal.Body>
+        </Modal>
+      )}
+    </Layout>
+  )
+  // } else {
+  //   Router.push('/api/signin')
+  //   return null
+  // }
 }
 
-export async function getServerSideProps ({ req }) {
+export async function getServerSideProps({ req }) {
   const session = await NextAuth.session({ req })
   const host = req ? req.headers['x-forwarded-host'] : window.location.hostname
   let protocol = 'https:'

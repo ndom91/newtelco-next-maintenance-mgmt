@@ -65,7 +65,7 @@ const SupplierCIDs = props => {
   }
 
   useEffect(() => {
-    fetch(`/api/lieferantcids/settings`, {
+    fetch('/api/lieferantcids/settings', {
       method: 'get'
     })
       .then(resp => resp.json())
@@ -75,7 +75,7 @@ const SupplierCIDs = props => {
       })
       .catch(err => console.error(err))
     // fill Companies Select
-    fetch(`/api/companies/selectmaint`, {
+    fetch('/api/companies/selectmaint', {
       method: 'get'
     })
       .then(resp => resp.json())
@@ -178,9 +178,6 @@ const SupplierCIDs = props => {
   const Header = () => {
     return (
       <FlexboxGrid justify='space-between' align='middle'>
-        <FlexboxGrid.Item>
-          Newtelco CIDs
-        </FlexboxGrid.Item>
         <FlexboxGrid.Item>
           <ButtonGroup>
             <IconButton onClick={toggleSupplierCidAdd} icon={<Icon icon='plus-circle' />} appearance='ghost' placement='right'>

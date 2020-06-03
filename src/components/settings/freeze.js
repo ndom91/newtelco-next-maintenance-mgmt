@@ -89,7 +89,7 @@ const Freeze = props => {
   }
 
   useEffect(() => {
-    fetch(`/api/freeze`, {
+    fetch('/api/freeze', {
       method: 'get'
     })
       .then(resp => resp.json())
@@ -99,7 +99,7 @@ const Freeze = props => {
       })
       .catch(err => console.error(err))
     // fill Companies Select
-    fetch(`/api/companies/selectmaint`, {
+    fetch('/api/companies/selectmaint', {
       method: 'get'
     })
       .then(resp => resp.json())
@@ -220,9 +220,6 @@ const Freeze = props => {
   const Header = () => {
     return (
       <FlexboxGrid justify='space-between' align='middle'>
-        <FlexboxGrid.Item>
-          Freeze
-        </FlexboxGrid.Item>
         <FlexboxGrid.Item>
           <ButtonGroup>
             <IconButton onClick={toggleFreezeAddModal} icon={<Icon icon='plus-circle' />} appearance='ghost' placement='right'>

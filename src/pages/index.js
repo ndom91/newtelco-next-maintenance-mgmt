@@ -1,4 +1,5 @@
 import React from 'react'
+import Router from 'next/router'
 import Layout from '@/newtelco/layout'
 import dynamic from 'next/dynamic'
 import RequireLogin from '@/newtelco/require-login'
@@ -31,6 +32,10 @@ const ActiveMaintenances = dynamic(() => import('../components/homepage/active')
 const Index = ({ session }) => {
   const store = Store.useStore()
 
+  if (typeof window !== 'undefined' && !session) {
+    Router.push('/api/auth/signin')
+  }
+
   if (session) {
     return (
       <Layout>
@@ -62,8 +67,16 @@ const Index = ({ session }) => {
   }
 }
 
-export async function getServerSideProps({ req }) {
+export async function getServerSideProps ({ req, res }) {
   const session = await NextAuth.session({ req })
+  if (!session) {
+    if (req) {
+      res.writeHead(302, { Location: '/api/auth/signin' })
+      res.end()
+    } else {
+      Router.push('/api/auth/signin')
+    }
+  }
   return {
     props: {
       session

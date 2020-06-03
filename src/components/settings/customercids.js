@@ -93,7 +93,7 @@ const CustomerCIDs = props => {
   }
 
   useEffect(() => {
-    fetch(`/api/customercids`, {
+    fetch('/api/customercids', {
       method: 'get'
     })
       .then(resp => resp.json())
@@ -103,7 +103,7 @@ const CustomerCIDs = props => {
       })
       .catch(err => console.error(err))
     // fill Companies Select
-    fetch(`/api/companies/selectmaint`, {
+    fetch('/api/companies/selectmaint', {
       method: 'get'
     })
       .then(resp => resp.json())
@@ -112,7 +112,7 @@ const CustomerCIDs = props => {
       })
       .catch(err => console.error(`Error - ${err}`))
     // fill Supplier Select
-    fetch(`/api/lieferantcids/select`, {
+    fetch('/api/lieferantcids/select', {
       method: 'get'
     })
       .then(resp => resp.json())
@@ -127,7 +127,7 @@ const CustomerCIDs = props => {
     gridApi.current.showLoadingOverlay()
     gridColumnApi.current = params.columnApi
     params.api.sizeColumnsToFit()
-  };
+  }
 
   const toggleCustomerCidAdd = () => {
     setOpenCustomerCidAdd(!openCustomerCidAdd)
@@ -235,9 +235,6 @@ const CustomerCIDs = props => {
   const Header = () => {
     return (
       <FlexboxGrid justify='space-between' align='middle'>
-        <FlexboxGrid.Item>
-          Customer CIDs
-        </FlexboxGrid.Item>
         <FlexboxGrid.Item>
           <ButtonGroup>
             <IconButton onClick={toggleCustomerCidAdd} icon={<Icon icon='plus-circle' />} appearance='ghost' placement='right'>
@@ -359,6 +356,5 @@ CustomerCIDs.getInitialProps = async ({ req, query }) => {
     jsonData: json
   }
 }
-
 
 export default CustomerCIDs
