@@ -97,7 +97,7 @@ const AreaChart = () => {
 
     return (
       <Panel bordered header={<div style={{ display: 'flex', justifyContent: 'space-between' }}>Completed<Icon icon='tasks' style={{ color: 'var(--primary)' }} size='lg' /></div>} style={{ height: '100%' }}>
-        <Chart options={options} series={returnSeries} type='area' width={300} height={220} />
+        <Chart options={options} series={returnSeries} type='area' width={400} height={220} />
       </Panel>
     )
   } else {

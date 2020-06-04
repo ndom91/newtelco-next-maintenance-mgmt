@@ -8,7 +8,6 @@
     "build": "next build",
     "analyze": "ANALYZE=true next build",
     "analyze:dev": "ANALYZE=true NODE_ENV=development PORT=4000 node index.js",
-    "export": "next export"
   },
   "keywords": [
     "nextjs",
@@ -28,7 +27,6 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@asayerio/tracker": "^5.5.0",
     "@date-io/date-fns": "^1.3.13",
     "@kazzkiq/darkmode": "^0.1.0",
     "@meltwater/fetch-favicon": "^1.0.4",
@@ -42,7 +40,6 @@
     "apexcharts": "^3.19.2",
     "date-fns": "^2.14.0",
     "dotenv-webpack": "^1.8.0",
-    "express-session": "^1.17.1",
     "file-saver": "^2.0.2",
     "fontfaceobserver": "^2.1.0",
     "formik": "^2.1.4",

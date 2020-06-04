@@ -7,7 +7,7 @@ import ErrorBoundary from '@/newtelco/errorboundary'
 import Store from '@/newtelco/store'
 import NextAuth from 'next-auth/client'
 // import * as Sentry from '@sentry/browser'
-// const LogRocket = require('logrocket')
+const LogRocket = require('logrocket')
 
 export default ({ Component, pageProps }) => {
   const ConditionalWrap = ({ condition, wrap, children }) => (
@@ -17,11 +17,11 @@ export default ({ Component, pageProps }) => {
   useEffect(() => {
     if (process.env.NEXT_PUBLIC_ENV === 'production') {
       if (process.browser && pageProps.session && pageProps.session.user) {
-        // LogRocket.init('ui2vht/next-maintenance')
-        // LogRocket.identify(pageProps.session.user.id, {
-        //   name: pageProps.session.user.name,
-        //   email: pageProps.session.user.email
-        // })
+        LogRocket.init('ui2vht/next-maintenance')
+        LogRocket.identify(pageProps.session.user.id, {
+          name: pageProps.session.user.name,
+          email: pageProps.session.user.email
+        })
         // Sentry setup: https://github.com/zeit/next.js/blob/canary/examples/with-sentry-simple/
         // Sentry.init({
         //   enabled: process.env.NODE_ENV === 'production',
@@ -76,14 +76,14 @@ export default ({ Component, pageProps }) => {
 // export async function getInitialProps({ Component, ctx }) {
 //   let pageProps = Component.getInitialProps ? await Component.getInitialProps(ctx) : {};
 //   if (Object.keys(pageProps).length > 0) {
-//     return { pageProps: pageProps }; // 1. IF YOU RETURN HERE LIKE THIS(named) WHEN PAGE 
+//     return { pageProps: pageProps }; // 1. IF YOU RETURN HERE LIKE THIS(named) WHEN PAGE
 //     // PROPS IS EMPTY OBJECT aka length === 0
 //   } else {
 //     return {};
 //   }
 // }
 
-export function reportWebVitals(metric) {
+export function reportWebVitals (metric) {
   if (process.env.NEXT_PUBLIC_VITALS) {
     console.table('metrics', metric.name, metric.value)
   }

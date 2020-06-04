@@ -15,10 +15,10 @@ const BarChart = () => {
     return (
       <Panel bordered header={<div style={{ display: 'flex', justifyContent: 'space-between' }}>Totals<Icon icon='bar-chart' style={{ color: 'var(--primary)' }} size='lg' /></div>} style={{ height: '100%' }}>
         <Bar
-          width={300}
+          width={400}
           height={250}
           layout='horizontal'
-          margin={{ top: 26, right: 20, bottom: 26, left: 60 }}
+          margin={{ top: 26, right: 20, bottom: 26, left: 70 }}
           data={Users}
           keys={['value']}
           indexBy='person'

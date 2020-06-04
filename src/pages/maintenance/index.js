@@ -3,14 +3,13 @@ import NextAuth from 'next-auth/client'
 import Layout from '@/newtelco/layout'
 import RequireLogin from '@/newtelco/require-login'
 import './maintenance.css'
-import Router from 'next/router'
-import { useRouter } from 'next/router'
+import Router, { useRouter } from 'next/router'
 import { Helmet } from 'react-helmet'
 import MailEditor from '@/newtelco/maintenance/mailEditor'
 import { format, isValid, formatDistance, parseISO } from 'date-fns'
 import moment from 'moment-timezone'
 import Flatpickr from 'react-flatpickr'
-import 'flatpickr/dist/themes/material_blue.css'
+import 'flatpickr/dist/themes/airbnb.css'
 import { getUnique, convertDateTime } from '@/newtelco/maintenance/helper'
 import ProtectedIcon from '@/newtelco/ag-grid/protected'
 import SentIcon from '@/newtelco/ag-grid/sent'
@@ -703,6 +702,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
     const startDE = startMoment.tz('Europe/Berlin').format()
     const endMoment = moment.tz(endDateTime, currentMaint.timezone)
     const endDE = endMoment.tz('Europe/Berlin').format()
+    console.log(endDE)
 
     fetch('/v1/api/calendar/create', {
       method: 'post',

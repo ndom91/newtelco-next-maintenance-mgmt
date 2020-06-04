@@ -160,21 +160,21 @@ const Inbox = ({ session, inboxItems }) => {
               </FlexboxGrid.Item>
             </FlexboxGrid>
           ) : (
-              <List bordered style={{ width: '100%' }}>
-                {Array.isArray(inboxMails) && inboxMails.map((mail, index) => {
-                  return (
-                    <List.Item key={index}>
-                      <InboxItem
-                        mail={mail}
-                        index={index}
-                        handleDelete={onDelete}
-                        toggle={toggle}
-                      />
-                    </List.Item>
-                  )
-                })}
-              </List>
-            )}
+            <List bordered style={{ width: '100%' }}>
+              {Array.isArray(inboxMails) && inboxMails.map((mail, index) => {
+                return (
+                  <List.Item key={index}>
+                    <InboxItem
+                      mail={mail}
+                      index={index}
+                      handleDelete={onDelete}
+                      toggle={toggle}
+                    />
+                  </List.Item>
+                )
+              })}
+            </List>
+          )}
         </MaintPanel>
         {isOpen && (
           <Modal className='mail-modal-body' autoFocus backdrop show={isOpen} size='lg' onHide={() => toggle(null)} full>
@@ -234,7 +234,7 @@ const Inbox = ({ session, inboxItems }) => {
   }
 }
 
-export async function getServerSideProps({ req }) {
+export async function getServerSideProps ({ req }) {
   const session = await NextAuth.session({ req })
   const host = req ? req.headers['x-forwarded-host'] : window.location.hostname
   let protocol = 'https:'
