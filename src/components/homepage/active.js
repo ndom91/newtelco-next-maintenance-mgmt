@@ -22,7 +22,7 @@ const ActiveMaintenances = () => {
 
   if (data) {
     return (
-      <Panel bordered header={<div style={{ display: 'flex', justifyContent: 'space-between' }}>Active<Icon icon='bolt' style={{ color: 'var(--primary)' }} size='lg' /></div>} style={{ height: '100%' }}>
+      <Panel bordered header={<div style={{ display: 'flex', justifyContent: 'space-between' }}>Active & Upcoming<Icon icon='bolt' style={{ color: 'var(--primary)' }} size='lg' /></div>} style={{ height: '100%' }}>
         <List style={{ overflow: 'visible' }}>
           {data.query.length > 0 ? (
             data.query.map(item => {
@@ -59,12 +59,12 @@ const ActiveMaintenances = () => {
               )
             })
           ) : (
-            <List.Item>
-              <div style={{ display: 'flex', justifyContent: 'center' }}>
-                No Active Maintenances
+              <List.Item>
+                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                  No Active Maintenances
               </div>
-            </List.Item>
-          )}
+              </List.Item>
+            )}
         </List>
       </Panel>
     )

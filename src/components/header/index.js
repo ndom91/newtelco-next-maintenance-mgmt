@@ -1,5 +1,6 @@
 import React from 'react'
-import NextAuth from 'next-auth/client'
+import NextAuth, { signout } from 'next-auth/client'
+import Router from 'next/router'
 import Link from 'next/link'
 import Store from '../store'
 import SearchInput from './search'
@@ -126,7 +127,7 @@ const MaintHeader = props => {
               </Dropdown.Item>
               <Dropdown.Item divider />
               <Dropdown.Item onSelect={(key, e) => e.preventDefault()} eventKey='1' onClick={toggleDark}>
-                <Toggle checked={night} checkedChildren={<Icon style={{ alignItems: 'center', color: '#fff' }} icon="moon-o" />} unCheckedChildren={<Icon icon="sun-o" />} onChange={toggleDark} size='sm' />
+                <Toggle checked={night} checkedChildren={<Icon style={{ alignItems: 'center', color: '#fff' }} icon='moon-o' />} unCheckedChildren={<Icon icon='sun-o' />} onChange={toggleDark} size='sm' />
                 Darkmode
               </Dropdown.Item>
               <Dropdown.Item divider />

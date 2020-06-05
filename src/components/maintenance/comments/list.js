@@ -122,7 +122,7 @@ const CommentList = ({ user, id, initialComment }) => {
   }
 
   return (
-    <FlexboxGrid style={{ flexDirection: 'column', alignItems: 'center' }} alignItems='middle'>
+    <FlexboxGrid style={{ flexDirection: 'column', alignItems: 'center' }} align='middle'>
       <FlexboxGrid.Item colspan={22}>
         <Divider />
       </FlexboxGrid.Item>

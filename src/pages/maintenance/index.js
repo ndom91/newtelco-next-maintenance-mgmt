@@ -4,7 +4,7 @@ import Layout from '@/newtelco/layout'
 import RequireLogin from '@/newtelco/require-login'
 import './maintenance.css'
 import Router, { useRouter } from 'next/router'
-import { Helmet } from 'react-helmet'
+import Head from 'next/head'
 import MailEditor from '@/newtelco/maintenance/mailEditor'
 import { format, isValid, formatDistance, parseISO } from 'date-fns'
 import moment from 'moment-timezone'
@@ -71,22 +71,26 @@ const MyTextarea = ({ field, form }) => {
       componentClass='textarea'
       name={field.name}
       value={field.value}
-      validateOnChange={false}
-      validateOnBlur={false}
       onChange={option => form.setFieldValue(field.name, option)}
     />
   )
 }
 
-const MyDateTime = ({ field, form }) => {
+const MyDateTime = ({ field, form, ...props }) => {
   return (
     <Flatpickr
       name={field.name}
       value={field.value}
       data-enable-time
-      validateOnChange={false}
-      validateOnBlur={false}
-      onChange={option => form.setFieldValue(field.name, option[0])}
+      onChange={option => {
+        form.setFieldValue(field.name, option[0])
+        const startDateTime = props.startDateTime
+        const endDateTime = props.endDateTime
+        if (startDateTime && endDateTime && isValid(parseISO(startDateTime)) && isValid(parseISO(endDateTime))) {
+          const impactCalculation = formatDistance(parseISO(endDateTime), parseISO(startDateTime))
+          props.setImpactPlaceholder(impactCalculation)
+        }
+      }}
       options={{ time_24hr: 'true', allow_input: 'true' }}
       className='flatpickr end-date-time'
     />
@@ -117,8 +121,6 @@ const MyTagPicker = ({ field, form, ...props }) => {
       data={props.supplierCids}
       block
       cleanable
-      validateOnChange={false}
-      validateOnBlur={false}
       placeholder='Please select a CID'
     />
   )
@@ -161,9 +163,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
   const [frozenCompany, setFrozenCompany] = useState('')
   const [openReadModal, setOpenReadModal] = useState(false)
   const [openPreviewModal, setOpenPreviewModal] = useState(false)
-  const [openRescheduleModal, setOpenRescheduleModal] = useState(false)
   const [openConfirmFreezeModal, setOpenConfirmFreezeModal] = useState(false)
-  const [openMaintenanceChangelog, setOpenMaintenanceChangelog] = useState(false)
   const [mailBodyText, setMailBodyText] = useState('')
   const [mailPreviewRecipients, setMailPreviewRecipients] = useState('')
   const [mailPreviewCustomerCID, setMailPreviewCustomerCid] = useState('')
@@ -348,10 +348,10 @@ const Maintenance = ({ session, serverData, suppliers }) => {
         cancelled: !!+cancelled,
         emergency: !!+emergency,
         done: !!+done,
-        timezone: 'Europe/Amsterdam',
-        timezoneLabel: '(GMT+01:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna',
-        startDateTime: moment.tz(serverData.profile.startDateTime, 'GMT').tz('Etc/GMT-1').format('YYYY-MM-DD HH:mm:ss'), // TODO: DONT HARDCORE TIMEZONE
-        endDateTime: moment.tz(serverData.profile.endDateTime, 'GMT').tz('Etc/GMT-1').format('YYYY-MM-DD HH:mm:ss') // TODO: DONT HARDCORE TIMEZONE
+        // timezone: 'Europe/Amsterdam',
+        // timezoneLabel: '(GMT+01:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna',
+        // startDateTime: moment.tz(serverData.profile.startDateTime, 'GMT').tz('Etc/GMT-1').format('YYYY-MM-DD HH:mm:ss'), 
+        // endDateTime: moment.tz(serverData.profile.endDateTime, 'GMT').tz('Etc/GMT-1').format('YYYY-MM-DD HH:mm:ss') 
       })
       fetchSupplierCids(serverData.profile.lieferant)
 
@@ -606,15 +606,15 @@ const Maintenance = ({ session, serverData, suppliers }) => {
     let subject = subj || mailPreviewSubject
     const to = recipient || mailPreviewRecipients
 
-    if (+maintenance.emergency) {
-      subject = `[EMERGENCY] ${subject}`
-    }
-    if (+maintenance.cancelled) {
-      subject = `[CANCELLED] ${subject}`
-    }
-    if (store.get('rescheduleData').length !== 0) {
-      subject = `[RESCHEDULED] ${subject}-${store.get('rescheduleData')[store.get('rescheduleData').length - 1].rcounter}`
-    }
+    // if (+maintenance.emergency) {
+    //   subject = `[EMERGENCY] ${subject}`
+    // }
+    // if (+maintenance.cancelled) {
+    //   subject = `[CANCELLED] ${subject}`
+    // }
+    // if (store.get('rescheduleData').length !== 0) {
+    //   subject = `[RESCHEDULED] ${subject}-${store.get('rescheduleData')[store.get('rescheduleData').length - 1].rcounter}`
+    // }
 
     fetch('/v1/api/mail/send', {
       method: 'post',
@@ -982,7 +982,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
     if (rData.length !== 0) {
       text += '-' + rData[rData.length - 1].rcounter
     }
-    setMailPreviewSubject(text.trimStart().trimEnd())
+    setMailPreviewSubject(text.trim())
     return text
   }
 
@@ -1053,8 +1053,6 @@ const Maintenance = ({ session, serverData, suppliers }) => {
           options={tzOptions}
           name={field.name}
           value={tzOptions ? tzOptions.find(option => option.value === field.value) : ''}
-          validateOnChange={false}
-          validateOnBlur={false}
           onChange={(option) => form.setFieldValue(field.name, option.value)}
           className='timezone-select'
         />
@@ -1069,8 +1067,6 @@ const Maintenance = ({ session, serverData, suppliers }) => {
         <SelectPicker
           style={{ width: '100%' }}
           name={field.name}
-          validateOnChange={false}
-          validateOnBlur={false}
           value={field.value}
           onChange={option => {
             fetch(`/api/lieferantcids?id=${option}`, {
@@ -1105,10 +1101,8 @@ const Maintenance = ({ session, serverData, suppliers }) => {
       return (
         <Input
           name={field.name}
-          value={field.value}
+          value={field.value || ''}
           placeholder={placeholder}
-          validateOnChange={false}
-          validateOnBlur={false}
           onChange={option => form.setFieldValue(field.name, option)}
         />
       )
@@ -1117,8 +1111,6 @@ const Maintenance = ({ session, serverData, suppliers }) => {
       return (
         <Toggle
           size='lg'
-          validateOnChange={false}
-          validateOnBlur={false}
           checkedChildren={checkedChildren}
           checked={field.value}
           name={field.name}
@@ -1185,9 +1177,9 @@ const Maintenance = ({ session, serverData, suppliers }) => {
         {maintenance.id === 'NEW' && (
           <Message full showIcon type='warning' description='Remember to Save before continuing to work!' style={{ position: 'fixed', zIndex: '999' }} />
         )}
-        <Helmet>
-          <title>{`Newtelco Maintenance | NT-${maintenance.id}`}</title>
-        </Helmet>
+        <Head>
+          <title>{`NT-${maintenance.id} | Newtelco Maintenance`}</title>
+        </Head>
         <MaintPanel header={<HeaderLeft />} center={<HeaderCenter />} buttons={<HeaderRight />}>
           <FlexboxGrid justify='space-around' align='top' style={{ width: '100%' }}>
             <FlexboxGrid.Item colspan={11} style={{ margin: '0 10px' }}>
@@ -1285,7 +1277,8 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                                   Time in above selected Timezone
                                 </HelpBlock>
                               </ControlLabel>
-                              <FastField name='startDateTime' component={MyDateTime} />
+                              <FastField name='startDateTime' startDateTime={values.startDateTime} endDateTime={values.endDateTime} setImpactPlaceholder={setImpactPlaceholder} component={MyDateTime} />
+                              <HelpBlock style={{ margin: '5px', opacity: '0.5' }}>Time in CEST: {moment.tz(moment.tz(values.startDateTime, values.timezone), 'Europe/Berlin').format('DD.MM.YYYY HH:mm')}</HelpBlock>
                             </FormGroup>
                           </Col>
                           <Col sm={12} xs={24}>
@@ -1296,7 +1289,8 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                                   Time in above selected Timezone
                                 </HelpBlock>
                               </ControlLabel>
-                              <FastField name='endDateTime' component={MyDateTime} />
+                              <FastField name='endDateTime' startDateTime={values.startDateTime} endDateTime={values.endDateTime} setImpactPlaceholder={setImpactPlaceholder} component={MyDateTime} />
+                              <HelpBlock style={{ margin: '5px', opacity: '0.5' }}>Time in CEST: {moment.tz(moment.tz(values.endDateTime, values.timezone), 'Europe/Berlin').format('DD.MM.YYYY HH:mm')}</HelpBlock>
                             </FormGroup>
                           </Col>
                         </Row>

@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react'
+import { providers } from 'next-auth/client'
 import Fonts from '@/newtelco/fonts'
 import { Container, FlexboxGrid, Panel, Content, Button, Col } from 'rsuite'
 import './signin.css'
@@ -72,24 +73,10 @@ const SignIn = ({ providers }) => {
 
 export default SignIn
 
-export async function getServerSideProps({ req }) {
-  const host = req ? req.headers['x-forwarded-host'] : window.location.hostname
-  let protocol = 'https:'
-  if (host.indexOf('localhost') > -1) {
-    protocol = 'http:'
-  }
-  const pageRequest = `${protocol}//${host}/api/auth/providers`
-  const res = await fetch(pageRequest, {
-    mode: 'cors',
-    headers: {
-      'Access-Control-Allow-Origin': '*'
-    }
-  })
-  const providers = await res.json()
-
+export async function getServerSideProps(ctx) {
   return {
     props: {
-      providers
+      providers: await providers(ctx)
     }
   }
 }

@@ -5,9 +5,6 @@ import dynamic from 'next/dynamic'
 import KeyboardShortcuts from './keyboardShortcuts'
 import Store from './store'
 import Fonts from './fonts'
-import Helmet from 'react-helmet'
-import styled from 'styled-components'
-// import '../../public/static/css/rsuite-default.min.css'
 import {
   Container,
   Content,
@@ -23,10 +20,6 @@ const UnreadFavicon = dynamic(
   () => import('./unreadcount'),
   { ssr: false }
 )
-
-// const Wrapper = (props.content) = styled.div`
-//   ${content}
-// `;
 
 const Layout = ({ children }) => {
   const [openA2HS, setOpenA2HS] = useState(false)

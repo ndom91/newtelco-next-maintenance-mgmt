@@ -20,8 +20,7 @@ const options = {
   adapter: Adapters.Default(database),
   pages: {
     signin: '/auth/signin',
-    // signout: 'https://example.com/signout',
-    // checkEmail: 'https://example.com/check-email',
+    signout: '/auth/signout',
     // error: 'https://example.com/error'
   }
 }

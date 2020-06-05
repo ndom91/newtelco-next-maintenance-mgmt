@@ -23,13 +23,13 @@ module.exports = async (req, res) => {
       emergency = ${values.emergency},
       startDateTime = ${toSqlDatetime(values.startDateTime)},
       endDateTime = ${toSqlDatetime(values.endDateTime)},
-      impact = ${values.impact},
-      location = ${values.location},
-      reason = ${values.reason},
-      maintNote = ${values.maintNote},
-      lieferant = ${values.supplier},
-      derenCIDid = ${values.supplierCids.join(',')},
-      timezone = ${values.timezone}
+      impact = ${values.impact || ''},
+      location = ${values.location || ''},
+      reason = ${values.reason || ''},
+      maintNote = ${values.maintNote || ''},
+      lieferant = ${values.supplier || ''},
+      derenCIDid = ${values.supplierCids ? values.supplierCids.join(',') : ''},
+      timezone = ${values.timezone || ''}
     WHERE id LIKE ${maintId}
   `)
   const fieldName = {
