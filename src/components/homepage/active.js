@@ -37,9 +37,9 @@ const ActiveMaintenances = () => {
                         <span><b>{item.name}</b> (NT-{item.maintId})</span>
                       </div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        {format(new Date(item.startDateTime), 'HH:mm - LL.dd.yyyy')}
+                        {format(new Date(item.startDateTime), 'HH:mm - dd.LL.yyyy')}
                         <Icon icon='page-next' />
-                        {format(new Date(item.endDateTime), 'HH:mm - LL.dd.yyyy')}
+                        {format(new Date(item.endDateTime), 'HH:mm - dd.LL.yyyy')}
                       </div>
                     </FlexboxGrid.Item>
                     <FlexboxGrid.Item colspan={3}>
