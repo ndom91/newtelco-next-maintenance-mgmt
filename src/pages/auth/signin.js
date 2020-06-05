@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
-import Link from 'next/link'
 import Fonts from '@/newtelco/fonts'
 import { Container, FlexboxGrid, Panel, Content, Button, Col } from 'rsuite'
+import './signin.css'
 
 const SignIn = ({ providers }) => {
   useEffect(() => {
@@ -36,7 +36,7 @@ const SignIn = ({ providers }) => {
               {providers &&
                 Object.values(providers).map((provider) => (
                   <p key={provider.name}>
-                    <a href={provider.signinUrl}>
+                    <a href={provider.signinUrl} className='signin-link'>
                       <Button
                         id='signin-btn'
                         type='submit'
@@ -48,7 +48,7 @@ const SignIn = ({ providers }) => {
                           justifyContent: 'center'
                         }}
                       >
-                        <svg width='24' height='24' viewBox='0 0 256 262' xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='xMidYMid' style={{ marginRight: '15px' }}>
+                        <svg width='20' height='20' viewBox='0 0 256 262' xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='xMidYMid' style={{ marginRight: '15px' }}>
                           <defs>
                             <filter id='grayscale'>
                               <feColorMatrix type='matrix' values='0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0' />
