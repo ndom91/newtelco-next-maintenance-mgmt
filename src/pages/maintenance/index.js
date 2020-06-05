@@ -893,14 +893,6 @@ const Maintenance = ({ session, serverData, suppliers }) => {
     }
   }
 
-  const toggleRescheduleModal = () => {
-    setOpenRescheduleModal(!openRescheduleModal)
-  }
-
-  const toggleHistoryView = () => {
-    setOpenMaintenanceChangelog(!openMaintenanceChangelog)
-  }
-
   const toggleConfirmFreezeModal = () => {
     setOpenConfirmFreezeModal(!openConfirmFreezeModal)
   }
@@ -1155,11 +1147,21 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                   .catch(err => console.error(`Error - ${err}`))
               }
               // Set 'impacted CIDs'
-              fetch(`/api/maintenances/save/impactedcids?cids=${impactedCIDs}&maintId=${maintenance.id}&updatedby=${activeUser}`, {
-                method: 'get',
+              let impactedCids = ''
+              customerCids.forEach(entry => {
+                impactedCids += ` ${entry.kundenCID}`
+              })
+              fetch('/api/maintenances/save/impactedcids', {
+                method: 'post',
+                body: JSON.stringify({
+                  cids: impactedCids.trim(),
+                  maintId: maintenance.id,
+                  updatedBy: session.user.email.match(/^([^@]*)@/)[1]
+                }),
+                mode: 'cors',
                 headers: {
                   'Access-Control-Allow-Origin': '*',
-                  _csrf: session.accessToken
+                  'Content-Type': 'application/json'
                 }
               })
                 .then(resp => resp.json())
@@ -1169,11 +1171,9 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                   }
                 })
                 .catch(err => console.error(`Error - ${err}`))
-              // TODO: Check whats up here
-              // update Algolia Index
-              // fetch('/v1/api/search/update', {
-              //   method: 'get'
-              // })
+
+              // update algolia search index with latest created maintenance
+              fetch('/v1/api/search/update')
             }
           }}
         />
