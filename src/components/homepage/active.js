@@ -34,7 +34,7 @@ const ActiveMaintenances = () => {
                     </FlexboxGrid.Item>
                     <FlexboxGrid.Item colspan={16}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                        <span><b>{item.name}</b> (NT-{item.id})</span>
+                        <span><b>{item.name}</b> (NT-{item.maintId})</span>
                       </div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         {format(new Date(item.startDateTime), 'HH:mm - LL.dd.yyyy')}
