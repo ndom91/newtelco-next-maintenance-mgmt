@@ -86,9 +86,40 @@ const MyDateTime = ({ field, form }) => {
       data-enable-time
       validateOnChange={false}
       validateOnBlur={false}
-      onChange={option => form.setFieldValue(field.name, option)}
+      onChange={option => form.setFieldValue(field.name, option[0])}
       options={{ time_24hr: 'true', allow_input: 'true' }}
       className='flatpickr end-date-time'
+    />
+  )
+}
+
+const MyTagPicker = ({ field, form, ...props }) => {
+  return (
+    <TagPicker
+      name={field.name}
+      value={field.value}
+      onChange={option => {
+        form.setFieldValue(field.name, option)
+        if (!option && props.customerCids.length) {
+          props.setCustomerCids([])
+        }
+      }}
+      onClose={() => {
+        if (field.value?.length) {
+          props.fetchCustomerCids(field.value)
+        } else {
+          props.setCustomerCids([])
+        }
+      }}
+      onClean={() => {
+        props.setCustomerCids([])
+      }}
+      data={props.supplierCids}
+      block
+      cleanable
+      validateOnChange={false}
+      validateOnBlur={false}
+      placeholder='Please select a CID'
     />
   )
 }
@@ -297,7 +328,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
             name: companyName,
             lieferant: companyId,
             bearbeitetvon: username,
-            updatedAt: format(new Date(), 'MM.dd.yyyy HH:mm'),
+            updatedAt: format(new Date(), 'MM.dd.yyyy HH:mm')
           })
           fetchSupplierCids(companyId)
           formRef.current.setFieldValue('supplier', companyId)
@@ -469,8 +500,6 @@ const Maintenance = ({ session, serverData, suppliers }) => {
   const generateMail = (customerCID, protection) => {
     // TODO: everything that can be changed by form = currentMaint, everythign else =hook maintenance
     const currentMaint = formRef.current.values
-    console.log('maintenancehook', maintenance)
-    console.log('currentMaint', formRef.current.values)
 
     if (currentMaint.id === '' || currentMaint.startDateTime === '' || currentMaint.endDateTime === '') {
       Notify('warning', 'Missing Required Fields')
@@ -478,12 +507,12 @@ const Maintenance = ({ session, serverData, suppliers }) => {
     }
 
     const timezoneValue = currentMaint.timezone || 'Europe/Dublin'
-    const rawStart = moment.tz(currentMaint.startDateTime, currentMaint.timezoneValue)
-    const rawEnd = moment.tz(currentMaint.endDateTime, timezoneValue)
+    const rawStart = moment.tz(moment(currentMaint.startDateTime).format('YYYY-MM-DD HH:mm:ss'), timezoneValue)
+    const rawEnd = moment.tz(moment(currentMaint.endDateTime).format('YYYY-MM-DD HH:mm:ss'), timezoneValue)
     const utcStart1 = rawStart.tz('GMT').format('YYYY-MM-DD HH:mm:ss')
     const utcEnd1 = rawEnd.tz('GMT').format('YYYY-MM-DD HH:mm:ss')
-    const utcStart = serverData.profile.startDateTime || utcStart1
-    const utcEnd = serverData.profile.endDateTime || utcEnd1
+    const utcStart = utcStart1 || serverData.profile.startDateTime
+    const utcEnd = utcEnd1 || serverData.profile.endDateTime
 
     let maintenanceIntro = 'We would like to inform you about planned work on the following CID(s):'
     const rescheduleText = ''
@@ -577,10 +606,10 @@ const Maintenance = ({ session, serverData, suppliers }) => {
     let subject = subj || mailPreviewSubject
     const to = recipient || mailPreviewRecipients
 
-    if (!!+maintenance.emergency) {
+    if (+maintenance.emergency) {
       subject = `[EMERGENCY] ${subject}`
     }
-    if (!!+maintenance.cancelled) {
+    if (+maintenance.cancelled) {
       subject = `[CANCELLED] ${subject}`
     }
     if (store.get('rescheduleData').length !== 0) {
@@ -702,7 +731,6 @@ const Maintenance = ({ session, serverData, suppliers }) => {
     const startDE = startMoment.tz('Europe/Berlin').format()
     const endMoment = moment.tz(endDateTime, currentMaint.timezone)
     const endDE = endMoment.tz('Europe/Berlin').format()
-    console.log(endDE)
 
     fetch('/v1/api/calendar/create', {
       method: 'post',
@@ -865,7 +893,6 @@ const Maintenance = ({ session, serverData, suppliers }) => {
     }
   }
 
-
   const toggleRescheduleModal = () => {
     setOpenRescheduleModal(!openRescheduleModal)
   }
@@ -901,7 +928,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
     }
     const updatedAtFormatted = format(new Date(updatedAt), 'yyyy-MM-dd HH:mm:ss')
 
-    fetch(`/api/maintenances/save/create`, {
+    fetch('/api/maintenances/save/create', {
       method: 'post',
       body: JSON.stringify({
         bearbeitetvon: bearbeitetvon,
@@ -952,7 +979,6 @@ const Maintenance = ({ session, serverData, suppliers }) => {
         })
         .catch(err => console.error(`Error - ${err}`))
     }
-
   }
 
   const generateMailSubject = () => {
@@ -1055,7 +1081,6 @@ const Maintenance = ({ session, serverData, suppliers }) => {
           validateOnBlur={false}
           value={field.value}
           onChange={option => {
-            console.log(option)
             fetch(`/api/lieferantcids?id=${option}`, {
               method: 'get'
             })
@@ -1065,7 +1090,6 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                   setSupplierCids([{ label: 'No CIDs available for this Supplier', value: '1' }])
                   return
                 }
-                console.log('supplierSelect')
                 setMaintenance({
                   ...maintenance,
                   lieferant: option,
@@ -1081,38 +1105,6 @@ const Maintenance = ({ session, serverData, suppliers }) => {
           }}
           data={suppliers?.companies || []}
           placeholder='Please select a Supplier'
-        />
-      )
-    }
-
-    const MyTagPicker = ({ field, form }) => {
-      return (
-        <TagPicker
-          name={field.name}
-          value={field.value}
-          onChange={option => {
-            form.setFieldValue(field.name, option)
-            if (!option && customerCids.length) {
-              setCustomerCids([])
-            }
-          }}
-          onClose={() => {
-            console.log(field.value)
-            if (field.value?.length) {
-              fetchCustomerCids(field.value)
-            } else {
-              setCustomerCids([])
-            }
-          }}
-          onClean={() => {
-            setCustomerCids([])
-          }}
-          data={supplierCids}
-          block
-          cleanable
-          validateOnChange={false}
-          validateOnBlur={false}
-          placeholder='Please select a CID'
         />
       )
     }
@@ -1194,7 +1186,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
           <Message full showIcon type='warning' description='Remember to Save before continuing to work!' style={{ position: 'fixed', zIndex: '999' }} />
         )}
         <Helmet>
-          <title>{`Newtelco Maintenance - NT-${maintenance.id}`}</title>
+          <title>{`Newtelco Maintenance | NT-${maintenance.id}`}</title>
         </Helmet>
         <MaintPanel header={<HeaderLeft />} center={<HeaderCenter />} buttons={<HeaderRight />}>
           <FlexboxGrid justify='space-around' align='top' style={{ width: '100%' }}>
@@ -1225,7 +1217,6 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                       if (values.supplierCids && !customerCids.length) {
                         fetchCustomerCids(values.supplierCids)
                       }
-                      console.log(diff)
                       if (Object.keys(diff).length) {
                         if (maintenance.id === 'NEW') {
                           Notify('error', 'Unable to Save', 'Not maintenance ID created yet.')
@@ -1313,7 +1304,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                           <Col sm={24}>
                             <FormGroup>
                               <ControlLabel htmlFor='their-cid'>{maintenance.name} CID</ControlLabel>
-                              <Field name='supplierCids' component={MyTagPicker} />
+                              <Field name='supplierCids' customerCids={customerCids} setCustomerCids={setCustomerCids} fetchCustomerCids={fetchCustomerCids} supplierCids={supplierCids} component={MyTagPicker} />
                             </FormGroup>
                           </Col>
                         </Row>
@@ -1528,7 +1519,6 @@ export async function getServerSideProps({ req, query }) {
   if (host.indexOf('localhost') > -1) {
     protocol = 'http:'
   }
-  console.log('query', query)
   const res2 = await fetch(`${protocol}//${host}/api/companies/selectmaint`)
   const suppliers = await res2.json()
   if (query.id === 'NEW') {
