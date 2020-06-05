@@ -3,7 +3,7 @@ const escape = require('sql-template-strings')
 
 module.exports = async (req, res) => {
   const query = await db.query(escape`
-    select maintenancedb.*, maintenancedb.id as maintId, companies.*
+    select distinct maintenancedb.*, maintenancedb.id as maintId, companies.*
     from maintenancedb
     left join companies on maintenancedb.lieferant = companies.id
     where DATE(NOW()) like DATE(startDateTime) 
