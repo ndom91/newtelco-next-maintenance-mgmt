@@ -177,7 +177,7 @@ const SupplierCIDs = props => {
 
   const Header = () => {
     return (
-      <FlexboxGrid justify='space-between' align='middle'>
+      <FlexboxGrid justify='end' align='middle'>
         <FlexboxGrid.Item>
           <ButtonGroup>
             <IconButton onClick={toggleSupplierCidAdd} icon={<Icon icon='plus-circle' />} appearance='ghost' placement='right'>

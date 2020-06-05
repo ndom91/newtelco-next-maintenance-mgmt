@@ -167,7 +167,7 @@ const Companies = props => {
 
   const Header = () => {
     return (
-      <FlexboxGrid justify='space-between' align='middle'>
+      <FlexboxGrid justify='end' align='middle'>
         <FlexboxGrid.Item>
           <ButtonGroup>
             <IconButton onClick={toggleCompanyAdd} icon={<Icon icon='plus-circle' />} appearance='ghost' placement='right'>
