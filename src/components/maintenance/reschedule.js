@@ -414,7 +414,7 @@ const RescheduleGrid = ({ maintId, user, handleCalendarUpdate }) => {
             </FlexboxGrid>
           </Modal.Header>
           <Modal.Body className='modal-body reschedule' style={{ marginTop: '0px', paddingBottom: '0px' }}>
-            <FlexboxGrid justify='space-around' align='middle' style={{ flexDirection: 'column', height: '510px' }}>
+            <FlexboxGrid justify='space-around' align='middle' style={{ flexDirection: 'column', height: '520px' }}>
               <FlexboxGrid.Item style={{ padding: '30px' }}>
                 <Form>
                   <FormGroup style={{ margin: '20px' }}>

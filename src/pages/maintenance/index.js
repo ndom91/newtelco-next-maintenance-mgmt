@@ -514,8 +514,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
     const utcStart = utcStart1 || serverData.profile.startDateTime
     const utcEnd = utcEnd1 || serverData.profile.endDateTime
 
-    // let maintenanceIntro = 'We would like to inform you about planned work on the following CID(s):'
-    let maintenanceIntro = ''
+    let maintenanceIntro = 'We would like to inform you about planned work on the following CID(s):'
     const rescheduleText = ''
     const tzSuffixRAW = 'UTC / GMT+0:00'
 
@@ -534,7 +533,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
       if (cancelled && store.get('rescheduleData')[latest]) {
         maintenanceIntro = `We would like to inform you that these rescheduled planned works (<b>NT-${maintenance.id}-${rcounter}</b>) have been <b>cancelled</b>.<br><br>We are sorry for any inconveniences this may have caused.<br><footer>​<style>.sig{font-family:Century Gothic, sans-serif;font-size:9pt;color:#636266!important;}b.i{color:#4ca702;}.gray{color:#636266 !important;}a{text-decoration:none;color:#636266 !important;}</style><div class="sig"><div>Best regards <b class="i">|</b> Mit freundlichen Grüßen</div><br><div><b>Newtelco Maintenance Team</b></div><br><div>NewTelco GmbH <b class="i">|</b> Moenchhofsstr. 24 <b class="i">|</b> 60326 Frankfurt a.M. <b class="i">|</b> DE <br>www.newtelco.com <b class="i">|</b> 24/7 NOC  49 69 75 00 27 30 ​​<b class="i">|</b> <a style="color:#" href="mailto:service@newtelco.de">service@newtelco.de</a><br><br><div><img alt="sig" src="https://home.newtelco.de/sig.png" height="29" width="516"></div></div>​</footer><hr />`
       }
-      maintenanceIntro += `We regret to inform you that the planned works have been <b>rescheduled</b> on the following CID(s):\n\n<br><br><b>${customerCID}</b><br><br>The maintenance has been rescheduled due to ${newReason}.<br><br>The new details are as follows:<br><table border="0" cellspacing="2" cellpadding="2" width="775px"><tr><td style='width: 205px;'>Maintenance ID:</td><td><b>NT-${maintenance.id}-${rcounter}</b></td></tr><tr><td>New Start date and time:</td><td><b>${newStart} (${tzSuffixRAW})</b></td></tr><tr><td>New Finish date and time:</td><td><b>${newEnd} (${tzSuffixRAW})</b></td></tr><tr><td>New Impact:</td><td><b>${newImpact}</b></td></tr></table><br>Thank you very much for your patience and cooperation.<br>`
+      maintenanceIntro = `We regret to inform you that the planned works have been <b>rescheduled</b> on the following CID(s):\n\n<br><br><b>${customerCID}</b><br><br>The maintenance has been rescheduled due to ${newReason}.<br><br>The new details are as follows:<br><table border="0" cellspacing="2" cellpadding="2" width="775px"><tr><td style='width: 205px;'>Maintenance ID:</td><td><b>NT-${maintenance.id}-${rcounter}</b></td></tr><tr><td>New Start date and time:</td><td><b>${newStart} (${tzSuffixRAW})</b></td></tr><tr><td>New Finish date and time:</td><td><b>${newEnd} (${tzSuffixRAW})</b></td></tr><tr><td>New Impact:</td><td><b>${newImpact}</b></td></tr></table><br>Thank you very much for your patience and cooperation.<br>`
 
       if (store.get('rescheduleData').length > 1) {
         maintenanceIntro += '<br><hr><br><b>Previous Reschedules:</b><br>'
@@ -1045,7 +1044,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
             ) : (
               <Whisper placement='bottom' speaker={<Tooltip>Send All Notifications</Tooltip>}>
                 <IconButton appearance='ghost' onClick={handleSendAll} icon={<Icon icon='envelope-o' />}>
-                  Send
+                  Send All
                 </IconButton>
               </Whisper>
             )}
