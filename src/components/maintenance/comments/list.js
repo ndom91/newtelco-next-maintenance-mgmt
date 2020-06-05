@@ -85,7 +85,8 @@ const CommentList = ({ user, id, initialComment }) => {
           newComments.unshift({
             user: user,
             datetime: now.toISOString(),
-            body: comment
+            body: comment,
+            id: resp.comments.insertId
           })
           setComments(newComments)
           setComment('')

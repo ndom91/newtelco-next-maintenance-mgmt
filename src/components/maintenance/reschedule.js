@@ -352,7 +352,7 @@ const RescheduleGrid = ({ maintId, user, handleCalendarUpdate }) => {
 
   return (
     <Container style={{ padding: '20px' }}>
-      <Row>
+      <Row style={{ marginBottom: '20px' }}>
         <FlexboxGrid justify='end'>
           <FlexboxGrid.Item>
             <Whisper placement='bottom' speaker={<Tooltip>Create New Reschedule</Tooltip>}>
@@ -407,12 +407,9 @@ const RescheduleGrid = ({ maintId, user, handleCalendarUpdate }) => {
           dragHandleClassName='reschedule-header'
         >
           <Modal.Header className='reschedule reschedule-header' onHide={() => setOpenRescheduleModal(!openRescheduleModal)}>
-            <FlexboxGrid justify='start' align='middle'>
-              <FlexboxGrid.Item colspan={20}>
+            <FlexboxGrid justify='center' align='middle'>
+              <FlexboxGrid.Item colspan={24} style={{ textAlign: 'center' }}>
                 <h3>Reschedule Maintenance</h3>
-              </FlexboxGrid.Item>
-              <FlexboxGrid.Item colspan={2}>
-                <Button appearance='primary' disabled style={{ opacity: '0.9', fontSize: '1.3rem' }}>{store.get('rescheduleData').length + 1}</Button>
               </FlexboxGrid.Item>
             </FlexboxGrid>
           </Modal.Header>
@@ -479,7 +476,7 @@ const RescheduleGrid = ({ maintId, user, handleCalendarUpdate }) => {
               </FlexboxGrid.Item>
               <FlexboxGrid.Item colspan={18}>
                 <ButtonGroup justified>
-                  <Button appearance='sublte' onClick={() => setOpenRescheduleModal(!openRescheduleModal)}>
+                  <Button appearance='subtle' onClick={() => setOpenRescheduleModal(!openRescheduleModal)}>
                     Cancel
                   </Button>
                   <Button onClick={handleRescheduleSave}>

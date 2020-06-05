@@ -514,7 +514,8 @@ const Maintenance = ({ session, serverData, suppliers }) => {
     const utcStart = utcStart1 || serverData.profile.startDateTime
     const utcEnd = utcEnd1 || serverData.profile.endDateTime
 
-    let maintenanceIntro = 'We would like to inform you about planned work on the following CID(s):'
+    // let maintenanceIntro = 'We would like to inform you about planned work on the following CID(s):'
+    let maintenanceIntro = ''
     const rescheduleText = ''
     const tzSuffixRAW = 'UTC / GMT+0:00'
 
@@ -988,7 +989,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
     text += formRef.current.values.cancelled ? ' [CANCELLED]' : ''
     text += ' Planned Work Notification - NT-' + maintenance.id
     if (rData.length !== 0) {
-      text += '-' + rData[rData.length - 1].rcounter + 1
+      text += '-' + rData[rData.length - 1].rcounter
     }
     setMailPreviewSubject(text.trimStart().trimEnd())
     return text

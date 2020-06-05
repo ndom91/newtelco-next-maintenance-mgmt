@@ -117,13 +117,6 @@
   padding: 25px !important;
 }
 
-.reschedule-header:hover {
-  cursor: grab;
-}
-.reschedule-header:active {
-  cursor: grabbing
-}
-
 .modal-attachment-header-text:hover {
   cursor: grab;
 }
