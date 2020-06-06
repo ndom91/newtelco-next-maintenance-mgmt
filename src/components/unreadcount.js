@@ -26,7 +26,13 @@ const UnreadCount = () => {
 
         // Draw Notification Circle
         context.beginPath()
-        context.arc(canvas.width - faviconSize / 3, 6 + faviconSize / 3, faviconSize / 3, 0, 2 * Math.PI)
+        context.arc(
+          canvas.width - faviconSize / 3,
+          6 + faviconSize / 3,
+          faviconSize / 3,
+          0,
+          2 * Math.PI
+        )
         context.fillStyle = '#FF0000'
         context.fill()
 
@@ -35,7 +41,11 @@ const UnreadCount = () => {
         context.textAlign = 'center'
         context.textBaseline = 'middle'
         context.fillStyle = '#FFFFFF'
-        context.fillText(count, canvas.width - faviconSize / 3, 6 + faviconSize / 3)
+        context.fillText(
+          count,
+          canvas.width - faviconSize / 3,
+          6 + faviconSize / 3
+        )
 
         // Replace favicon
         favicon.href = canvas.toDataURL('image/png')
@@ -51,20 +61,14 @@ const UnreadCount = () => {
   //   }
   // }, [count])
 
-  store
-    .on('count')
-    .subscribe(async count => {
-      if (typeof window !== 'undefined' && count !== 0) {
-        const fav = getFavicon(count)
-        fav && setFaviconEl(fav)
-      }
-    })
+  store.on('count').subscribe(async count => {
+    if (typeof window !== 'undefined' && count !== 0) {
+      const fav = getFavicon(count)
+      fav && setFaviconEl(fav)
+    }
+  })
 
-  return (
-    <Head>
-      {`${faviconEl}`}
-    </Head>
-  )
+  return <Head>{`${faviconEl}`}</Head>
 }
 
 export default UnreadCount

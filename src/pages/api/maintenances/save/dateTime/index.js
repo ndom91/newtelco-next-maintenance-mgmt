@@ -18,9 +18,13 @@ module.exports = async (req, res) => {
   }
   if (cidIdsQuery.affectedRows >= 1) {
     const fieldName = `${element} date/time`
-    const updateHistory = await db.query(escape`INSERT INTO changelog (mid, user, action, field) VALUES (${maintId}, ${updatedBy}, 'changed', ${fieldName});`)
+    const updateHistory = await db.query(
+      escape`INSERT INTO changelog (mid, user, action, field) VALUES (${maintId}, ${updatedBy}, 'changed', ${fieldName});`
+    )
     res.status(200).json({ statusText: 'OK', status: 200 })
   } else {
-    res.status(200).json({ statusText: 'FAIL', status: 500, err: 'Save Failed' })
+    res
+      .status(200)
+      .json({ statusText: 'FAIL', status: 500, err: 'Save Failed' })
   }
 }

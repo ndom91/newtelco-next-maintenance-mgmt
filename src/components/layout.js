@@ -5,21 +5,12 @@ import dynamic from 'next/dynamic'
 import KeyboardShortcuts from './keyboardShortcuts'
 import Store from './store'
 import Fonts from './fonts'
-import {
-  Container,
-  Content,
-  Modal,
-  Button,
-  FlexboxGrid
-} from 'rsuite'
+import { Container, Content, Modal, Button, FlexboxGrid } from 'rsuite'
 
 // TODO: Darkmode
 // https://github.com/kazzkiq/darkmode
 
-const UnreadFavicon = dynamic(
-  () => import('./unreadcount'),
-  { ssr: false }
-)
+const UnreadFavicon = dynamic(() => import('./unreadcount'), { ssr: false })
 
 const Layout = ({ children }) => {
   const [openA2HS, setOpenA2HS] = useState(false)
@@ -37,7 +28,6 @@ const Layout = ({ children }) => {
     store.set('count')(data ? data.count : 0)
   }, [data])
 
-
   useEffect(() => {
     Fonts()
 
@@ -50,7 +40,7 @@ const Layout = ({ children }) => {
     const installAsk = window.localStorage.getItem('askA2HS') || 0
 
     if (window.outerWidth < 500 && installAsk < 3) {
-      window.addEventListener('beforeinstallprompt', (e) => {
+      window.addEventListener('beforeinstallprompt', e => {
         e.preventDefault()
         setOpenA2HS(!openA2HS)
         setDeferredPrompt(e)
@@ -66,7 +56,7 @@ const Layout = ({ children }) => {
   const addToHomescreen = () => {
     deferredPrompt.prompt()
     // Wait for the user to respond to the prompt
-    deferredPrompt.userChoice.then((choiceResult) => {
+    deferredPrompt.userChoice.then(choiceResult => {
       if (choiceResult.outcome === 'accepted') {
         console.log('User accepted the A2HS prompt')
       } else {
@@ -82,7 +72,11 @@ const Layout = ({ children }) => {
   }
 
   store.on('night').subscribe(night => {
-    fetch(night ? '/static/css/rsuite-dark.min.css' : '/static/css/rsuite-default.min.css')
+    fetch(
+      night
+        ? '/static/css/rsuite-dark.min.css'
+        : '/static/css/rsuite-default.min.css'
+    )
       .then(response => response.text())
       .then(data => {
         setStyle(data)
@@ -91,9 +85,7 @@ const Layout = ({ children }) => {
 
   return (
     <div>
-      <style>
-        {style}
-      </style>
+      <style>{style}</style>
       <KeyboardShortcuts>
         <UnreadFavicon count={store.get('count')} />
         <Container>
@@ -106,14 +98,25 @@ const Layout = ({ children }) => {
             </FlexboxGrid>
           </Content>
         </Container>
-        <Modal className='a2hs-modal' backdrop='static' size='md' show={openA2HS} onHide={() => toggleA2HSModal} style={{ marginTop: '75px' }}>
+        <Modal
+          className='a2hs-modal'
+          backdrop='static'
+          size='md'
+          show={openA2HS}
+          onHide={() => toggleA2HSModal}
+          style={{ marginTop: '75px' }}
+        >
           <Modal.Header className='keyboard-shortcut-header'>
             Save Application
           </Modal.Header>
           <Modal.Body className='keyboard-shortcut-body'>
             <Container className='keyboard-shortcut-container'>
               Do you want to save this app to the homescreen?
-              <Button style={{ width: '100%', marginTop: '20px' }} onClick={addToHomescreen} className='a2hs-btn'>
+              <Button
+                style={{ width: '100%', marginTop: '20px' }}
+                onClick={addToHomescreen}
+                className='a2hs-btn'
+              >
                 Add to Homescreen
               </Button>
             </Container>

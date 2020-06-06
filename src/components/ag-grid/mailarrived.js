@@ -8,11 +8,7 @@ const MailArrived = ({ node }) => {
   } else {
     dateTime = node.data.maileingang
   }
-  return (
-    <span>
-      {dateTime}
-    </span>
-  )
+  return <span>{dateTime}</span>
 }
 
 export default MailArrived

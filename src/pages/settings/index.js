@@ -11,10 +11,7 @@ import Freeze from '@/newtelco/settings/freeze'
 // import Templates from '@/newtelco/settings/templates'
 import MaintPanel from '@/newtelco/panel'
 import './settings.css'
-import {
-  Nav,
-  FlexboxGrid
-} from 'rsuite'
+import { Nav, FlexboxGrid } from 'rsuite'
 
 const Settings = ({ session, router }) => {
   const { tab } = router.query
@@ -28,12 +25,16 @@ const Settings = ({ session, router }) => {
           </Link>
         </Nav.Item>
         <Nav.Item componentClass='div' active={tab === 'customercids'}>
-          <Link href={{ pathname: '/settings', query: { tab: 'customercids' } }}>
+          <Link
+            href={{ pathname: '/settings', query: { tab: 'customercids' } }}
+          >
             <a>Customer CIDs</a>
           </Link>
         </Nav.Item>
         <Nav.Item componentClass='div' active={tab === 'suppliercids'}>
-          <Link href={{ pathname: '/settings', query: { tab: 'suppliercids' } }}>
+          <Link
+            href={{ pathname: '/settings', query: { tab: 'suppliercids' } }}
+          >
             <a>Supplier CIDs</a>
           </Link>
         </Nav.Item>
@@ -70,8 +71,8 @@ export async function getServerSideProps({ req }) {
   const session = await NextAuth.session({ req })
   return {
     props: {
-      session
-    }
+      session,
+    },
   }
 }
 

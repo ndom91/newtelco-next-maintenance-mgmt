@@ -17,7 +17,7 @@ import {
   ControlLabel,
   HelpBlock,
   Modal,
-  Loader
+  Loader,
 } from 'rsuite'
 
 const Companies = props => {
@@ -27,36 +27,36 @@ const Companies = props => {
       sortable: true,
       filter: true,
       selectable: true,
-      editable: true
+      editable: true,
     },
     columnDefs: [
       {
         headerName: 'ID',
         field: 'id',
         width: 60,
-        editable: false
+        editable: false,
       },
       {
         headerName: 'Domain',
         field: 'mailDomain',
-        width: 100
+        width: 100,
       },
       {
         headerName: 'Company',
         field: 'name',
         width: 100,
-        sort: { direction: 'desc' }
+        sort: { direction: 'desc' },
       },
       {
         headerName: 'Recipient',
-        field: 'maintenanceRecipient'
-      }
+        field: 'maintenanceRecipient',
+      },
     ],
     rowSelection: 'single',
     frameworkComponents: {
-      customLoadingOverlay: Loader
+      customLoadingOverlay: Loader,
     },
-    loadingOverlayComponent: 'customLoadingOverlay'
+    loadingOverlayComponent: 'customLoadingOverlay',
   }
 
   const gridApi = useRef()
@@ -70,7 +70,7 @@ const Companies = props => {
 
   useEffect(() => {
     fetch('/api/companies', {
-      method: 'get'
+      method: 'get',
     })
       .then(resp => resp.json())
       .then(data => {
@@ -93,7 +93,7 @@ const Companies = props => {
 
   const handleDelete = () => {
     fetch(`/api/settings/delete/companies?id=${companyToDelete.id}`, {
-      method: 'get'
+      method: 'get',
     })
       .then(resp => resp.json())
       .then(data => {
@@ -125,19 +125,34 @@ const Companies = props => {
   }
 
   const handleAddCompany = () => {
-    fetch(`/api/settings/add/companies?name=${encodeURIComponent(newName)}&domain=${encodeURIComponent(newDomain)}&recipient=${encodeURIComponent(newRecipient)}`, {
-      method: 'get'
-    })
+    fetch(
+      `/api/settings/add/companies?name=${encodeURIComponent(
+        newName
+      )}&domain=${encodeURIComponent(newDomain)}&recipient=${encodeURIComponent(
+        newRecipient
+      )}`,
+      {
+        method: 'get',
+      }
+    )
       .then(resp => resp.json())
       .then(data => {
         const insertId = data.insertCompanyQuery.insertId
-        if (data.insertCompanyQuery.affectedRows === 1 && data.insertCompanyQuery.warningCount === 0) {
+        if (
+          data.insertCompanyQuery.affectedRows === 1 &&
+          data.insertCompanyQuery.warningCount === 0
+        ) {
           Notify('success', `${newName} Added`)
         } else {
           Notify('warning', 'Error', data.err)
         }
         const newRowData = rowData
-        newRowData.push({ id: insertId, mailDomain: newDomain, maintenanceRecipient: newRecipient, name: newName })
+        newRowData.push({
+          id: insertId,
+          mailDomain: newDomain,
+          maintenanceRecipient: newRecipient,
+          name: newName,
+        })
         setRowData(newRowData)
         setOpenCompanyModal(!openCompanyModal)
         gridApi.current.setRowData(newRowData)
@@ -151,9 +166,16 @@ const Companies = props => {
     const newDomain = params.data.mailDomain
     const newRecipient = params.data.maintenanceRecipient
 
-    fetch(`/api/settings/edit/companies?id=${id}&name=${encodeURIComponent(newName)}&domain=${encodeURIComponent(newDomain)}&recipient=${encodeURIComponent(newRecipient)}`, {
-      method: 'get'
-    })
+    fetch(
+      `/api/settings/edit/companies?id=${id}&name=${encodeURIComponent(
+        newName
+      )}&domain=${encodeURIComponent(newDomain)}&recipient=${encodeURIComponent(
+        newRecipient
+      )}`,
+      {
+        method: 'get',
+      }
+    )
       .then(resp => resp.json())
       .then(data => {
         if (data.updateCompanyQuery.affectedRows === 1) {
@@ -170,10 +192,20 @@ const Companies = props => {
       <FlexboxGrid justify='end' align='middle'>
         <FlexboxGrid.Item>
           <ButtonGroup>
-            <IconButton onClick={toggleCompanyAdd} icon={<Icon icon='plus-circle' />} appearance='ghost' placement='right'>
+            <IconButton
+              onClick={toggleCompanyAdd}
+              icon={<Icon icon='plus-circle' />}
+              appearance='ghost'
+              placement='right'
+            >
               Add
             </IconButton>
-            <IconButton onClick={toggleCompanyDeleteModal} icon={<Icon icon='trash' />} appearance='ghost' placement='right'>
+            <IconButton
+              onClick={toggleCompanyDeleteModal}
+              icon={<Icon icon='trash' />}
+              appearance='ghost'
+              placement='right'
+            >
               Delete
             </IconButton>
           </ButtonGroup>
@@ -189,7 +221,7 @@ const Companies = props => {
           className='ag-theme-material'
           style={{
             height: '700px',
-            width: '100%'
+            width: '100%',
           }}
         >
           <AgGridReact
@@ -200,42 +232,77 @@ const Companies = props => {
             animateRows
             stopEditingWhenGridLosesFocus
             deltaRowDataMode
-            getRowNodeId={(data) => {
+            getRowNodeId={data => {
               return data.id
             }}
           />
         </div>
       </Panel>
       {openCompanyModal && (
-        <Modal backdrop show={openCompanyModal} size='sm' onHide={toggleCompanyAdd}>
-          <Modal.Header>
-            New Company
-          </Modal.Header>
+        <Modal
+          backdrop
+          show={openCompanyModal}
+          size='sm'
+          onHide={toggleCompanyAdd}
+        >
+          <Modal.Header>New Company</Modal.Header>
           <Modal.Body>
-            <FlexboxGrid justify='space-around' align='middle' style={{ flexDirection: 'column', height: '350px' }}>
-              <FlexboxGrid.Item style={{ fontFamily: 'var(--font-body)', fontSize: '1.1rem' }}>
+            <FlexboxGrid
+              justify='space-around'
+              align='middle'
+              style={{ flexDirection: 'column', height: '350px' }}
+            >
+              <FlexboxGrid.Item
+                style={{ fontFamily: 'var(--font-body)', fontSize: '1.1rem' }}
+              >
                 <Form>
                   <FormGroup>
                     <ControlLabel>Name</ControlLabel>
-                    <Input key='input-name' name='name' type='text' value={newName} onChange={value => setNewName(value)} />
+                    <Input
+                      key='input-name'
+                      name='name'
+                      type='text'
+                      value={newName}
+                      onChange={value => setNewName(value)}
+                    />
                   </FormGroup>
                   <FormGroup>
                     <ControlLabel>Domain</ControlLabel>
-                    <Input key='input-domain' name='domain' type='text' value={newDomain} onChange={value => setNewDomain(value)} />
+                    <Input
+                      key='input-domain'
+                      name='domain'
+                      type='text'
+                      value={newDomain}
+                      onChange={value => setNewDomain(value)}
+                    />
                   </FormGroup>
                   <FormGroup>
                     <ControlLabel>Recipients</ControlLabel>
-                    <Input key='input-recipient' name='recipients' type='text' value={newRecipient} onChange={value => setNewRecipient(value)} />
+                    <Input
+                      key='input-recipient'
+                      name='recipients'
+                      type='text'
+                      value={newRecipient}
+                      onChange={value => setNewRecipient(value)}
+                    />
                     <HelpBlock>Seperate multiple with semicolons</HelpBlock>
                   </FormGroup>
                 </Form>
               </FlexboxGrid.Item>
               <FlexboxGrid.Item>
                 <ButtonGroup block style={{ width: '20em' }}>
-                  <Button appearance='default' onClick={toggleCompanyAdd} style={{ width: '50%' }}>
+                  <Button
+                    appearance='default'
+                    onClick={toggleCompanyAdd}
+                    style={{ width: '50%' }}
+                  >
                     Cancel
                   </Button>
-                  <Button appearance='primary' onClick={handleAddCompany} style={{ width: '50%' }}>
+                  <Button
+                    appearance='primary'
+                    onClick={handleAddCompany}
+                    style={{ width: '50%' }}
+                  >
                     Confirm
                   </Button>
                 </ButtonGroup>
@@ -268,7 +335,7 @@ Companies.getInitialProps = async ({ req, query }) => {
   const res = await fetch(pageRequest)
   const json = await res.json()
   return {
-    jsonData: json
+    jsonData: json,
   }
 }
 

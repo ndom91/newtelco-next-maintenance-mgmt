@@ -9,7 +9,7 @@ import {
   ButtonGroup,
   Whisper,
   Tooltip,
-  Avatar
+  Avatar,
 } from 'rsuite'
 
 const InboxItem = ({ toggle, mail, index, handleDelete }) => {
@@ -27,15 +27,15 @@ const InboxItem = ({ toggle, mail, index, handleDelete }) => {
         from: mail.from,
         subject: mail.subject,
         maileingang: mail.date,
-        loaded: false
-      }
+        loaded: false,
+      },
     })
   }
 
   useEffect(() => {
     try {
       fetch(`/v1/api/favicon?d=${mail.domain}`, {
-        method: 'get'
+        method: 'get',
       })
         .then(resp => resp.json())
         .then(data => {
@@ -73,7 +73,11 @@ const InboxItem = ({ toggle, mail, index, handleDelete }) => {
           />
         </Whisper>
         <div className='mail-info'>
-          <FlexboxGrid justify='start' align='middle' style={{ flexDirection: 'column' }}>
+          <FlexboxGrid
+            justify='start'
+            align='middle'
+            style={{ flexDirection: 'column' }}
+          >
             <FlexboxGrid.Item>
               <h5>{mail.from}</h5>
               <h5>{mail.subject}</h5>
@@ -108,10 +112,21 @@ const InboxItem = ({ toggle, mail, index, handleDelete }) => {
               flexDirection: 'column',
               justifyContent: 'center',
               alignItems: 'center',
-              display: 'flex'
+              display: 'flex',
             }}
             icon={
-              <svg height='24' width='24' fill='none' strokeLinecap='round' strokeLinejoin='round' strokeWidth='2' stroke='var(--grey4)' viewBox='0 0 24 24'><path d='M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z' /></svg>
+              <svg
+                height='24'
+                width='24'
+                fill='none'
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                strokeWidth='2'
+                stroke='var(--grey4)'
+                viewBox='0 0 24 24'
+              >
+                <path d='M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z' />
+              </svg>
             }
           />
           {/* </Link> */}
@@ -124,10 +139,21 @@ const InboxItem = ({ toggle, mail, index, handleDelete }) => {
               flexDirection: 'column',
               justifyContent: 'center',
               alignItems: 'center',
-              display: 'flex'
+              display: 'flex',
             }}
             icon={
-              <svg height='24' width='24' fill='none' strokeLinecap='round' strokeLinejoin='round' strokeWidth='2' stroke='var(--grey4)' viewBox='0 0 24 24'><path d='M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16' /></svg>
+              <svg
+                height='24'
+                width='24'
+                fill='none'
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                strokeWidth='2'
+                stroke='var(--grey4)'
+                viewBox='0 0 24 24'
+              >
+                <path d='M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16' />
+              </svg>
             }
           />
         </ButtonGroup>

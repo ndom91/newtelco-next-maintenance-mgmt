@@ -9,9 +9,8 @@ import NextAuth from 'next-auth/client'
 const LogRocket = require('logrocket')
 
 export default ({ Component, pageProps }) => {
-  const ConditionalWrap = ({ condition, wrap, children }) => (
+  const ConditionalWrap = ({ condition, wrap, children }) =>
     condition ? wrap(children) : children
-  )
 
   useEffect(() => {
     if (process.env.NEXT_PUBLIC_ENV === 'production') {
@@ -19,7 +18,7 @@ export default ({ Component, pageProps }) => {
         LogRocket.init('ui2vht/next-maintenance')
         LogRocket.identify(pageProps.session.user.id, {
           name: pageProps.session.user.name,
-          email: pageProps.session.user.email
+          email: pageProps.session.user.email,
         })
       }
     }
@@ -39,25 +38,54 @@ export default ({ Component, pageProps }) => {
         <Head>
           <title>Newtelco Maintenance</title>
           <meta name='viewport' content='width=device-width, initial-scale=1' />
-          <link rel='apple-touch-icon' sizes='180x180' href='/static/images/favicon/apple-touch-icon.png' />
-          <link rel='mask-icon' href='/static/images/favicon/safari-pinned-tab.svg' color='#5bbad5' />
+          <link
+            rel='apple-touch-icon'
+            sizes='180x180'
+            href='/static/images/favicon/apple-touch-icon.png'
+          />
+          <link
+            rel='mask-icon'
+            href='/static/images/favicon/safari-pinned-tab.svg'
+            color='#5bbad5'
+          />
           <meta name='msapplication-TileColor' content='#603cba' />
           <meta name='theme-color' content='#eaeaea' />
           <meta name='application-name' content='Newtelco Maintenance' />
           <meta name='apple-mobile-web-app-capable' content='yes' />
-          <meta name='apple-mobile-web-app-status-bar-style' content='default' />
-          <meta name='apple-mobile-web-app-title' content='Newtelco Maintenance' />
+          <meta
+            name='apple-mobile-web-app-status-bar-style'
+            content='default'
+          />
+          <meta
+            name='apple-mobile-web-app-title'
+            content='Newtelco Maintenance'
+          />
           <meta name='description' content='Newtelco Maintenance Management' />
           <meta name='format-detection' content='telephone=no' />
           <meta name='mobile-web-app-capable' content='yes' />
           <meta name='msapplication-TileColor' content='#2B5797' />
           <meta name='msapplication-tap-highlight' content='no' />
           <meta name='theme-color' content='#eaeaea' />
-          <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no, user-scalable=no, viewport-fit=cover' />
-          <link rel='apple-touch-icon' sizes='180x180' href='/static/images/favicon/apple-touch-icon.png' />
+          <meta
+            name='viewport'
+            content='minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no, user-scalable=no, viewport-fit=cover'
+          />
+          <link
+            rel='apple-touch-icon'
+            sizes='180x180'
+            href='/static/images/favicon/apple-touch-icon.png'
+          />
           <link rel='manifest' href='/manifest.json' />
-          <link rel='mask-icon' href='/static/icons/safari-pinned-tab.svg' color='#5bbad5' />
-          <link rel='shortcut icon' id='favicon' href='/static/images/favicon/favicon.ico' />
+          <link
+            rel='mask-icon'
+            href='/static/icons/safari-pinned-tab.svg'
+            color='#5bbad5'
+          />
+          <link
+            rel='shortcut icon'
+            id='favicon'
+            href='/static/images/favicon/favicon.ico'
+          />
         </Head>
         <Store.Container>
           <Component {...pageProps} />

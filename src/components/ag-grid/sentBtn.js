@@ -1,9 +1,5 @@
 import React from 'react'
-import {
-  Icon,
-  IconButton,
-  Dropdown
-} from 'rsuite'
+import { Icon, IconButton, Dropdown } from 'rsuite'
 
 const sentBtn = props => {
   return (
@@ -15,9 +11,27 @@ const sentBtn = props => {
       }}
       placement='leftStart'
     >
-      <Dropdown.Item onClick={() => props.context.toggleRescheduleSentBtn(props.data.rcounter)}>Toggle Sent</Dropdown.Item>
-      <Dropdown.Item onClick={() => props.context.moveCalendarEntry(props.data.startDateTime, props.data.endDateTime, props.data.rcounter)}>Move Calendar</Dropdown.Item>
-      <Dropdown.Item onClick={props.context.toggleRescheduleDelete}>Delete</Dropdown.Item>
+      <Dropdown.Item
+        onClick={() =>
+          props.context.toggleRescheduleSentBtn(props.data.rcounter)
+        }
+      >
+        Toggle Sent
+      </Dropdown.Item>
+      <Dropdown.Item
+        onClick={() =>
+          props.context.moveCalendarEntry(
+            props.data.startDateTime,
+            props.data.endDateTime,
+            props.data.rcounter
+          )
+        }
+      >
+        Move Calendar
+      </Dropdown.Item>
+      <Dropdown.Item onClick={props.context.toggleRescheduleDelete}>
+        Delete
+      </Dropdown.Item>
     </Dropdown>
   )
 }

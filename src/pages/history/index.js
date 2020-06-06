@@ -26,7 +26,7 @@ import {
   ButtonGroup,
   FlexboxGrid,
   SelectPicker,
-  Loader
+  Loader,
 } from 'rsuite'
 
 const History = ({ session, data }) => {
@@ -35,7 +35,7 @@ const History = ({ session, data }) => {
       resizable: true,
       sortable: true,
       filter: true,
-      selectable: true
+      selectable: true,
     },
     columnDefs: [
       {
@@ -45,55 +45,73 @@ const History = ({ session, data }) => {
         filter: false,
         resizable: false,
         cellRenderer: 'editBtn',
-        pinned: 'left'
-      }, {
+        pinned: 'left',
+      },
+      {
         headerName: 'ID',
         field: 'id',
         width: 100,
         pinned: 'left',
-        sort: { direction: 'asc', priority: 0 }
-      }, {
+        sort: { direction: 'asc', priority: 0 },
+      },
+      {
         headerName: 'By',
         field: 'bearbeitetvon',
         cellRenderer: 'edittedby',
         width: 100,
-        cellStyle: (params) => {
-          return { display: 'flex', alignItems: 'center', justifyContent: 'center' };
-        }
-      }, {
+        cellStyle: params => {
+          return {
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }
+        },
+      },
+      {
         headerName: 'Supplier',
         field: 'name',
         cellRenderer: 'supplier',
-        cellStyle: (params) => {
-          return { display: 'flex', alignItems: 'center', justifyContent: 'start' };
-        }
-      }, {
+        cellStyle: params => {
+          return {
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'start',
+          }
+        },
+      },
+      {
         headerName: 'Their CID',
         field: 'derenCID',
-        tooltipField: 'derenCID'
-      }, {
+        tooltipField: 'derenCID',
+      },
+      {
         headerName: 'Start',
         field: 'startDateTime',
         width: 160,
-        cellRenderer: 'startdateTime'
-      }, {
+        cellRenderer: 'startdateTime',
+      },
+      {
         headerName: 'End',
         field: 'endDateTime',
         width: 160,
-        cellRenderer: 'enddateTime'
-      }, {
+        cellRenderer: 'enddateTime',
+      },
+      {
         headerName: 'Newtelco CIDs',
         field: 'betroffeneCIDs',
-        tooltipField: 'betroffeneCIDs'
-      }, {
+        tooltipField: 'betroffeneCIDs',
+      },
+      {
         headerName: 'Mail Arrived',
         field: 'maileingang',
-        cellRenderer: 'mailArrived'
-      }, {
+        cellRenderer: 'mailArrived',
+      },
+      {
         headerName: 'Updated',
         field: 'updatedAt',
-        cellRenderer: 'updatedAt'
-      }, {
+        cellRenderer: 'updatedAt',
+      },
+      {
         headerName: 'Rescheduled',
         field: 'rescheduled',
         width: 150,
@@ -102,15 +120,16 @@ const History = ({ session, data }) => {
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
-          height: '100%'
-        }
-      }, {
+          height: '100%',
+        },
+      },
+      {
         headerName: 'Complete',
         field: 'done',
         width: 100,
         pinned: 'right',
-        cellRenderer: 'complete'
-      }
+        cellRenderer: 'complete',
+      },
     ],
     context: { componentParent: this },
     frameworkComponents: {
@@ -122,34 +141,34 @@ const History = ({ session, data }) => {
       supplier: Supplier,
       complete: CompleteIcon,
       edittedby: EdittedBy,
-      rescheduledIcon: RescheduledIcon
+      rescheduledIcon: RescheduledIcon,
     },
     rowSelection: 'multiple',
     paginationPageSize: 10,
     rowClass: 'row-class',
     rowClassRules: {
-      'row-completed': (params) => {
+      'row-completed': params => {
         const done = params.data.done
         if (done === 'true' || done === '1') {
           return true
         }
         return false
       },
-      'row-cancelled': (params) => {
+      'row-cancelled': params => {
         const cancelled = params.data.cancelled
         if (cancelled === 'true' || cancelled === '1') {
           return true
         }
         return false
       },
-      'row-emergency': (params) => {
+      'row-emergency': params => {
         const emergency = params.data.emergency
         if (emergency === 'true' || emergency === '1') {
           return true
         }
         return false
-      }
-    }
+      },
+    },
   }
 
   const gridApi = useRef()
@@ -175,7 +194,7 @@ const History = ({ session, data }) => {
       const params = {
         allColumns: true,
         fileName: `maintenanceExport_${moment(new Date()).format('YYYYMMDD')}`,
-        columnSeparator: ','
+        columnSeparator: ',',
       }
       gridApi.current.exportDataAsCsv(params)
     }
@@ -185,13 +204,13 @@ const History = ({ session, data }) => {
     setOpenNewModal(!openNewModal)
   }
 
-  const handleNewCompanySelect = (selectedOption) => {
+  const handleNewCompanySelect = selectedOption => {
     setSelectedNewCompany(selectedOption)
   }
 
   const handleDelete = () => {
     fetch(`/api/maintenances/delete?maintId=${idToDelete}`, {
-      method: 'get'
+      method: 'get',
     })
       .then(resp => resp.json())
       .then(data => {
@@ -228,7 +247,7 @@ const History = ({ session, data }) => {
   const handleSelectOpen = () => {
     if (newMaintenanceInfo.length === 0) {
       fetch('/api/companies/select', {
-        method: 'get'
+        method: 'get',
       })
         .then(resp => resp.json())
         .then(data => {
@@ -243,19 +262,21 @@ const History = ({ session, data }) => {
       query: {
         id: 'NEW',
         mailId: 'NT',
-        name: newCompanyDomain
+        name: newCompanyDomain,
       },
-      asPath: '/maintenance/new'
+      asPath: '/maintenance/new',
     })
   }
 
   const NewMaintenanceSelect = () => {
     return (
-      <FlexboxGrid justify='center' align='middle' style={{ fontSize: '1.0rem', width: '200px' }}>
+      <FlexboxGrid
+        justify='center'
+        align='middle'
+        style={{ fontSize: '1.0rem', width: '200px' }}
+      >
         <FlexboxGrid.Item>
-          <label>
-            Select a Company to create a Maintenance for
-          </label>
+          <label>Select a Company to create a Maintenance for</label>
           <br />
           <SelectPicker
             style={{ width: 325 }}
@@ -268,7 +289,7 @@ const History = ({ session, data }) => {
             renderMenu={menu => {
               if (newMaintenanceInfo.length === 0) {
                 return (
-                  <div style={{ marginTop: '100px' }} >
+                  <div style={{ marginTop: '100px' }}>
                     <Loader center />
                   </div>
                 )
@@ -289,19 +310,46 @@ const History = ({ session, data }) => {
           header='History'
           buttons={
             <ButtonGroup>
-              <IconButton appearance='default' style={{ border: '1px solid var(--grey3)', color: 'var(--grey4)' }} onClick={handleToggleNewModal} icon={<Icon icon='plus' />}>
+              <IconButton
+                appearance='default'
+                style={{
+                  border: '1px solid var(--grey3)',
+                  color: 'var(--grey4)',
+                }}
+                onClick={handleToggleNewModal}
+                icon={<Icon icon='plus' />}
+              >
                 New
               </IconButton>
-              <IconButton appearance='default' style={{ border: '1px solid var(--grey3)', color: 'var(--grey4)' }} onClick={handleDeleteMaintOpen} icon={<Icon icon='trash' />}>
+              <IconButton
+                appearance='default'
+                style={{
+                  border: '1px solid var(--grey3)',
+                  color: 'var(--grey4)',
+                }}
+                onClick={handleDeleteMaintOpen}
+                icon={<Icon icon='trash' />}
+              >
                 Delete
               </IconButton>
-              <IconButton appearance='default' style={{ border: '1px solid var(--grey3)', color: 'var(--grey4)' }} onClick={handleGridExport} icon={<Icon icon='export' />}>
+              <IconButton
+                appearance='default'
+                style={{
+                  border: '1px solid var(--grey3)',
+                  color: 'var(--grey4)',
+                }}
+                onClick={handleGridExport}
+                icon={<Icon icon='export' />}
+              >
                 Export
               </IconButton>
             </ButtonGroup>
           }
         >
-          <div className='ag-theme-material' style={{ height: '700px', width: '100%' }}>
+          <div
+            className='ag-theme-material'
+            style={{ height: '700px', width: '100%' }}
+          >
             <AgGridReact
               gridOptions={gridOptions}
               rowData={rowData}
@@ -335,9 +383,7 @@ const History = ({ session, data }) => {
       </Layout>
     )
   } else {
-    return (
-      <RequireLogin />
-    )
+    return <RequireLogin />
   }
 }
 
@@ -354,8 +400,8 @@ export async function getServerSideProps({ req }) {
   return {
     props: {
       data,
-      session
-    }
+      session,
+    },
   }
 }
 

@@ -7,7 +7,7 @@
     "start": "NEXT_PUBLIC_ENV=production next start -p 4000",
     "build": "next build",
     "analyze": "ANALYZE=true next build",
-    "analyze:dev": "ANALYZE=true NODE_ENV=development PORT=4000 node index.js"
+    "prettier": "prettier --write \"src/**/*.{js,jsx,json}\""
   },
   "keywords": [
     "nextjs",

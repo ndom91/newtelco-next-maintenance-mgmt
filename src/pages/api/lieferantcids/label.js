@@ -7,7 +7,7 @@ module.exports = async (req, res) => {
   const cidArray = lieferantCIDid.split(',')
   let cidString = ''
   cidArray.forEach(cid => {
-    cidString += (`,"${cid}"`)
+    cidString += `,"${cid}"`
   })
   cidString = cidString.substr(1, cidString.length)
   cidString = `(${cidString})`

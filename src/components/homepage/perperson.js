@@ -11,9 +11,24 @@ const BarChart = () => {
   )
 
   if (data) {
-    const Users = data.query.sort((a, b) => { return (a.value < b.value) ? -1 : 0 })
+    const Users = data.query.sort((a, b) => {
+      return a.value < b.value ? -1 : 0
+    })
     return (
-      <Panel bordered header={<div style={{ display: 'flex', justifyContent: 'space-between' }}>Totals<Icon icon='bar-chart' style={{ color: 'var(--primary)' }} size='lg' /></div>} style={{ height: '100%' }}>
+      <Panel
+        bordered
+        header={
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            Totals
+            <Icon
+              icon='bar-chart'
+              style={{ color: 'var(--primary)' }}
+              size='lg'
+            />
+          </div>
+        }
+        style={{ height: '100%' }}
+      >
         <Bar
           width={400}
           height={250}
@@ -38,8 +53,29 @@ const BarChart = () => {
     )
   } else {
     return (
-      <Panel bordered header={<div style={{ display: 'flex', justifyContent: 'space-between' }}>Totals<Icon icon='bar-chart' style={{ color: 'var(--primary)' }} size='lg' /></div>} style={{ height: '100%' }}>
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '200px' }}>
+      <Panel
+        bordered
+        header={
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            Totals
+            <Icon
+              icon='bar-chart'
+              style={{ color: 'var(--primary)' }}
+              size='lg'
+            />
+          </div>
+        }
+        style={{ height: '100%' }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: '100%',
+            height: '200px',
+          }}
+        >
           <Loader />
         </div>
       </Panel>

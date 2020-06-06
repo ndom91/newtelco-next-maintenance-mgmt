@@ -14,10 +14,16 @@ import {
   Avatar,
   Whisper,
   Popover,
-  Dropdown
+  Dropdown,
 } from 'rsuite'
 
-const ReadModal = ({ maintenance, openReadModal, toggleReadModal, incomingAttachments, jsonData }) => {
+const ReadModal = ({
+  maintenance,
+  openReadModal,
+  toggleReadModal,
+  incomingAttachments,
+  jsonData,
+}) => {
   const triggerRef = useRef()
   const [attachmentHTMLContent, setAttachmentHTMLContent] = useState('')
   const [pdfB64, setPdfB64] = useState('')
@@ -85,10 +91,13 @@ const ReadModal = ({ maintenance, openReadModal, toggleReadModal, incomingAttach
         const filedata = file.data
         const mime = file.mime
         const filename = file.name
-        let base64 = (filedata).replace(/_/g, '/')
+        let base64 = filedata.replace(/_/g, '/')
         base64 = base64.replace(/-/g, '+')
         const base64Fixed = fixBase64(base64)
-        var fileData = new Blob([base64Fixed], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;' })
+        var fileData = new Blob([base64Fixed], {
+          type:
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;',
+        })
 
         ExcelRenderer(fileData, (err, resp) => {
           if (err) {
@@ -106,8 +115,18 @@ const ReadModal = ({ maintenance, openReadModal, toggleReadModal, incomingAttach
             setCurrentAttachmentName(filename)
             setAttachmentPopoverBody(
               <Dropdown.Menu onSelect={() => triggerRef.current.hide()}>
-                <Dropdown.Item onClick={() => setOpenAttachmentModal(!openAttachmentModal)} eventKey={1}>Preview</Dropdown.Item>
-                <Dropdown.Item onClick={() => downloadFile(base64, filename, mime)} eventKey={2}>Download</Dropdown.Item>
+                <Dropdown.Item
+                  onClick={() => setOpenAttachmentModal(!openAttachmentModal)}
+                  eventKey={1}
+                >
+                  Preview
+                </Dropdown.Item>
+                <Dropdown.Item
+                  onClick={() => downloadFile(base64, filename, mime)}
+                  eventKey={2}
+                >
+                  Download
+                </Dropdown.Item>
               </Dropdown.Menu>
             )
           }
@@ -118,7 +137,7 @@ const ReadModal = ({ maintenance, openReadModal, toggleReadModal, incomingAttach
         const filedata = file.data
         const mime = file.mime
         const filename = file.name
-        let base64 = (filedata).replace(/_/g, '/')
+        let base64 = filedata.replace(/_/g, '/')
         base64 = base64.replace(/-/g, '+')
         const base64Fixed = fixBase64(base64)
         const fileData = new Blob([base64Fixed], { type: 'application/pdf' })
@@ -127,8 +146,18 @@ const ReadModal = ({ maintenance, openReadModal, toggleReadModal, incomingAttach
         setCurrentAttachmentName(filename)
         setAttachmentPopoverBody(
           <Dropdown.Menu onSelect={() => triggerRef.current.hide()}>
-            <Dropdown.Item onClick={() => setOpenAttachmentModal(!openAttachmentModal)} eventKey={1}>Preview</Dropdown.Item>
-            <Dropdown.Item onClick={() => downloadFile(base64, filename, mime)} eventKey={2}>Download</Dropdown.Item>
+            <Dropdown.Item
+              onClick={() => setOpenAttachmentModal(!openAttachmentModal)}
+              eventKey={1}
+            >
+              Preview
+            </Dropdown.Item>
+            <Dropdown.Item
+              onClick={() => downloadFile(base64, filename, mime)}
+              eventKey={2}
+            >
+              Download
+            </Dropdown.Item>
           </Dropdown.Menu>
         )
       } else if (filetype === 'html') {
@@ -137,15 +166,25 @@ const ReadModal = ({ maintenance, openReadModal, toggleReadModal, incomingAttach
         const filedata = file.data
         const filename = file.name
         const mime = file.mime
-        let base64 = (filedata).replace(/_/g, '/')
+        let base64 = filedata.replace(/_/g, '/')
         base64 = base64.replace(/-/g, '+')
         setFiletype(filetype)
         setAttachmentHTMLContent(window.atob(base64))
         setCurrentAttachmentName(filename)
         setAttachmentPopoverBody(
           <Dropdown.Menu onSelect={() => triggerRef.current.hide()}>
-            <Dropdown.Item onClick={() => setOpenAttachmentModal(!openAttachmentModal)} eventKey={1}>Preview</Dropdown.Item>
-            <Dropdown.Item onClick={() => downloadFile(base64, filename, mime)} eventKey={2}>Download</Dropdown.Item>
+            <Dropdown.Item
+              onClick={() => setOpenAttachmentModal(!openAttachmentModal)}
+              eventKey={1}
+            >
+              Preview
+            </Dropdown.Item>
+            <Dropdown.Item
+              onClick={() => downloadFile(base64, filename, mime)}
+              eventKey={2}
+            >
+              Download
+            </Dropdown.Item>
           </Dropdown.Menu>
         )
       } else {
@@ -153,12 +192,19 @@ const ReadModal = ({ maintenance, openReadModal, toggleReadModal, incomingAttach
         const file = incomingAttachments[fileIndex]
         const mime = file.mime
         const rawData = file.data
-        let base64 = (rawData).replace(/_/g, '/')
+        let base64 = rawData.replace(/_/g, '/')
         base64 = base64.replace(/-/g, '+')
         setAttachmentPopoverBody(
           <Dropdown.Menu onSelect={() => triggerRef.current.hide()}>
-            <Dropdown.Item disabled eventKey={1}>Preview</Dropdown.Item>
-            <Dropdown.Item onClick={() => downloadFile(base64, filename, mime)} eventKey={2}>Download</Dropdown.Item>
+            <Dropdown.Item disabled eventKey={1}>
+              Preview
+            </Dropdown.Item>
+            <Dropdown.Item
+              onClick={() => downloadFile(base64, filename, mime)}
+              eventKey={2}
+            >
+              Download
+            </Dropdown.Item>
           </Dropdown.Menu>
         )
       }
@@ -173,23 +219,36 @@ const ReadModal = ({ maintenance, openReadModal, toggleReadModal, incomingAttach
         default={{
           x: window.outerWidth / 2 - 50,
           y: 100,
-          width: (window.outerWidth / 2),
-          height: 600
+          width: window.outerWidth / 2,
+          height: 600,
         }}
         style={{
           background: 'var(--white)',
           overflow: 'hidden',
           borderRadius: '5px',
           zIndex: '101',
-          boxShadow: '0px 0px 10px 1px var(--grey3)'
+          boxShadow: '0px 0px 10px 1px var(--grey3)',
         }}
         bounds='window'
         dragHandleClassName='mail-read-header'
       >
-        <div style={{ borderRadius: '15px', position: 'relative', height: 'calc(100% - 112px)' }}>
+        <div
+          style={{
+            borderRadius: '15px',
+            position: 'relative',
+            height: 'calc(100% - 112px)',
+          }}
+        >
           <Modal.Header className='mail-read-header' onHide={toggleReadModal}>
-            <FlexboxGrid justify='start' align='middle' style={{ width: '100%' }}>
-              <FlexboxGrid.Item colspan={3} style={{ display: 'flex', justifyContent: 'center' }}>
+            <FlexboxGrid
+              justify='start'
+              align='middle'
+              style={{ width: '100%' }}
+            >
+              <FlexboxGrid.Item
+                colspan={3}
+                style={{ display: 'flex', justifyContent: 'center' }}
+              >
                 <Avatar
                   size='lg'
                   src={`/v1/api/faviconUrl?d=${jsonData.profile.mailDomain}`}
@@ -202,43 +261,81 @@ const ReadModal = ({ maintenance, openReadModal, toggleReadModal, incomingAttach
                     <InputGroup.Addon style={{ height: '31px' }} type='prepend'>
                       From
                     </InputGroup.Addon>
-                    <Input readOnly value={maintenance.incomingFrom || maintenance.from} />
+                    <Input
+                      readOnly
+                      value={maintenance.incomingFrom || maintenance.from}
+                    />
                   </InputGroup>
                   <InputGroup className='modal-textbox'>
                     <InputGroup.Addon style={{ height: '31px' }} type='prepend'>
                       Subject
                     </InputGroup.Addon>
-                    <Input type='text' readOnly value={maintenance.incomingSubject || maintenance.subject} />
+                    <Input
+                      type='text'
+                      readOnly
+                      value={maintenance.incomingSubject || maintenance.subject}
+                    />
                   </InputGroup>
                 </div>
               </FlexboxGrid.Item>
             </FlexboxGrid>
-            <div style={{ flexGrow: Array.isArray(maintenance.incomingAttachments) ? '1' : '0', width: '100%', marginTop: '5px' }}>
-              {Array.isArray(maintenance.incomingAttachments) && maintenance.incomingAttachments.length !== 0 && maintenance.incomingAttachments.map((attachment, index) => {
-                return (
-                  <Whisper
-                    key={attachment.id}
-                    placement='bottomStart'
-                    trigger='click'
-                    triggerRef={triggerRef}
-                    speaker={<Popover full onSelect={() => triggerRef.current.hide()}>{attachmentPopoverBody}</Popover>}
-                  >
-                    <IconButton
-                      size='sm'
-                      icon={<Icon icon={fileTypeIcon(attachment.name)} />}
-                      onClick={() => showAttachments(attachment.id, attachment.name)}
-                      style={{ marginLeft: '10px' }}
+            <div
+              style={{
+                flexGrow: Array.isArray(maintenance.incomingAttachments)
+                  ? '1'
+                  : '0',
+                width: '100%',
+                marginTop: '5px',
+              }}
+            >
+              {Array.isArray(maintenance.incomingAttachments) &&
+                maintenance.incomingAttachments.length !== 0 &&
+                maintenance.incomingAttachments.map((attachment, index) => {
+                  return (
+                    <Whisper
+                      key={attachment.id}
+                      placement='bottomStart'
+                      trigger='click'
+                      triggerRef={triggerRef}
+                      speaker={
+                        <Popover
+                          full
+                          onSelect={() => triggerRef.current.hide()}
+                        >
+                          {attachmentPopoverBody}
+                        </Popover>
+                      }
                     >
-                      {attachment.name}
-                    </IconButton>
-                  </Whisper>
-                )
-              })}
+                      <IconButton
+                        size='sm'
+                        icon={<Icon icon={fileTypeIcon(attachment.name)} />}
+                        onClick={() =>
+                          showAttachments(attachment.id, attachment.name)
+                        }
+                        style={{ marginLeft: '10px' }}
+                      >
+                        {attachment.name}
+                      </IconButton>
+                    </Whisper>
+                  )
+                })}
             </div>
           </Modal.Header>
-          <Modal.Body className='read-mail-body' style={{ height: `calc(100% - ${Array.isArray(maintenance.incomingAttachments) && maintenance.incomingAttachments.length !== 0 ? '35px' : '20px'})` }}>
+          <Modal.Body
+            className='read-mail-body'
+            style={{
+              height: `calc(100% - ${
+                Array.isArray(maintenance.incomingAttachments) &&
+                maintenance.incomingAttachments.length !== 0
+                  ? '35px'
+                  : '20px'
+              })`,
+            }}
+          >
             <ShadowDom>
-              <div dangerouslySetInnerHTML={{ __html: maintenance.incomingBody }} />
+              <div
+                dangerouslySetInnerHTML={{ __html: maintenance.incomingBody }}
+              />
             </ShadowDom>
           </Modal.Body>
         </div>
@@ -249,14 +346,14 @@ const ReadModal = ({ maintenance, openReadModal, toggleReadModal, incomingAttach
             x: window.outerWidth / 2,
             y: 225,
             width: window.outerWidth / 3,
-            height: 'auto'
+            height: 'auto',
           }}
           style={{
             backgroundColor: 'var(--background)',
             overflow: 'hidden',
             borderRadius: '5px',
             zIndex: '101',
-            boxShadow: '0px 0px 10px 1px var(--grey3)'
+            boxShadow: '0px 0px 10px 1px var(--grey3)',
           }}
           bounds='window'
           dragHandleClassName='modal-attachment-header-text'
@@ -269,45 +366,67 @@ const ReadModal = ({ maintenance, openReadModal, toggleReadModal, incomingAttach
                 borderRadius: '0px',
                 display: 'flex',
                 justifyContent: 'space-between',
-                backgroundColor: 'var(--grey1)'
+                backgroundColor: 'var(--grey1)',
               }}
             >
-              <FlexboxGrid justify='start' align='middle' style={{ width: '100%', height: '60px', padding: '15px 20px' }}>
-                <FlexboxGrid.Item colspan={2} style={{ display: 'flex', justifyContent: 'center' }}>
+              <FlexboxGrid
+                justify='start'
+                align='middle'
+                style={{ width: '100%', height: '60px', padding: '15px 20px' }}
+              >
+                <FlexboxGrid.Item
+                  colspan={2}
+                  style={{ display: 'flex', justifyContent: 'center' }}
+                >
                   <Icon size='lg' icon={fileTypeIcon(currentAttachmentName)} />
                 </FlexboxGrid.Item>
-                <FlexboxGrid.Item colspan={8} style={{ display: 'flex', justifyContent: 'start', fontFamily: 'var(--font-body)', fontSize: '1.2rem', marginLeft: '5px' }}>
+                <FlexboxGrid.Item
+                  colspan={8}
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'start',
+                    fontFamily: 'var(--font-body)',
+                    fontSize: '1.2rem',
+                    marginLeft: '5px',
+                  }}
+                >
                   {currentAttachmentName}
                 </FlexboxGrid.Item>
               </FlexboxGrid>
             </Modal.Header>
-            <Modal.Body style={filetype === 'pdf' ? { overflow: 'scroll', height: '450px' } : { padding: '20px', marginTop: '0px' }}>
-              {filetype === 'excel'
-                ? (
-                  <div className='attachment-body pdf'>
-                    <OutTable data={rows} columns={cols} tableClassName='ExcelTable2007' tableHeaderRowClass='heading' />
+            <Modal.Body
+              style={
+                filetype === 'pdf'
+                  ? { overflow: 'scroll', height: '450px' }
+                  : { padding: '20px', marginTop: '0px' }
+              }
+            >
+              {filetype === 'excel' ? (
+                <div className='attachment-body pdf'>
+                  <OutTable
+                    data={rows}
+                    columns={cols}
+                    tableClassName='ExcelTable2007'
+                    tableHeaderRowClass='heading'
+                  />
+                </div>
+              ) : null}
+              {filetype === 'pdf' ? (
+                <div className='attachment-body excel'>
+                  <PDF file={pdfB64} scale={1.75} />
+                </div>
+              ) : null}
+              {filetype === 'html' ? (
+                <ShadowDom>
+                  <div className='attachment-body html'>
+                    <div
+                      dangerouslySetInnerHTML={{
+                        __html: attachmentHTMLContent,
+                      }}
+                    />
                   </div>
-                ) : (
-                  null
-                )}
-              {filetype === 'pdf'
-                ? (
-                  <div className='attachment-body excel'>
-                    <PDF file={pdfB64} scale={1.75} />
-                  </div>
-                ) : (
-                  null
-                )}
-              {filetype === 'html'
-                ? (
-                  <ShadowDom>
-                    <div className='attachment-body html'>
-                      <div dangerouslySetInnerHTML={{ __html: attachmentHTMLContent }} />
-                    </div>
-                  </ShadowDom>
-                ) : (
-                  null
-                )}
+                </ShadowDom>
+              ) : null}
             </Modal.Body>
           </div>
         </Rnd>

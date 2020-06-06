@@ -1,11 +1,7 @@
 import React from 'react'
 import useSWR from 'swr'
 import Chart from 'react-apexcharts'
-import {
-  Panel,
-  Icon,
-  Loader
-} from 'rsuite'
+import { Panel, Icon, Loader } from 'rsuite'
 
 const options = {
   chart: {
@@ -13,26 +9,26 @@ const options = {
     height: 250,
     stacked: false,
     zoom: {
-      enabled: false
+      enabled: false,
     },
     toolbar: {
-      show: false
-    }
+      show: false,
+    },
   },
   dataLabels: {
-    enabled: false
+    enabled: false,
   },
   markers: {
-    size: 0
+    size: 0,
   },
   stroke: {
-    curve: 'smooth'
+    curve: 'smooth',
   },
   tooltip: {
-    shared: true
+    shared: true,
   },
   grid: {
-    show: false
+    show: false,
   },
   fill: {
     type: 'gradient',
@@ -40,27 +36,27 @@ const options = {
       shadeIntensity: 1,
       opacityFrom: 0.7,
       opacityTo: 0.9,
-      stops: [0, 90, 100]
-    }
+      stops: [0, 90, 100],
+    },
   },
   yaxis: {
-    show: false
+    show: false,
   },
   xaxis: {
     type: 'datetime',
     axisTicks: {
-      show: false
+      show: false,
     },
     tooltip: {
-      enabled: false
-    }
+      enabled: false,
+    },
   },
   legend: {
-    show: false
+    show: false,
   },
   theme: {
-    palette: 'palette4' // upto palette10
-  }
+    palette: 'palette4', // upto palette10
+  },
 }
 
 const AreaChart = () => {
@@ -73,20 +69,22 @@ const AreaChart = () => {
   if (data) {
     const userSeries = []
     const returnSeries = []
-    const users = Array.from(new Set(data.query.map(obj => JSON.stringify(({ user: obj.user }))))).map(JSON.parse)
+    const users = Array.from(
+      new Set(data.query.map(obj => JSON.stringify({ user: obj.user })))
+    ).map(JSON.parse)
     users.forEach(user => {
       const userData = data.query
         .filter(x => x.user === user.user)
         .sort((a, b) => {
-          return (a.year > b.year)
+          return a.year > b.year
             ? -1
-            : (a.year < b.year)
-              ? 1
-              : (a.week > b.week)
-                ? -1
-                : (a.week < b.week)
-                  ? 1
-                  : 0
+            : a.year < b.year
+            ? 1
+            : a.week > b.week
+            ? -1
+            : a.week < b.week
+            ? 1
+            : 0
         })
       userSeries.push(userData)
     })
@@ -96,8 +94,23 @@ const AreaChart = () => {
     })
 
     return (
-      <Panel bordered header={<div style={{ display: 'flex', justifyContent: 'space-between' }}>Completed<Icon icon='tasks' style={{ color: 'var(--primary)' }} size='lg' /></div>} style={{ height: '100%' }}>
-        <Chart options={options} series={returnSeries} type='area' width={400} height={220} />
+      <Panel
+        bordered
+        header={
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            Completed
+            <Icon icon='tasks' style={{ color: 'var(--primary)' }} size='lg' />
+          </div>
+        }
+        style={{ height: '100%' }}
+      >
+        <Chart
+          options={options}
+          series={returnSeries}
+          type='area'
+          width={400}
+          height={220}
+        />
       </Panel>
     )
   } else {
@@ -107,7 +120,11 @@ const AreaChart = () => {
         header={
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             Completed
-            <Icon icon='bar-chart' style={{ color: 'var(--primary)' }} size='lg' />
+            <Icon
+              icon='bar-chart'
+              style={{ color: 'var(--primary)' }}
+              size='lg'
+            />
           </div>
         }
         style={{ height: '100%' }}
@@ -118,7 +135,7 @@ const AreaChart = () => {
             justifyContent: 'center',
             alignItems: 'center',
             width: '100%',
-            height: '200px'
+            height: '200px',
           }}
         >
           <Loader />

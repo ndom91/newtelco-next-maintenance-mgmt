@@ -2,13 +2,12 @@ const db = require('../../../lib/db')
 const escape = require('sql-template-strings')
 
 module.exports = async (req, res) => {
-  const toSqlDatetime = (inputDate) => {
+  const toSqlDatetime = inputDate => {
     const date = new Date(inputDate)
-    const dateWithOffest = new Date(date.getTime() - (date.getTimezoneOffset() * 60000))
-    return dateWithOffest
-      .toISOString()
-      .slice(0, 19)
-      .replace('T', ' ')
+    const dateWithOffest = new Date(
+      date.getTime() - date.getTimezoneOffset() * 60000
+    )
+    return dateWithOffest.toISOString().slice(0, 19).replace('T', ' ')
   }
 
   const maintId = req.body.id
@@ -44,16 +43,18 @@ module.exports = async (req, res) => {
     maintNote: 'notes',
     supplier: 'supplier',
     supplierCids: 'supplier cids',
-    timezone: 'timezone'
+    timezone: 'timezone',
   }
   let updateHistory
   if (field) {
-    updateHistory = await db.query(escape`INSERT INTO changelog (mid, user, action, field) VALUES (${maintId}, ${user}, 'changed', ${fieldName[field]});`)
+    updateHistory = await db.query(
+      escape`INSERT INTO changelog (mid, user, action, field) VALUES (${maintId}, ${user}, 'changed', ${fieldName[field]});`
+    )
   }
   res.status(200).json({
     saved: save.affectedRows === 1 ? true : save,
     insertHistory: updateHistory?.affectedRows === 1,
     maintId,
-    values
+    values,
   })
 }

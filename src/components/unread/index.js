@@ -1,8 +1,6 @@
 import React, { useEffect } from 'react'
 import Link from 'next/link'
-import {
-  Panel
-} from 'rsuite'
+import { Panel } from 'rsuite'
 import Store from '../store'
 import './unread.css'
 

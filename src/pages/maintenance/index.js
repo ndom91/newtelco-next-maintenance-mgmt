@@ -54,13 +54,12 @@ import {
   Message,
   SelectPicker,
   TagPicker,
-  Nav
+  Nav,
 } from 'rsuite'
 
-const Changelog = dynamic(
-  () => import('@/newtelco/maintenance/timeline'),
-  { ssr: false }
-)
+const Changelog = dynamic(() => import('@/newtelco/maintenance/timeline'), {
+  ssr: false,
+})
 
 const MyTextarea = ({ field, form }) => {
   return (
@@ -86,8 +85,16 @@ const MyDateTime = ({ field, form, ...props }) => {
         form.setFieldValue(field.name, option[0])
         const startDateTime = props.startDateTime
         const endDateTime = props.endDateTime
-        if (startDateTime && endDateTime && isValid(parseISO(startDateTime)) && isValid(parseISO(endDateTime))) {
-          const impactCalculation = formatDistance(parseISO(endDateTime), parseISO(startDateTime))
+        if (
+          startDateTime &&
+          endDateTime &&
+          isValid(parseISO(startDateTime)) &&
+          isValid(parseISO(endDateTime))
+        ) {
+          const impactCalculation = formatDistance(
+            parseISO(endDateTime),
+            parseISO(startDateTime)
+          )
           props.setImpactPlaceholder(impactCalculation)
         }
       }}
@@ -132,7 +139,9 @@ const AutoSave = ({ debounceMs, id }) => {
   const debouncedSubmit = React.useCallback(
     debounce(
       () =>
-        formik.submitForm().then(() => setLastSaved(new Date().toLocaleString('de-DE'))),
+        formik
+          .submitForm()
+          .then(() => setLastSaved(new Date().toLocaleString('de-DE'))),
       debounceMs
     ),
     [debounceMs, formik.submitForm]
@@ -153,7 +162,28 @@ const AutoSave = ({ debounceMs, id }) => {
   } else if (lastSaved !== null) {
     result = `Last Saved: ${lastSaved}`
   }
-  return <div style={{ color: 'var(--grey2)', display: 'flex', alignItems: 'center' }}><svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='var(--grey2)' strokeWidth='2' strokeLinecap='round' strokeLinejoin='round'><path d='M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z' /><polyline points='17 21 17 13 7 13 7 21' /><polyline points='7 3 7 8 15 8' /></svg><span style={{ marginLeft: '5px' }}>{result}</span></div>
+  return (
+    <div
+      style={{ color: 'var(--grey2)', display: 'flex', alignItems: 'center' }}
+    >
+      <svg
+        xmlns='http://www.w3.org/2000/svg'
+        width='18'
+        height='18'
+        viewBox='0 0 24 24'
+        fill='none'
+        stroke='var(--grey2)'
+        strokeWidth='2'
+        strokeLinecap='round'
+        strokeLinejoin='round'
+      >
+        <path d='M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z' />
+        <polyline points='17 21 17 13 7 13 7 21' />
+        <polyline points='7 3 7 8 15 8' />
+      </svg>
+      <span style={{ marginLeft: '5px' }}>{result}</span>
+    </div>
+  )
 }
 
 const Maintenance = ({ session, serverData, suppliers }) => {
@@ -185,11 +215,11 @@ const Maintenance = ({ session, serverData, suppliers }) => {
     note: serverData.profile.maintNote,
     cancelled: !!+serverData.profile.cancelled,
     emergency: !!+serverData.profile.emergency,
-    done: !!+serverData.profile.done
+    done: !!+serverData.profile.done,
   })
   const [frozenState, setFrozenState] = useState({
     recipient: '',
-    cid: ''
+    cid: '',
   })
 
   const formRef = useRef()
@@ -198,17 +228,29 @@ const Maintenance = ({ session, serverData, suppliers }) => {
 
   const router = useRouter()
 
-  const sendMailBtns = ({ data: { maintenanceRecipient, kundenCID, frozen, name, protected: protection } }) => {
+  const sendMailBtns = ({
+    data: {
+      maintenanceRecipient,
+      kundenCID,
+      frozen,
+      name,
+      protected: protection,
+    },
+  }) => {
     return (
       <ButtonGroup>
         <IconButton
-          onClick={() => prepareDirectSend(maintenanceRecipient, kundenCID, frozen, name)}
+          onClick={() =>
+            prepareDirectSend(maintenanceRecipient, kundenCID, frozen, name)
+          }
           size='sm'
           appearance='ghost'
           icon={<Icon icon='send' />}
         />
         <IconButton
-          onClick={() => togglePreviewModal(maintenanceRecipient, kundenCID, protection)}
+          onClick={() =>
+            togglePreviewModal(maintenanceRecipient, kundenCID, protection)
+          }
           size='sm'
           appearance='ghost'
           icon={<Icon icon='search' />}
@@ -238,19 +280,21 @@ const Maintenance = ({ session, serverData, suppliers }) => {
       resizable: true,
       sortable: true,
       filter: true,
-      selectable: true
+      selectable: true,
     },
     columnDefs: [
       {
         headerName: 'CID',
         field: 'kundenCID',
         width: 100,
-        sort: { direction: 'asc', priority: 0 }
-      }, {
+        sort: { direction: 'asc', priority: 0 },
+      },
+      {
         headerName: 'Customer',
         field: 'name',
-        width: 170
-      }, {
+        width: 170,
+      },
+      {
         headerName: 'Protection',
         field: 'protected',
         filter: false,
@@ -260,13 +304,15 @@ const Maintenance = ({ session, serverData, suppliers }) => {
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
-          height: '100%'
-        }
-      }, {
+          height: '100%',
+        },
+      },
+      {
         headerName: 'Recipient',
         field: 'maintenanceRecipient',
-        width: 150
-      }, {
+        width: 150,
+      },
+      {
         headerName: 'Sent',
         field: 'sent',
         cellRenderer: 'sentIcon',
@@ -276,9 +322,10 @@ const Maintenance = ({ session, serverData, suppliers }) => {
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
-          height: '100%'
-        }
-      }, {
+          height: '100%',
+        },
+      },
+      {
         headerName: 'Mail',
         width: 80,
         sortable: false,
@@ -286,15 +333,15 @@ const Maintenance = ({ session, serverData, suppliers }) => {
         resizable: false,
         pinned: 'right',
         cellRenderer: 'sendMailBtn',
-        cellStyle: { 'padding-right': '0px', 'padding-left': '10px' }
-      }
+        cellStyle: { 'padding-right': '0px', 'padding-left': '10px' },
+      },
     ],
     loadingOverlayComponent: 'customLoadingOverlay',
     frameworkComponents: {
       sendMailBtn: sendMailBtns,
       protectedIcon: ProtectedIcon,
       sentIcon: SentIcon,
-      customLoadingOverlay: Loader
+      customLoadingOverlay: Loader,
     },
     paginationPageSize: 10,
     rowClass: 'row-class',
@@ -304,16 +351,19 @@ const Maintenance = ({ session, serverData, suppliers }) => {
           return true
         }
         return false
-      }
-    }
+      },
+    },
   }
 
   useEffect(() => {
     if (serverData.profile.id === 'NEW') {
       // prepare NEW maintenance
-      const username = session.user.email.substr(0, session.user.email.indexOf('@'))
+      const username = session.user.email.substr(
+        0,
+        session.user.email.indexOf('@')
+      )
       fetch(`/api/companies/domain?id=${serverData.profile.name}`, {
-        method: 'get'
+        method: 'get',
       })
         .then(resp => resp.json())
         .then(data => {
@@ -328,7 +378,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
             name: companyName,
             lieferant: companyId,
             bearbeitetvon: username,
-            updatedAt: format(new Date(), 'MM.dd.yyyy HH:mm')
+            updatedAt: format(new Date(), 'MM.dd.yyyy HH:mm'),
           })
           fetchSupplierCids(companyId)
           formRef.current.setFieldValue('supplier', companyId)
@@ -337,11 +387,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
         .catch(err => console.error(`Error - ${err}`))
     } else {
       // prepare page for existing maintenance
-      const {
-        cancelled,
-        emergency,
-        done
-      } = serverData.profile
+      const { cancelled, emergency, done } = serverData.profile
 
       setMaintenance({
         ...serverData.profile,
@@ -350,15 +396,23 @@ const Maintenance = ({ session, serverData, suppliers }) => {
         done: !!+done,
         // timezone: 'Europe/Amsterdam',
         // timezoneLabel: '(GMT+01:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna',
-        // startDateTime: moment.tz(serverData.profile.startDateTime, 'GMT').tz('Etc/GMT-1').format('YYYY-MM-DD HH:mm:ss'), 
-        // endDateTime: moment.tz(serverData.profile.endDateTime, 'GMT').tz('Etc/GMT-1').format('YYYY-MM-DD HH:mm:ss') 
+        // startDateTime: moment.tz(serverData.profile.startDateTime, 'GMT').tz('Etc/GMT-1').format('YYYY-MM-DD HH:mm:ss'),
+        // endDateTime: moment.tz(serverData.profile.endDateTime, 'GMT').tz('Etc/GMT-1').format('YYYY-MM-DD HH:mm:ss')
       })
       fetchSupplierCids(serverData.profile.lieferant)
 
       const startDateTime = serverData.profile.startDateTime
       const endDateTime = serverData.profile.endDateTime
-      if (startDateTime && endDateTime && isValid(parseISO(startDateTime)) && isValid(parseISO(endDateTime))) {
-        const impactCalculation = formatDistance(parseISO(endDateTime), parseISO(startDateTime))
+      if (
+        startDateTime &&
+        endDateTime &&
+        isValid(parseISO(startDateTime)) &&
+        isValid(parseISO(endDateTime))
+      ) {
+        const impactCalculation = formatDistance(
+          parseISO(endDateTime),
+          parseISO(startDateTime)
+        )
         setImpactPlaceholder(impactCalculation)
       }
     }
@@ -391,12 +445,14 @@ const Maintenance = ({ session, serverData, suppliers }) => {
       return
     }
     fetch(`/api/lieferantcids?id=${lieferantId}`, {
-      method: 'get'
+      method: 'get',
     })
       .then(resp => resp.json())
       .then(data => {
         if (!data.lieferantCIDsResult) {
-          setSupplierCids([{ label: 'No CIDs available for this Supplier', value: '1' }])
+          setSupplierCids([
+            { label: 'No CIDs available for this Supplier', value: '1' },
+          ])
           return
         }
         setSupplierCids(data.lieferantCIDsResult)
@@ -413,11 +469,11 @@ const Maintenance = ({ session, serverData, suppliers }) => {
     fetch('/api/customercids/maint', {
       method: 'post',
       body: JSON.stringify({
-        cids: lieferantCidId
+        cids: lieferantCidId,
       }),
       headers: {
-        'Content-Type': 'application/json'
-      }
+        'Content-Type': 'application/json',
+      },
     })
       .then(resp => resp.json())
       .then(data => {
@@ -440,7 +496,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
       .catch(err => console.error(`Error - ${err}`))
   }
 
-  const checkFreezeStatus = (cids) => {
+  const checkFreezeStatus = cids => {
     const startDate = maintenance.startDateTime
     const endDate = maintenance.endDateTime
     const uniqueCustomers = []
@@ -452,19 +508,25 @@ const Maintenance = ({ session, serverData, suppliers }) => {
       body: JSON.stringify({
         companys: [...new Set(uniqueCustomers)],
         startDate: startDate,
-        endDate: endDate
+        endDate: endDate,
       }),
       headers: {
-        'Content-Type': 'application/json'
-      }
+        'Content-Type': 'application/json',
+      },
     })
       .then(resp => resp.json())
       .then(data => {
         if (data.freezeQuery.length !== 0) {
           const customerCidEntries = customerCids
           data.freezeQuery.forEach(freezeResult => {
-            const frozenCidIndex = customerCidEntries.findIndex(el => el.kunde === freezeResult.companyId)
-            Notify('error', 'Network Freeze', `${freezeResult.name} has active freeze during this time period!`)
+            const frozenCidIndex = customerCidEntries.findIndex(
+              el => el.kunde === freezeResult.companyId
+            )
+            Notify(
+              'error',
+              'Network Freeze',
+              `${freezeResult.name} has active freeze during this time period!`
+            )
             customerCidEntries[frozenCidIndex].frozen = true
           })
           setCustomerCids(customerCidEntries)
@@ -485,7 +547,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
     if (frozen) {
       setFrozenState({
         recipient: recipient,
-        cid: customerCID
+        cid: customerCID,
       })
       setFrozenCompany(companyName)
       toggleConfirmFreezeModal()
@@ -501,20 +563,31 @@ const Maintenance = ({ session, serverData, suppliers }) => {
     // TODO: everything that can be changed by form = currentMaint, everythign else =hook maintenance
     const currentMaint = formRef.current.values
 
-    if (currentMaint.id === '' || currentMaint.startDateTime === '' || currentMaint.endDateTime === '') {
+    if (
+      currentMaint.id === '' ||
+      currentMaint.startDateTime === '' ||
+      currentMaint.endDateTime === ''
+    ) {
       Notify('warning', 'Missing Required Fields')
       return
     }
 
     const timezoneValue = currentMaint.timezone || 'Europe/Dublin'
-    const rawStart = moment.tz(moment(currentMaint.startDateTime).format('YYYY-MM-DD HH:mm:ss'), timezoneValue)
-    const rawEnd = moment.tz(moment(currentMaint.endDateTime).format('YYYY-MM-DD HH:mm:ss'), timezoneValue)
+    const rawStart = moment.tz(
+      moment(currentMaint.startDateTime).format('YYYY-MM-DD HH:mm:ss'),
+      timezoneValue
+    )
+    const rawEnd = moment.tz(
+      moment(currentMaint.endDateTime).format('YYYY-MM-DD HH:mm:ss'),
+      timezoneValue
+    )
     const utcStart1 = rawStart.tz('GMT').format('YYYY-MM-DD HH:mm:ss')
     const utcEnd1 = rawEnd.tz('GMT').format('YYYY-MM-DD HH:mm:ss')
     const utcStart = utcStart1 || serverData.profile.startDateTime
     const utcEnd = utcEnd1 || serverData.profile.endDateTime
 
-    let maintenanceIntro = 'We would like to inform you about planned work on the following CID(s):'
+    let maintenanceIntro =
+      'We would like to inform you about planned work on the following CID(s):'
     const rescheduleText = ''
     const tzSuffixRAW = 'UTC / GMT+0:00'
 
@@ -525,8 +598,12 @@ const Maintenance = ({ session, serverData, suppliers }) => {
 
     if (store.get('rescheduleData').length !== 0) {
       const latest = store.get('rescheduleData').length - 1
-      const newStart = moment(store.get('rescheduleData')[latest].startDateTime).format('YYYY-MM-DD HH:mm:ss')
-      const newEnd = moment(store.get('rescheduleData')[latest].endDateTime).format('YYYY-MM-DD HH:mm:ss')
+      const newStart = moment(
+        store.get('rescheduleData')[latest].startDateTime
+      ).format('YYYY-MM-DD HH:mm:ss')
+      const newEnd = moment(
+        store.get('rescheduleData')[latest].endDateTime
+      ).format('YYYY-MM-DD HH:mm:ss')
       const newImpact = store.get('rescheduleData')[latest].impact
       const newReason = store.get('rescheduleData')[latest].reason.toLowerCase()
       const rcounter = store.get('rescheduleData')[latest].rcounter
@@ -545,9 +622,9 @@ const Maintenance = ({ session, serverData, suppliers }) => {
             index--
             return {
               done: index < 0,
-              value: oldReschedules[index]
+              value: oldReschedules[index],
             }
-          }
+          },
         }
         reversedReschedules[Symbol.iterator] = function () {
           return this
@@ -561,7 +638,8 @@ const Maintenance = ({ session, serverData, suppliers }) => {
           maintenanceIntro += `<br>This maintenance had been rescheduled due to ${newReason}.<br><br>The previous details were as follows:<br><table border="0" cellspacing="2" cellpadding="2" width="775px"><tr><td style='width: 205px;'>Maintenance ID:</td><td><b>NT-${maintenance.id}-${rcounter}</b></td></tr><tr><td>Previous Start date and time:</td><td><b>${newStart} (${tzSuffixRAW})</b></td></tr><tr><td>Previous Finish date and time:</td><td><b>${newEnd} (${tzSuffixRAW})</b></td></tr><tr><td>Previous Impact:</td><td><b>${newImpact}</b></td></tr></table>`
         }
       }
-      maintenanceIntro += '<br><hr><i><b>Original Planned Works:</b></i><br><br>Dear Colleagues,<br><br>We would like to inform you about planned work on the following CID(s):\n'
+      maintenanceIntro +=
+        '<br><hr><i><b>Original Planned Works:</b></i><br><br>Dear Colleagues,<br><br>We would like to inform you about planned work on the following CID(s):\n'
     }
 
     let body = `<body style="color:#666666;">${rescheduleText} Dear Colleagues,​​<p><span>${maintenanceIntro}<br><br> <b>${customerCID}</b> <br><br>The maintenance work is with the following details:</span></p><table border="0" cellspacing="2" cellpadding="2" width="775px"><tr><td style='width: 205px;'>Maintenance ID:</td><td><b>NT-${maintenance.id}</b></td></tr><tr><td>Start date and time:</td><td><b>${utcStart} (${tzSuffixRAW})</b></td></tr><tr><td>Finish date and time:</td><td><b>${utcEnd} (${tzSuffixRAW})</b></td></tr>`
@@ -575,29 +653,47 @@ const Maintenance = ({ session, serverData, suppliers }) => {
     }
 
     if (currentMaint.location) {
-      body = body + '<tr><td>Location:</td><td>' + currentMaint.location + '</td></tr>'
+      body =
+        body +
+        '<tr><td>Location:</td><td>' +
+        currentMaint.location +
+        '</td></tr>'
     }
 
     if (currentMaint.reason) {
-      body = body + '<tr><td>Reason:</td><td>' + currentMaint.reason + '</td></tr>'
+      body =
+        body + '<tr><td>Reason:</td><td>' + currentMaint.reason + '</td></tr>'
     }
 
-    const maintNoteBody = currentMaint.maintNote ? `<p>${currentMaint.maintNote}</p>` : ''
+    const maintNoteBody = currentMaint.maintNote
+      ? `<p>${currentMaint.maintNote}</p>`
+      : ''
 
-    body = body + `</table>${maintNoteBody}<p>We sincerely regret any inconvenience that may be caused by this and hope for further mutually advantageous cooperation.</p><p>If you have any questions feel free to contact us at maintenance@newtelco.de.</p></div>​​</body>​​<footer>​<style>.sig{font-family:Century Gothic, sans-serif;font-size:9pt;color:#636266!important;}b.i{color:#4ca702;}.gray{color:#636266 !important;}a{text-decoration:none;color:#636266 !important;}</style><div class="sig"><div>Best regards <b class="i">|</b> Mit freundlichen Grüßen</div><br><div><b>Newtelco Maintenance Team</b></div><br><div>NewTelco GmbH <b class="i">|</b> Moenchhofsstr. 24 <b class="i">|</b> 60326 Frankfurt a.M. <b class="i">|</b> DE <br>www.newtelco.com <b class="i">|</b> 24/7 NOC  49 69 75 00 27 30 ​​<b class="i">|</b> <a style="color:#" href="mailto:service@newtelco.de">service@newtelco.de</a><br><br><div><img alt="sig" src="https://home.newtelco.de/sig.png" height="29" width="516"></div></div>​</footer>`
+    body =
+      body +
+      `</table>${maintNoteBody}<p>We sincerely regret any inconvenience that may be caused by this and hope for further mutually advantageous cooperation.</p><p>If you have any questions feel free to contact us at maintenance@newtelco.de.</p></div>​​</body>​​<footer>​<style>.sig{font-family:Century Gothic, sans-serif;font-size:9pt;color:#636266!important;}b.i{color:#4ca702;}.gray{color:#636266 !important;}a{text-decoration:none;color:#636266 !important;}</style><div class="sig"><div>Best regards <b class="i">|</b> Mit freundlichen Grüßen</div><br><div><b>Newtelco Maintenance Team</b></div><br><div>NewTelco GmbH <b class="i">|</b> Moenchhofsstr. 24 <b class="i">|</b> 60326 Frankfurt a.M. <b class="i">|</b> DE <br>www.newtelco.com <b class="i">|</b> 24/7 NOC  49 69 75 00 27 30 ​​<b class="i">|</b> <a style="color:#" href="mailto:service@newtelco.de">service@newtelco.de</a><br><br><div><img alt="sig" src="https://home.newtelco.de/sig.png" height="29" width="516"></div></div>​</footer>`
 
     return body
   }
 
   // send out the created mail
-  const sendMail = (recipient, customerCid, subj, htmlBody, isFromPreview, isFromSendAll) => {
-    const activeRowIndex = customerCids.findIndex(el => el.kundenCID === customerCid)
+  const sendMail = (
+    recipient,
+    customerCid,
+    subj,
+    htmlBody,
+    isFromPreview,
+    isFromSendAll
+  ) => {
+    const activeRowIndex = customerCids.findIndex(
+      el => el.kundenCID === customerCid
+    )
     const kundenCidRow = customerCids[activeRowIndex]
     if (kundenCidRow && kundenCidRow.frozen) {
       setFrozenCompany(kundenCidRow.name || '')
       setFrozenState({
         recipient: recipient,
-        cid: customerCid
+        cid: customerCid,
       })
       toggleConfirmFreezeModal()
       return
@@ -621,13 +717,13 @@ const Maintenance = ({ session, serverData, suppliers }) => {
       body: JSON.stringify({
         body: body,
         subject: subject,
-        to: to
+        to: to,
       }),
       mode: 'cors',
       headers: {
         'Access-Control-Allow-Origin': '*',
-        'Content-Type': 'application/json'
-      }
+        'Content-Type': 'application/json',
+      },
     })
       .then(resp => resp.json())
       .then(data => {
@@ -635,18 +731,20 @@ const Maintenance = ({ session, serverData, suppliers }) => {
         const statusText = data.response.statusText
 
         if (status === 200 && statusText === 'OK') {
-          const activeRowIndex = customerCids.findIndex(el => el.kundenCID === customerCid)
+          const activeRowIndex = customerCids.findIndex(
+            el => el.kundenCID === customerCid
+          )
           const kundenCidRow = customerCids[activeRowIndex]
           if (maintenance.cancelled === true && maintenance.done === true) {
             kundenCidRow.sent = 2
           } else {
             kundenCidRow.sent = 1
           }
-          const updatedKundenCids = [
-            ...customerCids,
-            kundenCidRow
-          ]
-          const deduplicatedKundenCids = getUnique(updatedKundenCids, 'kundenCID')
+          const updatedKundenCids = [...customerCids, kundenCidRow]
+          const deduplicatedKundenCids = getUnique(
+            updatedKundenCids,
+            'kundenCID'
+          )
           setCustomerCids(deduplicatedKundenCids)
           if (!isFromSendAll) {
             Notify('success', 'Mail Sent')
@@ -662,12 +760,14 @@ const Maintenance = ({ session, serverData, suppliers }) => {
           const action = 'sent to'
           const field = kundenCidRow.name
           updateSentProgress()
-          fetch(`/api/history?mid=${maintId}&user=${user}&field=${field}&action=${action}`, {
-            method: 'get'
-          })
+          fetch(
+            `/api/history?mid=${maintId}&user=${user}&field=${field}&action=${action}`,
+            {
+              method: 'get',
+            }
+          )
             .then(resp => resp.json())
-            .then(data => {
-            })
+            .then(data => {})
             .catch(err => console.error(`Error updating Audit Log - ${err}`))
         } else {
           Notify('error', 'Error Sending Mail')
@@ -685,7 +785,14 @@ const Maintenance = ({ session, serverData, suppliers }) => {
       setTimeout(() => {
         const HtmlBody = generateMail(node.data.kundenCID, node.data.protected)
         const subject = generateMailSubject()
-        sendMail(node.data.maintenanceRecipient, node.data.kundenCID, subject, HtmlBody, false, true)
+        sendMail(
+          node.data.maintenanceRecipient,
+          node.data.kundenCID,
+          subject,
+          HtmlBody,
+          false,
+          true
+        )
         Notify('success', `Mail Sent - ${node.data.name}`)
         if (index === rowCount) {
           Notify('success', 'All Mails Sent!')
@@ -716,7 +823,9 @@ const Maintenance = ({ session, serverData, suppliers }) => {
 
     let derenCid = ''
     currentMaint.supplierCids.forEach(supp => {
-      const supplierLabel = supplierCids.filter(supplier => supplier.value === supp)
+      const supplierLabel = supplierCids.filter(
+        supplier => supplier.value === supp
+      )
       derenCid += ` ${supplierLabel[0].label}`
     })
     derenCid = derenCid.trim()
@@ -741,12 +850,12 @@ const Maintenance = ({ session, serverData, suppliers }) => {
         maintId: maintId,
         startDateTime: startDE,
         endDateTime: endDE,
-        user: session.user.email
+        user: session.user.email,
       }),
       headers: {
         'Access-Control-Allow-Origin': '*',
-        'Content-Type': 'application/json'
-      }
+        'Content-Type': 'application/json',
+      },
     })
       .then(resp => resp.json())
       .then(data => {
@@ -760,7 +869,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
           setMaintenance({
             ...maintenance,
             ...currentMaint,
-            calendarId: calId
+            calendarId: calId,
           })
 
           fetch('/api/maintenances/save/calendar', {
@@ -768,12 +877,12 @@ const Maintenance = ({ session, serverData, suppliers }) => {
             body: JSON.stringify({
               mid: maintenance.id,
               cid: calId,
-              updatedBy: session.user.email
+              updatedBy: session.user.email,
             }),
             headers: {
               'Access-Control-Allow-Origin': '*',
-              'Content-Type': 'application/json'
-            }
+              'Content-Type': 'application/json',
+            },
           })
             .then(resp => resp.json())
             .then(data => {
@@ -795,7 +904,9 @@ const Maintenance = ({ session, serverData, suppliers }) => {
 
     let derenCid = ''
     currentMaint.supplierCids.forEach(supp => {
-      const supplierLabel = supplierCids.filter(supplier => supplier.value === supp)
+      const supplierLabel = supplierCids.filter(
+        supplier => supplier.value === supp
+      )
       derenCid += ` ${supplierLabel[0].label}`
     })
     derenCid = derenCid.trim()
@@ -817,13 +928,13 @@ const Maintenance = ({ session, serverData, suppliers }) => {
           calId: calId,
           startDateTime: startDateTime,
           endDateTime: endDateTime,
-          rcounter: rcounter
+          rcounter: rcounter,
         }),
         mode: 'cors',
         headers: {
           'Access-Control-Allow-Origin': '*',
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+        },
       })
         .then(resp => resp.json())
         .then(data => {
@@ -843,7 +954,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
   //
   /// /////////////////////////////////////////////////////////
 
-  const handleEditorChange = (data) => {
+  const handleEditorChange = data => {
     setMailBodyText(data.level.content)
   }
 
@@ -858,16 +969,23 @@ const Maintenance = ({ session, serverData, suppliers }) => {
     if (!maintenance.incomingBody) {
       const mailId = maintenance.mailId || maintenance.receivedmail
       if (mailId === 'NT') {
-        Notify('warning', 'No Mail Available', 'This Maintenance was manually created.')
+        Notify(
+          'warning',
+          'No Mail Available',
+          'This Maintenance was manually created.'
+        )
         return
       }
       fetch(`/v1/api/mail/${mailId}`, {
-        method: 'get'
+        method: 'get',
       })
         .then(resp => resp.json())
         .then(data => {
           let mailBody
-          const htmlRegex = new RegExp(/<(?:"[^"]*"[`"]*|'[^']*'['"]*|[^'">])+>/, 'gi')
+          const htmlRegex = new RegExp(
+            /<(?:"[^"]*"[`"]*|'[^']*'['"]*|[^'">])+>/,
+            'gi'
+          )
           // const htmlRegex2 = new RegExp('<([a-z]+)[^>]*(?<!/)>', 'gi')
           // const htmlRegex3 = new RegExp('<meta .*>', 'gi')
 
@@ -883,7 +1001,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
             incomingSubject: data.subject,
             incomingDate: data.date,
             incomingAttachments: data.attachments,
-            incomingDomain: serverData.profile.mailDomain
+            incomingDomain: serverData.profile.mailDomain,
           })
           setOpenReadModal(!openReadModal)
         })
@@ -903,13 +1021,13 @@ const Maintenance = ({ session, serverData, suppliers }) => {
   //
   /// /////////////////////////////////////////////////////////
 
-  const handleCreateOnClick = (event) => {
+  const handleCreateOnClick = event => {
     const {
       bearbeitetvon,
       maileingang,
       lieferant,
       mailId,
-      updatedAt
+      updatedAt,
     } = maintenance
 
     let incomingFormatted
@@ -918,7 +1036,10 @@ const Maintenance = ({ session, serverData, suppliers }) => {
     } else {
       incomingFormatted = format(new Date(maileingang), 'yyyy-MM-dd HH:mm:ss')
     }
-    const updatedAtFormatted = format(new Date(updatedAt), 'yyyy-MM-dd HH:mm:ss')
+    const updatedAtFormatted = format(
+      new Date(updatedAt),
+      'yyyy-MM-dd HH:mm:ss'
+    )
 
     fetch('/api/maintenances/save/create', {
       method: 'post',
@@ -927,12 +1048,12 @@ const Maintenance = ({ session, serverData, suppliers }) => {
         lieferant: lieferant,
         mailId: mailId,
         updatedAt: updatedAtFormatted,
-        maileingang: incomingFormatted
+        maileingang: incomingFormatted,
       }),
       headers: {
         'Access-Control-Allow-Origin': '*',
-        'Content-Type': 'application/json'
-      }
+        'Content-Type': 'application/json',
+      },
     })
       .then(resp => resp.json())
       .then(data => {
@@ -958,8 +1079,8 @@ const Maintenance = ({ session, serverData, suppliers }) => {
         body: JSON.stringify({ m: incomingMailId }),
         headers: {
           'Access-Control-Allow-Origin': '*',
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+        },
       })
         .then(resp => resp.json())
         .then(data => {
@@ -996,11 +1117,22 @@ const Maintenance = ({ session, serverData, suppliers }) => {
     const HeaderLeft = () => {
       return (
         <ButtonGroup size='md'>
-          <IconButton appearance='ghost' onClick={() => Router.back()} icon={<Icon icon='chevron-left' />}>
+          <IconButton
+            appearance='ghost'
+            onClick={() => Router.back()}
+            icon={<Icon icon='chevron-left' />}
+          >
             Back
           </IconButton>
-          <Whisper placement='bottom' speaker={<Tooltip>Open Incoming Mail</Tooltip>}>
-            <IconButton appearance='ghost' onClick={toggleReadModal} icon={<Icon icon='at' />}>
+          <Whisper
+            placement='bottom'
+            speaker={<Tooltip>Open Incoming Mail</Tooltip>}
+          >
+            <IconButton
+              appearance='ghost'
+              onClick={toggleReadModal}
+              icon={<Icon icon='at' />}
+            >
               Read
             </IconButton>
           </Whisper>
@@ -1010,8 +1142,19 @@ const Maintenance = ({ session, serverData, suppliers }) => {
 
     const HeaderCenter = () => {
       return (
-        <Badge content={maintenance.id === 'NEW' ? 'NEW' : `NT-${maintenance.id}`} className='header-badge'>
-          <Button appearance='subtle' size='lg' style={{ fontSize: '1.1em', fontWeight: '200', border: '1px solid var(--grey2)' }}>
+        <Badge
+          content={maintenance.id === 'NEW' ? 'NEW' : `NT-${maintenance.id}`}
+          className='header-badge'
+        >
+          <Button
+            appearance='subtle'
+            size='lg'
+            style={{
+              fontSize: '1.1em',
+              fontWeight: '200',
+              border: '1px solid var(--grey2)',
+            }}
+          >
             {maintenance.name}
           </Button>
         </Badge>
@@ -1021,48 +1164,67 @@ const Maintenance = ({ session, serverData, suppliers }) => {
     const HeaderRight = () => {
       return (
         <ButtonGroup size='md'>
-          <Whisper placement='bottom' speaker={<Tooltip>Create Calendar Entry</Tooltip>}>
-            <IconButton appearance='ghost' onClick={handleCalendarCreate} icon={<Icon icon='calendar' />}>
+          <Whisper
+            placement='bottom'
+            speaker={<Tooltip>Create Calendar Entry</Tooltip>}
+          >
+            <IconButton
+              appearance='ghost'
+              onClick={handleCalendarCreate}
+              icon={<Icon icon='calendar' />}
+            >
               Create
             </IconButton>
           </Whisper>
-          {maintenance.id === 'NEW'
-            ? (
-              <Whisper placement='bottom' speaker={<Tooltip>Create New Maintenance</Tooltip>}>
-                <IconButton appearance='ghost' onClick={handleCreateOnClick} icon={<Icon icon='plus' />} className='create-btn'>
-                  Save
-                </IconButton>
-              </Whisper>
-            ) : (
-              <Whisper placement='bottom' speaker={<Tooltip>Send All Notifications</Tooltip>}>
-                <IconButton appearance='ghost' onClick={handleSendAll} icon={<Icon icon='envelope-o' />}>
-                  Send All
-                </IconButton>
-              </Whisper>
-            )}
+          {maintenance.id === 'NEW' ? (
+            <Whisper
+              placement='bottom'
+              speaker={<Tooltip>Create New Maintenance</Tooltip>}
+            >
+              <IconButton
+                appearance='ghost'
+                onClick={handleCreateOnClick}
+                icon={<Icon icon='plus' />}
+                className='create-btn'
+              >
+                Save
+              </IconButton>
+            </Whisper>
+          ) : (
+            <Whisper
+              placement='bottom'
+              speaker={<Tooltip>Send All Notifications</Tooltip>}
+            >
+              <IconButton
+                appearance='ghost'
+                onClick={handleSendAll}
+                icon={<Icon icon='envelope-o' />}
+              >
+                Send All
+              </IconButton>
+            </Whisper>
+          )}
         </ButtonGroup>
       )
     }
 
-    const TimezoneSelector = ({
-      field,
-      form
-    }) => {
+    const TimezoneSelector = ({ field, form }) => {
       return (
         <Select
           options={tzOptions}
           name={field.name}
-          value={tzOptions ? tzOptions.find(option => option.value === field.value) : ''}
-          onChange={(option) => form.setFieldValue(field.name, option.value)}
+          value={
+            tzOptions
+              ? tzOptions.find(option => option.value === field.value)
+              : ''
+          }
+          onChange={option => form.setFieldValue(field.name, option.value)}
           className='timezone-select'
         />
       )
     }
 
-    const SupplierSelector = ({
-      field,
-      form
-    }) => {
+    const SupplierSelector = ({ field, form }) => {
       return (
         <SelectPicker
           style={{ width: '100%' }}
@@ -1070,18 +1232,25 @@ const Maintenance = ({ session, serverData, suppliers }) => {
           value={field.value}
           onChange={option => {
             fetch(`/api/lieferantcids?id=${option}`, {
-              method: 'get'
+              method: 'get',
             })
               .then(resp => resp.json())
               .then(data => {
                 if (!data.lieferantCIDsResult) {
-                  setSupplierCids([{ label: 'No CIDs available for this Supplier', value: '1' }])
+                  setSupplierCids([
+                    {
+                      label: 'No CIDs available for this Supplier',
+                      value: '1',
+                    },
+                  ])
                   return
                 }
                 setMaintenance({
                   ...maintenance,
                   lieferant: option,
-                  name: suppliers.companies.find(options => options.value === option).label
+                  name: suppliers.companies.find(
+                    options => options.value === option
+                  ).label,
                 })
                 setSupplierCids(data.lieferantCIDsResult)
                 setCustomerCids([])
@@ -1127,13 +1296,17 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                   mode: 'cors',
                   headers: {
                     'Access-Control-Allow-Origin': '*',
-                    'Content-Type': 'application/json'
-                  }
+                    'Content-Type': 'application/json',
+                  },
                 })
                   .then(resp => resp.json())
                   .then(data => {
                     if (data.id === 500) {
-                      Notify('error', 'Error', 'Cannot move mail to complete label.')
+                      Notify(
+                        'error',
+                        'Error',
+                        'Cannot move mail to complete label.'
+                      )
                     }
                   })
                   .catch(err => console.error(`Error - ${err}`))
@@ -1148,13 +1321,13 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                 body: JSON.stringify({
                   cids: impactedCids.trim(),
                   maintId: maintenance.id,
-                  updatedBy: session.user.email.match(/^([^@]*)@/)[1]
+                  updatedBy: session.user.email.match(/^([^@]*)@/)[1],
                 }),
                 mode: 'cors',
                 headers: {
                   'Access-Control-Allow-Origin': '*',
-                  'Content-Type': 'application/json'
-                }
+                  'Content-Type': 'application/json',
+                },
               })
                 .then(resp => resp.json())
                 .then(data => {
@@ -1175,13 +1348,27 @@ const Maintenance = ({ session, serverData, suppliers }) => {
     return (
       <Layout>
         {maintenance.id === 'NEW' && (
-          <Message full showIcon type='warning' description='Remember to Save before continuing to work!' style={{ position: 'fixed', zIndex: '999' }} />
+          <Message
+            full
+            showIcon
+            type='warning'
+            description='Remember to Save before continuing to work!'
+            style={{ position: 'fixed', zIndex: '999' }}
+          />
         )}
         <Head>
           <title>{`NT-${maintenance.id} | Newtelco Maintenance`}</title>
         </Head>
-        <MaintPanel header={<HeaderLeft />} center={<HeaderCenter />} buttons={<HeaderRight />}>
-          <FlexboxGrid justify='space-around' align='top' style={{ width: '100%' }}>
+        <MaintPanel
+          header={<HeaderLeft />}
+          center={<HeaderCenter />}
+          buttons={<HeaderRight />}
+        >
+          <FlexboxGrid
+            justify='space-around'
+            align='top'
+            style={{ width: '100%' }}
+          >
             <FlexboxGrid.Item colspan={11} style={{ margin: '0 10px' }}>
               <Panel bordered>
                 <Grid fluid>
@@ -1194,14 +1381,16 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                       supplier: serverData.profile.lieferant,
                       startDateTime: serverData.profile.startDateTime,
                       endDateTime: serverData.profile.endDateTime,
-                      supplierCids: serverData.profile.derenCIDid?.split(',').map(Number) || '',
+                      supplierCids:
+                        serverData.profile.derenCIDid?.split(',').map(Number) ||
+                        '',
                       impact: serverData.profile.impact,
                       location: serverData.profile.location,
                       reason: serverData.profile.reason,
                       maintNote: serverData.profile.maintNote,
                       cancelled: !!+serverData.profile.cancelled,
                       emergency: !!+serverData.profile.emergency,
-                      done: !!+serverData.profile.done
+                      done: !!+serverData.profile.done,
                     }}
                     onSubmit={async (values, formikHelpers) => {
                       const diff = objDiff(maintHistory, values)
@@ -1211,7 +1400,11 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                       }
                       if (Object.keys(diff).length) {
                         if (maintenance.id === 'NEW') {
-                          Notify('error', 'Unable to Save', 'Not maintenance ID created yet.')
+                          Notify(
+                            'error',
+                            'Unable to Save',
+                            'Not maintenance ID created yet.'
+                          )
                           return
                         }
                         try {
@@ -1221,11 +1414,11 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                               id: maintenance.id,
                               values: values,
                               user: session.user.email.match(/^([^@]*)@/)[1],
-                              field: Object.keys(diff)[0]
+                              field: Object.keys(diff)[0],
                             }),
                             headers: {
-                              'Content-Type': 'application/json'
-                            }
+                              'Content-Type': 'application/json',
+                            },
                           })
                         } catch (e) {
                           formikHelpers.setErrors({ error: e })
@@ -1233,7 +1426,13 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                       }
                     }}
                   >
-                    {({ values, handleChange, handleBlur, handleSubmit, setFieldValue }) => (
+                    {({
+                      values,
+                      handleChange,
+                      handleBlur,
+                      handleSubmit,
+                      setFieldValue,
+                    }) => (
                       <>
                         <Row gutter={20} style={{ marginBottom: '20px' }}>
                           <Col sm={24} xs={24}>
@@ -1243,93 +1442,249 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                         <Row gutter={20} style={{ marginBottom: '20px' }}>
                           <Col sm={12} xs={24}>
                             <FormGroup>
-                              <ControlLabel htmlFor='edited-by'>Created By</ControlLabel>
-                              <Input tabIndex='-1' readOnly id='edited-by-input' name='edited-by' type='text' value={maintenance.bearbeitetvon} disabled />
+                              <ControlLabel htmlFor='edited-by'>
+                                Created By
+                              </ControlLabel>
+                              <Input
+                                tabIndex='-1'
+                                readOnly
+                                id='edited-by-input'
+                                name='edited-by'
+                                type='text'
+                                value={maintenance.bearbeitetvon}
+                                disabled
+                              />
                             </FormGroup>
                           </Col>
                           <Col sm={12} xs={24}>
                             <FormGroup>
-                              <ControlLabel htmlFor='maileingang'>Mail Arrived</ControlLabel>
-                              <Input tabIndex='-1' readOnly id='maileingang-input' name='maileingang' type='text' value={convertDateTime(maintenance.maileingang)} disabled />
+                              <ControlLabel htmlFor='maileingang'>
+                                Mail Arrived
+                              </ControlLabel>
+                              <Input
+                                tabIndex='-1'
+                                readOnly
+                                id='maileingang-input'
+                                name='maileingang'
+                                type='text'
+                                value={convertDateTime(maintenance.maileingang)}
+                                disabled
+                              />
                             </FormGroup>
                           </Col>
                         </Row>
                         <Row gutter={20} style={{ marginBottom: '20px' }}>
                           <Col sm={12} xs={24}>
                             <FormGroup>
-                              <ControlLabel htmlFor='supplier'>Timezone</ControlLabel>
-                              <FastField name='timezone' component={TimezoneSelector} />
+                              <ControlLabel htmlFor='supplier'>
+                                Timezone
+                              </ControlLabel>
+                              <FastField
+                                name='timezone'
+                                component={TimezoneSelector}
+                              />
                             </FormGroup>
                           </Col>
                           <Col sm={12} xs={24}>
                             <FormGroup>
-                              <ControlLabel htmlFor='supplier'>Supplier</ControlLabel>
-                              <FastField name='supplier' component={SupplierSelector} />
+                              <ControlLabel htmlFor='supplier'>
+                                Supplier
+                              </ControlLabel>
+                              <FastField
+                                name='supplier'
+                                component={SupplierSelector}
+                              />
                             </FormGroup>
                           </Col>
                         </Row>
                         <Row gutter={20} style={{ marginBottom: '20px' }}>
                           <Col sm={12} xs={24}>
                             <FormGroup>
-                              <ControlLabel htmlFor='start-datetime' style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                              <ControlLabel
+                                htmlFor='start-datetime'
+                                style={{
+                                  display: 'flex',
+                                  justifyContent: 'space-between',
+                                  alignItems: 'center',
+                                }}
+                              >
                                 Start Date/Time
                                 <HelpBlock style={{ float: 'right' }} tooltip>
                                   Time in above selected Timezone
                                 </HelpBlock>
                               </ControlLabel>
-                              <FastField name='startDateTime' startDateTime={values.startDateTime} endDateTime={values.endDateTime} setImpactPlaceholder={setImpactPlaceholder} component={MyDateTime} />
-                              <HelpBlock style={{ margin: '5px', opacity: '0.5' }}>Time in CEST: {moment.tz(moment.tz(values.startDateTime, values.timezone), 'Europe/Berlin').format('DD.MM.YYYY HH:mm')}</HelpBlock>
+                              <FastField
+                                name='startDateTime'
+                                startDateTime={values.startDateTime}
+                                endDateTime={values.endDateTime}
+                                setImpactPlaceholder={setImpactPlaceholder}
+                                component={MyDateTime}
+                              />
+                              <HelpBlock
+                                style={{ margin: '5px', opacity: '0.5' }}
+                              >
+                                Time in CEST:{' '}
+                                {moment
+                                  .tz(
+                                    moment.tz(
+                                      values.startDateTime,
+                                      values.timezone
+                                    ),
+                                    'Europe/Berlin'
+                                  )
+                                  .format('DD.MM.YYYY HH:mm')}
+                              </HelpBlock>
                             </FormGroup>
                           </Col>
                           <Col sm={12} xs={24}>
                             <FormGroup>
-                              <ControlLabel htmlFor='end-datetime' style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                              <ControlLabel
+                                htmlFor='end-datetime'
+                                style={{
+                                  display: 'flex',
+                                  justifyContent: 'space-between',
+                                  alignItems: 'center',
+                                }}
+                              >
                                 End Date/Time
                                 <HelpBlock style={{ float: 'right' }} tooltip>
                                   Time in above selected Timezone
                                 </HelpBlock>
                               </ControlLabel>
-                              <FastField name='endDateTime' startDateTime={values.startDateTime} endDateTime={values.endDateTime} setImpactPlaceholder={setImpactPlaceholder} component={MyDateTime} />
-                              <HelpBlock style={{ margin: '5px', opacity: '0.5' }}>Time in CEST: {moment.tz(moment.tz(values.endDateTime, values.timezone), 'Europe/Berlin').format('DD.MM.YYYY HH:mm')}</HelpBlock>
+                              <FastField
+                                name='endDateTime'
+                                startDateTime={values.startDateTime}
+                                endDateTime={values.endDateTime}
+                                setImpactPlaceholder={setImpactPlaceholder}
+                                component={MyDateTime}
+                              />
+                              <HelpBlock
+                                style={{ margin: '5px', opacity: '0.5' }}
+                              >
+                                Time in CEST:{' '}
+                                {moment
+                                  .tz(
+                                    moment.tz(
+                                      values.endDateTime,
+                                      values.timezone
+                                    ),
+                                    'Europe/Berlin'
+                                  )
+                                  .format('DD.MM.YYYY HH:mm')}
+                              </HelpBlock>
                             </FormGroup>
                           </Col>
                         </Row>
                         <Row gutter={20} style={{ marginBottom: '20px' }}>
                           <Col sm={24}>
                             <FormGroup>
-                              <ControlLabel htmlFor='their-cid'>{maintenance.name} CID</ControlLabel>
-                              <Field name='supplierCids' customerCids={customerCids} setCustomerCids={setCustomerCids} fetchCustomerCids={fetchCustomerCids} supplierCids={supplierCids} component={MyTagPicker} />
+                              <ControlLabel htmlFor='their-cid'>
+                                {maintenance.name} CID
+                              </ControlLabel>
+                              <Field
+                                name='supplierCids'
+                                customerCids={customerCids}
+                                setCustomerCids={setCustomerCids}
+                                fetchCustomerCids={fetchCustomerCids}
+                                supplierCids={supplierCids}
+                                component={MyTagPicker}
+                              />
                             </FormGroup>
                           </Col>
                         </Row>
                         <Row gutter={20} style={{ marginBottom: '20px' }}>
                           <Col sm={12} xs={24}>
                             <FormGroup>
-                              <ControlLabel htmlFor='impact' style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                              <ControlLabel
+                                htmlFor='impact'
+                                style={{
+                                  display: 'flex',
+                                  justifyContent: 'space-between',
+                                  alignItems: 'center',
+                                }}
+                              >
                                 Impact
-                                <ButtonGroup size='sm' style={{ float: 'right' }}>
-                                  <Whisper placement='bottom' speaker={<Tooltip>Use 50ms Protection Switch Text</Tooltip>}>
-                                    <IconButton id='protectionswitchtext' onClick={() => setFieldValue('impact', '50ms protection switch')} size='sm' icon={<Icon icon='clock-o' />} />
+                                <ButtonGroup
+                                  size='sm'
+                                  style={{ float: 'right' }}
+                                >
+                                  <Whisper
+                                    placement='bottom'
+                                    speaker={
+                                      <Tooltip>
+                                        Use 50ms Protection Switch Text
+                                      </Tooltip>
+                                    }
+                                  >
+                                    <IconButton
+                                      id='protectionswitchtext'
+                                      onClick={() =>
+                                        setFieldValue(
+                                          'impact',
+                                          '50ms protection switch'
+                                        )
+                                      }
+                                      size='sm'
+                                      icon={<Icon icon='clock-o' />}
+                                    />
                                   </Whisper>
-                                  <Whisper placement='bottom' speaker={<Tooltip>Use Time Difference Text</Tooltip>}>
-                                    <IconButton id='impactplaceholdertext' onClick={() => setFieldValue('impact', impactPlaceholder)} size='sm' icon={<Icon icon='history' />} />
+                                  <Whisper
+                                    placement='bottom'
+                                    speaker={
+                                      <Tooltip>
+                                        Use Time Difference Text
+                                      </Tooltip>
+                                    }
+                                  >
+                                    <IconButton
+                                      id='impactplaceholdertext'
+                                      onClick={() =>
+                                        setFieldValue(
+                                          'impact',
+                                          impactPlaceholder
+                                        )
+                                      }
+                                      size='sm'
+                                      icon={<Icon icon='history' />}
+                                    />
                                   </Whisper>
                                 </ButtonGroup>
                               </ControlLabel>
-                              <FastField name='impact' component={MyTextinput} placeholder={impactPlaceholder} />
+                              <FastField
+                                name='impact'
+                                component={MyTextinput}
+                                placeholder={impactPlaceholder}
+                              />
                             </FormGroup>
                           </Col>
                           <Col sm={12} xs={24}>
-                            <FormGroup style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', height: '70px' }}>
-                              <ControlLabel htmlFor='location' style={{ marginBottom: '10px' }}>Location</ControlLabel>
-                              <FastField name='location' component={MyTextinput} />
+                            <FormGroup
+                              style={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                justifyContent: 'flex-end',
+                                height: '70px',
+                              }}
+                            >
+                              <ControlLabel
+                                htmlFor='location'
+                                style={{ marginBottom: '10px' }}
+                              >
+                                Location
+                              </ControlLabel>
+                              <FastField
+                                name='location'
+                                component={MyTextinput}
+                              />
                             </FormGroup>
                           </Col>
                         </Row>
                         <Row gutter={20} style={{ marginBottom: '20px' }}>
                           <Col sm={24}>
                             <FormGroup>
-                              <ControlLabel htmlFor='reason'>Reason</ControlLabel>
+                              <ControlLabel htmlFor='reason'>
+                                Reason
+                              </ControlLabel>
                               <FastField name='reason' component={MyTextarea} />
                             </FormGroup>
                           </Col>
@@ -1337,39 +1692,94 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                         <Row gutter={20} style={{ marginBottom: '20px' }}>
                           <Col sm={24}>
                             <FormGroup>
-                              <ControlLabel htmlFor='maintNote' style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                              <ControlLabel
+                                htmlFor='maintNote'
+                                style={{
+                                  display: 'flex',
+                                  justifyContent: 'space-between',
+                                  alignItems: 'center',
+                                }}
+                              >
                                 Note
                                 <HelpBlock style={{ float: 'right' }} tooltip>
                                   This note will be included in the mail
                                 </HelpBlock>
                               </ControlLabel>
-                              <FastField name='maintNote' key='maintNote' component={MyTextarea} />
+                              <FastField
+                                name='maintNote'
+                                key='maintNote'
+                                component={MyTextarea}
+                              />
                             </FormGroup>
                           </Col>
                         </Row>
                         <Row gutter={20} style={{ marginBottom: '20px' }}>
-                          <Col xs={8} style={{ display: 'flex', justifyContent: 'center' }}>
-                            <FormGroup style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                              <ControlLabel>
-                                Cancelled
-                              </ControlLabel>
-                              <Field name='cancelled' component={MyToggle} checkedChildren={<Icon icon='ban' inverse />} />
+                          <Col
+                            xs={8}
+                            style={{
+                              display: 'flex',
+                              justifyContent: 'center',
+                            }}
+                          >
+                            <FormGroup
+                              style={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                              }}
+                            >
+                              <ControlLabel>Cancelled</ControlLabel>
+                              <Field
+                                name='cancelled'
+                                component={MyToggle}
+                                checkedChildren={<Icon icon='ban' inverse />}
+                              />
                             </FormGroup>
                           </Col>
-                          <Col xs={8} style={{ display: 'flex', justifyContent: 'center' }}>
-                            <FormGroup style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                              <ControlLabel>
-                                Emergency
-                              </ControlLabel>
-                              <Field name='emergency' component={MyToggle} checkedChildren={<Icon icon='hospital-o' inverse />} />
+                          <Col
+                            xs={8}
+                            style={{
+                              display: 'flex',
+                              justifyContent: 'center',
+                            }}
+                          >
+                            <FormGroup
+                              style={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                              }}
+                            >
+                              <ControlLabel>Emergency</ControlLabel>
+                              <Field
+                                name='emergency'
+                                component={MyToggle}
+                                checkedChildren={
+                                  <Icon icon='hospital-o' inverse />
+                                }
+                              />
                             </FormGroup>
                           </Col>
-                          <Col xs={8} style={{ display: 'flex', justifyContent: 'center' }}>
-                            <FormGroup style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                              <ControlLabel>
-                                Done
-                              </ControlLabel>
-                              <Field name='done' component={MyToggle} checkedChildren={<Icon icon='check' inverse />} />
+                          <Col
+                            xs={8}
+                            style={{
+                              display: 'flex',
+                              justifyContent: 'center',
+                            }}
+                          >
+                            <FormGroup
+                              style={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                              }}
+                            >
+                              <ControlLabel>Done</ControlLabel>
+                              <Field
+                                name='done'
+                                component={MyToggle}
+                                checkedChildren={<Icon icon='check' inverse />}
+                              />
                             </FormGroup>
                           </Col>
                         </Row>
@@ -1379,7 +1789,11 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                   <Row gutter={20} style={{ marginBottom: '20px' }}>
                     <Col>
                       {maintenance.id && (
-                        <CommentList user={session.user.email} id={maintenance.id} initialComment={serverData.profile.notes} />
+                        <CommentList
+                          user={session.user.email}
+                          id={maintenance.id}
+                          initialComment={serverData.profile.notes}
+                        />
                       )}
                     </Col>
                   </Row>
@@ -1388,7 +1802,14 @@ const Maintenance = ({ session, serverData, suppliers }) => {
             </FlexboxGrid.Item>
             <FlexboxGrid.Item colspan={11} style={{ margin: '0 10px' }}>
               <Panel bordered className='panel-right'>
-                <Nav justified appearance='tabs' reversed activeKey={activeTab} onSelect={key => setActiveTab(key)} style={{ marginTop: '-1px' }}>
+                <Nav
+                  justified
+                  appearance='tabs'
+                  reversed
+                  activeKey={activeTab}
+                  onSelect={key => setActiveTab(key)}
+                  style={{ marginTop: '-1px' }}
+                >
                   <Nav.Item eventKey='customer'>Customer CIDs</Nav.Item>
                   <Nav.Item eventKey='reschedule'>Reschedule</Nav.Item>
                   <Nav.Item eventKey='changelog'>Changelog</Nav.Item>
@@ -1402,16 +1823,25 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                             <Container style={{ marginTop: '10px' }}>
                               <Row>
                                 <Col>
-                                  <Progress.Line percent={sentProgress} showInfo={false} />
+                                  <Progress.Line
+                                    percent={sentProgress}
+                                    showInfo={false}
+                                  />
                                 </Col>
                               </Row>
                               <Row>
-                                <Col style={{ width: '100%', height: '500px', padding: '20px' }}>
+                                <Col
+                                  style={{
+                                    width: '100%',
+                                    height: '500px',
+                                    padding: '20px',
+                                  }}
+                                >
                                   <div
                                     className='ag-theme-material'
                                     style={{
                                       height: '100%',
-                                      width: '100%'
+                                      width: '100%',
                                     }}
                                   >
                                     <AgGridReact
@@ -1420,7 +1850,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                                       onGridReady={handleGridReady}
                                       pagination
                                       deltaRowDataMode
-                                      getRowNodeId={(data) => {
+                                      getRowNodeId={data => {
                                         return data.kundenCID
                                       }}
                                     />
@@ -1462,43 +1892,41 @@ const Maintenance = ({ session, serverData, suppliers }) => {
             </FlexboxGrid.Item>
           </FlexboxGrid>
         </MaintPanel>
-        {
-          openReadModal && (
-            <ReadModal
-              maintenance={maintenance}
-              openReadModal={openReadModal}
-              toggleReadModal={toggleReadModal}
-              incomingAttachments={maintenance.incomingAttachments}
-              jsonData={serverData}
-            />
-          )
-        }
-        {
-          openPreviewModal && (
-            <MailEditor
-              open={openPreviewModal}
-              onHide={togglePreviewModal}
-              recipients={mailPreviewRecipients.toLowerCase()}
-              subject={mailPreviewSubject}
-              body={mailBodyText}
-              customerCid={mailPreviewCustomerCID}
-              sendMail={sendMail}
-              onEditorChange={handleEditorChange}
-            />
-          )
-        }
-        {
-          openConfirmFreezeModal && (
-            <ConfirmModal
-              show={openConfirmFreezeModal}
-              onHide={toggleConfirmFreezeModal}
-              header='Confirm Freeze'
-              content={`There is a network freeze for <b>${frozenCompany || ''}</b>. Are you sure you want to send this mail?`}
-              cancelAction={toggleConfirmFreezeModal}
-              confirmAction={() => prepareDirectSend(frozenState.recipient, frozenState.cid, false)}
-            />
-          )
-        }
+        {openReadModal && (
+          <ReadModal
+            maintenance={maintenance}
+            openReadModal={openReadModal}
+            toggleReadModal={toggleReadModal}
+            incomingAttachments={maintenance.incomingAttachments}
+            jsonData={serverData}
+          />
+        )}
+        {openPreviewModal && (
+          <MailEditor
+            open={openPreviewModal}
+            onHide={togglePreviewModal}
+            recipients={mailPreviewRecipients.toLowerCase()}
+            subject={mailPreviewSubject}
+            body={mailBodyText}
+            customerCid={mailPreviewCustomerCID}
+            sendMail={sendMail}
+            onEditorChange={handleEditorChange}
+          />
+        )}
+        {openConfirmFreezeModal && (
+          <ConfirmModal
+            show={openConfirmFreezeModal}
+            onHide={toggleConfirmFreezeModal}
+            header='Confirm Freeze'
+            content={`There is a network freeze for <b>${
+              frozenCompany || ''
+            }</b>. Are you sure you want to send this mail?`}
+            cancelAction={toggleConfirmFreezeModal}
+            confirmAction={() =>
+              prepareDirectSend(frozenState.recipient, frozenState.cid, false)
+            }
+          />
+        )}
       </Layout>
     )
   } else {
@@ -1520,8 +1948,8 @@ export async function getServerSideProps({ req, query }) {
       props: {
         serverData: { profile: query },
         suppliers,
-        session
-      }
+        session,
+      },
     }
   } else {
     const res = await fetch(`${protocol}//${host}/api/maintenances/${query.id}`)
@@ -1530,8 +1958,8 @@ export async function getServerSideProps({ req, query }) {
       props: {
         serverData,
         suppliers,
-        session
-      }
+        session,
+      },
     }
   }
 }

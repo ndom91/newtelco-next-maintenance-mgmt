@@ -1,10 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import format from 'date-fns/format'
-import {
-  Loader,
-  Timeline,
-  Icon
-} from 'rsuite'
+import { Loader, Timeline, Icon } from 'rsuite'
 
 const Changelog = ({ maintId }) => {
   const [fetching, setFetching] = useState(false)
@@ -13,7 +9,7 @@ const Changelog = ({ maintId }) => {
   useEffect(() => {
     setFetching(true)
     fetch(`/api/maintenances/history?mid=${maintId}`, {
-      method: 'get'
+      method: 'get',
     })
       .then(resp => resp.json())
       .then(data => {
@@ -60,12 +56,11 @@ const Changelog = ({ maintId }) => {
             dot = 'question'
           }
           return (
-            <Timeline.Item
-              key={item.id}
-              dot={<Icon icon={dot} />}
-            >
+            <Timeline.Item key={item.id} dot={<Icon icon={dot} />}>
               <p>{format(new Date(item.datetime), 'LLL dd, HH:mm')}</p>
-              <p>{item.user} {item.action || ''} {item.field || ''}</p>
+              <p>
+                {item.user} {item.action || ''} {item.field || ''}
+              </p>
             </Timeline.Item>
           )
         })}
@@ -73,15 +68,38 @@ const Changelog = ({ maintId }) => {
     )
   } else {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '150px' }}>
-        {fetching
-          ? (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '200px', width: '100%' }}>
-              <Loader />
-            </div>
-          ) : (
-            <h4 style={{ fontWeight: '100 !important', marginTop: '20px', color: 'var(--font-color)' }}>No History Available</h4>
-          )}
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          width: '100%',
+          height: '150px',
+        }}
+      >
+        {fetching ? (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              height: '200px',
+              width: '100%',
+            }}
+          >
+            <Loader />
+          </div>
+        ) : (
+          <h4
+            style={{
+              fontWeight: '100 !important',
+              marginTop: '20px',
+              color: 'var(--font-color)',
+            }}
+          >
+            No History Available
+          </h4>
+        )}
       </div>
     )
   }

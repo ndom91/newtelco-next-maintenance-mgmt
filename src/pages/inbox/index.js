@@ -18,7 +18,7 @@ import {
   Whisper,
   Tooltip,
   FlexboxGrid,
-  Loader
+  Loader,
 } from 'rsuite'
 
 const Inbox = ({ session, inboxItems }) => {
@@ -33,7 +33,11 @@ const Inbox = ({ session, inboxItems }) => {
   const { data } = useSWR(
     '/v1/api/inbox',
     url => fetch(url).then(res => res.json()),
-    { refreshInterval: 30000, focusThrottleInterval: 10000, initialData: inboxItems }
+    {
+      refreshInterval: 30000,
+      focusThrottleInterval: 10000,
+      initialData: inboxItems,
+    }
   )
 
   useEffect(() => {
@@ -46,7 +50,7 @@ const Inbox = ({ session, inboxItems }) => {
         if (mail.faviconUrl.length === 0) {
           const mailDomain = mail.domain
           fetch(`/v1/api/favicon?d=${mailDomain}`, {
-            method: 'get'
+            method: 'get',
           })
             .then(resp => resp.json())
             .then(data => {
@@ -67,12 +71,15 @@ const Inbox = ({ session, inboxItems }) => {
     }
   }, [])
 
-  const toggle = (mailId) => {
+  const toggle = mailId => {
     if (mailId) {
       const activeMail = inboxMails.findIndex(el => el.id === mailId)
 
       let mailBody = inboxMails[activeMail].body
-      const htmlRegex = new RegExp(/<(?:"[^"]*"[`"]*|'[^']*'['"]*|[^'">])+>/, 'gi')
+      const htmlRegex = new RegExp(
+        /<(?:"[^"]*"[`"]*|'[^']*'['"]*|[^'">])+>/,
+        'gi'
+      )
       // const htmlRegex2 = new RegExp('<([a-z]+)[^>]*(?<!/)>', 'gi')
       // const htmlRegex3 = new RegExp('<meta .*>', 'gi')
 
@@ -84,7 +91,7 @@ const Inbox = ({ session, inboxItems }) => {
         subject: inboxMails[activeMail].subject,
         from: inboxMails[activeMail].from,
         favicon: inboxMails[activeMail].faviconUrl,
-        body: mailBody
+        body: mailBody,
       }
       setIsOpen(!isOpen)
       setFaviconLoading(true)
@@ -107,8 +114,8 @@ const Inbox = ({ session, inboxItems }) => {
         mode: 'cors',
         headers: {
           'Access-Control-Allow-Origin': '*',
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+        },
       })
         .then(resp => resp.json())
         .then(data => {
@@ -121,15 +128,15 @@ const Inbox = ({ session, inboxItems }) => {
     }
   }
 
-  const onDelete = (mailId) => {
+  const onDelete = mailId => {
     fetch('/v1/api/inbox/delete', {
       method: 'post',
       body: JSON.stringify({ m: mailId }),
       mode: 'cors',
       headers: {
         'Access-Control-Allow-Origin': '*',
-        'Content-Type': 'application/json'
-      }
+        'Content-Type': 'application/json',
+      },
     })
       .then(resp => resp.json())
       .then(data => {
@@ -153,62 +160,102 @@ const Inbox = ({ session, inboxItems }) => {
       <Layout>
         <MaintPanel header='Inbox'>
           {inboxMails.length === 0 ? (
-            <FlexboxGrid justify='center' align='middle' style={{ margin: '40px 0' }}>
+            <FlexboxGrid
+              justify='center'
+              align='middle'
+              style={{ margin: '40px 0' }}
+            >
               <FlexboxGrid.Item>
-                <img src='/static/images/inbox0.svg' alt='Inbox' style={{ width: '400px' }} />
-                <h4 style={{ textAlign: 'center' }}>Congrats, nothing to do!</h4>
+                <img
+                  src='/static/images/inbox0.svg'
+                  alt='Inbox'
+                  style={{ width: '400px' }}
+                />
+                <h4 style={{ textAlign: 'center' }}>
+                  Congrats, nothing to do!
+                </h4>
               </FlexboxGrid.Item>
             </FlexboxGrid>
           ) : (
             <List bordered style={{ width: '100%' }}>
-              {Array.isArray(inboxMails) && inboxMails.map((mail, index) => {
-                return (
-                  <List.Item key={index}>
-                    <InboxItem
-                      mail={mail}
-                      index={index}
-                      handleDelete={onDelete}
-                      toggle={toggle}
-                    />
-                  </List.Item>
-                )
-              })}
+              {Array.isArray(inboxMails) &&
+                inboxMails.map((mail, index) => {
+                  return (
+                    <List.Item key={index}>
+                      <InboxItem
+                        mail={mail}
+                        index={index}
+                        handleDelete={onDelete}
+                        toggle={toggle}
+                      />
+                    </List.Item>
+                  )
+                })}
             </List>
           )}
         </MaintPanel>
         {isOpen && (
-          <Modal className='mail-modal-body' autoFocus backdrop show={isOpen} size='lg' onHide={() => toggle(null)} full>
+          <Modal
+            className='mail-modal-body'
+            autoFocus
+            backdrop
+            show={isOpen}
+            size='lg'
+            onHide={() => toggle(null)}
+            full
+          >
             <Modal.Header>
-              <FlexboxGrid justify='start' align='middle' style={{ width: '100%' }}>
-                <FlexboxGrid.Item colspan={2} style={{ display: 'flex', justifyContent: 'center' }}>
-                  {faviconLoading && (
-                    <Loader />
-                  )}
+              <FlexboxGrid
+                justify='start'
+                align='middle'
+                style={{ width: '100%' }}
+              >
+                <FlexboxGrid.Item
+                  colspan={2}
+                  style={{ display: 'flex', justifyContent: 'center' }}
+                >
+                  {faviconLoading && <Loader />}
                   <Avatar
                     size='lg'
                     src={modalInfo.favicon}
-                    style={{ backgroundColor: 'transparent', display: faviconLoading ? 'none' : 'block' }}
+                    style={{
+                      backgroundColor: 'transparent',
+                      display: faviconLoading ? 'none' : 'block',
+                    }}
                     onLoad={() => setFaviconLoading(false)}
                   />
                 </FlexboxGrid.Item>
                 <FlexboxGrid.Item colspan={20}>
                   <div className='modal-preview-text-wrapper'>
                     <InputGroup className='modal-textbox'>
-                      <InputGroup.Addon style={{ height: '31px' }} type='prepend'>
+                      <InputGroup.Addon
+                        style={{ height: '31px' }}
+                        type='prepend'
+                      >
                         From
                       </InputGroup.Addon>
                       <Input readonly='readonly' value={modalInfo.from} />
                     </InputGroup>
                     <InputGroup className='modal-textbox'>
-                      <InputGroup.Addon style={{ height: '31px' }} type='prepend'>
+                      <InputGroup.Addon
+                        style={{ height: '31px' }}
+                        type='prepend'
+                      >
                         Subject
                       </InputGroup.Addon>
-                      <Input type='text' readonly='readonly' value={modalInfo.subject} />
+                      <Input
+                        type='text'
+                        readonly='readonly'
+                        value={modalInfo.subject}
+                      />
                     </InputGroup>
                   </div>
                 </FlexboxGrid.Item>
                 <FlexboxGrid.Item colspan={1} style={{ marginLeft: '30px' }}>
-                  <Whisper speaker={<Tooltip>Translate</Tooltip>} placement='bottom'>
+                  <Whisper
+                    speaker={<Tooltip>Translate</Tooltip>}
+                    placement='bottom'
+                  >
                     <IconButton
                       onClick={handleTranslate}
                       appearance='default'
@@ -221,20 +268,21 @@ const Inbox = ({ session, inboxItems }) => {
               </FlexboxGrid>
             </Modal.Header>
             <Modal.Body className='mail-body'>
-              <div dangerouslySetInnerHTML={{ __html: modalInfo.body }} style={{ padding: '20px' }} />
+              <div
+                dangerouslySetInnerHTML={{ __html: modalInfo.body }}
+                style={{ padding: '20px' }}
+              />
             </Modal.Body>
           </Modal>
         )}
       </Layout>
     )
   } else {
-    return (
-      <RequireLogin />
-    )
+    return <RequireLogin />
   }
 }
 
-export async function getServerSideProps ({ req }) {
+export async function getServerSideProps({ req }) {
   const session = await NextAuth.session({ req })
   const host = req ? req.headers['x-forwarded-host'] : window.location.hostname
   let protocol = 'https:'
@@ -245,15 +293,15 @@ export async function getServerSideProps ({ req }) {
   const res = await fetch(pageRequest, {
     mode: 'cors',
     headers: {
-      'Access-Control-Allow-Origin': '*'
-    }
+      'Access-Control-Allow-Origin': '*',
+    },
   })
   const inboxContent = await res.json()
   return {
     props: {
       session,
-      inboxItems: inboxContent === 'No unread emails' ? [] : inboxContent
-    }
+      inboxItems: inboxContent === 'No unread emails' ? [] : inboxContent,
+    },
   }
 }
 

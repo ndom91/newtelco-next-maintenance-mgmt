@@ -4,7 +4,11 @@ import { IconButton } from 'rsuite'
 
 const EditBtn = ({ node }) => {
   return (
-    <Link href={{ pathname: '/maintenance', query: { id: node.data.id } }} as={`/maintenance?id=${node.data.id}`} passHref>
+    <Link
+      href={{ pathname: '/maintenance', query: { id: node.data.id } }}
+      as={`/maintenance?id=${node.data.id}`}
+      passHref
+    >
       <IconButton
         size='md'
         appearance='subtle'
@@ -29,4 +33,3 @@ const EditBtn = ({ node }) => {
 }
 
 export default EditBtn
-

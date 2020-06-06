@@ -8,11 +8,7 @@ const UpdatedAt = ({ node }) => {
   } else {
     dateTime = node.data.updatedAt
   }
-  return (
-    <span>
-      {dateTime}
-    </span>
-  )
+  return <span>{dateTime}</span>
 }
 
 export default UpdatedAt

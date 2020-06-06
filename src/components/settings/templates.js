@@ -3,7 +3,7 @@ import Select from 'react-select'
 import { Editor as TinyEditor } from '@tinymce/tinymce-react'
 
 export default class Templates extends React.Component {
-  static async getInitialProps ({ req, query }) {
+  static async getInitialProps({ req, query }) {
     // const host = req ? req.headers['x-forwarded-host'] : window.location.hostname
     // const protocol = 'https:'
     // if (host.indexOf('localhost') > -1) {
@@ -17,12 +17,12 @@ export default class Templates extends React.Component {
     // }
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       mailText: '',
       calendarText: '',
-      openSupplierCidAdd: false
+      openSupplierCidAdd: false,
     }
     this.handleMailBlur = this.handleMailBlur.bind(this)
     this.handleMailChange = this.handleMailChange.bind(this)
@@ -31,31 +31,19 @@ export default class Templates extends React.Component {
     this.handleSaveOnClick = this.handleSaveOnClick.bind(this)
   }
 
-  componentDidMount () {
+  componentDidMount() {}
 
-  }
+  handleMailChange() {}
 
-  handleMailChange () {
+  handleMailBlur() {}
 
-  }
+  handleCalChange() {}
 
-  handleMailBlur () {
+  handleCalBlur() {}
 
-  }
+  handleSaveOnClick() {}
 
-  handleCalChange () {
-
-  }
-
-  handleCalBlur () {
-
-  }
-
-  handleSaveOnClick () {
-
-  }
-
-  render () {
+  render() {
     return (
       <>
         <CardBody>
@@ -76,12 +64,11 @@ export default class Templates extends React.Component {
                   plugins: [
                     'advlist autolink lists link image print preview anchor',
                     'searchreplace code',
-                    'insertdatetime table paste code help wordcount'
+                    'insertdatetime table paste code help wordcount',
                   ],
-                  toolbar:
-                    `undo redo | formatselect | bold italic backcolor | 
+                  toolbar: `undo redo | formatselect | bold italic backcolor | 
                     alignleft aligncenter alignright alignjustify | 
-                    bullist numlist outdent indent | removeformat | help`
+                    bullist numlist outdent indent | removeformat | help`,
                 }}
                 onChange={this.handleMailChange}
               />
@@ -104,20 +91,20 @@ export default class Templates extends React.Component {
                   plugins: [
                     'advlist autolink lists link image print preview anchor',
                     'searchreplace code',
-                    'insertdatetime table paste code help wordcount'
+                    'insertdatetime table paste code help wordcount',
                   ],
-                  toolbar:
-                    `undo redo | formatselect | bold italic backcolor | 
+                  toolbar: `undo redo | formatselect | bold italic backcolor | 
                     alignleft aligncenter alignright alignjustify | 
                     bullist numlist outdent indent | removeformat | help`,
-                  content_style: 'html { color: #828282 }'
+                  content_style: 'html { color: #828282 }',
                 }}
                 onChange={this.handleCalChange}
               />
             </Container>
           </Container>
         </CardBody>
-        <style jsx>{`
+        <style jsx>
+          {`
             :global(.container-header) {
               font-size: 1.5em;
             }

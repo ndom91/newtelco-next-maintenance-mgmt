@@ -20,7 +20,7 @@ import {
   Icon,
   ButtonGroup,
   Toggle,
-  Loader
+  Loader,
 } from 'rsuite'
 
 const CustomerCIDs = props => {
@@ -44,32 +44,32 @@ const CustomerCIDs = props => {
       sortable: true,
       filter: true,
       selectable: true,
-      editable: true
+      editable: true,
     },
     columnDefs: [
       {
         headerName: 'ID',
         field: 'id',
         width: 60,
-        editable: false
+        editable: false,
       },
       {
         headerName: 'Newtelco CID',
         field: 'kundenCID',
-        width: 200
+        width: 200,
       },
       {
         headerName: 'Customer',
         field: 'name',
         width: 200,
         // sort: { direction: 'asc', priority: 0 },
-        editable: false
+        editable: false,
       },
       {
         headerName: 'Their CID',
         field: 'derenCID',
         width: 200,
-        editable: false
+        editable: false,
       },
       {
         headerName: 'Protected',
@@ -80,21 +80,21 @@ const CustomerCIDs = props => {
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
-          height: '100%'
-        }
-      }
+          height: '100%',
+        },
+      },
     ],
     rowSelection: 'single',
     frameworkComponents: {
       protectedIcon: ProtectedIcon,
-      customLoadingOverlay: Loader
+      customLoadingOverlay: Loader,
     },
-    loadingOverlayComponent: 'customLoadingOverlay'
+    loadingOverlayComponent: 'customLoadingOverlay',
   }
 
   useEffect(() => {
     fetch('/api/customercids', {
-      method: 'get'
+      method: 'get',
     })
       .then(resp => resp.json())
       .then(data => {
@@ -104,7 +104,7 @@ const CustomerCIDs = props => {
       .catch(err => console.error(err))
     // fill Companies Select
     fetch('/api/companies/selectmaint', {
-      method: 'get'
+      method: 'get',
     })
       .then(resp => resp.json())
       .then(data => {
@@ -113,7 +113,7 @@ const CustomerCIDs = props => {
       .catch(err => console.error(`Error - ${err}`))
     // fill Supplier Select
     fetch('/api/lieferantcids/select', {
-      method: 'get'
+      method: 'get',
     })
       .then(resp => resp.json())
       .then(data => {
@@ -136,20 +136,20 @@ const CustomerCIDs = props => {
   const handleCompanyChange = selectedOption => {
     setNewCompanySelection({
       value: selectedOption.value,
-      label: selectedOption.label
+      label: selectedOption.label,
     })
   }
 
   const handleSupplierCidChange = selectedOption => {
     setNewSupplierSelection({
       value: selectedOption.value,
-      label: selectedOption.label
+      label: selectedOption.label,
     })
   }
 
   const handleDelete = () => {
     fetch(`/api/settings/delete/customercids?id=${customerCidIdToDelete}`, {
-      method: 'get'
+      method: 'get',
     })
       .then(resp => resp.json())
       .then(data => {
@@ -182,13 +182,25 @@ const CustomerCIDs = props => {
   }
 
   const handleAddCustomerCid = () => {
-    fetch(`/api/settings/add/customercids?customercid=${encodeURIComponent(newNewtelcoCid)}&company=${encodeURIComponent(newCompanySelection.value)}&protection=${encodeURIComponent(newProtection)}&supplier=${encodeURIComponent(newSupplierSelection.value)}`, {
-      method: 'get'
-    })
+    fetch(
+      `/api/settings/add/customercids?customercid=${encodeURIComponent(
+        newNewtelcoCid
+      )}&company=${encodeURIComponent(
+        newCompanySelection.value
+      )}&protection=${encodeURIComponent(
+        newProtection
+      )}&supplier=${encodeURIComponent(newSupplierSelection.value)}`,
+      {
+        method: 'get',
+      }
+    )
       .then(resp => resp.json())
       .then(data => {
         const insertId = data.insertCustomerCidQuery.insertId
-        if (data.insertCustomerCidQuery.affectedRows === 1 && data.insertCustomerCidQuery.warningCount === 0) {
+        if (
+          data.insertCustomerCidQuery.affectedRows === 1 &&
+          data.insertCustomerCidQuery.warningCount === 0
+        ) {
           Notify('success', `${newNewtelcoCid} Added`)
         } else {
           Notify('warning', 'Error', data.err)
@@ -200,7 +212,7 @@ const CustomerCIDs = props => {
           derenCID: newSupplierSelection.label,
           kundenCID: newNewtelcoCid,
           name: newCompanySelection.label,
-          protected: newProtectionValue || '0'
+          protected: newProtectionValue || '0',
         })
         setRowData(newRowData)
         setOpenCustomerCidAdd(!openCustomerCidAdd)
@@ -218,9 +230,14 @@ const CustomerCIDs = props => {
     const newCustomerCid = params.data.kundenCID
     const newProtected = params.data.protected
 
-    fetch(`/api/settings/edit/customercids?id=${id}&customercid=${encodeURIComponent(newCustomerCid)}&protected=${encodeURIComponent(newProtected)}`, {
-      method: 'get'
-    })
+    fetch(
+      `/api/settings/edit/customercids?id=${id}&customercid=${encodeURIComponent(
+        newCustomerCid
+      )}&protected=${encodeURIComponent(newProtected)}`,
+      {
+        method: 'get',
+      }
+    )
       .then(resp => resp.json())
       .then(data => {
         if (data.updateCustomerCidQuery.affectedRows === 1) {
@@ -237,10 +254,20 @@ const CustomerCIDs = props => {
       <FlexboxGrid justify='end' align='middle'>
         <FlexboxGrid.Item>
           <ButtonGroup>
-            <IconButton onClick={toggleCustomerCidAdd} icon={<Icon icon='plus-circle' />} appearance='ghost' placement='right'>
+            <IconButton
+              onClick={toggleCustomerCidAdd}
+              icon={<Icon icon='plus-circle' />}
+              appearance='ghost'
+              placement='right'
+            >
               Add
             </IconButton>
-            <IconButton onClick={toggleCustomerCidDeleteModal} icon={<Icon icon='trash' />} appearance='ghost' placement='right'>
+            <IconButton
+              onClick={toggleCustomerCidDeleteModal}
+              icon={<Icon icon='trash' />}
+              appearance='ghost'
+              placement='right'
+            >
               Delete
             </IconButton>
           </ButtonGroup>
@@ -257,7 +284,7 @@ const CustomerCIDs = props => {
             className='ag-theme-material'
             style={{
               height: '700px',
-              width: '100%'
+              width: '100%',
             }}
           >
             <AgGridReact
@@ -267,7 +294,7 @@ const CustomerCIDs = props => {
               onCellEditingStopped={handleCellEdit}
               animateRows
               deltaRowDataMode
-              getRowNodeId={(data) => {
+              getRowNodeId={data => {
                 return data.id
               }}
               stopEditingWhenGridLosesFocus
@@ -286,17 +313,32 @@ const CustomerCIDs = props => {
         />
       )}
       {openCustomerCidAdd && (
-        <Modal backdrop show={openCustomerCidAdd} size='xs' onHide={toggleCustomerCidAdd}>
-          <Modal.Header>
-            New Customer CID
-          </Modal.Header>
+        <Modal
+          backdrop
+          show={openCustomerCidAdd}
+          size='xs'
+          onHide={toggleCustomerCidAdd}
+        >
+          <Modal.Header>New Customer CID</Modal.Header>
           <Modal.Body style={{ overflow: 'visible' }}>
-            <FlexboxGrid justify='space-around' align='middle' style={{ flexDirection: 'column', height: '450px' }}>
-              <FlexboxGrid.Item style={{ fontFamily: 'var(--font-body)', fontSize: '1.1rem' }}>
+            <FlexboxGrid
+              justify='space-around'
+              align='middle'
+              style={{ flexDirection: 'column', height: '450px' }}
+            >
+              <FlexboxGrid.Item
+                style={{ fontFamily: 'var(--font-body)', fontSize: '1.1rem' }}
+              >
                 <Form>
                   <FormGroup>
                     <ControlLabel>Newtelco CID</ControlLabel>
-                    <Input key='input-name' name='name' type='text' value={newNewtelcoCid} onChange={value => setNewNewtelcoCid(value)} />
+                    <Input
+                      key='input-name'
+                      name='name'
+                      type='text'
+                      value={newNewtelcoCid}
+                      onChange={value => setNewNewtelcoCid(value)}
+                    />
                   </FormGroup>
                   <FormGroup>
                     <ControlLabel>Customer</ControlLabel>
@@ -322,16 +364,27 @@ const CustomerCIDs = props => {
                   </FormGroup>
                   <FormGroup>
                     <ControlLabel>Protected</ControlLabel>
-                    <Toggle checked={newProtection} onChange={() => setNewProtection(!newProtection)} />
+                    <Toggle
+                      checked={newProtection}
+                      onChange={() => setNewProtection(!newProtection)}
+                    />
                   </FormGroup>
                 </Form>
               </FlexboxGrid.Item>
               <FlexboxGrid.Item>
                 <ButtonGroup block style={{ width: '20em' }}>
-                  <Button appearance='default' onClick={toggleCustomerCidAdd} style={{ width: '50%' }}>
+                  <Button
+                    appearance='default'
+                    onClick={toggleCustomerCidAdd}
+                    style={{ width: '50%' }}
+                  >
                     Cancel
                   </Button>
-                  <Button appearance='primary' onClick={handleAddCustomerCid} style={{ width: '50%' }}>
+                  <Button
+                    appearance='primary'
+                    onClick={handleAddCustomerCid}
+                    style={{ width: '50%' }}
+                  >
                     Confirm
                   </Button>
                 </ButtonGroup>
@@ -353,7 +406,7 @@ CustomerCIDs.getInitialProps = async ({ req, query }) => {
   const res = await fetch(pageRequest)
   const json = await res.json()
   return {
-    jsonData: json
+    jsonData: json,
   }
 }
 

@@ -15,7 +15,10 @@ const objDiff = (origObj, newObj) => {
     return transform(newObj, (result, value, key) => {
       if (!isEqual(value, origObj[key])) {
         const resultKey = isArray(origObj) ? arrayIndexCounter++ : key
-        result[resultKey] = (isObject(value) && isObject(origObj[key])) ? changes(value, origObj[key]) : value
+        result[resultKey] =
+          isObject(value) && isObject(origObj[key])
+            ? changes(value, origObj[key])
+            : value
       }
     })
   }

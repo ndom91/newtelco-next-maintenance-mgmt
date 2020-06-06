@@ -6,7 +6,7 @@ import Adapters from 'next-auth/adapters'
 const database = {
   type: 'sqlite',
   database: ':memory:',
-  synchronize: true
+  synchronize: true,
 }
 
 const options = {
@@ -14,8 +14,8 @@ const options = {
   providers: [
     Providers.Google({
       clientId: process.env.GOOGLE_ID,
-      clientSecret: process.env.GOOGLE_SECRET
-    })
+      clientSecret: process.env.GOOGLE_SECRET,
+    }),
   ],
   adapter: Adapters.Default(database),
   pages: {

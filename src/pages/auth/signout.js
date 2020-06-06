@@ -27,7 +27,11 @@ const SignOut = ({ providers }) => {
             xs={18}
           >
             <div style={{ marginBottom: '40px' }}>
-              <img style={{ width: '70%', margin: '0 auto' }} src='/static/images/nt-black.png' alt='Newtelco Logo' />
+              <img
+                style={{ width: '70%', margin: '0 auto' }}
+                src='/static/images/nt-black.png'
+                alt='Newtelco Logo'
+              />
             </div>
             <Panel
               header='Network Maintenance'
@@ -45,7 +49,7 @@ const SignOut = ({ providers }) => {
                   style={{
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center'
+                    justifyContent: 'center',
                   }}
                 >
                   Signout

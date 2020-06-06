@@ -11,11 +11,7 @@ const StartDateTime = ({ node }) => {
   } else {
     dateTime = node.data.startDateTime
   }
-  return (
-    <span>
-      {dateTime}
-    </span>
-  )
+  return <span>{dateTime}</span>
 }
 
 export default StartDateTime

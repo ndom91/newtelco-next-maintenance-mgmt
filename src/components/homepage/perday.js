@@ -10,15 +10,20 @@ const Heatmap = () => {
   )
 
   if (data) {
-    return (
-      <div style={{ width: '100%', maxWidth: '1300px' }}>
-        TODO
-      </div>
-    )
+    return <div style={{ width: '100%', maxWidth: '1300px' }}>TODO</div>
   } else {
     return (
       <div style={{ height: '165px', width: '100%', maxWidth: '1300px' }}>
-        <Placeholder.Graph active height='165px' style={{ maxWidth: '1300px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Placeholder.Graph
+          active
+          height='165px'
+          style={{
+            maxWidth: '1300px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
           <Loader content='Loading...' />
         </Placeholder.Graph>
       </div>

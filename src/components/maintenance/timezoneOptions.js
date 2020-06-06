@@ -76,7 +76,7 @@ const timezones = [
   'Asia/Magadan',
   'Pacific/Fiji',
   'Pacific/Auckland',
-  'Pacific/Tongatapu'
+  'Pacific/Tongatapu',
 ]
 
 const tzi18n = {
@@ -105,7 +105,7 @@ const tzi18n = {
   'Etc/GMT+2': 'Mid-Atlantic',
   'Atlantic/Azores': 'Azores',
   'Atlantic/Cape_Verde': 'Cape Verde Islands',
-  'GMT': 'Dublin, Edinburgh, Lisbon, London',
+  GMT: 'Dublin, Edinburgh, Lisbon, London',
   'Africa/Casablanca': 'Casablanca, Monrovia',
   'Atlantic/Canary': 'Canary Islands',
   'Europe/Belgrade': 'Belgrade, Bratislava, Budapest, Ljubljana, Prague',
@@ -155,10 +155,10 @@ const tzi18n = {
   'Asia/Magadan': 'Magadan, Solomon Islands, New Caledonia',
   'Pacific/Fiji': 'Fiji Islands, Kamchatka, Marshall Islands',
   'Pacific/Auckland': 'Auckland, Wellington',
-  'Pacific/Tongatapu': "Nuku'alofa"
+  'Pacific/Tongatapu': "Nuku'alofa",
 }
 
-const _t = (s) => {
+const _t = s => {
   if (tzi18n !== null && tzi18n[s]) {
     return tzi18n[s]
   }
@@ -168,14 +168,15 @@ const _t = (s) => {
 
 const tzOptions = []
 
-moment.tz.names()
+moment.tz
+  .names()
   .filter(tz => {
     return timezones.includes(tz)
   })
   .reduce((memo, tz) => {
     memo.push({
       name: tz,
-      offset: moment.tz(tz).utcOffset()
+      offset: moment.tz(tz).utcOffset(),
     })
 
     return memo

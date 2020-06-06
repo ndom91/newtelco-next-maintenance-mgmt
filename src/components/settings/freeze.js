@@ -24,7 +24,7 @@ import {
   ControlLabel,
   HelpBlock,
   DatePicker,
-  Loader
+  Loader,
 } from 'rsuite'
 
 const Freeze = props => {
@@ -45,7 +45,7 @@ const Freeze = props => {
       sortable: true,
       filter: true,
       selectable: true,
-      editable: true
+      editable: true,
     },
     columnDefs: [
       {
@@ -53,44 +53,44 @@ const Freeze = props => {
         field: 'id',
         width: 80,
         editable: false,
-        sort: { direction: 'asc', priority: 1 }
+        sort: { direction: 'asc', priority: 1 },
       },
       {
         headerName: 'Company',
         field: 'name',
         width: 200,
-        editable: false
+        editable: false,
       },
       {
         headerName: 'Start Date',
         field: 'startDateTime',
         width: 200,
-        cellRenderer: 'startdateTime'
+        cellRenderer: 'startdateTime',
       },
       {
         headerName: 'End Date',
         field: 'endDateTime',
         width: 200,
-        cellRenderer: 'enddateTime'
+        cellRenderer: 'enddateTime',
       },
       {
         headerName: 'Notes',
         field: 'notes',
-        width: 300
-      }
+        width: 300,
+      },
     ],
     rowSelection: 'single',
     frameworkComponents: {
       startdateTime: StartDateTime,
       enddateTime: EndDateTime,
-      customLoadingOverlay: Loader
+      customLoadingOverlay: Loader,
     },
-    loadingOverlayComponent: 'customLoadingOverlay'
+    loadingOverlayComponent: 'customLoadingOverlay',
   }
 
   useEffect(() => {
     fetch('/api/freeze', {
-      method: 'get'
+      method: 'get',
     })
       .then(resp => resp.json())
       .then(data => {
@@ -100,7 +100,7 @@ const Freeze = props => {
       .catch(err => console.error(err))
     // fill Companies Select
     fetch('/api/companies/selectmaint', {
-      method: 'get'
+      method: 'get',
     })
       .then(resp => resp.json())
       .then(data => {
@@ -122,7 +122,7 @@ const Freeze = props => {
   const handleCompanyChange = selectedOption => {
     setNewCompany({
       value: selectedOption.value,
-      label: selectedOption.label
+      label: selectedOption.label,
     })
   }
 
@@ -142,7 +142,7 @@ const Freeze = props => {
 
   const handleDelete = () => {
     fetch(`/api/settings/delete/freeze?id=${freezeIdToDelete}`, {
-      method: 'get'
+      method: 'get',
     })
       .then(resp => resp.json())
       .then(data => {
@@ -175,20 +175,39 @@ const Freeze = props => {
   }
 
   const handleFreezeAdd = () => {
-    fetch(`/api/settings/add/freeze?companyid=${encodeURIComponent(newCompany.value)}&startdatetime=${encodeURIComponent(newStartDateTime)}&enddatetime=${encodeURIComponent(newEndDateTime)}&notes=${encodeURIComponent(newNotes)}`, {
-      method: 'get'
-    })
+    fetch(
+      `/api/settings/add/freeze?companyid=${encodeURIComponent(
+        newCompany.value
+      )}&startdatetime=${encodeURIComponent(
+        newStartDateTime
+      )}&enddatetime=${encodeURIComponent(
+        newEndDateTime
+      )}&notes=${encodeURIComponent(newNotes)}`,
+      {
+        method: 'get',
+      }
+    )
       .then(resp => resp.json())
       .then(data => {
         const insertId = data.insertFreezeQuery.insertId
         const newCompanyName = newCompany.label
-        if (data.insertFreezeQuery.affectedRows === 1 && data.insertFreezeQuery.warningCount === 0) {
+        if (
+          data.insertFreezeQuery.affectedRows === 1 &&
+          data.insertFreezeQuery.warningCount === 0
+        ) {
           Notify('success', `Freeze for ${newCompanyName} Added`)
         } else {
           Notify('warning', 'Error', data.err)
         }
         const newRowData = rowData
-        newRowData.push({ id: insertId, name: newCompany.label, companyId: newCompany.value, startDateTime: newStartDateTime, endDateTime: newEndDateTime, notes: newNotes })
+        newRowData.push({
+          id: insertId,
+          name: newCompany.label,
+          companyId: newCompany.value,
+          startDateTime: newStartDateTime,
+          endDateTime: newEndDateTime,
+          notes: newNotes,
+        })
         setRowData(newRowData)
         setOpenFreezeAdd(!openFreezeAdd)
         gridApi.current.setRowData(newRowData)
@@ -198,13 +217,24 @@ const Freeze = props => {
 
   const handleCellEdit = params => {
     const id = params.data.id
-    const startdate = moment(params.data.startDateTime).format('YYYY.MM.DD HH:mm:ss')
-    const enddate = moment(params.data.endDateTime).format('YYYY.MM.DD HH:mm:ss')
+    const startdate = moment(params.data.startDateTime).format(
+      'YYYY.MM.DD HH:mm:ss'
+    )
+    const enddate = moment(params.data.endDateTime).format(
+      'YYYY.MM.DD HH:mm:ss'
+    )
     const notes = params.data.notes
 
-    fetch(`/api/settings/edit/freeze?id=${id}&startdate=${encodeURIComponent(startdate)}&enddate=${encodeURIComponent(enddate)}&notes=${encodeURIComponent(notes)}`, {
-      method: 'get'
-    })
+    fetch(
+      `/api/settings/edit/freeze?id=${id}&startdate=${encodeURIComponent(
+        startdate
+      )}&enddate=${encodeURIComponent(enddate)}&notes=${encodeURIComponent(
+        notes
+      )}`,
+      {
+        method: 'get',
+      }
+    )
       .then(resp => resp.json())
       .then(data => {
         if (data.updateFreezeQuery.affectedRows === 1) {
@@ -221,10 +251,20 @@ const Freeze = props => {
       <FlexboxGrid justify='end' align='middle'>
         <FlexboxGrid.Item>
           <ButtonGroup>
-            <IconButton onClick={toggleFreezeAddModal} icon={<Icon icon='plus-circle' />} appearance='ghost' placement='right'>
+            <IconButton
+              onClick={toggleFreezeAddModal}
+              icon={<Icon icon='plus-circle' />}
+              appearance='ghost'
+              placement='right'
+            >
               Add
             </IconButton>
-            <IconButton onClick={toggleFreezeDeleteModal} icon={<Icon icon='trash' />} appearance='ghost' placement='right'>
+            <IconButton
+              onClick={toggleFreezeDeleteModal}
+              icon={<Icon icon='trash' />}
+              appearance='ghost'
+              placement='right'
+            >
               Delete
             </IconButton>
           </ButtonGroup>
@@ -240,7 +280,7 @@ const Freeze = props => {
           className='ag-theme-material'
           style={{
             height: '700px',
-            width: '100%'
+            width: '100%',
           }}
         >
           <AgGridReact
@@ -251,7 +291,7 @@ const Freeze = props => {
             rowData={rowData}
             stopEditingWhenGridLosesFocus
             deltaRowDataMode
-            getRowNodeId={(data) => {
+            getRowNodeId={data => {
               return data.id
             }}
           />
@@ -268,13 +308,22 @@ const Freeze = props => {
         />
       )}
       {openFreezeAdd && (
-        <Modal backdrop show={openFreezeAdd} size='sm' onHide={toggleFreezeAddModal}>
-          <Modal.Header>
-            New Freeze
-          </Modal.Header>
+        <Modal
+          backdrop
+          show={openFreezeAdd}
+          size='sm'
+          onHide={toggleFreezeAddModal}
+        >
+          <Modal.Header>New Freeze</Modal.Header>
           <Modal.Body>
-            <FlexboxGrid justify='space-around' align='middle' style={{ flexDirection: 'column', height: '450px' }}>
-              <FlexboxGrid.Item style={{ fontFamily: 'var(--font-body)', fontSize: '1.1rem' }}>
+            <FlexboxGrid
+              justify='space-around'
+              align='middle'
+              style={{ flexDirection: 'column', height: '450px' }}
+            >
+              <FlexboxGrid.Item
+                style={{ fontFamily: 'var(--font-body)', fontSize: '1.1rem' }}
+              >
                 <Form>
                   <FormGroup>
                     <ControlLabel>Customer</ControlLabel>
@@ -310,16 +359,30 @@ const Freeze = props => {
                   </FormGroup>
                   <FormGroup>
                     <ControlLabel>Notes</ControlLabel>
-                    <Input name='notes' type='text' componentClass='textarea' value={newNotes} onChange={value => setNewNotes(value)} />
+                    <Input
+                      name='notes'
+                      type='text'
+                      componentClass='textarea'
+                      value={newNotes}
+                      onChange={value => setNewNotes(value)}
+                    />
                   </FormGroup>
                 </Form>
               </FlexboxGrid.Item>
               <FlexboxGrid.Item>
                 <ButtonGroup block style={{ width: '20em' }}>
-                  <Button appearance='default' onClick={toggleFreezeAddModal} style={{ width: '50%' }}>
+                  <Button
+                    appearance='default'
+                    onClick={toggleFreezeAddModal}
+                    style={{ width: '50%' }}
+                  >
                     Cancel
                   </Button>
-                  <Button appearance='primary' onClick={handleFreezeAdd} style={{ width: '50%' }}>
+                  <Button
+                    appearance='primary'
+                    onClick={handleFreezeAdd}
+                    style={{ width: '50%' }}
+                  >
                     Confirm
                   </Button>
                 </ButtonGroup>
@@ -342,7 +405,7 @@ Freeze.getInitialProps = async ({ req }) => {
   const res = await fetch(pageRequest)
   const json = await res.json()
   return {
-    jsonData: json
+    jsonData: json,
   }
 }
 

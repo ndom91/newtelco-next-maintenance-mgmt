@@ -11,11 +11,7 @@ const EndDateTime = ({ node }) => {
   } else {
     dateTime = node.data.endDateTime
   }
-  return (
-    <span>
-      {dateTime}
-    </span>
-  )
+  return <span>{dateTime}</span>
 }
 
 export default EndDateTime

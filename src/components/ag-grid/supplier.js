@@ -12,13 +12,10 @@ const UpdatedAt = ({ node }) => {
         />
       </FlexboxGrid.Item>
       <FlexboxGrid.Item>
-        <span>
-          {node.data.name}
-        </span>
+        <span>{node.data.name}</span>
       </FlexboxGrid.Item>
     </FlexboxGrid>
   )
 }
 
 export default UpdatedAt
-

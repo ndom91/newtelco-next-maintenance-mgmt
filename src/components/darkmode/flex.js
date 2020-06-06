@@ -1,78 +1,78 @@
 const margin = {
   horizontal: 'marginRight',
-  vertical: 'marginBottom'
+  vertical: 'marginBottom',
 }
 
 export const flex = {
   horizontal: {
     display: 'flex',
-    flexDirection: 'row'
+    flexDirection: 'row',
   },
   vertical: {
     display: 'flex',
-    flexDirection: 'column'
+    flexDirection: 'column',
   },
   flexWrap: {
     display: 'flex',
-    flexWrap: 'wrap'
+    flexWrap: 'wrap',
   },
   centerHorizontal: {
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   wrap: {
-    flexWrap: 'wrap'
+    flexWrap: 'wrap',
   },
   horizontalReverse: {
     display: 'flex',
-    flexDirection: 'row-reverse'
+    flexDirection: 'row-reverse',
   },
   verticalReverse: {
     display: 'flex',
-    flexDirection: 'column-reverse'
+    flexDirection: 'column-reverse',
   },
   noWrap: {
-    flexWrap: 'nowrap'
+    flexWrap: 'nowrap',
   },
   centerHorizontalH: {
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
   centerHorizontalV: {
-    alignItems: 'center'
+    alignItems: 'center',
   },
   centerVertical: {
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
   centerVerticalH: {
-    alignItems: 'center'
+    alignItems: 'center',
   },
   centerVerticalV: {
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
   spaceAround: {
-    justifyContent: 'space-around'
+    justifyContent: 'space-around',
   },
   spaceBetween: {
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
   },
   justifyEnd: {
-    justifyContent: 'flex-end'
+    justifyContent: 'flex-end',
   },
   alignStart: {
-    alignContent: 'flex-start'
+    alignContent: 'flex-start',
   },
   stretchSelf: {
-    alignSelf: 'stretch'
+    alignSelf: 'stretch',
   },
   spaceChildren: (space, direction = 'horizontal') => ({
     '& > *': {
-      [margin[direction]]: space
+      [margin[direction]]: space,
     },
     '& > *:last-child': {
-      [margin[direction]]: 0
-    }
-  })
+      [margin[direction]]: 0,
+    },
+  }),
 }
 
 export default flex

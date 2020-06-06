@@ -17,7 +17,7 @@ import {
   FlexboxGrid,
   Modal,
   ControlLabel,
-  Loader
+  Loader,
 } from 'rsuite'
 
 const SupplierCIDs = props => {
@@ -36,37 +36,37 @@ const SupplierCIDs = props => {
       sortable: true,
       filter: true,
       selectable: true,
-      editable: true
+      editable: true,
     },
     columnDefs: [
       {
         headerName: 'ID',
         field: 'id',
         width: 60,
-        editable: false
+        editable: false,
       },
       {
         headerName: 'Company',
         field: 'name',
         width: 200,
-        editable: false
+        editable: false,
       },
       {
         headerName: 'Supplier CID',
         field: 'derenCID',
-        width: 200
-      }
+        width: 200,
+      },
     ],
     rowSelection: 'single',
     frameworkComponents: {
-      customLoadingOverlay: Loader
+      customLoadingOverlay: Loader,
     },
-    loadingOverlayComponent: 'customLoadingOverlay'
+    loadingOverlayComponent: 'customLoadingOverlay',
   }
 
   useEffect(() => {
     fetch('/api/lieferantcids/settings', {
-      method: 'get'
+      method: 'get',
     })
       .then(resp => resp.json())
       .then(data => {
@@ -76,7 +76,7 @@ const SupplierCIDs = props => {
       .catch(err => console.error(err))
     // fill Companies Select
     fetch('/api/companies/selectmaint', {
-      method: 'get'
+      method: 'get',
     })
       .then(resp => resp.json())
       .then(data => {
@@ -99,13 +99,13 @@ const SupplierCIDs = props => {
   const handleCompanyChange = selectedOption => {
     setNewCompanySelection({
       value: selectedOption.value,
-      label: selectedOption.label
+      label: selectedOption.label,
     })
   }
 
   const handleDelete = () => {
     fetch(`/api/settings/delete/suppliercids?id=${supplierCidToDelete.id}`, {
-      method: 'get'
+      method: 'get',
     })
       .then(resp => resp.json())
       .then(data => {
@@ -137,19 +137,31 @@ const SupplierCIDs = props => {
   }
 
   const handleAddSupplierCid = () => {
-    fetch(`/api/settings/add/suppliercids?cid=${encodeURIComponent(newSupplierCid)}&company=${encodeURIComponent(newCompanySelection.value)}`, {
-      method: 'get'
-    })
+    fetch(
+      `/api/settings/add/suppliercids?cid=${encodeURIComponent(
+        newSupplierCid
+      )}&company=${encodeURIComponent(newCompanySelection.value)}`,
+      {
+        method: 'get',
+      }
+    )
       .then(resp => resp.json())
       .then(data => {
         const insertId = data.insertSupplierCidQuery.insertId
-        if (data.insertSupplierCidQuery.affectedRows === 1 && data.insertSupplierCidQuery.warningCount === 0) {
+        if (
+          data.insertSupplierCidQuery.affectedRows === 1 &&
+          data.insertSupplierCidQuery.warningCount === 0
+        ) {
           Notify('success', `${newSupplierCid} Added`)
         } else {
           Notify('warning', 'Error', data.err)
         }
         const newRowData = rowData
-        newRowData.push({ id: insertId, derenCID: newSupplierCid, name: newCompanySelection.label })
+        newRowData.push({
+          id: insertId,
+          derenCID: newSupplierCid,
+          name: newCompanySelection.label,
+        })
         setRowData(newRowData)
         setOpenSupplierCidAdd(!openSupplierCidAdd)
         gridApi.current.setRowData(newRowData)
@@ -161,9 +173,14 @@ const SupplierCIDs = props => {
     const id = params.data.id
     const newSupplierCid = params.data.derenCID
 
-    fetch(`/api/settings/edit/suppliercids?id=${id}&suppliercid=${encodeURIComponent(newSupplierCid)}`, {
-      method: 'get'
-    })
+    fetch(
+      `/api/settings/edit/suppliercids?id=${id}&suppliercid=${encodeURIComponent(
+        newSupplierCid
+      )}`,
+      {
+        method: 'get',
+      }
+    )
       .then(resp => resp.json())
       .then(data => {
         if (data.updateSupplierCidQuery.affectedRows === 1) {
@@ -180,10 +197,20 @@ const SupplierCIDs = props => {
       <FlexboxGrid justify='end' align='middle'>
         <FlexboxGrid.Item>
           <ButtonGroup>
-            <IconButton onClick={toggleSupplierCidAdd} icon={<Icon icon='plus-circle' />} appearance='ghost' placement='right'>
+            <IconButton
+              onClick={toggleSupplierCidAdd}
+              icon={<Icon icon='plus-circle' />}
+              appearance='ghost'
+              placement='right'
+            >
               Add
             </IconButton>
-            <IconButton onClick={toggleSupplierCidDeleteModal} icon={<Icon icon='trash' />} appearance='ghost' placement='right'>
+            <IconButton
+              onClick={toggleSupplierCidDeleteModal}
+              icon={<Icon icon='trash' />}
+              appearance='ghost'
+              placement='right'
+            >
               Delete
             </IconButton>
           </ButtonGroup>
@@ -200,7 +227,7 @@ const SupplierCIDs = props => {
             className='ag-theme-material'
             style={{
               height: '700px',
-              width: '100%'
+              width: '100%',
             }}
           >
             <AgGridReact
@@ -211,7 +238,7 @@ const SupplierCIDs = props => {
               rowData={rowData}
               stopEditingWhenGridLosesFocus
               deltaRowDataMode
-              getRowNodeId={(data) => {
+              getRowNodeId={data => {
                 return data.id
               }}
             />
@@ -229,13 +256,22 @@ const SupplierCIDs = props => {
         />
       )}
       {openSupplierCidAdd && (
-        <Modal backdrop show={openSupplierCidAdd} size='xs' onHide={toggleSupplierCidAdd}>
-          <Modal.Header>
-            New Supplier CID
-          </Modal.Header>
+        <Modal
+          backdrop
+          show={openSupplierCidAdd}
+          size='xs'
+          onHide={toggleSupplierCidAdd}
+        >
+          <Modal.Header>New Supplier CID</Modal.Header>
           <Modal.Body style={{ overflow: 'visible' }}>
-            <FlexboxGrid justify='space-around' align='middle' style={{ flexDirection: 'column', height: '350px' }}>
-              <FlexboxGrid.Item style={{ fontFamily: 'var(--font-body)', fontSize: '1.1rem' }}>
+            <FlexboxGrid
+              justify='space-around'
+              align='middle'
+              style={{ flexDirection: 'column', height: '350px' }}
+            >
+              <FlexboxGrid.Item
+                style={{ fontFamily: 'var(--font-body)', fontSize: '1.1rem' }}
+              >
                 <Form>
                   <FormGroup>
                     <ControlLabel>Customer</ControlLabel>
@@ -250,16 +286,30 @@ const SupplierCIDs = props => {
                   </FormGroup>
                   <FormGroup>
                     <ControlLabel>Supplier CID</ControlLabel>
-                    <Input id='updated-by' name='updated-by' type='text' value={newSupplierCid} onChange={value => setNewSupplierCid(value)} />
+                    <Input
+                      id='updated-by'
+                      name='updated-by'
+                      type='text'
+                      value={newSupplierCid}
+                      onChange={value => setNewSupplierCid(value)}
+                    />
                   </FormGroup>
                 </Form>
               </FlexboxGrid.Item>
               <FlexboxGrid.Item>
                 <ButtonGroup block style={{ width: '20em' }}>
-                  <Button appearance='default' onClick={toggleSupplierCidAdd} style={{ width: '50%' }}>
+                  <Button
+                    appearance='default'
+                    onClick={toggleSupplierCidAdd}
+                    style={{ width: '50%' }}
+                  >
                     Cancel
                   </Button>
-                  <Button appearance='primary' onClick={handleAddSupplierCid} style={{ width: '50%' }}>
+                  <Button
+                    appearance='primary'
+                    onClick={handleAddSupplierCid}
+                    style={{ width: '50%' }}
+                  >
                     Confirm
                   </Button>
                 </ButtonGroup>
@@ -282,7 +332,7 @@ SupplierCIDs.getInitialProps = async ({ req, query }) => {
   const res = await fetch(pageRequest)
   const json = await res.json()
   return {
-    jsonData: json
+    jsonData: json,
   }
 }
 

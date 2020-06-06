@@ -1,28 +1,31 @@
 import React from 'react'
-import {
-  Icon,
-  Badget
-} from 'rsuite'
+import { Icon, Badget } from 'rsuite'
 
 const SentIcon = ({ node }) => {
-  const {
-    sent
-  } = node.data
+  const { sent } = node.data
 
   if (sent === '2' || sent === 2) {
     return (
       <div style={{ width: '32px', height: '40px' }}>
         <Badge content={sent}>
-          <Icon style={{ color: 'var(--primary)' }} size='lg' icon='check-circle' />
+          <Icon
+            style={{ color: 'var(--primary)' }}
+            size='lg'
+            icon='check-circle'
+          />
         </Badge>
       </div>
     )
   } else if (sent === '1' || sent === 1) {
     return (
       <div style={{ width: '32px', height: '40px' }}>
-        <Icon style={{ color: 'var(--primary)' }} size='lg' icon='check-circle' />
+        <Icon
+          style={{ color: 'var(--primary)' }}
+          size='lg'
+          icon='check-circle'
+        />
       </div>
-      )
+    )
   } else {
     return (
       <div style={{ width: '32px', height: '40px' }}>

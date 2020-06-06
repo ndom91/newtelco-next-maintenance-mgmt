@@ -11,6 +11,8 @@ module.exports = async (req, res) => {
   const editRescheduleQuery = await db.query(escape`
     UPDATE reschedule SET impact = ${newImpact}, sdt = ${newStartDateTime}, edt = ${newEndDateTime} WHERE maintenanceid = ${maintId} AND rcounter LIKE ${rid}
   `)
-  const updateHistory = await db.query(escape`INSERT INTO changelog (mid, user, action, field) VALUES (${maintId}, ${user}, 'edit', 'reschedule - ${rid}');`)
+  const updateHistory = await db.query(
+    escape`INSERT INTO changelog (mid, user, action, field) VALUES (${maintId}, ${user}, 'edit', 'reschedule - ${rid}');`
+  )
   res.status(200).json({ editRescheduleQuery })
 }
