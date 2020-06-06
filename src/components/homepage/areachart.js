@@ -102,8 +102,25 @@ const AreaChart = () => {
     )
   } else {
     return (
-      <Panel bordered header={<div style={{ display: 'flex', justifyContent: 'space-between' }}>Completed<Icon icon='bar-chart' style={{ color: 'var(--primary)' }} size='lg' /></div>} style={{ height: '100%' }}>
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '200px' }}>
+      <Panel
+        bordered
+        header={
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            Completed
+            <Icon icon='bar-chart' style={{ color: 'var(--primary)' }} size='lg' />
+          </div>
+        }
+        style={{ height: '100%' }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: '100%',
+            height: '200px'
+          }}
+        >
           <Loader />
         </div>
       </Panel>
