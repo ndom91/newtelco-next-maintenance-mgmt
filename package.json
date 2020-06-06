@@ -80,7 +80,6 @@
     "dotenv": "^8.2.0",
     "dotenv-webpack": "^1.8.0",
     "prettier": "^2.0.5",
-    "standard": "^14.3.4",
     "webpack": "^4.43.0",
     "webpack-bundle-analyzer": "^3.8.0",
     "webpack-cli": "^3.3.11",
@@ -90,25 +89,11 @@
     "last 2 versions",
     "> 2%"
   ],
-  "standard": {
-    "parser": "babel-eslint",
-    "standard": {
-      "globals": [
-        "fetch"
-      ],
-      "validate": [
-        "javascript",
-        "javascriptreact",
-        {
-          "language": "html",
-          "autoFix": true
-        }
-      ]
-    },
-    "ignore": [
-      "node_modules/",
-      "out",
-      ".next"
-    ]
+  "prettier": {
+    "singleQuote": true,
+    "trailingComma": "es5",
+    "semi": false,
+    "jsxSingleQuote": true,
+    "arrowParens": "avoid"
   }
 }
