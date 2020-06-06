@@ -6,7 +6,6 @@ import Head from 'next/head'
 import ErrorBoundary from '@/newtelco/errorboundary'
 import Store from '@/newtelco/store'
 import NextAuth from 'next-auth/client'
-// import * as Sentry from '@sentry/browser'
 const LogRocket = require('logrocket')
 
 export default ({ Component, pageProps }) => {
@@ -22,11 +21,6 @@ export default ({ Component, pageProps }) => {
           name: pageProps.session.user.name,
           email: pageProps.session.user.email
         })
-        // Sentry setup: https://github.com/zeit/next.js/blob/canary/examples/with-sentry-simple/
-        // Sentry.init({
-        //   enabled: process.env.NODE_ENV === 'production',
-        //   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
-        // })
       }
     }
   }, [])
@@ -48,7 +42,7 @@ export default ({ Component, pageProps }) => {
           <link rel='apple-touch-icon' sizes='180x180' href='/static/images/favicon/apple-touch-icon.png' />
           <link rel='mask-icon' href='/static/images/favicon/safari-pinned-tab.svg' color='#5bbad5' />
           <meta name='msapplication-TileColor' content='#603cba' />
-          <meta name='theme-color' content='#ffffff' />
+          <meta name='theme-color' content='#eaeaea' />
           <meta name='application-name' content='Newtelco Maintenance' />
           <meta name='apple-mobile-web-app-capable' content='yes' />
           <meta name='apple-mobile-web-app-status-bar-style' content='default' />
@@ -58,7 +52,7 @@ export default ({ Component, pageProps }) => {
           <meta name='mobile-web-app-capable' content='yes' />
           <meta name='msapplication-TileColor' content='#2B5797' />
           <meta name='msapplication-tap-highlight' content='no' />
-          <meta name='theme-color' content='#000000' />
+          <meta name='theme-color' content='#eaeaea' />
           <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no, user-scalable=no, viewport-fit=cover' />
           <link rel='apple-touch-icon' sizes='180x180' href='/static/images/favicon/apple-touch-icon.png' />
           <link rel='manifest' href='/manifest.json' />
@@ -73,18 +67,8 @@ export default ({ Component, pageProps }) => {
   )
 }
 
-// export async function getInitialProps({ Component, ctx }) {
-//   let pageProps = Component.getInitialProps ? await Component.getInitialProps(ctx) : {};
-//   if (Object.keys(pageProps).length > 0) {
-//     return { pageProps: pageProps }; // 1. IF YOU RETURN HERE LIKE THIS(named) WHEN PAGE
-//     // PROPS IS EMPTY OBJECT aka length === 0
-//   } else {
-//     return {};
+// export function reportWebVitals (metric) {
+//   if (process.env.NEXT_PUBLIC_VITALS) {
+//     console.table('metrics', metric.name, metric.value)
 //   }
 // }
-
-export function reportWebVitals (metric) {
-  if (process.env.NEXT_PUBLIC_VITALS) {
-    console.table('metrics', metric.name, metric.value)
-  }
-}

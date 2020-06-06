@@ -10,8 +10,6 @@ const SignOut = ({ providers }) => {
   }, [])
   const [session, loading] = NextAuth.useSession()
 
-  console.log(session)
-
   return (
     <Container>
       <Content>

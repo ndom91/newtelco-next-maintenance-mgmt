@@ -45,7 +45,7 @@ const ReadModal = ({ maintenance, openReadModal, toggleReadModal, incomingAttach
   }
 
   const showAttachments = (id, filename) => {
-    function fixBase64 (binaryData) {
+    function fixBase64(binaryData) {
       var base64str = binaryData
       var binary = atob(base64str.replace(/\s/g, ''))
       var len = binary.length
@@ -57,7 +57,7 @@ const ReadModal = ({ maintenance, openReadModal, toggleReadModal, incomingAttach
       }
       return view
     }
-    function downloadFile (base64, filename, mimeType) {
+    function downloadFile(base64, filename, mimeType) {
       const base64Fixed = fixBase64(base64)
       const fileData = new Blob([base64Fixed], { type: mimeType })
       saveAs(fileData, filename)
@@ -92,7 +92,7 @@ const ReadModal = ({ maintenance, openReadModal, toggleReadModal, incomingAttach
 
         ExcelRenderer(fileData, (err, resp) => {
           if (err) {
-            console.log(err)
+            console.error(err)
           } else {
             resp.cols.forEach(col => {
               col.name = resp.rows[0][col.key]

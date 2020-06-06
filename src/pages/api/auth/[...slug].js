@@ -22,7 +22,10 @@ const options = {
     signin: '/auth/signin',
     signout: '/auth/signout',
     // error: 'https://example.com/error'
-  }
+  },
+  secret: 'pdBV/+G4RPeeOfJlg800QA8My1AWbngPkehniml9tRY=',
+  jwt: true,
+  jwtSecret: 'euTOBIsBEbyML9QzV+XklZr4nfj5a+cqjHCSzadQdlQ=',
 }
 
 export default (req, res) => NextAuth(req, res, options)

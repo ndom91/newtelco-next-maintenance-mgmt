@@ -67,11 +67,9 @@ const Layout = ({ children }) => {
     deferredPrompt.prompt()
     // Wait for the user to respond to the prompt
     deferredPrompt.userChoice.then((choiceResult) => {
-      console.log(choiceResult)
       if (choiceResult.outcome === 'accepted') {
         console.log('User accepted the A2HS prompt')
       } else {
-        console.log('User dismissed the AA2HS prompt')
         const a2hsDismisCount = window.localStorage.getItem('a2hs')
         if (!a2hsDismisCount) {
           window.localStorage.setItem('a2hs', 0)

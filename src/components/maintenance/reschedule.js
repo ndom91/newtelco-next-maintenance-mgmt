@@ -273,7 +273,7 @@ const RescheduleGrid = ({ maintId, user, handleCalendarUpdate }) => {
     // TODO: fix dis!
     // const reschedIndex = newRescheduleData.findIndex(el => el.rcounter === rcounter)
     // console.log(reschedIndex, newRescheduleData, rcounter)
-    console.log(newRescheduleData, rcounter, rcounter - 1)
+    // console.log(newRescheduleData, rcounter, rcounter - 1)
     const currentSentStatus = newRescheduleData[rcounter - 1].sent
     let newSentStatus
     if (currentSentStatus === 1) {
