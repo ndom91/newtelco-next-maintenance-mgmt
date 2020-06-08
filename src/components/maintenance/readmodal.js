@@ -350,8 +350,8 @@ const ReadModal = ({
               height: `calc(100% - ${
                 Array.isArray(maintenance.incomingAttachments) &&
                 maintenance.incomingAttachments.length !== 0
-                  ? '40px'
-                  : '10px'
+                  ? '50px'
+                  : '20px'
               })`,
             }}
           >
