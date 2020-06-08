@@ -14,7 +14,7 @@ import { Container, Content, Modal, Button, FlexboxGrid } from 'rsuite'
 const UnreadFavicon = dynamic(() => import('./unreadcount'), { ssr: false })
 
 const Layout = ({ children }) => {
-  const [style, setStyle] = useState('/static/css/rsuite-default.min.css')
+  const [style, setStyle] = useState('/static/css/rsuite-default.css')
   const store = Store.useStore()
 
   const { data } = useSWR(
@@ -33,9 +33,7 @@ const Layout = ({ children }) => {
 
   store.on('night').subscribe(night => {
     fetch(
-      night
-        ? '/static/css/rsuite-dark.min.css'
-        : '/static/css/rsuite-default.min.css'
+      night ? '/static/css/rsuite-dark.css' : '/static/css/rsuite-default.css'
     )
       .then(response => response.text())
       .then(data => {

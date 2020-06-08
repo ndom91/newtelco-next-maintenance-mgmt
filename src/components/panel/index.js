@@ -23,7 +23,7 @@ const MaintPanel = ({ children, header, buttons = null, center = null }) => {
       bordered
       shaded
       bodyFill
-      style={{ background: '#fff', margin: '50px 0 20px 0' }}
+      style={{ background: 'var(--white)', margin: '50px 0 20px 0' }}
     >
       <FlexboxGrid
         justify='space-around'
