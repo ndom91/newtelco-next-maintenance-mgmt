@@ -1,0 +1,195 @@
+.header-badge .rs-badge-content {
+  background-color: var(--primary);
+  font-size: 1.1rem;
+  padding: 5px;
+  transform: translate(60%, -20%);
+}
+
+.flip-transition-enter {
+  opacity: 0;
+  transform: rotateY( 180deg );
+}
+.flip-transition-enter-active {
+  opacity: 1;
+  transform: translateX(0);
+  transform: rotateY( 360deg );
+  transition: opacity 0.9s, transform 0.9s;
+}
+.flip-transition-exit {
+  opacity: 0;
+  transform: rotateY( 180deg );
+}
+.flip-transition-exit-active {
+  opacity: 1;
+  transform: translateX(0);
+  transform: rotateY( 360deg );
+  transition: opacity 0.9s, transform 0.9s;
+}
+
+.flatpickr {
+  height: auto;
+  width: 100%;
+  padding: .5rem 1rem;
+  font-size: .95rem;
+  line-height: 1.5;
+  color: var(--font-color);
+  background-color: var(--input);
+  border: 1px solid #e5e5ea;
+  font-weight: 300;
+  will-change: border-color,box-shadow;
+  border-radius: 5px;
+  box-shadow: none;
+  transition: box-shadow 250ms cubic-bezier(.27,.01,.38,1.06),border 250ms cubic-bezier(.27,.01,.38,1.06);
+}
+.flatpickr-months {
+  border-radius: 10px;
+  background: #67B246 !important;
+  background: var(--grey2) !important;
+}
+.flatpickr-month {
+  background: #67B246 !important;
+  background: var(--grey2) !important;
+}
+.flatpickr-monthDropdown-months {
+  background: #67B246 !important;
+  background: var(--grey2) !important;
+}
+.flatpickr-weekdays {
+  background: #67B246 !important;
+  background: var(--grey2) !important;
+}
+.flatpickr-weekday {
+  background: #67B246 !important;
+  background: var(--grey2) !important;
+}
+.flatpickr-day.selected {
+  background: #67B246 !important;
+  border-color: #67B246 !important;
+}
+.flatpickr-calendar.arrowTop:before,
+.flatpickr-calendar.arrowTop:after {
+  border-bottom-color: var(--grey2) !important;
+}
+.flatpickr-current-month .flatpickr-monthDropdown-months .flatpickr-monthDropdown-month {
+  background-color: #c1c1c1;
+}
+
+.rs-timeline {
+  margin-top: 20px !important;
+}
+
+.rs-timeline-item-custom-dot .rs-icon {
+  position: absolute;
+  background: #fff;
+  top: 0;
+  left: -2px;
+  border: 2px solid #ddd;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 18px;
+  padding-top: 9px;
+  color: #999;
+  margin-left: -13px;
+}
+
+.rs-timeline-item .rs-timeline-item-content {
+  margin-left: 15px;
+}
+
+.mail-read-header {
+  padding: 20px 20px 0px 20px !important;
+}
+
+.mail-read-header .modal-textbox {
+  pointer-events: none;
+}
+
+.mail-read-header:hover {
+  cursor: grab;
+}
+.mail-read-header:active {
+  cursor: grabbing
+}
+
+.reschedule-header {
+  background: var(--grey1);
+  padding: 25px !important;
+}
+
+.modal-attachment-header-text:hover {
+  cursor: grab;
+}
+
+.modal-attachment-header-text:active {
+  cursor: grabbing
+}
+
+.read-mail-body {
+  padding: 20px;
+  margin: 10px;
+  border: 1px solid var(--grey2);
+  border-radius: 5px;
+  overflow: scroll;
+}
+
+.ag-horizontal-left-spacer::-webkit-scrollbar-track,
+.ag-horizontal-right-spacer::-webkit-scrollbar-track,
+.ag-body-horizontal-scroll-viewport::-webkit-scrollbar-track,
+textarea::-webkit-scrollbar-track,
+.read-mail-body::-webkit-scrollbar-track {
+  border-radius: 10px;
+  background-color: rgba(0,0,0,0);
+}
+
+.ag-horizontal-left-spacer::-webkit-scrollbar,
+.ag-horizontal-right-spacer::-webkit-scrollbar,
+.ag-body-horizontal-scroll-viewport::-webkit-scrollbar,
+textarea::-webkit-scrollbar,
+.read-mail-body::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+  background-color: transparent;
+}
+
+.ag-horizontal-left-spacer::-webkit-scrollbar-thumb,
+.ag-horizontal-right-spacer::-webkit-scrollbar-thumb,
+.ag-body-horizontal-scroll-viewport::-webkit-scrollbar-thumb,
+textarea::-webkit-scrollbar-thumb,
+.read-mail-body::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background-color: rgba(0,0,0,0.4);
+}
+
+.create-btn{
+  animation: glow 1s infinite alternate;
+}
+
+@keyframes glow {
+  from {
+    box-shadow: 0 0 10px -10px rgba(102, 178, 70, 0.3);
+  }
+  to {
+    box-shadow: 0 0 15px 15px rgba(102, 178, 70, 0.3);
+  }
+}
+
+.tox-tinymce {
+  border-radius: 5px !important;
+}
+
+.timezone-select > div:nth-of-type(2) {
+  z-index: 99;
+}
+
+.panel-right .rs-panel-body {
+  padding-top: 0px;
+}
+
+.panel-right .rs-nav.rs-nav-horizontal {
+  margin-bottom: 15px;
+}
+
+.panel-right .rs-nav-reversed.rs-nav-tabs.rs-nav-horizontal .rs-nav-item > .rs-nav-item-content {
+  text-align: center;
+}

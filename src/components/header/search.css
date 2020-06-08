@@ -1,0 +1,68 @@
+.aa-dropdown-menus {
+  position: absolute;
+  width: 400px;
+  z-index: 9999;
+  box-shadow: 0 5px 10px rgba(0,0,0,0.25);
+  border-radius: 10px;
+}
+
+.aa-dropdown-menu::-webkit-scrollbar-track {
+  border-radius: 10px;
+  background-color: rgba(0,0,0,0);
+}
+.aa-dropdown-menu::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+  background-color: transparent;
+}
+.aa-dropdown-menu::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background-color: rgba(0,0,0,0.4);
+}
+
+.aa-suggestion.selected, .aa-suggestion:hover {
+  color: #67B246;
+}
+
+.aa-dropdown-menu {
+  width: 400px;
+  max-height: 60vh;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  margin-top: 0px;
+  border-radius: 10px;
+}
+
+.aa-suggestions {
+  transform: translate(-390px,20px);
+}
+
+.aa-input-container {
+  display: flex;
+  justify-content: flex-end;
+}
+
+#aa-search-input {
+  width: 40%;
+  transition: width 250ms ease-in-out;
+}
+
+.search-small {
+  width: 40%;
+}
+
+.search-large {
+  width: 100% !important;
+}
+
+#aa-search-input:focus {
+  width: 100%;
+}
+
+.hide-dropdown {
+  display: none;
+}
+
+.show-dropdown {
+  display: flex;
+}

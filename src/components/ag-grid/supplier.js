@@ -1,19 +1,21 @@
-import React, { Component } from 'react'
+import React from 'react'
+import { FlexboxGrid } from 'rsuite'
 
-export default class UpdatedAt extends Component {
-  constructor (props) {
-    super(props)
-    this.state = {
-      imgSrc: `https://www.google.com/s2/favicons?domain=${props.node.data.mailDomain}`
-    }
-  }
+const UpdatedAt = ({ node }) => {
+  return (
+    <FlexboxGrid justify='start' align='middle'>
+      <FlexboxGrid.Item>
+        <img
+          src={`https://www.google.com/s2/favicons?domain=${node.data.mailDomain}`}
+          style={{ padding: '5px' }}
+          alt='Domain Favicon'
+        />
+      </FlexboxGrid.Item>
+      <FlexboxGrid.Item>
+        <span>{node.data.name}</span>
+      </FlexboxGrid.Item>
+    </FlexboxGrid>
+  )
+}
 
-  render () {
-    return (
-      <span>
-        <img src={this.state.imgSrc} style={{ padding: '5px' }} alt='Domain Favicon' />
-        {this.props.node.data.name}
-      </span>
-    )
-  }
-};
+export default UpdatedAt

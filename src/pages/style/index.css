@@ -1,0 +1,20 @@
+.grid-container {
+  display: grid;
+  margin: 10px;
+  grid-template-columns: 1fr 1.5fr 1.5fr 1.5fr;
+  grid-template-rows: 0.5fr 1fr;
+  gap: 25px 25px;
+  grid-template-areas: "unread chart1 chart2 recents" "heatmap heatmap heatmap recents";
+  height: 100%;
+  width: 100%;
+}
+
+.unread { grid-area: unread; }
+
+.heatmap { grid-area: heatmap; }
+
+.recents { grid-area: recents; }
+
+.chart1 { grid-area: chart1; }
+
+.chart2 { grid-area: chart2; }

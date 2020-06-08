@@ -4,31 +4,26 @@
 
 ## Features
 
-- Gmail API - Create maintenance entries directly from incoming Emails as well as send mails to notify clients
-- Google Translate API - Translate Russian mails directly in the read preview
-- Google Calendar API - Create calendar entries at the click of a button
+- Gmail API - Create maintenance entries directly from incoming Emails
+- Google Translate API - Translate mails directly in the read preview
+- Google Calendar API - Create calendar entries from the application
 - Clean, professional, responsive UI
-- TinyMCE WYSIWYG Editor
-- Export history data to CSV
-- LogRocket
+- WYSIWYG Editor
+- Export data to CSV
+- LogRocket error tracking
 - Keyboard Shortcuts
-- Darkmode :)  
-![darkmode switch](https://imgur.com/XpHgYlX.gif)
-- SMTP Outbound Mail
-- Blazing fast SPA built on:  
-  - Next.js / React
-  - Custom Next.js Server (Express)
-  - ShardsUI (Bootstrap 4 spin-off)
-  - MongoDB backend for auth 
-  - MySQL backend for data
-  - Nedb
-  - Passport
-  - Ag-Grid
-  - Algolia Search
 
-## Setup
+## Stack
 
-There is an API part to this project contained in a sister repo (`ndom91/api-maintenance`) which must be running as well. 
+- Next.js / React
+- RSuite UI Library
+- MySQL
+- Ag-Grid
+- Algolia Search
+
+## Contributing
+
+There is an API sister project to this one located in the following repo: (`ndom91/api-maintenance`). This must be running during dev / prod to get anything going.
 
 #### Prerequisites:
 1. MySQL DB
@@ -56,14 +51,10 @@ It is currently setup so that the host is dynamic, you can reverse proxy it out 
 
 ### Screenshots
 
-<img src="https://imgur.com/0TCYfJE.png" width="512" alt="screenshot 1">
+<img src="https://i.imgur.com/UJdRJs4.png" width="512" alt="screenshot 1">
 
-<img src="https://imgur.com/x1UW9Ox.png" width="512" alt="screenshot 2">
+<img src="https://i.imgur.com/2RFzi0Q.png" width="512" alt="screenshot 2">
 
-<img src="https://imgur.com/SK2DOuD.png" width="512" alt="screenshot 3">
-
-<img src="https://imgur.com/3QymwYQ.png" width="512" alt="screenshot 4">
-
-<img src="https://imgur.com/wz4LOzy.png" width="512" alt="screenshot 5">
+<img src="https://i.imgur.com/S0huKm2.png" width="512" alt="screenshot 3">
 
 **Internal Application used by NewTelco GmbH**

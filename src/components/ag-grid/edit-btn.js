@@ -1,19 +1,35 @@
-import React, { Component } from 'react'
+import React from 'react'
 import Link from 'next/link'
-import { Button } from 'shards-react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import {
-  faPencilAlt
-} from '@fortawesome/free-solid-svg-icons'
+import { IconButton } from 'rsuite'
 
-export default class EditBtn extends Component {
-  render () {
-    return (
-      <Link href={`/maintenance?id=${this.props.node.data.id}`} passHref>
-        <Button style={{ padding: '0.7em 0.9em' }} size='sm' outline>
-          <FontAwesomeIcon width='1.325em' style={{ fontSize: '12px' }} className='edit-icon' icon={faPencilAlt} />
-        </Button>
-      </Link>
-    )
-  }
-};
+const EditBtn = ({ node }) => {
+  return (
+    <Link
+      href={{ pathname: '/maintenance', query: { id: node.data.id } }}
+      as={`/maintenance?id=${node.data.id}`}
+      passHref
+    >
+      <IconButton
+        size='md'
+        appearance='subtle'
+        style={{ paddingLeft: '12px', border: '1px solid var(--primary)' }}
+        icon={
+          <svg
+            height='20'
+            width='20'
+            fill='none'
+            strokeLinecap='round'
+            strokeLinejoin='round'
+            strokeWidth='2'
+            stroke='var(--primary)'
+            viewBox='0 0 24 24'
+          >
+            <path d='M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z' />
+          </svg>
+        }
+      />
+    </Link>
+  )
+}
+
+export default EditBtn

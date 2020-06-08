@@ -1,532 +1,413 @@
-import React from 'react'
-import fetch from 'isomorphic-unfetch'
-import Toggle from 'react-toggle'
-import 'react-toggle/style.css'
+import React, { useEffect, useState, useRef } from 'react'
 import { AgGridReact } from 'ag-grid-react'
 import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-material.css'
 import Select from 'react-select'
-import cogoToast from 'cogo-toast'
-import { HotKeys } from 'react-hotkeys'
-import ProtectedIcon from '../ag-grid/protected'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import ProtectedIcon from '@/newtelco/ag-grid/protected'
+import Notify from '@/newtelco-utils/notification'
+import ConfirmModal from '@/newtelco/confirmmodal'
 import {
-  faPlusCircle,
-  faLock,
-  faLockOpen,
-  faTrash
-} from '@fortawesome/free-solid-svg-icons'
-import {
-  CardTitle,
-  Badge,
-  Button,
-  ButtonGroup,
-  Container,
-  Col,
-  Row,
   Modal,
-  ModalHeader,
-  ModalBody,
+  FlexboxGrid,
+  Input,
+  Form,
   FormGroup,
-  FormInput
-} from 'shards-react'
+  ControlLabel,
+  HelpBlock,
+  Panel,
+  IconButton,
+  Button,
+  Icon,
+  ButtonGroup,
+  Toggle,
+  Loader,
+} from 'rsuite'
 
-export default class CustomerCIDs extends React.Component {
-  static async getInitialProps ({ req, query }) {
-    const host = req ? req.headers['x-forwarded-host'] : location.host
-    const pageRequest = `https://${host}/api/settings/theircids` // ?page=${query.page || 1}&limit=${query.limit || 41}`
-    const res = await fetch(pageRequest)
-    const json = await res.json()
-    return {
-      jsonData: json
-    }
-  }
+const CustomerCIDs = props => {
+  const gridApi = useRef()
+  const gridColumnApi = useRef()
+  const [newNewtelcoCid, setNewNewtelcoCid] = useState('')
+  const [customerCidIdToDelete, setCustomerCidIdToDelete] = useState('')
+  const [customerNameToDelete, setCustomerNameToDelete] = useState('')
+  const [rowData, setRowData] = useState([])
+  const [companySelections, setCompanySelections] = useState([])
+  const [supplierSelections, setSupplierSelections] = useState([])
+  const [openCustomerCidAdd, setOpenCustomerCidAdd] = useState(false)
+  const [openConfirmDeleteModal, setOpenConfirmDeleteModal] = useState(false)
+  const [newCompanySelection, setNewCompanySelection] = useState({})
+  const [newSupplierSelection, setNewSupplierSelection] = useState({})
+  const [newProtection, setNewProtection] = useState(false)
 
-  constructor (props) {
-    super(props)
-    this.state = {
-      gridOptions: {
-        defaultColDef: {
-          resizable: true,
-          sortable: true,
-          filter: true,
-          selectable: true,
-          editable: true
-        },
-        columnDefs: [
-          {
-            headerName: 'ID',
-            field: 'id',
-            width: 60,
-            editable: false
-          },
-          {
-            headerName: 'Newtelco CID',
-            field: 'kundenCID',
-            width: 200
-          },
-          {
-            headerName: 'Customer',
-            field: 'name',
-            width: 200,
-            // sort: { direction: 'asc', priority: 0 },
-            editable: false
-          },
-          {
-            headerName: 'Their CID',
-            field: 'derenCID',
-            width: 200,
-            editable: false
-          },
-          {
-            headerName: 'Protected',
-            field: 'protected',
-            width: 80,
-            cellRenderer: 'protectedIcon',
-            cellStyle: {
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              height: '100%'
-            }
-          }
-        ],
-        rowSelection: 'single',
-        frameworkComponents: {
-          protectedIcon: ProtectedIcon
-        }
+  const gridOptions = {
+    defaultColDef: {
+      resizable: true,
+      sortable: true,
+      filter: true,
+      selectable: true,
+      editable: true,
+    },
+    columnDefs: [
+      {
+        headerName: 'ID',
+        field: 'id',
+        width: 60,
+        editable: false,
       },
-      newNewtelcoCid: '',
-      openCustomerCidAdd: false,
-      openConfirmDeleteModal: false
-    }
-    this.toggleCustomerCidAdd = this.toggleCustomerCidAdd.bind(this)
-    this.handleNewtelcoCidChange = this.handleNewtelcoCidChange.bind(this)
-    this.handleSupplierCidChange = this.handleSupplierCidChange.bind(this)
-    this.handleProtectionChange = this.handleProtectionChange.bind(this)
-    this.handleCompanyChange = this.handleCompanyChange.bind(this)
-    this.handleDelete = this.handleDelete.bind(this)
-    this.toggleCustomerCidDeleteModal = this.toggleCustomerCidDeleteModal.bind(this)
-    this.handleAddCustomerCid = this.handleAddCustomerCid.bind(this)
-    this.handleCellEdit = this.handleCellEdit.bind(this)
+      {
+        headerName: 'Newtelco CID',
+        field: 'kundenCID',
+        width: 200,
+      },
+      {
+        headerName: 'Customer',
+        field: 'name',
+        width: 200,
+        // sort: { direction: 'asc', priority: 0 },
+        editable: false,
+      },
+      {
+        headerName: 'Their CID',
+        field: 'derenCID',
+        width: 200,
+        editable: false,
+      },
+      {
+        headerName: 'Protected',
+        field: 'protected',
+        width: 80,
+        cellRenderer: 'protectedIcon',
+        cellStyle: {
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100%',
+        },
+      },
+    ],
+    rowSelection: 'single',
+    frameworkComponents: {
+      protectedIcon: ProtectedIcon,
+      customLoadingOverlay: Loader,
+    },
+    loadingOverlayComponent: 'customLoadingOverlay',
   }
 
-  componentDidMount () {
-    const host = window.location.host
-    fetch(`https://${host}/api/customercids`, {
-      method: 'get'
+  useEffect(() => {
+    fetch('/api/customercids', {
+      method: 'get',
     })
       .then(resp => resp.json())
       .then(data => {
-        this.setState({
-          rowData: data.customercids
-        })
+        gridApi.current.hideOverlay()
+        setRowData(data.customercids)
       })
       .catch(err => console.error(err))
     // fill Companies Select
-    fetch(`https://${host}/api/companies/selectmaint`, {
-      method: 'get'
+    fetch('/api/companies/selectmaint', {
+      method: 'get',
     })
       .then(resp => resp.json())
       .then(data => {
-        this.setState({
-          companySelections: data.companies
-        })
+        setCompanySelections(data.companies)
       })
       .catch(err => console.error(`Error - ${err}`))
     // fill Supplier Select
-    fetch(`https://${host}/api/lieferantcids/select`, {
-      method: 'get'
+    fetch('/api/lieferantcids/select', {
+      method: 'get',
     })
       .then(resp => resp.json())
       .then(data => {
-        this.setState({
-          supplierSelections: data.lieferantCids
-        })
+        setSupplierSelections(data.lieferantCids)
       })
       .catch(err => console.error(`Error - ${err}`))
-  }
+  }, [])
 
-  handleGridReady = params => {
-    this.gridApi = params.api
-    window.gridApi = params.api
-    this.gridColumnApi = params.columnApi
+  const handleGridReady = params => {
+    gridApi.current = params.api
+    gridApi.current.showLoadingOverlay()
+    gridColumnApi.current = params.columnApi
     params.api.sizeColumnsToFit()
-  };
-
-  onFirstDataRendered (params) {
-    // params.columnApi.autoSizeColumns()
-    // params.columnApi.sizeColumnsToFit()
-    // params.api.setSortModel({ colId: 'name', sort: 'desc' })
   }
 
-  toggleCustomerCidAdd () {
-    this.setState({
-      openCustomerCidAdd: !this.state.openCustomerCidAdd
+  const toggleCustomerCidAdd = () => {
+    setOpenCustomerCidAdd(!openCustomerCidAdd)
+  }
+
+  const handleCompanyChange = selectedOption => {
+    setNewCompanySelection({
+      value: selectedOption.value,
+      label: selectedOption.label,
     })
   }
 
-  handleCompanyChange (selectedOption) {
-    this.setState({
-      newCompanySelection: {
-        value: selectedOption.value,
-        label: selectedOption.label
-      }
+  const handleSupplierCidChange = selectedOption => {
+    setNewSupplierSelection({
+      value: selectedOption.value,
+      label: selectedOption.label,
     })
   }
 
-  handleProtectionChange (ev) {
-    this.setState({
-      newProtection: !this.state.newProtection
-    })
-  }
-
-  handleSupplierCidChange (selectedOption) {
-    this.setState({
-      newSupplierSelection: {
-        value: selectedOption.value,
-        label: selectedOption.label
-      }
-    })
-  }
-
-  handleNewtelcoCidChange (ev) {
-    this.setState({
-      newNewtelcoCid: ev.target.value
-    })
-  }
-
-  handleDelete () {
-    const host = window.location.host
-    const customerCidId = this.state.customerCidIdToDelete
-    fetch(`https://${host}/api/settings/delete/customercids?id=${customerCidId}`, {
-      method: 'get'
+  const handleDelete = () => {
+    fetch(`/api/settings/delete/customercids?id=${customerCidIdToDelete}`, {
+      method: 'get',
     })
       .then(resp => resp.json())
       .then(data => {
         if (data.deleteCustomerCidQuery.affectedRows === 1) {
-          cogoToast.success('Delete Success', {
-            position: 'top-right'
-          })
+          Notify('success', `${customerNameToDelete} Deleted`)
         } else {
-          cogoToast.warn(`Error - ${data.err}`, {
-            position: 'top-right'
-          })
+          Notify('warning', 'Error', data.err)
         }
       })
       .catch(err => console.error(err))
 
-    const newRowData = this.state.rowData.filter(el => el.id !== customerCidId)
-    this.setState({
-      rowData: newRowData,
-      openConfirmDeleteModal: !this.state.openConfirmDeleteModal
-    })
+    const newRowData = rowData.filter(el => el.id !== customerCidIdToDelete)
+    setRowData(newRowData)
+    setOpenConfirmDeleteModal(!openConfirmDeleteModal)
   }
 
-  toggleCustomerCidDeleteModal () {
-    if (window.gridApi) {
-      const row = window.gridApi.getSelectedRows()
-      const customerCidId = row[0].id
-      const customerCidName = row[0].kundenCID
-      this.setState({
-        openConfirmDeleteModal: !this.state.openConfirmDeleteModal,
-        customerCidIdToDelete: customerCidId,
-        customerCidNameToDelete: customerCidName
-      })
+  const toggleCustomerCidDeleteModal = () => {
+    if (gridApi.current) {
+      const row = gridApi.current.getSelectedRows()
+      if (row[0]) {
+        const customerCidId = row[0].id
+        const customerCidName = row[0].kundenCID
+        setOpenConfirmDeleteModal(!openConfirmDeleteModal)
+        setCustomerCidIdToDelete(customerCidId)
+        setCustomerNameToDelete(customerCidName)
+      } else {
+        Notify('warning', 'Please select a Customer CID')
+      }
     }
   }
 
-  handleAddCustomerCid () {
-    const {
-      newCompanySelection,
-      newNewtelcoCid,
-      newProtection,
-      newSupplierSelection
-    } = this.state
-
-    const host = window.location.host
-    fetch(`https://${host}/api/settings/add/customercids?customercid=${encodeURIComponent(newNewtelcoCid)}&company=${encodeURIComponent(newCompanySelection.value)}&protection=${encodeURIComponent(newProtection)}&supplier=${encodeURIComponent(newSupplierSelection.value)}`, {
-      method: 'get'
-    })
+  const handleAddCustomerCid = () => {
+    fetch(
+      `/api/settings/add/customercids?customercid=${encodeURIComponent(
+        newNewtelcoCid
+      )}&company=${encodeURIComponent(
+        newCompanySelection.value
+      )}&protection=${encodeURIComponent(
+        newProtection
+      )}&supplier=${encodeURIComponent(newSupplierSelection.value)}`,
+      {
+        method: 'get',
+      }
+    )
       .then(resp => resp.json())
       .then(data => {
         const insertId = data.insertCustomerCidQuery.insertId
-        if (data.insertCustomerCidQuery.affectedRows === 1 && data.insertCustomerCidQuery.warningCount === 0) {
-          cogoToast.success(`CID ${newNewtelcoCid} Added`, {
-            position: 'top-right'
-          })
+        if (
+          data.insertCustomerCidQuery.affectedRows === 1 &&
+          data.insertCustomerCidQuery.warningCount === 0
+        ) {
+          Notify('success', `${newNewtelcoCid} Added`)
         } else {
-          cogoToast.warn(`Error - ${data.err}`, {
-            position: 'top-right'
-          })
+          Notify('warning', 'Error', data.err)
         }
-        const newRowData = this.state.rowData
+        const newRowData = rowData
         const newProtectionValue = newProtection ? '1' : '0'
         newRowData.push({
           id: insertId,
           derenCID: newSupplierSelection.label,
           kundenCID: newNewtelcoCid,
           name: newCompanySelection.label,
-          protected: newProtectionValue || '0'
+          protected: newProtectionValue || '0',
         })
-        this.setState({
-          rowData: newRowData,
-          openCustomerCidAdd: !this.state.openCustomerCidAdd,
-          newCompanySelection: [],
-          newNewtelcoCid: '',
-          newProtection: '',
-          newSupplierSelection: []
-        })
-        window.gridApi.setRowData(newRowData)
+        setRowData(newRowData)
+        setOpenCustomerCidAdd(!openCustomerCidAdd)
+        setNewCompanySelection([])
+        setNewNewtelcoCid('')
+        setNewProtection('')
+        setNewSupplierSelection([])
+        gridApi.current.setRowData(newRowData)
       })
       .catch(err => console.error(err))
   }
 
-  handleCellEdit (params) {
+  const handleCellEdit = params => {
     const id = params.data.id
     const newCustomerCid = params.data.kundenCID
     const newProtected = params.data.protected
 
-    const host = window.location.host
-    fetch(`https://${host}/api/settings/edit/customercids?id=${id}&customercid=${encodeURIComponent(newCustomerCid)}&protected=${encodeURIComponent(newProtected)}`, {
-      method: 'get'
-    })
+    fetch(
+      `/api/settings/edit/customercids?id=${id}&customercid=${encodeURIComponent(
+        newCustomerCid
+      )}&protected=${encodeURIComponent(newProtected)}`,
+      {
+        method: 'get',
+      }
+    )
       .then(resp => resp.json())
       .then(data => {
-        console.log(data)
         if (data.updateCustomerCidQuery.affectedRows === 1) {
-          cogoToast.success(`Customer CID ${newCustomerCid} Updated`, {
-            position: 'top-right'
-          })
+          Notify('success', `${newCustomerCid} Updated`)
         } else {
-          cogoToast.warn(`Error - ${data.err}`, {
-            position: 'top-right'
-          })
+          Notify('warning', 'Error', data.err)
         }
       })
       .catch(err => console.error(err))
   }
 
-  render () {
-    const {
-      newNewtelcoCid,
-      newCompanySelection,
-      newSupplierSelection,
-      newProtection
-    } = this.state
-
-    const keyMap = {
-      DELETE_MAINT: 'alt+l'
-    }
-
-    const handlers = {
-      DELETE_MAINT: this.toggleCustomerCidDeleteModal
-    }
-
+  const Header = () => {
     return (
-      <>
-        <HotKeys keyMap={keyMap} handlers={handlers}>
-          <CardTitle>
-            <span className='section-title'>Customer CIDs</span>
-            <ButtonGroup>
-              <Button onClick={this.toggleCustomerCidAdd} outline theme='primary'>
-                <FontAwesomeIcon width='1.125em' style={{ marginRight: '10px' }} icon={faPlusCircle} />
-                Add
-              </Button>
-              <Button onClick={this.toggleCustomerCidDeleteModal} theme='primary'>
-                <FontAwesomeIcon width='1.125em' style={{ marginRight: '10px' }} icon={faTrash} />
-                Delete
-              </Button>
-            </ButtonGroup>
-          </CardTitle>
-          <div className='table-wrapper'>
-            <div
-              className='ag-theme-material'
-              style={{
-                height: '700px',
-                width: '100%'
-              }}
+      <FlexboxGrid justify='end' align='middle'>
+        <FlexboxGrid.Item>
+          <ButtonGroup>
+            <IconButton
+              onClick={toggleCustomerCidAdd}
+              icon={<Icon icon='plus-circle' />}
+              appearance='ghost'
+              placement='right'
             >
-              <AgGridReact
-                gridOptions={this.state.gridOptions}
-                onGridReady={this.handleGridReady}
-                rowData={this.state.rowData}
-                onCellEditingStopped={this.handleCellEdit}
-                animateRows
-                deltaRowDataMode
-                getRowNodeId={(data) => {
-                  return data.id
-                }}
-                stopEditingWhenGridLosesFocus
-                onFirstDataRendered={this.onFirstDataRendered.bind(this)}
-              />
-            </div>
-          </div>
-          <Modal animation backdrop backdropClassName='modal-backdrop' open={this.state.openCustomerCidAdd} size='md' toggle={this.toggleCustomerCidAdd}>
-            <ModalHeader>
-              New Customer CID
-            </ModalHeader>
-            <ModalBody className='modal-body'>
-              <Container className='container-border'>
-                <Row>
-                  <Col>
-                    <FormGroup>
-                      <label style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        Newtelco CID<Badge outline theme='primary'>for Customer</Badge>
-                      </label>
-                      <FormInput id='updated-by' name='updated-by' type='text' value={newNewtelcoCid} onChange={this.handleNewtelcoCidChange} />
-                    </FormGroup>
-                    <FormGroup>
-                      <label>
-                        Customer
-                      </label>
-                      <Select
-                        value={newCompanySelection}
-                        className='company-select'
-                        onChange={this.handleCompanyChange}
-                        options={this.state.companySelections}
-                        noOptionsMessage={() => 'No Companies Available'}
-                        placeholder='Please Select a Company'
-                      />
-                    </FormGroup>
-                    <FormGroup>
-                      <label>
-                        Supplier CID
-                      </label>
-                      <Select
-                        value={newSupplierSelection}
-                        className='company-select'
-                        onChange={this.handleSupplierCidChange}
-                        options={this.state.supplierSelections}
-                        noOptionsMessage={() => 'No Supplier CIDs Available'}
-                        placeholder='Please Select a Supplier CID'
-                      />
-                    </FormGroup>
-                    <FormGroup className='protection-group'>
-                      <label>
-                        Protection
-                      </label>
-                      <Toggle
-                        icons={{
-                          checked: <FontAwesomeIcon icon={faLock} width='0.7em' style={{ left: '10px', top: '-12px', color: 'var(--white)' }} />,
-                          unchecked: <FontAwesomeIcon icon={faLockOpen} width='0.9em' style={{ right: '12px', top: '-12px', color: 'var(--white)' }} />
-                        }}
-                        checked={newProtection}
-                        onChange={(event) => this.handleProtectionChange(event)}
-                        className='add-protection-toggle'
-                      />
-                    </FormGroup>
-                  </Col>
-                </Row>
-              </Container>
-              <Row style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <Col>
-                  <Button onClick={this.handleAddCustomerCid} style={{ width: '100%', marginTop: '15px' }} theme='primary'>
-                    Save
-                  </Button>
-                </Col>
-              </Row>
-            </ModalBody>
-          </Modal>
-          <Modal className='delete-modal' animation backdrop backdropClassName='modal-backdrop' open={this.state.openConfirmDeleteModal} size='md' toggle={this.toggleConfirmDeleteModal}>
-            <ModalHeader className='modal-delete-header'>
-              Confirm Delete
-            </ModalHeader>
-            <ModalBody className='modal-body'>
-              <Container className='container-border'>
-                <Row>
-                  <Col>
-                    Are you sure you want to delete <b style={{ fontWeight: '900' }}> {this.state.customerCidNameToDelete}</b> ({this.state.customerCidIdToDelete})
-                  </Col>
-                </Row>
-              </Container>
-              <Row style={{ marginTop: '20px' }}>
-                <Col>
-                  <ButtonGroup style={{ width: '100%' }}>
-                    <Button onClick={this.toggleCustomerCidDeleteModal} outline theme='secondary'>
-                      Cancel
-                    </Button>
-                    <Button onClick={this.handleDelete} theme='danger'>
-                      Confirm
-                    </Button>
-                  </ButtonGroup>
-                </Col>
-              </Row>
-            </ModalBody>
-          </Modal>
-          <style jsx>{`
-              :global(.add-protection-toggle > .react-toggle-track > div) {
-                top: -12px; 
-              }
-              :global(.protection-group) {
-                display: flex;
-                justify-content: space-between;
-                margin-top: 25px;
-              }
-              :global(.container-border) {
-                border: 1px solid var(--light);
-                border-radius: 0.325rem;
-                margin: 10px 0;
-                padding: 1.5rem;
-              }
-              :global(.modal-body) {
-                background-color: var(--primary-bg);
-                color: var(--font-color);
-              }
-              :global(.modal-header) {
-                background: var(--secondary-bg);
-                color: var(--font-color);
-                display: flex;
-                justify-content: flex-start;
-                align-content: center;
-              }
-              :global(.card-title) {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-              }
-              :global(.ag-cell.ag-cell-inline-editing) {
-                padding: 10px !important;
-                height: inherit !important;
-              }
-              :global(.company-select [class$='-placeholder']) {
-                color: var(--border-color) !important;
-              }
-              :global(.company-select *) {
-                background-color: var(--input);
-                color: var(--font-color) !important;
-              }
-              :global(.company-select div[class$="-multiValue"]) {
-                background-color: var(--input);
-                color: var(--font-color);
-              }
-              :global(.company-select div[class$="-singleValue"]) {
-                background-color: var(--input);
-                color: var(--font-color);
-              }
-              :global(.form-group textarea:focus) {
-                background-color: var(--primary-bg);
-                color: var(--font-color);
-              }
-              :global(.form-group textarea) {
-                background-color: var(--primary-bg);
-                color: var(--font-color);
-              }
-              :global(.form-group label) {
-                color: var(--font-color);
-              }
-              :global(.form-group input:focus) {
-                background-color: var(--primary-bg);
-                color: var(--font-color);
-              }
-              :global(.form-group input) {
-                background-color: var(--primary-bg);
-                color: var(--font-color);
-              }
-            `}
-          </style>
-        </HotKeys>
-      </>
+              Add
+            </IconButton>
+            <IconButton
+              onClick={toggleCustomerCidDeleteModal}
+              icon={<Icon icon='trash' />}
+              appearance='ghost'
+              placement='right'
+            >
+              Delete
+            </IconButton>
+          </ButtonGroup>
+        </FlexboxGrid.Item>
+      </FlexboxGrid>
     )
   }
+
+  return (
+    <div style={{ width: '100%' }} className='section'>
+      <Panel header={<Header />}>
+        <div className='table-wrapper'>
+          <div
+            className='ag-theme-material'
+            style={{
+              height: '700px',
+              width: '100%',
+            }}
+          >
+            <AgGridReact
+              gridOptions={gridOptions}
+              onGridReady={handleGridReady}
+              rowData={rowData}
+              onCellEditingStopped={handleCellEdit}
+              animateRows
+              deltaRowDataMode
+              getRowNodeId={data => {
+                return data.id
+              }}
+              stopEditingWhenGridLosesFocus
+            />
+          </div>
+        </div>
+      </Panel>
+      {openConfirmDeleteModal && (
+        <ConfirmModal
+          show={openConfirmDeleteModal}
+          onHide={toggleCustomerCidDeleteModal}
+          header='Confirm Delete'
+          content={`Are you sure you want to delete ${customerNameToDelete} (${customerCidIdToDelete})`}
+          cancelAction={toggleCustomerCidDeleteModal}
+          confirmAction={handleDelete}
+        />
+      )}
+      {openCustomerCidAdd && (
+        <Modal
+          backdrop
+          show={openCustomerCidAdd}
+          size='xs'
+          onHide={toggleCustomerCidAdd}
+        >
+          <Modal.Header>New Customer CID</Modal.Header>
+          <Modal.Body style={{ overflow: 'visible' }}>
+            <FlexboxGrid
+              justify='space-around'
+              align='middle'
+              style={{ flexDirection: 'column', height: '450px' }}
+            >
+              <FlexboxGrid.Item
+                style={{ fontFamily: 'var(--font-body)', fontSize: '1.1rem' }}
+              >
+                <Form>
+                  <FormGroup>
+                    <ControlLabel>Newtelco CID</ControlLabel>
+                    <Input
+                      key='input-name'
+                      name='name'
+                      type='text'
+                      value={newNewtelcoCid}
+                      onChange={value => setNewNewtelcoCid(value)}
+                    />
+                  </FormGroup>
+                  <FormGroup>
+                    <ControlLabel>Customer</ControlLabel>
+                    <Select
+                      value={newCompanySelection}
+                      className='company-select'
+                      onChange={handleCompanyChange}
+                      options={companySelections}
+                      noOptionsMessage={() => 'No Companies Available'}
+                      placeholder='Company'
+                    />
+                  </FormGroup>
+                  <FormGroup>
+                    <ControlLabel>Supplier CID</ControlLabel>
+                    <Select
+                      value={newSupplierSelection}
+                      className='company-select'
+                      onChange={handleSupplierCidChange}
+                      options={supplierSelections}
+                      noOptionsMessage={() => 'No Supplier CIDs Available'}
+                      placeholder='Supplier CID'
+                    />
+                  </FormGroup>
+                  <FormGroup>
+                    <ControlLabel>Protected</ControlLabel>
+                    <Toggle
+                      checked={newProtection}
+                      onChange={() => setNewProtection(!newProtection)}
+                    />
+                  </FormGroup>
+                </Form>
+              </FlexboxGrid.Item>
+              <FlexboxGrid.Item>
+                <ButtonGroup block style={{ width: '20em' }}>
+                  <Button
+                    appearance='default'
+                    onClick={toggleCustomerCidAdd}
+                    style={{ width: '50%' }}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    appearance='primary'
+                    onClick={handleAddCustomerCid}
+                    style={{ width: '50%' }}
+                  >
+                    Confirm
+                  </Button>
+                </ButtonGroup>
+              </FlexboxGrid.Item>
+            </FlexboxGrid>
+          </Modal.Body>
+        </Modal>
+      )}
+    </div>
+  )
 }
+CustomerCIDs.getInitialProps = async ({ req, query }) => {
+  const host = req ? req.headers['x-forwarded-host'] : window.location.hostname
+  const protocol = 'https:'
+  if (host.indexOf('localhost') > -1) {
+    protocol = 'http:'
+  }
+  const pageRequest = `${protocol}//${host}/api/settings/theircids`
+  const res = await fetch(pageRequest)
+  const json = await res.json()
+  return {
+    jsonData: json,
+  }
+}
+
+export default CustomerCIDs

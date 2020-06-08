@@ -1,0 +1,5 @@
+.signin-link:hover,
+.signin-link:active,
+.signin-link:focus {
+  text-decoration: none;
+}

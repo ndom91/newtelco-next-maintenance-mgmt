@@ -1,4 +1,4 @@
-const db = require('../../../../lib/db')
+const db = require('../../../lib/db')
 const escape = require('sql-template-strings')
 
 module.exports = async (req, res) => {
@@ -7,7 +7,7 @@ module.exports = async (req, res) => {
   const cidArray = lieferantCIDid.split(',')
   let cidString = ''
   cidArray.forEach(cid => {
-    cidString += (`,"${cid}"`)
+    cidString += `,"${cid}"`
   })
   cidString = cidString.substr(1, cidString.length)
   cidString = `(${cidString})`

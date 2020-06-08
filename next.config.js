@@ -2,18 +2,19 @@ const { parsed: localEnv } = require('dotenv').config({ path: './.env' })
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true'
 })
-const dev = process.env.NODE_ENV !== 'production'
+const dev = process.env.NEXT_PUBLIC_ENV === 'development'
+const path = require('path')
 const webpack = require('webpack')
 const withCSS = require('@zeit/next-css')
-require('dotenv').config()
-const path = require('path')
-const Dotenv = require('dotenv-webpack')
+const withLess = require('@zeit/next-less')
 const withPWA = require('next-pwa')
+const Dotenv = require('dotenv-webpack')
+require('dotenv').config()
 
 function HACK_removeMinimizeOptionFromCssLoaders (config) {
-  console.warn(
-    'HACK: Removing `minimize` option from `css-loader` entries in Webpack config'
-  )
+  // console.warn(
+  //   'HACK: Removing `minimize` option from `css-loader` entries in Webpack config'
+  // )
   config.module.rules.forEach(rule => {
     if (Array.isArray(rule.use)) {
       rule.use.forEach(u => {
@@ -32,16 +33,16 @@ const nextConfig = {
     modern: true
   },
   pwa: {
-    disable: dev,
     dest: 'public',
-    register: true,
-    scope: '/',
-    sw: 'sw.js',
-    clientsClaim: true,
-    skipWaiting: true,
-    modifyURLPrefix: {
-      '.next': '/_next'
-    },
+    disable: dev,
+    // register: true
+    // scope: '/',
+    // sw: 'sw.js',
+    // modifyURLPrefix: {
+    //   '.next': '/_next'
+    // }
+    // clientsClaim: true,
+    // skipWaiting: true,
     runtimeCaching: [{
       urlPattern: /api/i,
       handler: 'NetworkFirst',
@@ -134,10 +135,8 @@ const nextConfig = {
       }
     }]
   },
-  exportPathMap: function () {
-    return {
-      '/': { page: '/' }
-    }
+  lessLoaderOptions: {
+    javascriptEnabled: true
   },
   webpack (config, { isServer, buildId, dev }) {
     config.plugins.push(new webpack.EnvironmentPlugin(localEnv))
@@ -152,4 +151,4 @@ const nextConfig = {
   }
 }
 
-module.exports = withBundleAnalyzer(withPWA(withCSS(nextConfig)))
+module.exports = withBundleAnalyzer(withPWA(withLess(withCSS(nextConfig))))

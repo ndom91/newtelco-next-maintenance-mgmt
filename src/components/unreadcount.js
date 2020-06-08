@@ -1,59 +1,74 @@
-import fetch from 'isomorphic-unfetch'
+import React, { useState, useEffect } from 'react'
 import Head from 'next/head'
+import Store from './store'
 
 const UnreadCount = () => {
-  if (typeof window !== 'undefined') {
-    const host = window.location.host
-    fetch(`https://api.${host}/inbox/count`, {
-      method: 'get'
-    })
-      .then(resp => resp.json())
-      .then(data => {
-        if (data !== 'No unread emails') {
-          // console.log('favico count: ', data.count)
-          const favicon = document.getElementById('favicon')
-          const faviconSize = 16
+  const [faviconEl, setFaviconEl] = useState({})
+  const store = Store.useStore()
+  // const count = store.get('count')
 
-          const canvas = document.createElement('canvas')
-          canvas.width = faviconSize
-          canvas.height = faviconSize
+  const getFavicon = count => {
+    const favicon = document.getElementById('favicon')
+    if (favicon) {
+      const faviconSize = 16
 
-          const context = canvas.getContext('2d')
-          const img = document.createElement('img')
-          img.src = favicon.href
+      const canvas = document.createElement('canvas')
+      canvas.width = faviconSize
+      canvas.height = faviconSize
 
-          img.onload = () => {
-            // Draw Original Favicon as Background
-            context.drawImage(img, 0, 0, faviconSize, faviconSize)
+      const context = canvas.getContext('2d')
+      const img = document.createElement('img')
+      img.src = favicon.href
 
-            // Draw Notification Circle
-            context.beginPath()
-            context.arc(canvas.width - faviconSize / 3, 6 + faviconSize / 3, faviconSize / 3, 0, 2 * Math.PI)
-            context.fillStyle = '#FF0000'
-            context.fill()
+      img.onload = () => {
+        // Draw Original Favicon as Background
+        context.drawImage(img, 0, 0, faviconSize, faviconSize)
 
-            // Draw Notification Number
-            context.font = '9px "helvetica", sans-serif'
-            context.textAlign = 'center'
-            context.textBaseline = 'middle'
-            context.fillStyle = '#FFFFFF'
-            context.fillText(data.count, canvas.width - faviconSize / 3, 6 + faviconSize / 3)
+        // Draw Notification Circle
+        context.beginPath()
+        context.arc(
+          canvas.width - faviconSize / 3,
+          6 + faviconSize / 3,
+          faviconSize / 3,
+          0,
+          2 * Math.PI
+        )
+        context.fillStyle = '#FF0000'
+        context.fill()
 
-            // Replace favicon
-            favicon.href = canvas.toDataURL('image/png')
+        // Draw Notification Number
+        context.font = '9px "helvetica", sans-serif'
+        context.textAlign = 'center'
+        context.textBaseline = 'middle'
+        context.fillStyle = '#FFFFFF'
+        context.fillText(
+          count,
+          canvas.width - faviconSize / 3,
+          6 + faviconSize / 3
+        )
 
-            return (
-              <Head>
-                <title>{`${favicon}`}</title>
-              </Head>
-            )
-          }
-        }
-      })
-      .catch(err => console.error(`Error - ${err}`))
-  } else {
-    return null
+        // Replace favicon
+        favicon.href = canvas.toDataURL('image/png')
+        return favicon
+      }
+    }
   }
+
+  // useEffect(() => {
+  //   if (typeof window !== 'undefined') {
+  //     const fav = getFavicon()
+  //     fav && setFaviconEl(fav)
+  //   }
+  // }, [count])
+
+  store.on('count').subscribe(async count => {
+    if (typeof window !== 'undefined' && count !== 0) {
+      const fav = getFavicon(count)
+      fav && setFaviconEl(fav)
+    }
+  })
+
+  return <Head>{`${faviconEl}`}</Head>
 }
 
 export default UnreadCount

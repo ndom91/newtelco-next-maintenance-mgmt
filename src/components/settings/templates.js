@@ -1,25 +1,15 @@
-
 import React from 'react'
-import fetch from 'isomorphic-unfetch'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Select from 'react-select'
 import { Editor as TinyEditor } from '@tinymce/tinymce-react'
-import {
-  faCalendarAlt,
-  faAt
-} from '@fortawesome/free-solid-svg-icons'
-import {
-  CardBody,
-  CardHeader,
-  Badge,
-  Button,
-  Container
-} from 'shards-react'
 
 export default class Templates extends React.Component {
-  static async getInitialProps ({ req, query }) {
-    // const host = req ? req.headers['x-forwarded-host'] : location.host
-    // const pageRequest = `https://${host}/api/settings/lieferantcids`
+  static async getInitialProps({ req, query }) {
+    // const host = req ? req.headers['x-forwarded-host'] : window.location.hostname
+    // const protocol = 'https:'
+    // if (host.indexOf('localhost') > -1) {
+    //   protocol = 'http:'
+    // }
+    // const pageRequest = `${protocol}//${host}/api/settings/lieferantcids`
     // const res = await fetch(pageRequest)
     // const json = await res.json()
     // return {
@@ -27,12 +17,12 @@ export default class Templates extends React.Component {
     // }
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       mailText: '',
       calendarText: '',
-      openSupplierCidAdd: false
+      openSupplierCidAdd: false,
     }
     this.handleMailBlur = this.handleMailBlur.bind(this)
     this.handleMailChange = this.handleMailChange.bind(this)
@@ -41,38 +31,26 @@ export default class Templates extends React.Component {
     this.handleSaveOnClick = this.handleSaveOnClick.bind(this)
   }
 
-  componentDidMount () {
+  componentDidMount() {}
 
-  }
+  handleMailChange() {}
 
-  handleMailChange () {
+  handleMailBlur() {}
 
-  }
+  handleCalChange() {}
 
-  handleMailBlur () {
+  handleCalBlur() {}
 
-  }
+  handleSaveOnClick() {}
 
-  handleCalChange () {
-
-  }
-
-  handleCalBlur () {
-
-  }
-
-  handleSaveOnClick () {
-
-  }
-
-  render () {
+  render() {
     return (
       <>
         <CardBody>
           <Container className='container-exterior'>
             <CardHeader className='container-header'>
               Maintenance Email
-              <FontAwesomeIcon width='1.125em' style={{ marginRight: '10px' }} icon={faAt} />
+              {/* <FontAwesomeIcon width='1.125em' style={{ marginRight: '10px' }} icon={faAt} /> */}
             </CardHeader>
             <Container className='container-border'>
               <TinyEditor
@@ -86,12 +64,11 @@ export default class Templates extends React.Component {
                   plugins: [
                     'advlist autolink lists link image print preview anchor',
                     'searchreplace code',
-                    'insertdatetime table paste code help wordcount'
+                    'insertdatetime table paste code help wordcount',
                   ],
-                  toolbar:
-                    `undo redo | formatselect | bold italic backcolor | 
+                  toolbar: `undo redo | formatselect | bold italic backcolor | 
                     alignleft aligncenter alignright alignjustify | 
-                    bullist numlist outdent indent | removeformat | help`
+                    bullist numlist outdent indent | removeformat | help`,
                 }}
                 onChange={this.handleMailChange}
               />
@@ -100,7 +77,7 @@ export default class Templates extends React.Component {
           <Container className='container-exterior'>
             <CardHeader className='container-header'>
               Maintenance Calendar
-              <FontAwesomeIcon width='1.125em' style={{ marginRight: '10px' }} icon={faCalendarAlt} />
+              {/* <FontAwesomeIcon width='1.125em' style={{ marginRight: '10px' }} icon={faCalendarAlt} /> */}
             </CardHeader>
             <Container className='container-border'>
               <TinyEditor
@@ -114,20 +91,20 @@ export default class Templates extends React.Component {
                   plugins: [
                     'advlist autolink lists link image print preview anchor',
                     'searchreplace code',
-                    'insertdatetime table paste code help wordcount'
+                    'insertdatetime table paste code help wordcount',
                   ],
-                  toolbar:
-                    `undo redo | formatselect | bold italic backcolor | 
+                  toolbar: `undo redo | formatselect | bold italic backcolor | 
                     alignleft aligncenter alignright alignjustify | 
                     bullist numlist outdent indent | removeformat | help`,
-                  content_style: 'html { color: #828282 }'
+                  content_style: 'html { color: #828282 }',
                 }}
                 onChange={this.handleCalChange}
               />
             </Container>
           </Container>
         </CardBody>
-        <style jsx>{`
+        <style jsx>
+          {`
             :global(.container-header) {
               font-size: 1.5em;
             }

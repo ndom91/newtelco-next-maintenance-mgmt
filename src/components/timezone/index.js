@@ -2,7 +2,7 @@ import React from 'react'
 import Select from 'react-select'
 import moment from 'moment-timezone'
 
-const _t = (s) => {
+const _t = s => {
   if (i18n !== null && i18n[s]) {
     return i18n[s]
   }
@@ -86,7 +86,7 @@ const timezones = [
   'Asia/Magadan',
   'Pacific/Fiji',
   'Pacific/Auckland',
-  'Pacific/Tongatapu'
+  'Pacific/Tongatapu',
 ]
 
 const i18n = {
@@ -165,18 +165,19 @@ const i18n = {
   'Asia/Magadan': 'Magadan, Solomon Islands, New Caledonia',
   'Pacific/Fiji': 'Fiji Islands, Kamchatka, Marshall Islands',
   'Pacific/Auckland': 'Auckland, Wellington',
-  'Pacific/Tongatapu': "Nuku'alofa"
+  'Pacific/Tongatapu': "Nuku'alofa",
 }
 
 const options = []
-moment.tz.names()
+moment.tz
+  .names()
   .filter(tz => {
     return timezones.includes(tz)
   })
   .reduce((memo, tz) => {
     memo.push({
       name: tz,
-      offset: moment.tz(tz).utcOffset()
+      offset: moment.tz(tz).utcOffset(),
     })
 
     return memo
@@ -191,10 +192,10 @@ moment.tz.names()
   }, '')
 
 class TimezoneSelector extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
-      selectedOption: null
+      selectedOption: null,
     }
   }
 
@@ -202,7 +203,7 @@ class TimezoneSelector extends React.Component {
     this.setState({ selectedOption })
   }
 
-  render () {
+  render() {
     const { selectedOption } = this.state
 
     return (

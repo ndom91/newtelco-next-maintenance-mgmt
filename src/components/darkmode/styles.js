@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+// import styled from 'styled-components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import flex from './flex'
 import { hover, fixedSize } from './mixins'
@@ -12,7 +12,7 @@ export const Wrapper = styled.div({
   display: 'inline-block',
   borderRadius: 17,
   overflow: 'hidden',
-  willChange: 'transform'
+  willChange: 'transform',
 })
 
 export const DayNightSwitch = styled.div(
@@ -26,26 +26,26 @@ export const DayNightSwitch = styled.div(
     transition: `all ${transitionTime}ms linear`,
     ...hover(
       {
-        transform: 'scale(1.00)'
+        transform: 'scale(1.00)',
       },
       {
-        transform: 'scale(1.03)'
+        transform: 'scale(1.03)',
       }
-    )
+    ),
   },
   ({ theme }) => ({
     ...(theme.clicked && {
       backgroundColor: '#272727',
       '&:hover': {
-        backgroundColor: '#121212'
-      }
+        backgroundColor: '#121212',
+      },
     }),
     ...(!theme.clicked && {
       backgroundColor: '#80c7cb',
       '&:hover': {
-        backgroundColor: '#79bfc3'
-      }
-    })
+        backgroundColor: '#79bfc3',
+      },
+    }),
   })
 )
 
@@ -53,17 +53,17 @@ export const Icon = styled(FontAwesomeIcon)({
   position: 'absolute',
   transition: `all ${transitionTime}ms ease-in`,
   ...fixedSize(13),
-  fill: 'white'
+  fill: 'white',
 })
 
 export const Moon = styled(Icon)(({ theme }) => ({
   ...(theme.clicked && {
-    opacity: 1
+    opacity: 1,
   }),
   ...(!theme.clicked && {
     transform: 'translateY(30px)',
-    opacity: 0
-  })
+    opacity: 0,
+  }),
 }))
 
 export const Star = styled.div(
@@ -72,7 +72,7 @@ export const Star = styled.div(
     width: 3,
     height: 3,
     backgroundColor: 'white',
-    position: 'absolute'
+    position: 'absolute',
   },
   ({ size, x, y, index, theme }) => ({
     transition: `all ${50 * index}ms linear`,
@@ -81,15 +81,15 @@ export const Star = styled.div(
     left: 8 + x,
     ...(!theme.clicked && {
       opacity: 0,
-      transform: 'translateY(10px)'
-    })
+      transform: 'translateY(10px)',
+    }),
   })
 )
 
 export const Stars = styled.div({}, ({ theme }) => ({
   ...(theme.clicked && {
-    opacity: 1
-  })
+    opacity: 1,
+  }),
 }))
 
 export const Circle = styled.div(
@@ -101,27 +101,29 @@ export const Circle = styled.div(
     width: circleWidth,
     overflow: 'hidden',
     height: 27,
-    transition: `all ${transitionTime}ms ease-in`
+    transition: `all ${transitionTime}ms ease-in`,
   },
   ({ theme }) => {
-    const translateX = theme.clicked ? width - circleWidth - sideOffset : sideOffset
+    const translateX = theme.clicked
+      ? width - circleWidth - sideOffset
+      : sideOffset
     return {
       ...(theme.clicked && {
         transform: `translateX(${translateX}px)`,
         backgroundColor: 'rgba(255,255,255,0.4)',
         border: '2px solid rgba(255,255,255,0.9)',
         '&:hover': {
-          backgroundColor: 'rgba(255,255,255,0.3)'
-        }
+          backgroundColor: 'rgba(255,255,255,0.3)',
+        },
       }),
       ...(!theme.clicked && {
         transform: `translateX(${translateX}px)`,
         backgroundColor: '#fddf75',
         border: '3px solid #d6b05eb5',
         '&:hover': {
-          backgroundColor: '#fff0bb'
-        }
-      })
+          backgroundColor: '#fff0bb',
+        },
+      }),
     }
   }
 )

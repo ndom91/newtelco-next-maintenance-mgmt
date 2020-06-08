@@ -1,0 +1,20 @@
+.rs-nav-waterline {
+  border-top: 2px solid rgba(0,0,0,0) !important;
+}
+
+.section .rs-panel-heading {
+  background-color: #fff;
+}
+
+.ag-root {
+  font-family: var(--font-body);
+}
+
+.ag-header-cell-text {
+  font-family: var(--font-body);
+  font-size: 110%;
+}
+
+.company-select div:nth-of-type(2) {
+  z-index: 99;
+}
