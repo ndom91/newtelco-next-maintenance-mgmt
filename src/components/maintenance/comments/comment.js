@@ -47,14 +47,42 @@ const Comment = ({ data, handleDelete }) => {
               return (
                 <IconButton
                   appearance='subtle'
-                  icon={<Icon icon='ellipsis-v' />}
+                  icon={
+                    <svg
+                      width='18'
+                      height='18'
+                      fill='none'
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                      strokeWidth='2'
+                      viewBox='0 0 24 24'
+                      stroke='currentColor'
+                    >
+                      <path d='M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z' />
+                    </svg>
+                  }
                 />
               )
             }}
           >
             <Dropdown.Item
               onClick={() => handleDelete(data.id)}
-              icon={<Icon icon='trash' />}
+              className='deleteBtn'
+              icon={
+                <svg
+                  width='18'
+                  height='18'
+                  style={{ marginRight: '5px' }}
+                  fill='none'
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth='2'
+                  viewBox='0 0 24 24'
+                  stroke='currentColor'
+                >
+                  <path d='M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16'></path>
+                </svg>
+              }
             >
               Delete
             </Dropdown.Item>

@@ -8,6 +8,7 @@ export default createConnectedStore(
     impactPlaceholder: '',
     comments: [],
     rescheduleData: [],
+    night: false,
   },
   withLogger
 )

@@ -18,6 +18,10 @@
   justify-content: space-between;
   align-items: center;
 }
- .header-dropdown .rs-dropdown-menu .rs-dropdown-item-content .rs-btn-toggle-sm {
-   margin-right: 10px;
- }
+.header-dropdown .rs-dropdown-menu .rs-dropdown-item-content .rs-btn-toggle-sm {
+  margin-right: 10px;
+}
+
+.rs-navbar-nav .rs-nav-item > .rs-nav-item-content:first-of-type {
+  display: flex;
+}

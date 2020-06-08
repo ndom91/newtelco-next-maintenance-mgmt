@@ -443,9 +443,18 @@ const RescheduleGrid = ({ maintId, user, handleCalendarUpdate }) => {
             className='reschedule reschedule-header'
             onHide={() => setOpenRescheduleModal(!openRescheduleModal)}
           >
-            <FlexboxGrid justify='center' align='middle'>
-              <FlexboxGrid.Item colspan={24} style={{ textAlign: 'center' }}>
-                <h3>Reschedule Maintenance</h3>
+            <FlexboxGrid
+              justify='center'
+              align='middle'
+              style={{ pointerEvents: 'none' }}
+            >
+              <FlexboxGrid.Item
+                colspan={24}
+                style={{ textAlign: 'center', pointerEvents: 'none' }}
+              >
+                <h3 style={{ pointerEvents: 'none' }}>
+                  Reschedule Maintenance
+                </h3>
               </FlexboxGrid.Item>
             </FlexboxGrid>
           </Modal.Header>

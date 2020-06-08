@@ -2,7 +2,7 @@ import React from 'react'
 import NextAuth, { signout } from 'next-auth/client'
 import Router from 'next/router'
 import Link from 'next/link'
-import Store from '../store'
+import Store from '@/newtelco/store'
 import SearchInput from './search'
 import './header.css'
 import {
@@ -16,7 +16,7 @@ import {
   Divider,
   Toggle,
 } from 'rsuite'
-import Notify from '../../lib/notification'
+import Notify from '@/newtelco-utils/notification'
 
 const NextLink = React.forwardRef((props, ref) => {
   const { href, as, ...rest } = props
@@ -52,7 +52,8 @@ const MaintHeader = props => {
   }
 
   const toggleDark = e => {
-    store.set('night')(!store.get('night'))
+    const cur = store.get('night')
+    store.set('night')(!cur)
   }
 
   return (
@@ -94,16 +95,21 @@ const MaintHeader = props => {
               <Nav.Item
                 icon={
                   <svg
-                    height='16'
-                    width='16'
-                    fill='var(--grey4)'
-                    viewBox='0 0 20 20'
+                    height='18'
+                    width='18'
+                    fill='none'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth='2'
+                    viewBox='0 0 24 24'
+                    stroke='var(--grey4)'
+                    style={{ marginRight: '5px' }}
                   >
-                    <path d='M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z' />
+                    <path d='M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' />
                   </svg>
                 }
               >
-                <span style={{ marginLeft: '5px' }}>Home</span>
+                Home
               </Nav.Item>
             </Link>
             <Link href='/inbox' as='/inbox' passHref>
@@ -179,17 +185,17 @@ const MaintHeader = props => {
               >
                 <Toggle
                   checked={night}
-                  checkedChildren={
-                    <Icon
-                      style={{ alignItems: 'center', color: '#fff' }}
-                      icon='moon-o'
-                    />
-                  }
-                  unCheckedChildren={<Icon icon='sun-o' />}
+                  // checkedChildren={
+                  //   <Icon
+                  //     style={{ alignItems: 'center', color: '#fff' }}
+                  //     icon='moon-o'
+                  //   />
+                  // }
+                  // unCheckedChildren={<Icon icon='sun-o' />}
                   onChange={toggleDark}
                   size='sm'
                 />
-                Darkmode
+                Night
               </Dropdown.Item>
               <Dropdown.Item divider />
               <NavLink

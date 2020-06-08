@@ -55,6 +55,7 @@ import {
   SelectPicker,
   TagPicker,
   Nav,
+  InputGroup,
 } from 'rsuite'
 
 const Changelog = dynamic(() => import('@/newtelco/maintenance/timeline'), {
@@ -95,11 +96,30 @@ const MyDateTime = ({ field, form, ...props }) => {
             parseISO(endDateTime),
             parseISO(startDateTime)
           )
+          console.log(impactCalculation)
           props.setImpactPlaceholder(impactCalculation)
         }
       }}
-      options={{ time_24hr: 'true', allow_input: 'true' }}
-      className='flatpickr end-date-time'
+      options={{
+        time_24hr: 'true',
+        allow_input: 'true',
+      }}
+      className='flatpickr'
+      render={({ defaultValue, value, ...props }, ref) => {
+        const curTimezone = tzOptions.filter(
+          opt => opt.value === form.values.timezone
+        )
+        const regex = /(GMT(\-|\+)?([0-1][0-9]:[0-5][0-9])?)/i
+        const tzDisplay = curTimezone[0].label.match(regex)
+        return (
+          <InputGroup>
+            <Input defaultValue={defaultValue} inputRef={ref} {...props} />
+            <InputGroup.Addon style={{ color: '#b9b9b9' }}>
+              {tzDisplay[0]}
+            </InputGroup.Addon>
+          </InputGroup>
+        )
+      }}
     />
   )
 }
@@ -1120,7 +1140,27 @@ const Maintenance = ({ session, serverData, suppliers }) => {
           <IconButton
             appearance='ghost'
             onClick={() => Router.back()}
-            icon={<Icon icon='chevron-left' />}
+            icon={
+              <svg
+                width='18'
+                height='18'
+                style={{ marginRight: '10px' }}
+                fill='none'
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                strokeWidth='2'
+                viewBox='0 0 24 24'
+                stroke='currentColor'
+              >
+                <path d='M11 15l-3-3m0 0l3-3m-3 3h8M3 12a9 9 0 1118 0 9 9 0 01-18 0z' />
+              </svg>
+            }
+            style={{
+              padding: '12px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
           >
             Back
           </IconButton>
@@ -1131,7 +1171,27 @@ const Maintenance = ({ session, serverData, suppliers }) => {
             <IconButton
               appearance='ghost'
               onClick={toggleReadModal}
-              icon={<Icon icon='at' />}
+              icon={
+                <svg
+                  width='18'
+                  height='18'
+                  style={{ marginRight: '10px' }}
+                  fill='none'
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth='2'
+                  viewBox='0 0 24 24'
+                  stroke='currentColor'
+                >
+                  <path d='M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207' />
+                </svg>
+              }
+              style={{
+                padding: '12px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+              }}
             >
               Read
             </IconButton>
@@ -1171,7 +1231,27 @@ const Maintenance = ({ session, serverData, suppliers }) => {
             <IconButton
               appearance='ghost'
               onClick={handleCalendarCreate}
-              icon={<Icon icon='calendar' />}
+              icon={
+                <svg
+                  width='18'
+                  height='18'
+                  style={{ marginRight: '10px' }}
+                  fill='none'
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth='2'
+                  viewBox='0 0 24 24'
+                  stroke='currentColor'
+                >
+                  <path d='M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z' />
+                </svg>
+              }
+              style={{
+                padding: '12px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+              }}
             >
               Create
             </IconButton>
@@ -1184,7 +1264,27 @@ const Maintenance = ({ session, serverData, suppliers }) => {
               <IconButton
                 appearance='ghost'
                 onClick={handleCreateOnClick}
-                icon={<Icon icon='plus' />}
+                icon={
+                  <svg
+                    width='18'
+                    height='18'
+                    style={{ marginRight: '10px' }}
+                    fill='none'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth='2'
+                    viewBox='0 0 24 24'
+                    stroke='currentColor'
+                  >
+                    <path d='M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13' />
+                  </svg>
+                }
+                style={{
+                  padding: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}
                 className='create-btn'
               >
                 Save
@@ -1193,12 +1293,32 @@ const Maintenance = ({ session, serverData, suppliers }) => {
           ) : (
             <Whisper
               placement='bottom'
-              speaker={<Tooltip>Send All Notifications</Tooltip>}
+              speaker={<Tooltip>Send All Notification Mails</Tooltip>}
             >
               <IconButton
                 appearance='ghost'
                 onClick={handleSendAll}
-                icon={<Icon icon='envelope-o' />}
+                icon={
+                  <svg
+                    width='18'
+                    height='18'
+                    style={{ marginRight: '10px' }}
+                    fill='none'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth='2'
+                    viewBox='0 0 24 24'
+                    stroke='currentColor'
+                  >
+                    <path d='M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z' />
+                  </svg>
+                }
+                style={{
+                  padding: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}
               >
                 Send All
               </IconButton>
@@ -1509,9 +1629,6 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                                 }}
                               >
                                 Start Date/Time
-                                <HelpBlock style={{ float: 'right' }} tooltip>
-                                  Time in above selected Timezone
-                                </HelpBlock>
                               </ControlLabel>
                               <FastField
                                 name='startDateTime'
@@ -1523,7 +1640,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                               <HelpBlock
                                 style={{ margin: '5px', opacity: '0.5' }}
                               >
-                                Time in CEST:{' '}
+                                Europe/Berlin:{' '}
                                 {moment
                                   .tz(
                                     moment.tz(
@@ -1547,9 +1664,6 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                                 }}
                               >
                                 End Date/Time
-                                <HelpBlock style={{ float: 'right' }} tooltip>
-                                  Time in above selected Timezone
-                                </HelpBlock>
                               </ControlLabel>
                               <FastField
                                 name='endDateTime'

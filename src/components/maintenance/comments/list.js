@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import Store from '../../store'
+import Store from '@/newtelco/store'
 import Comment from './comment'
-import Notify from '../../../lib/notification'
+import Notify from '@/newtelco-utils/notification'
 import {
   List,
   FlexboxGrid,
@@ -142,11 +142,17 @@ const CommentList = ({ user, id, initialComment }) => {
       </FlexboxGrid.Item>
       <FlexboxGrid.Item colspan={22}>
         <FlexboxGrid justify='space-between' align='middle'>
-          <FlexboxGrid.Item colspan={21}>
+          <FlexboxGrid.Item colspan={19}>
             <Input value={comment} onChange={e => setComment(e)} />
           </FlexboxGrid.Item>
-          <FlexboxGrid.Item colspan={2} style={{ marginLeft: '5px' }}>
-            <IconButton icon={<Icon icon='send' />} onClick={submitComment} />
+          <FlexboxGrid.Item colspan={4} style={{ marginLeft: '5px' }}>
+            <IconButton
+              style={{ width: '100%' }}
+              icon={<Icon icon='send' />}
+              onClick={submitComment}
+            >
+              Submit
+            </IconButton>
           </FlexboxGrid.Item>
         </FlexboxGrid>
       </FlexboxGrid.Item>

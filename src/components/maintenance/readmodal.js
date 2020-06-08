@@ -217,7 +217,7 @@ const ReadModal = ({
     <>
       <Rnd
         default={{
-          x: window.outerWidth / 2 - 50,
+          x: window.outerWidth / 2 - 100,
           y: 100,
           width: window.outerWidth / 2,
           height: 600,
@@ -257,7 +257,10 @@ const ReadModal = ({
               </FlexboxGrid.Item>
               <FlexboxGrid.Item colspan={19}>
                 <div className='modal-preview-text-wrapper'>
-                  <InputGroup className='modal-textbox'>
+                  <InputGroup
+                    className='modal-textbox'
+                    style={{ marginBottom: '5px' }}
+                  >
                     <InputGroup.Addon style={{ height: '31px' }} type='prepend'>
                       From
                     </InputGroup.Addon>
@@ -327,8 +330,8 @@ const ReadModal = ({
               height: `calc(100% - ${
                 Array.isArray(maintenance.incomingAttachments) &&
                 maintenance.incomingAttachments.length !== 0
-                  ? '35px'
-                  : '20px'
+                  ? '40px'
+                  : '10px'
               })`,
             }}
           >
