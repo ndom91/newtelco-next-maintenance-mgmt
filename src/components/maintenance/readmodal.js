@@ -15,6 +15,7 @@ import {
   Whisper,
   Popover,
   Dropdown,
+  Loader,
 } from 'rsuite'
 
 const ReadModal = ({
@@ -33,6 +34,7 @@ const ReadModal = ({
   const [filetype, setFiletype] = useState('')
   const [currentAttachmentName, setCurrentAttachmentName] = useState('')
   const [attachmentPopoverBody, setAttachmentPopoverBody] = useState('')
+  const [faviconLoading, setFaviconLoading] = useState(true)
 
   const fileTypeIcon = filename => {
     const fileExt = filename.match(/\.[0-9a-z]+$/i)
@@ -227,7 +229,7 @@ const ReadModal = ({
           overflow: 'hidden',
           borderRadius: '5px',
           zIndex: '101',
-          boxShadow: '0px 0px 10px 1px var(--grey3)',
+          boxShadow: '0px 0px 15px -3px var(--grey3)',
         }}
         bounds='window'
         dragHandleClassName='mail-read-header'
@@ -249,10 +251,28 @@ const ReadModal = ({
                 colspan={3}
                 style={{ display: 'flex', justifyContent: 'center' }}
               >
+                {faviconLoading && (
+                  <div
+                    style={{
+                      width: '100%',
+                      height: '60px',
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <Loader />
+                  </div>
+                )}
                 <Avatar
                   size='lg'
                   src={`/v1/api/faviconUrl?d=${jsonData.profile.mailDomain}`}
-                  style={{ backgroundColor: 'transparent' }}
+                  style={
+                    faviconLoading
+                      ? { visibility: 'hidden', backgroundColor: 'transparent' }
+                      : { backgroundColor: 'transparent' }
+                  }
+                  onLoad={() => setFaviconLoading(false)}
                 />
               </FlexboxGrid.Item>
               <FlexboxGrid.Item colspan={19}>

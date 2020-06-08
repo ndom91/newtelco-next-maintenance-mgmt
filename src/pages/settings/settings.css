@@ -1,5 +1,5 @@
 .rs-nav-waterline {
-  border-top: 2px solid rgba(0,0,0,0) !important;
+  border-top: 2px solid rgba(0, 0, 0, 0) !important;
 }
 
 .section .rs-panel-heading {
@@ -17,4 +17,8 @@
 
 .company-select div:nth-of-type(2) {
   z-index: 99;
+}
+
+.section .rs-panel-heading {
+  padding: 0px;
 }

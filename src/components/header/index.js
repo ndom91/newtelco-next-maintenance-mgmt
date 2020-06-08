@@ -52,8 +52,8 @@ const MaintHeader = props => {
   }
 
   const toggleDark = e => {
-    const cur = store.get('night')
-    store.set('night')(!cur)
+    e.stopPropagation()
+    store.set('night')(!store.get('night'))
   }
 
   return (
@@ -91,23 +91,23 @@ const MaintHeader = props => {
         <Navbar.Body>
           <Nav>
             <Divider vertical />
-            <Link href='/' as='/' passHref>
+            <Link href='/' passHref>
               <Nav.Item
-                icon={
-                  <svg
-                    height='18'
-                    width='18'
-                    fill='none'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth='2'
-                    viewBox='0 0 24 24'
-                    stroke='var(--grey4)'
-                    style={{ marginRight: '5px' }}
-                  >
-                    <path d='M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' />
-                  </svg>
-                }
+              // icon={
+              //   <svg
+              //     height='18'
+              //     width='18'
+              //     fill='none'
+              //     strokeLinecap='round'
+              //     strokeLinejoin='round'
+              //     strokeWidth='2'
+              //     viewBox='0 0 24 24'
+              //     stroke='var(--grey4)'
+              //     style={{ marginRight: '5px' }}
+              //   >
+              //     <path d='M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' />
+              //   </svg>
+              // }
               >
                 Home
               </Nav.Item>
@@ -171,46 +171,100 @@ const MaintHeader = props => {
                 />
               }
             >
-              <Dropdown.Item panel style={{ padding: 10, textAlign: 'right' }}>
+              <Dropdown.Item
+                panel
+                style={{ padding: '10px', textAlign: 'right', width: '105px' }}
+              >
                 <p>Signed in as</p>
                 <strong>
                   {!loading && session.user.email.match(/^([^@]*)@/)[1]}
                 </strong>
               </Dropdown.Item>
               <Dropdown.Item divider />
-              <Dropdown.Item
-                onSelect={(key, e) => e.preventDefault()}
-                eventKey='1'
-                onClick={toggleDark}
-              >
-                <Toggle
-                  checked={night}
-                  // checkedChildren={
-                  //   <Icon
-                  //     style={{ alignItems: 'center', color: '#fff' }}
-                  //     icon='moon-o'
-                  //   />
-                  // }
-                  // unCheckedChildren={<Icon icon='sun-o' />}
-                  onChange={toggleDark}
-                  size='sm'
-                />
+              <Dropdown.Item eventKey='1'>
+                <span
+                  onClick={toggleDark}
+                  className='night-wrapper'
+                  style={{ display: 'flex', alignItems: 'center' }}
+                >
+                  <svg
+                    height='18'
+                    width='18'
+                    fill='none'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth='2'
+                    viewBox='0 0 24 24'
+                    stroke='currentColor'
+                    style={
+                      night
+                        ? { visibility: 'visible' }
+                        : { display: 'none', visibility: 'hidden' }
+                    }
+                  >
+                    <path d='M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z' />
+                  </svg>
+                  <svg
+                    height='18'
+                    width='18'
+                    fill='none'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth='2'
+                    viewBox='0 0 24 24'
+                    stroke='currentColor'
+                    style={
+                      !night
+                        ? { visibility: 'visible' }
+                        : { display: 'none', visibility: 'hidden' }
+                    }
+                  >
+                    <path d='M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z' />
+                  </svg>
+                </span>
                 Night
               </Dropdown.Item>
               <Dropdown.Item divider />
               <NavLink
-                icon={<Icon icon='cog' />}
+                icon={
+                  <svg
+                    height='16'
+                    width='16'
+                    fill='none'
+                    stroke-linecap='round'
+                    stroke-linejoin='round'
+                    stroke-width='2'
+                    viewBox='0 0 24 24'
+                    stroke='currentColor'
+                  >
+                    <path d='M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z'></path>
+                    <path d='M15 12a3 3 0 11-6 0 3 3 0 016 0z'></path>
+                  </svg>
+                }
                 href={{ pathname: '/settings', query: { tab: 'companies' } }}
               >
                 Settings
               </NavLink>
-              <Dropdown.Item
+              <NavLink
                 eventKey='2'
-                icon={<Icon icon='sign-out' />}
+                icon={
+                  <svg
+                    height='16'
+                    width='16'
+                    fill='none'
+                    stroke-linecap='round'
+                    stroke-linejoin='round'
+                    stroke-width='2'
+                    viewBox='0 0 24 24'
+                    stroke='currentColor'
+                  >
+                    <path d='M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1'></path>
+                  </svg>
+                }
                 href='/api/auth/signout'
               >
                 Logout
-              </Dropdown.Item>
+              </NavLink>
             </Dropdown>
           </Nav>
         </Navbar.Body>

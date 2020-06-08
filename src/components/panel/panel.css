@@ -4,3 +4,9 @@
   font-weight: 200;
   background-color: var(--grey1);
 }
+
+.header-middle > div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

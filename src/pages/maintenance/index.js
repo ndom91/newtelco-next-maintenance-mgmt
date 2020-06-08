@@ -55,6 +55,7 @@ import {
   SelectPicker,
   TagPicker,
   Nav,
+  Tag,
   InputGroup,
 } from 'rsuite'
 
@@ -1138,7 +1139,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
       return (
         <ButtonGroup size='md'>
           <IconButton
-            appearance='ghost'
+            appearance='subtle'
             onClick={() => Router.back()}
             icon={
               <svg
@@ -1156,7 +1157,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
               </svg>
             }
             style={{
-              padding: '12px',
+              padding: '0 12px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
@@ -1169,7 +1170,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
             speaker={<Tooltip>Open Incoming Mail</Tooltip>}
           >
             <IconButton
-              appearance='ghost'
+              appearance='subtle'
               onClick={toggleReadModal}
               icon={
                 <svg
@@ -1187,7 +1188,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                 </svg>
               }
               style={{
-                padding: '12px',
+                padding: '0 12px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
@@ -1202,22 +1203,34 @@ const Maintenance = ({ session, serverData, suppliers }) => {
 
     const HeaderCenter = () => {
       return (
-        <Badge
-          content={maintenance.id === 'NEW' ? 'NEW' : `NT-${maintenance.id}`}
-          className='header-badge'
-        >
+        <div>
           <Button
             appearance='subtle'
             size='lg'
             style={{
+              display: 'inline',
               fontSize: '1.1em',
               fontWeight: '200',
-              border: '1px solid var(--grey2)',
             }}
           >
             {maintenance.name}
           </Button>
-        </Badge>
+          <div
+            appearance='subtle'
+            size='lg'
+            style={{
+              display: 'inline',
+              color: 'var(--grey4)',
+              fontSize: '1.1em',
+              fontWeight: '200',
+              padding: '5px 10px',
+              border: '1px solid var(--grey2)',
+              borderRadius: '5px',
+            }}
+          >
+            {maintenance.id === 'NEW' ? 'NEW' : `NT-${maintenance.id}`}
+          </div>
+        </div>
       )
     }
 
@@ -1229,7 +1242,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
             speaker={<Tooltip>Create Calendar Entry</Tooltip>}
           >
             <IconButton
-              appearance='ghost'
+              appearance='subtle'
               onClick={handleCalendarCreate}
               icon={
                 <svg
@@ -1247,7 +1260,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                 </svg>
               }
               style={{
-                padding: '12px',
+                padding: '0 12px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
@@ -1262,7 +1275,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
               speaker={<Tooltip>Create New Maintenance</Tooltip>}
             >
               <IconButton
-                appearance='ghost'
+                appearance='subtle'
                 onClick={handleCreateOnClick}
                 icon={
                   <svg
@@ -1280,7 +1293,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                   </svg>
                 }
                 style={{
-                  padding: '12px',
+                  padding: '0 12px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
@@ -1296,7 +1309,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
               speaker={<Tooltip>Send All Notification Mails</Tooltip>}
             >
               <IconButton
-                appearance='ghost'
+                appearance='subtle'
                 onClick={handleSendAll}
                 icon={
                   <svg
@@ -1314,7 +1327,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                   </svg>
                 }
                 style={{
-                  padding: '12px',
+                  padding: '0 12px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
@@ -1480,6 +1493,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
           <title>{`NT-${maintenance.id} | Newtelco Maintenance`}</title>
         </Head>
         <MaintPanel
+          className='maintpanel maintenance-header'
           header={<HeaderLeft />}
           center={<HeaderCenter />}
           buttons={<HeaderRight />}

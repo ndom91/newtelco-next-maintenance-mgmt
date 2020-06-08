@@ -31,7 +31,7 @@ const RequireLogin = () => {
               style={{ backgroundColor: '#fff' }}
             >
               <p style={{ margin: '20px' }}>
-                You must be signed-in to view this content.
+                You must be signed in to view this page.
               </p>
               <p>
                 <Link href='/api/auth/signin'>

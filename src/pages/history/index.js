@@ -311,35 +311,86 @@ const History = ({ session, data }) => {
           buttons={
             <ButtonGroup>
               <IconButton
-                appearance='default'
-                style={{
-                  border: '1px solid var(--grey3)',
-                  color: 'var(--grey4)',
-                }}
+                appearance='subtle'
                 onClick={handleToggleNewModal}
-                icon={<Icon icon='plus' />}
+                icon={
+                  <svg
+                    width='20'
+                    height='20'
+                    fill='none'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth='2'
+                    viewBox='0 0 24 24'
+                    stroke='currentColor'
+                    style={{ marginRight: '5px' }}
+                  >
+                    <path d='M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z' />
+                  </svg>
+                }
+                style={{
+                  padding: '0 20px',
+                  color: 'var(--grey4)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}
               >
                 New
               </IconButton>
               <IconButton
-                appearance='default'
-                style={{
-                  border: '1px solid var(--grey3)',
-                  color: 'var(--grey4)',
-                }}
+                appearance='subtle'
                 onClick={handleDeleteMaintOpen}
-                icon={<Icon icon='trash' />}
+                icon={
+                  <svg
+                    width='20'
+                    height='20'
+                    fill='none'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth='2'
+                    viewBox='0 0 24 24'
+                    stroke='currentColor'
+                    style={{ marginRight: '5px' }}
+                  >
+                    <path d='M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16' />
+                  </svg>
+                }
+                style={{
+                  padding: '0 20px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  color: 'var(--grey4)',
+                  justifyContent: 'space-between',
+                }}
               >
                 Delete
               </IconButton>
               <IconButton
-                appearance='default'
-                style={{
-                  border: '1px solid var(--grey3)',
-                  color: 'var(--grey4)',
-                }}
+                appearance='subtle'
                 onClick={handleGridExport}
-                icon={<Icon icon='export' />}
+                icon={
+                  <svg
+                    width='20'
+                    height='20'
+                    fill='none'
+                    stroke-linecap='round'
+                    stroke-linejoin='round'
+                    stroke-width='2'
+                    viewBox='0 0 24 24'
+                    stroke='currentColor'
+                    style={{ marginRight: '5px' }}
+                  >
+                    <path d='M8 16a5 5 0 01-.916-9.916 5.002 5.002 0 019.832 0A5.002 5.002 0 0116 16m-7 3l3 3m0 0l3-3m-3 3V10' />
+                  </svg>
+                }
+                style={{
+                  padding: '0 20px',
+                  display: 'flex',
+                  color: 'var(--grey4)',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}
               >
                 Export
               </IconButton>

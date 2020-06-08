@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Router from 'next/router'
+import UseAnimations from 'react-useanimations'
 import './inbox.css'
 import {
   Panel,
@@ -60,7 +61,15 @@ const InboxItem = ({ toggle, mail, index, handleDelete }) => {
             loading={loading}
             appearance='link'
             onClick={() => toggle(mail.id)}
-            style={{ height: '74px', flexBasis: '100px' }}
+            style={{
+              height: '85px',
+              flexBasis: '100px',
+              border: '1px solid #eaeaea',
+              borderRadius: '10px',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
             icon={
               <Avatar
                 alt='Icon'
@@ -86,23 +95,6 @@ const InboxItem = ({ toggle, mail, index, handleDelete }) => {
           </FlexboxGrid>
         </div>
         <ButtonGroup vertical>
-          {/* <Link
-            href={{
-              pathname: '/maintenance',
-              query: {
-                id: 'NEW',
-                mailId: mail.id,
-                name: mail.domain,
-                mailDomain: mail.domain,
-                from: mail.from,
-                subject: mail.subject,
-                maileingang: mail.date,
-              }
-            }}
-            passHref
-            prefetch={false}
-            as={'/maintenance'}
-          > */}
           <IconButton
             appearance='subtle'
             onClick={() => createMaint(mail)}
@@ -129,7 +121,6 @@ const InboxItem = ({ toggle, mail, index, handleDelete }) => {
               </svg>
             }
           />
-          {/* </Link> */}
           <IconButton
             appearance='subtle'
             size='lg'
@@ -142,18 +133,26 @@ const InboxItem = ({ toggle, mail, index, handleDelete }) => {
               display: 'flex',
             }}
             icon={
-              <svg
-                height='24'
-                width='24'
-                fill='none'
-                strokeLinecap='round'
-                strokeLinejoin='round'
-                strokeWidth='2'
-                stroke='var(--grey4)'
-                viewBox='0 0 24 24'
-              >
-                <path d='M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16' />
-              </svg>
+              <UseAnimations
+                animationKey='trash2'
+                size={32}
+                style={{
+                  color: 'var(--grey4)',
+                  cursor: 'pointer',
+                }}
+              />
+              // <svg
+              //   height='24'
+              //   width='24'
+              //   fill='none'
+              //   strokeLinecap='round'
+              //   strokeLinejoin='round'
+              //   strokeWidth='2'
+              //   stroke='var(--grey4)'
+              //   viewBox='0 0 24 24'
+              // >
+              //   <path d='M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16' />
+              // </svg>
             }
           />
         </ButtonGroup>

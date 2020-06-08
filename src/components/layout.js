@@ -10,6 +10,8 @@ import { Container, Content, Modal, Button, FlexboxGrid } from 'rsuite'
 
 // TODO: Darkmode
 // https://github.com/kazzkiq/darkmode
+// https://joshwcomeau.com/gatsby/dark-mode/
+// https://hankchizljaw.com/wrote/create-a-user-controlled-dark-or-light-mode/
 
 const UnreadFavicon = dynamic(() => import('./unreadcount'), { ssr: false })
 

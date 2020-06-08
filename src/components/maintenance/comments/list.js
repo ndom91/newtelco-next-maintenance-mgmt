@@ -147,7 +147,7 @@ const CommentList = ({ user, id, initialComment }) => {
           </FlexboxGrid.Item>
           <FlexboxGrid.Item colspan={4} style={{ marginLeft: '5px' }}>
             <IconButton
-              style={{ width: '100%' }}
+              style={{ width: '100%', minWidth: '100px' }}
               icon={<Icon icon='send' />}
               onClick={submitComment}
             >
