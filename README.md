@@ -1,3 +1,5 @@
+<img align="right" src="https://imgur.com/HPVFsC4.png" width="256" height="256" />
+
 # Newtelco MaintenanceDB
 
 🚀 Rewrite of [maintenance.newtelco.de](https://maintenance.newtelco.de) with a modern stack.
