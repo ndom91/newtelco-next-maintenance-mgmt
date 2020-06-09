@@ -15,17 +15,9 @@
 - LogRocket error tracking
 - Keyboard Shortcuts
 
-## Stack
-
-- Next.js / React
-- RSuite UI Library
-- MySQL
-- Ag-Grid
-- Algolia Search
-
 ## Contributing
 
-There is an API sister project to this one located in the following repo: (`ndom91/api-maintenance`). This must be running during dev / prod to get anything going.
+There is an API sister project to this one located in the following repo: (`newtelco/api-maintenance`). This must be running during dev / prod to get anything going.
 
 #### Prerequisites:
 1. MySQL DB
