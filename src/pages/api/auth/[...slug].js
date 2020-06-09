@@ -23,7 +23,7 @@ const options = {
     signout: '/auth/signout',
     // error: 'https://example.com/error'
   },
-  secret: 'pdBV/+G4RPeeOfJlg800QA8My1AWbngPkehniml9tRY=',
+  // secret: 'pdBV/+G4RPeeOfJlg800QA8My1AWbngPkehniml9tRY=',
   // jwt: true,
   // jwtSecret: 'euTOBIsBEbyML9QzV+XklZr4nfj5a+cqjHCSzadQdlQ=',
 }

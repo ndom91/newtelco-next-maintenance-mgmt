@@ -71,6 +71,7 @@ const MyTextarea = ({ field, form }) => {
       key={field.name}
       componentClass='textarea'
       name={field.name}
+      defaultValue=''
       value={field.value}
       onChange={option => form.setFieldValue(field.name, option)}
     />
@@ -110,13 +111,16 @@ const MyDateTime = ({ field, form, ...props }) => {
         const curTimezone = tzOptions.filter(
           opt => opt.value === form.values.timezone
         )
-        const regex = /(GMT(\-|\+)?([0-1][0-9]:[0-5][0-9])?)/i
-        const tzDisplay = curTimezone[0].label.match(regex)
+        let tzDisplay = ''
+        if (curTimezone[0]) {
+          const regex = /(GMT(\-|\+)?([0-1][0-9]:[0-5][0-9])?)/i
+          tzDisplay = curTimezone[0].label.match(regex)[0]
+        }
         return (
           <InputGroup>
             <Input defaultValue={defaultValue} inputRef={ref} {...props} />
             <InputGroup.Addon style={{ color: '#b9b9b9' }}>
-              {tzDisplay[0]}
+              {tzDisplay}
             </InputGroup.Addon>
           </InputGroup>
         )
@@ -233,7 +237,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
     impact: serverData.profile.impact,
     location: serverData.profile.location,
     reason: serverData.profile.reason,
-    note: serverData.profile.maintNote,
+    maintNote: serverData.profile.maintNote,
     cancelled: !!+serverData.profile.cancelled,
     emergency: !!+serverData.profile.emergency,
     done: !!+serverData.profile.done,
@@ -512,7 +516,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
         const uniqueKundenCids = getUnique(kundencids, 'kundenCID')
         setCustomerCids(uniqueKundenCids)
         gridApi.current.hideOverlay()
-        checkFreezeStatus(uniqueKundenCids)
+        uniqueKundenCids.length && checkFreezeStatus(uniqueKundenCids)
       })
       .catch(err => console.error(`Error - ${err}`))
   }
