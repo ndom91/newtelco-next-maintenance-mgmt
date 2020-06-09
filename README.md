@@ -26,7 +26,7 @@ There is an API sister project to this one located in the following repo: (`newt
 
 #### Frontend
 
-1. `git clone https://github.com/ndom91/next-maintenance`
+1. `git clone https://github.com/newtelco/next-maintenance`
 2. `cd next-maintenance && npm i`
 3. `npm run dev`
 
@@ -34,13 +34,13 @@ This will then start the frontend on port `4000`
 
 #### Backend
 
-1. `git clone https://github.com/ndom91/api-maintenance`
+1. `git clone https://github.com/newtelco/api-maintenance`
 2. `cd api-maintenance && npm i`
 3. `npm run dev`
 
 This will then start the backend on port `4100`
 
-It is currently setup so that the host is dynamic, you can reverse proxy it out under any domain, however it is important that wherever you reverse proxy out the frontend, the backend must be under the subdomain `api` of the same domain. So, for example, if you have the frontend available at `myapplication.com`, then the backend must be available at `api.myapplication.com`. 
+It is currently setup so that the host is dynamic, you can reverse proxy it out under any domain, however it is important that wherever you reverse proxy out the frontend, the backend must be under the location `/v1/api` of the same domain. So, for example, if you have the frontend available at `myapplication.com`, then the backend must be available at `myapplication.com/v1/api`. An example nginx config file is included in the [api repo](https://github.com/newtelco/api-maintenance).
 
 
 ### Screenshots
