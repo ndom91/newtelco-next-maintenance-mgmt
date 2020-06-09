@@ -1,4 +1,4 @@
-<img align="right" src="https://imgur.com/HPVFsC4.png" width="256" height="256" />
+<img align="right" src="https://imgur.com/HPVFsC4.png" height="256" />
 
 # Newtelco MaintenanceDB
 
