@@ -1460,9 +1460,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                   maintId: maintenance.id,
                   updatedBy: session.user.email.match(/^([^@]*)@/)[1],
                 }),
-                mode: 'cors',
                 headers: {
-                  'Access-Control-Allow-Origin': '*',
                   'Content-Type': 'application/json',
                 },
               })
@@ -1475,7 +1473,15 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                 .catch(err => console.error(`Error - ${err}`))
 
               // update algolia search index with latest created maintenance
-              fetch('/v1/api/search/update')
+              fetch('/v1/api/search/update', {
+                method: 'post',
+                body: JSON.stringify({
+                  maintId: maintenance.id,
+                }),
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+              })
             }
           }}
         />
