@@ -14,8 +14,20 @@ const ConfirmModal = ({
 }) => {
   return (
     <Modal backdrop show={show} size='sm' onHide={onHide} {...props}>
-      <Modal.Header>{header}</Modal.Header>
-      <Modal.Body>
+      <Modal.Header
+        style={{
+          fontWeight: '100',
+          fontSize: '1.5rem',
+          fontFamily: 'var(--font-body)',
+        }}
+      >
+        {header}
+      </Modal.Header>
+      <Modal.Body
+        style={{
+          paddingBottom: '0px',
+        }}
+      >
         <FlexboxGrid
           justify='space-around'
           align='middle'

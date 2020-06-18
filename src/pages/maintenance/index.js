@@ -63,7 +63,7 @@ const Changelog = dynamic(() => import('@/newtelco/maintenance/timeline'), {
   ssr: false,
 })
 
-const MyTextarea = ({ field, form }) => {
+const MyTextarea = ({ field, form, ...props }) => {
   return (
     <Input
       rows={3}
@@ -72,7 +72,20 @@ const MyTextarea = ({ field, form }) => {
       componentClass='textarea'
       name={field.name}
       defaultValue=''
+      disabled={props.maintId === 'NEW'}
       value={field.value}
+      onChange={option => form.setFieldValue(field.name, option)}
+    />
+  )
+}
+
+const MyTextinput = ({ field, form, placeholder = '', ...props }) => {
+  return (
+    <Input
+      name={field.name}
+      value={field.value || ''}
+      disabled={props.maintId === 'NEW'}
+      placeholder={placeholder}
       onChange={option => form.setFieldValue(field.name, option)}
     />
   )
@@ -83,11 +96,17 @@ const MyDateTime = ({ field, form, ...props }) => {
     <Flatpickr
       name={field.name}
       value={field.value}
+      disabled={props.maintId === 'NEW'}
       data-enable-time
       onChange={option => {
         form.setFieldValue(field.name, option[0])
-        const startDateTime = props.startDateTime
-        const endDateTime = props.endDateTime
+        let startDateTime = new Date(form.values.startDateTime).toISOString()
+        let endDateTime = new Date(form.values.endDateTime).toISOString()
+        if (field.name === 'startDateTime') {
+          startDateTime = new Date(option[0]).toISOString()
+        } else if (field.name === 'endDateTime') {
+          endDateTime = new Date(option[0]).toISOString()
+        }
         if (
           startDateTime &&
           endDateTime &&
@@ -98,7 +117,6 @@ const MyDateTime = ({ field, form, ...props }) => {
             parseISO(endDateTime),
             parseISO(startDateTime)
           )
-          console.log(impactCalculation)
           props.setImpactPlaceholder(impactCalculation)
         }
       }}
@@ -154,6 +172,7 @@ const MyTagPicker = ({ field, form, ...props }) => {
       block
       cleanable
       placeholder='Please select a CID'
+      disabled={props.maintId === 'NEW'}
     />
   )
 }
@@ -744,9 +763,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
         subject: subject,
         to: to,
       }),
-      mode: 'cors',
       headers: {
-        'Access-Control-Allow-Origin': '*',
         'Content-Type': 'application/json',
       },
     })
@@ -878,7 +895,6 @@ const Maintenance = ({ session, serverData, suppliers }) => {
         user: session.user.email,
       }),
       headers: {
-        'Access-Control-Allow-Origin': '*',
         'Content-Type': 'application/json',
       },
     })
@@ -905,7 +921,6 @@ const Maintenance = ({ session, serverData, suppliers }) => {
               updatedBy: session.user.email,
             }),
             headers: {
-              'Access-Control-Allow-Origin': '*',
               'Content-Type': 'application/json',
             },
           })
@@ -955,9 +970,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
           endDateTime: endDateTime,
           rcounter: rcounter,
         }),
-        mode: 'cors',
         headers: {
-          'Access-Control-Allow-Origin': '*',
           'Content-Type': 'application/json',
         },
       })
@@ -1076,7 +1089,6 @@ const Maintenance = ({ session, serverData, suppliers }) => {
         maileingang: incomingFormatted,
       }),
       headers: {
-        'Access-Control-Allow-Origin': '*',
         'Content-Type': 'application/json',
       },
     })
@@ -1103,7 +1115,6 @@ const Maintenance = ({ session, serverData, suppliers }) => {
         method: 'post',
         body: JSON.stringify({ m: incomingMailId }),
         headers: {
-          'Access-Control-Allow-Origin': '*',
           'Content-Type': 'application/json',
         },
       })
@@ -1144,7 +1155,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
         <ButtonGroup size='md'>
           <IconButton
             appearance='subtle'
-            onClick={() => Router.back()}
+            onClick={() => Router.push('/history')}
             icon={
               <svg
                 width='18'
@@ -1349,6 +1360,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
       return (
         <Select
           options={tzOptions}
+          isDisabled={maintenance.id === 'NEW'}
           name={field.name}
           value={
             tzOptions
@@ -1366,6 +1378,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
         <SelectPicker
           style={{ width: '100%' }}
           name={field.name}
+          disabled={maintenance.id === 'NEW'}
           value={field.value}
           onChange={option => {
             fetch(`/api/lieferantcids?id=${option}`, {
@@ -1403,20 +1416,11 @@ const Maintenance = ({ session, serverData, suppliers }) => {
       )
     }
 
-    const MyTextinput = ({ field, form, placeholder = '' }) => {
-      return (
-        <Input
-          name={field.name}
-          value={field.value || ''}
-          placeholder={placeholder}
-          onChange={option => form.setFieldValue(field.name, option)}
-        />
-      )
-    }
     const MyToggle = ({ field, form, checkedChildren = '' }) => {
       return (
         <Toggle
           size='lg'
+          disabled={maintenance.id === 'NEW'}
           checkedChildren={checkedChildren}
           checked={field.value}
           name={field.name}
@@ -1430,9 +1434,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                 fetch('/v1/api/inbox/markcomplete', {
                   method: 'post',
                   body: JSON.stringify({ m: maintenance.receivedmail }),
-                  mode: 'cors',
                   headers: {
-                    'Access-Control-Allow-Origin': '*',
                     'Content-Type': 'application/json',
                   },
                 })
@@ -1494,8 +1496,8 @@ const Maintenance = ({ session, serverData, suppliers }) => {
           <Message
             full
             showIcon
-            type='warning'
-            description='Remember to Save before continuing to work!'
+            type='info'
+            description='Remember to click "Save" before continuing to work!'
             style={{ position: 'fixed', zIndex: '999' }}
           />
         )}
@@ -1660,6 +1662,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                                 endDateTime={values.endDateTime}
                                 setImpactPlaceholder={setImpactPlaceholder}
                                 component={MyDateTime}
+                                maintId={maintenance.id}
                               />
                               <HelpBlock
                                 style={{ margin: '5px', opacity: '0.5' }}
@@ -1695,6 +1698,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                                 endDateTime={values.endDateTime}
                                 setImpactPlaceholder={setImpactPlaceholder}
                                 component={MyDateTime}
+                                maintId={maintenance.id}
                               />
                               <HelpBlock
                                 style={{ margin: '5px', opacity: '0.5' }}
@@ -1726,6 +1730,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                                 fetchCustomerCids={fetchCustomerCids}
                                 supplierCids={supplierCids}
                                 component={MyTagPicker}
+                                maintId={maintenance.id}
                               />
                             </FormGroup>
                           </Col>
@@ -1792,6 +1797,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                                 name='impact'
                                 component={MyTextinput}
                                 placeholder={impactPlaceholder}
+                                maintId={maintenance.id}
                               />
                             </FormGroup>
                           </Col>
@@ -1813,6 +1819,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                               <FastField
                                 name='location'
                                 component={MyTextinput}
+                                maintId={maintenance.id}
                               />
                             </FormGroup>
                           </Col>
@@ -1823,7 +1830,11 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                               <ControlLabel htmlFor='reason'>
                                 Reason
                               </ControlLabel>
-                              <FastField name='reason' component={MyTextarea} />
+                              <FastField
+                                name='reason'
+                                component={MyTextarea}
+                                maintId={maintenance.id}
+                              />
                             </FormGroup>
                           </Col>
                         </Row>
@@ -1847,6 +1858,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                                 name='maintNote'
                                 key='maintNote'
                                 component={MyTextarea}
+                                maintId={maintenance.id}
                               />
                             </FormGroup>
                           </Col>

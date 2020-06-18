@@ -173,7 +173,7 @@ textarea::-webkit-scrollbar-thumb,
     box-shadow: 0 0 10px -10px rgba(102, 178, 70, 0.3);
   }
   to {
-    box-shadow: 0 0 15px 15px rgba(102, 178, 70, 0.3);
+    box-shadow: 0 0 0px 3px rgba(91, 201, 45, 0.2);
   }
 }
 
@@ -206,4 +206,8 @@ textarea::-webkit-scrollbar-thumb,
 
 .maintenance-header > .rs-panel-heading {
   padding: 5px 30px;
+}
+
+.timezone-select div[class='*-menu'] {
+  z-index: 9999;
 }
