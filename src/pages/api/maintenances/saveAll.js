@@ -4,10 +4,10 @@ const escape = require('sql-template-strings')
 module.exports = async (req, res) => {
   const toSqlDatetime = inputDate => {
     const date = new Date(inputDate)
-    const dateWithOffest = new Date(
-      date.getTime() - date.getTimezoneOffset() * 60000
-    )
-    return dateWithOffest.toISOString().slice(0, 19).replace('T', ' ')
+    // const dateWithOffest = new Date(
+    //   date.getTime() - date.getTimezoneOffset() * 60000
+    // )
+    return date.toISOString().slice(0, 19).replace('T', ' ')
   }
 
   const maintId = req.body.id
@@ -20,8 +20,8 @@ module.exports = async (req, res) => {
       cancelled = ${values.cancelled},
       done = ${values.done},
       emergency = ${values.emergency},
-      startDateTime = ${toSqlDatetime(values.startDateTime)},
-      endDateTime = ${toSqlDatetime(values.endDateTime)},
+      startDateTime = ${values.startDateTime},
+      endDateTime = ${values.endDateTime},
       impact = ${values.impact || ''},
       location = ${values.location || ''},
       reason = ${values.reason || ''},

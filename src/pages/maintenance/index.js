@@ -98,8 +98,12 @@ const MyDateTime = ({ field, form, ...props }) => {
       value={field.value}
       disabled={props.maintId === 'NEW'}
       data-enable-time
+      weekNumbers
       onChange={option => {
-        form.setFieldValue(field.name, option[0])
+        const rawValue = moment(option[0])
+          .format('YYYY-MM-DD HH:mm:ss')
+          .toString()
+        form.setFieldValue(field.name, rawValue)
         let startDateTime = new Date(form.values.startDateTime).toISOString()
         let endDateTime = new Date(form.values.endDateTime).toISOString()
         if (field.name === 'startDateTime') {
