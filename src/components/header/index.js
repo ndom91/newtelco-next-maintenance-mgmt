@@ -19,10 +19,10 @@ import {
 import Notify from '@/newtelco-utils/notification'
 
 const NextLink = React.forwardRef((props, ref) => {
-  const { href, as, ...rest } = props
+  const { href, as, external, ...rest } = props
   return (
-    <Link href={href} as={as}>
-      <a ref={ref} {...rest} />
+    <Link href={external ? '' : href} as={external ? '' : as}>
+      <a href={external ? href : ''} ref={ref} {...rest} />
     </Link>
   )
 })
@@ -262,6 +262,7 @@ const MaintHeader = props => {
                 }
                 href='https://newtelco.kampsite.co'
                 target='_blank'
+                external
               >
                 Requests
               </NavLink>
