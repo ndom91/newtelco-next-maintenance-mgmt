@@ -1,13 +1,18 @@
 import React, { useEffect } from 'react'
 import NextAuth, { csrfToken } from 'next-auth/client'
-import Fonts from '@/newtelco/fonts'
 import { Container, FlexboxGrid, Panel, Content, Button, Col } from 'rsuite'
 import './signin.css'
 
+if (typeof window !== 'undefined') {
+  const WebFontLoader = require('webfontloader')
+  WebFontLoader.load({
+    google: {
+      families: ['Fira Sans:200,400', 'Chivo:300,400,700']
+    }
+  });
+}
+
 const SignOut = ({ providers }) => {
-  useEffect(() => {
-    Fonts()
-  }, [])
   const [session, loading] = NextAuth.useSession()
 
   return (

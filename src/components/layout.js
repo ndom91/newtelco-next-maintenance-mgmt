@@ -5,8 +5,16 @@ import useSWR from 'swr'
 import dynamic from 'next/dynamic'
 import KeyboardShortcuts from './keyboardShortcuts'
 import Store from './store'
-import Fonts from './fonts'
 import { Container, Content, Modal, Button, FlexboxGrid } from 'rsuite'
+
+if (typeof window !== 'undefined') {
+  const WebFontLoader = require('webfontloader')
+  WebFontLoader.load({
+    google: {
+      families: ['Fira Sans:200,400', 'Chivo:300,400,700']
+    }
+  });
+}
 
 // TODO: Darkmode
 // https://github.com/kazzkiq/darkmode
@@ -28,10 +36,6 @@ const Layout = ({ children }) => {
   useEffect(() => {
     store.set('count')(data ? data.count : 0)
   }, [data])
-
-  useEffect(() => {
-    Fonts()
-  }, [])
 
   store.on('night').subscribe(night => {
     fetch(
