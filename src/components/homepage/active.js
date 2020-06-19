@@ -11,6 +11,7 @@ import {
   Icon,
   IconButton,
   Dropdown,
+  Tag
 } from 'rsuite'
 
 const ActiveMaintenances = () => {
@@ -42,13 +43,13 @@ const ActiveMaintenances = () => {
                     justify='space-between'
                     style={{ margin: '10px 0px' }}
                   >
-                    <FlexboxGrid.Item colspan={3}>
+                    <FlexboxGrid.Item colspan={4} style={{ display: 'flex', justifyContent: 'center' }}>
                       <Avatar
                         style={{ backgroundColor: 'transparent' }}
                         src={`/v1/api/faviconUrl?d=${item.mailDomain || ''}`}
                       />
                     </FlexboxGrid.Item>
-                    <FlexboxGrid.Item colspan={16}>
+                    <FlexboxGrid.Item style={{ flexGrow: '1' }}>
                       <div
                         style={{
                           display: 'flex',
@@ -57,8 +58,15 @@ const ActiveMaintenances = () => {
                           marginBottom: '10px',
                         }}
                       >
-                        <span>
-                          <b>{item.name}</b> (NT-{item.maintId})
+                        <span
+                          style={{
+                            width: '100%',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center'
+                          }}
+                        >
+                          <b>{item.name}</b><Tag color='green'>NT-{item.maintId}</Tag>
                         </span>
                       </div>
                       <div
@@ -68,15 +76,16 @@ const ActiveMaintenances = () => {
                           alignItems: 'center',
                         }}
                       >
-                        {format(
-                          new Date(item.startDateTime),
-                          'HH:mm - dd.LL.yyyy'
-                        )}
+                        <Tag>
+                          {format(
+                            new Date(item.startDateTime),
+                            'HH:mm - dd.LL.yyyy'
+                          )}</Tag>
                         <Icon icon='page-next' />
-                        {format(
+                        <Tag>{format(
                           new Date(item.endDateTime),
                           'HH:mm - dd.LL.yyyy'
-                        )}
+                        )}</Tag>
                       </div>
                     </FlexboxGrid.Item>
                     <FlexboxGrid.Item colspan={3}>
@@ -105,9 +114,9 @@ const ActiveMaintenances = () => {
                           target='_blank'
                           href={`mailto:${
                             item.maintenanceRecipient
-                          }?subject=${encodeURIComponent(
-                            `Newtelco - Regarding Maintenance NT-${item.maintId}`
-                          )}`}
+                            }?subject=${encodeURIComponent(
+                              `Newtelco - Regarding Maintenance NT-${item.maintId}`
+                            )}`}
                         >
                           Contact
                         </Dropdown.Item>
@@ -118,12 +127,12 @@ const ActiveMaintenances = () => {
               )
             })
           ) : (
-            <List.Item>
-              <div style={{ display: 'flex', justifyContent: 'center' }}>
-                No Active Maintenances
+              <List.Item>
+                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                  No Active Maintenances
               </div>
-            </List.Item>
-          )}
+              </List.Item>
+            )}
         </List>
       </Panel>
     )
