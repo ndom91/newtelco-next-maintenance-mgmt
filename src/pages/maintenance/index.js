@@ -36,7 +36,6 @@ import {
   Input,
   ControlLabel,
   HelpBlock,
-  Badge,
   Button,
   Whisper,
   Tooltip,
@@ -55,7 +54,6 @@ import {
   SelectPicker,
   TagPicker,
   Nav,
-  Tag,
   InputGroup,
 } from 'rsuite'
 
@@ -818,7 +816,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
             }
           )
             .then(resp => resp.json())
-            .then(data => { })
+            .then(data => {})
             .catch(err => console.error(`Error updating Audit Log - ${err}`))
         } else {
           Notify('error', 'Error Sending Mail')
@@ -1068,7 +1066,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
   //
   /// /////////////////////////////////////////////////////////
 
-  const handleCreateOnClick = event => {
+  const handleCreateOnClick = () => {
     const {
       bearbeitetvon,
       maileingang,
@@ -1328,39 +1326,39 @@ const Maintenance = ({ session, serverData, suppliers }) => {
               </IconButton>
             </Whisper>
           ) : (
-              <Whisper
-                placement='bottom'
-                speaker={<Tooltip>Send All Notification Mails</Tooltip>}
+            <Whisper
+              placement='bottom'
+              speaker={<Tooltip>Send All Notification Mails</Tooltip>}
+            >
+              <IconButton
+                appearance='subtle'
+                onClick={handleSendAll}
+                icon={
+                  <svg
+                    width='18'
+                    height='18'
+                    style={{ marginRight: '10px' }}
+                    fill='none'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth='2'
+                    viewBox='0 0 24 24'
+                    stroke='currentColor'
+                  >
+                    <path d='M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z' />
+                  </svg>
+                }
+                style={{
+                  padding: '0 12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}
               >
-                <IconButton
-                  appearance='subtle'
-                  onClick={handleSendAll}
-                  icon={
-                    <svg
-                      width='18'
-                      height='18'
-                      style={{ marginRight: '10px' }}
-                      fill='none'
-                      strokeLinecap='round'
-                      strokeLinejoin='round'
-                      strokeWidth='2'
-                      viewBox='0 0 24 24'
-                      stroke='currentColor'
-                    >
-                      <path d='M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z' />
-                    </svg>
-                  }
-                  style={{
-                    padding: '0 12px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                  }}
-                >
-                  Send All
+                Send All
               </IconButton>
-              </Whisper>
-            )}
+            </Whisper>
+          )}
         </ButtonGroup>
       )
     }
@@ -1588,362 +1586,362 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                       handleSubmit,
                       setFieldValue,
                     }) => (
-                        <>
-                          <Row gutter={20} style={{ marginBottom: '20px' }}>
-                            <Col sm={24} xs={24}>
-                              <AutoSave debounceMs={1000} id={maintenance.id} />
-                            </Col>
-                          </Row>
-                          <Row gutter={20} style={{ marginBottom: '20px' }}>
-                            <Col sm={12} xs={24}>
-                              <FormGroup>
-                                <ControlLabel htmlFor='edited-by'>
-                                  Created By
+                      <>
+                        <Row gutter={20} style={{ marginBottom: '20px' }}>
+                          <Col sm={24} xs={24}>
+                            <AutoSave debounceMs={1000} id={maintenance.id} />
+                          </Col>
+                        </Row>
+                        <Row gutter={20} style={{ marginBottom: '20px' }}>
+                          <Col sm={12} xs={24}>
+                            <FormGroup>
+                              <ControlLabel htmlFor='edited-by'>
+                                Created By
                               </ControlLabel>
-                                <Input
-                                  tabIndex='-1'
-                                  readOnly
-                                  id='edited-by-input'
-                                  name='edited-by'
-                                  type='text'
-                                  value={maintenance.bearbeitetvon}
-                                  disabled
-                                />
-                              </FormGroup>
-                            </Col>
-                            <Col sm={12} xs={24}>
-                              <FormGroup>
-                                <ControlLabel htmlFor='maileingang'>
-                                  Mail Arrived
+                              <Input
+                                tabIndex='-1'
+                                readOnly
+                                id='edited-by-input'
+                                name='edited-by'
+                                type='text'
+                                value={maintenance.bearbeitetvon}
+                                disabled
+                              />
+                            </FormGroup>
+                          </Col>
+                          <Col sm={12} xs={24}>
+                            <FormGroup>
+                              <ControlLabel htmlFor='maileingang'>
+                                Mail Arrived
                               </ControlLabel>
-                                <Input
-                                  tabIndex='-1'
-                                  readOnly
-                                  id='maileingang-input'
-                                  name='maileingang'
-                                  type='text'
-                                  value={convertDateTime(maintenance.maileingang)}
-                                  disabled
-                                />
-                              </FormGroup>
-                            </Col>
-                          </Row>
-                          <Row gutter={20} style={{ marginBottom: '20px' }}>
-                            <Col sm={12} xs={24}>
-                              <FormGroup>
-                                <ControlLabel htmlFor='supplier'>
-                                  Timezone
+                              <Input
+                                tabIndex='-1'
+                                readOnly
+                                id='maileingang-input'
+                                name='maileingang'
+                                type='text'
+                                value={convertDateTime(maintenance.maileingang)}
+                                disabled
+                              />
+                            </FormGroup>
+                          </Col>
+                        </Row>
+                        <Row gutter={20} style={{ marginBottom: '20px' }}>
+                          <Col sm={12} xs={24}>
+                            <FormGroup>
+                              <ControlLabel htmlFor='supplier'>
+                                Timezone
                               </ControlLabel>
-                                <FastField
-                                  name='timezone'
-                                  component={TimezoneSelector}
-                                />
-                              </FormGroup>
-                            </Col>
-                            <Col sm={12} xs={24}>
-                              <FormGroup>
-                                <ControlLabel htmlFor='supplier'>
-                                  Supplier
+                              <FastField
+                                name='timezone'
+                                component={TimezoneSelector}
+                              />
+                            </FormGroup>
+                          </Col>
+                          <Col sm={12} xs={24}>
+                            <FormGroup>
+                              <ControlLabel htmlFor='supplier'>
+                                Supplier
                               </ControlLabel>
-                                <FastField
-                                  name='supplier'
-                                  component={SupplierSelector}
-                                />
-                              </FormGroup>
-                            </Col>
-                          </Row>
-                          <Row gutter={20} style={{ marginBottom: '20px' }}>
-                            <Col sm={12} xs={24}>
-                              <FormGroup>
-                                <ControlLabel
-                                  htmlFor='start-datetime'
-                                  style={{
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    alignItems: 'center',
-                                  }}
-                                >
-                                  Start Date/Time
+                              <FastField
+                                name='supplier'
+                                component={SupplierSelector}
+                              />
+                            </FormGroup>
+                          </Col>
+                        </Row>
+                        <Row gutter={20} style={{ marginBottom: '20px' }}>
+                          <Col sm={12} xs={24}>
+                            <FormGroup>
+                              <ControlLabel
+                                htmlFor='start-datetime'
+                                style={{
+                                  display: 'flex',
+                                  justifyContent: 'space-between',
+                                  alignItems: 'center',
+                                }}
+                              >
+                                Start Date/Time
                               </ControlLabel>
-                                <FastField
-                                  name='startDateTime'
-                                  startDateTime={values.startDateTime}
-                                  endDateTime={values.endDateTime}
-                                  setImpactPlaceholder={setImpactPlaceholder}
-                                  component={MyDateTime}
-                                  maintId={maintenance.id}
-                                />
-                                <HelpBlock
-                                  style={{ margin: '5px', opacity: '0.5' }}
-                                >
-                                  Europe/Berlin:{' '}
-                                  {moment
-                                    .tz(
-                                      moment.tz(
-                                        values.startDateTime,
-                                        values.timezone
-                                      ),
-                                      'Europe/Berlin'
-                                    )
-                                    .format('DD.MM.YYYY HH:mm')}
-                                </HelpBlock>
-                              </FormGroup>
-                            </Col>
-                            <Col sm={12} xs={24}>
-                              <FormGroup>
-                                <ControlLabel
-                                  htmlFor='end-datetime'
-                                  style={{
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    alignItems: 'center',
-                                  }}
-                                >
-                                  End Date/Time
+                              <FastField
+                                name='startDateTime'
+                                startDateTime={values.startDateTime}
+                                endDateTime={values.endDateTime}
+                                setImpactPlaceholder={setImpactPlaceholder}
+                                component={MyDateTime}
+                                maintId={maintenance.id}
+                              />
+                              <HelpBlock
+                                style={{ margin: '5px', opacity: '0.5' }}
+                              >
+                                Europe/Berlin:{' '}
+                                {moment
+                                  .tz(
+                                    moment.tz(
+                                      values.startDateTime,
+                                      values.timezone
+                                    ),
+                                    'Europe/Berlin'
+                                  )
+                                  .format('DD.MM.YYYY HH:mm')}
+                              </HelpBlock>
+                            </FormGroup>
+                          </Col>
+                          <Col sm={12} xs={24}>
+                            <FormGroup>
+                              <ControlLabel
+                                htmlFor='end-datetime'
+                                style={{
+                                  display: 'flex',
+                                  justifyContent: 'space-between',
+                                  alignItems: 'center',
+                                }}
+                              >
+                                End Date/Time
                               </ControlLabel>
-                                <FastField
-                                  name='endDateTime'
-                                  startDateTime={values.startDateTime}
-                                  endDateTime={values.endDateTime}
-                                  setImpactPlaceholder={setImpactPlaceholder}
-                                  component={MyDateTime}
-                                  maintId={maintenance.id}
-                                />
-                                <HelpBlock
-                                  style={{ margin: '5px', opacity: '0.5' }}
-                                >
-                                  Time in CEST:{' '}
-                                  {moment
-                                    .tz(
-                                      moment.tz(
-                                        values.endDateTime,
-                                        values.timezone
-                                      ),
-                                      'Europe/Berlin'
-                                    )
-                                    .format('DD.MM.YYYY HH:mm')}
-                                </HelpBlock>
-                              </FormGroup>
-                            </Col>
-                          </Row>
-                          <Row gutter={20} style={{ marginBottom: '20px' }}>
-                            <Col sm={24}>
-                              <FormGroup>
-                                <ControlLabel htmlFor='their-cid'>
-                                  {maintenance.name} CID
+                              <FastField
+                                name='endDateTime'
+                                startDateTime={values.startDateTime}
+                                endDateTime={values.endDateTime}
+                                setImpactPlaceholder={setImpactPlaceholder}
+                                component={MyDateTime}
+                                maintId={maintenance.id}
+                              />
+                              <HelpBlock
+                                style={{ margin: '5px', opacity: '0.5' }}
+                              >
+                                Time in CEST:{' '}
+                                {moment
+                                  .tz(
+                                    moment.tz(
+                                      values.endDateTime,
+                                      values.timezone
+                                    ),
+                                    'Europe/Berlin'
+                                  )
+                                  .format('DD.MM.YYYY HH:mm')}
+                              </HelpBlock>
+                            </FormGroup>
+                          </Col>
+                        </Row>
+                        <Row gutter={20} style={{ marginBottom: '20px' }}>
+                          <Col sm={24}>
+                            <FormGroup>
+                              <ControlLabel htmlFor='their-cid'>
+                                {maintenance.name} CID
                               </ControlLabel>
-                                <Field
-                                  name='supplierCids'
-                                  customerCids={customerCids}
-                                  setCustomerCids={setCustomerCids}
-                                  fetchCustomerCids={fetchCustomerCids}
-                                  supplierCids={supplierCids}
-                                  component={MyTagPicker}
-                                  maintId={maintenance.id}
-                                />
-                              </FormGroup>
-                            </Col>
-                          </Row>
-                          <Row gutter={20} style={{ marginBottom: '20px' }}>
-                            <Col sm={12} xs={24}>
-                              <FormGroup>
-                                <ControlLabel
-                                  htmlFor='impact'
-                                  style={{
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    alignItems: 'center',
-                                  }}
-                                >
-                                  Impact
+                              <Field
+                                name='supplierCids'
+                                customerCids={customerCids}
+                                setCustomerCids={setCustomerCids}
+                                fetchCustomerCids={fetchCustomerCids}
+                                supplierCids={supplierCids}
+                                component={MyTagPicker}
+                                maintId={maintenance.id}
+                              />
+                            </FormGroup>
+                          </Col>
+                        </Row>
+                        <Row gutter={20} style={{ marginBottom: '20px' }}>
+                          <Col sm={12} xs={24}>
+                            <FormGroup>
+                              <ControlLabel
+                                htmlFor='impact'
+                                style={{
+                                  display: 'flex',
+                                  justifyContent: 'space-between',
+                                  alignItems: 'center',
+                                }}
+                              >
+                                Impact
                                 <ButtonGroup
-                                    size='sm'
-                                    style={{ float: 'right' }}
+                                  size='sm'
+                                  style={{ float: 'right' }}
+                                >
+                                  <Whisper
+                                    placement='bottom'
+                                    speaker={
+                                      <Tooltip>
+                                        Use 50ms Protection Switch Text
+                                      </Tooltip>
+                                    }
                                   >
-                                    <Whisper
-                                      placement='bottom'
-                                      speaker={
-                                        <Tooltip>
-                                          Use 50ms Protection Switch Text
-                                      </Tooltip>
+                                    <IconButton
+                                      id='protectionswitchtext'
+                                      onClick={() =>
+                                        setFieldValue(
+                                          'impact',
+                                          '50ms protection switch'
+                                        )
                                       }
-                                    >
-                                      <IconButton
-                                        id='protectionswitchtext'
-                                        onClick={() =>
-                                          setFieldValue(
-                                            'impact',
-                                            '50ms protection switch'
-                                          )
-                                        }
-                                        size='sm'
-                                        icon={<Icon icon='clock-o' />}
-                                      />
-                                    </Whisper>
-                                    <Whisper
-                                      placement='bottom'
-                                      speaker={
-                                        <Tooltip>
-                                          Use Time Difference Text
+                                      size='sm'
+                                      icon={<Icon icon='clock-o' />}
+                                    />
+                                  </Whisper>
+                                  <Whisper
+                                    placement='bottom'
+                                    speaker={
+                                      <Tooltip>
+                                        Use Time Difference Text
                                       </Tooltip>
+                                    }
+                                  >
+                                    <IconButton
+                                      id='impactplaceholdertext'
+                                      onClick={() =>
+                                        setFieldValue(
+                                          'impact',
+                                          impactPlaceholder
+                                        )
                                       }
-                                    >
-                                      <IconButton
-                                        id='impactplaceholdertext'
-                                        onClick={() =>
-                                          setFieldValue(
-                                            'impact',
-                                            impactPlaceholder
-                                          )
-                                        }
-                                        size='sm'
-                                        icon={<Icon icon='history' />}
-                                      />
-                                    </Whisper>
-                                  </ButtonGroup>
-                                </ControlLabel>
-                                <FastField
-                                  name='impact'
-                                  component={MyTextinput}
-                                  placeholder={impactPlaceholder}
-                                  maintId={maintenance.id}
-                                />
-                              </FormGroup>
-                            </Col>
-                            <Col sm={12} xs={24}>
-                              <FormGroup
+                                      size='sm'
+                                      icon={<Icon icon='history' />}
+                                    />
+                                  </Whisper>
+                                </ButtonGroup>
+                              </ControlLabel>
+                              <FastField
+                                name='impact'
+                                component={MyTextinput}
+                                placeholder={impactPlaceholder}
+                                maintId={maintenance.id}
+                              />
+                            </FormGroup>
+                          </Col>
+                          <Col sm={12} xs={24}>
+                            <FormGroup
+                              style={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                justifyContent: 'flex-end',
+                                height: '70px',
+                              }}
+                            >
+                              <ControlLabel
+                                htmlFor='location'
+                                style={{ marginBottom: '10px' }}
+                              >
+                                Location
+                              </ControlLabel>
+                              <FastField
+                                name='location'
+                                component={MyTextinput}
+                                maintId={maintenance.id}
+                              />
+                            </FormGroup>
+                          </Col>
+                        </Row>
+                        <Row gutter={20} style={{ marginBottom: '20px' }}>
+                          <Col sm={24}>
+                            <FormGroup>
+                              <ControlLabel htmlFor='reason'>
+                                Reason
+                              </ControlLabel>
+                              <FastField
+                                name='reason'
+                                component={MyTextarea}
+                                maintId={maintenance.id}
+                              />
+                            </FormGroup>
+                          </Col>
+                        </Row>
+                        <Row gutter={20} style={{ marginBottom: '20px' }}>
+                          <Col sm={24}>
+                            <FormGroup>
+                              <ControlLabel
+                                htmlFor='maintNote'
                                 style={{
                                   display: 'flex',
-                                  flexDirection: 'column',
-                                  justifyContent: 'flex-end',
-                                  height: '70px',
+                                  justifyContent: 'space-between',
+                                  alignItems: 'center',
                                 }}
                               >
-                                <ControlLabel
-                                  htmlFor='location'
-                                  style={{ marginBottom: '10px' }}
-                                >
-                                  Location
-                              </ControlLabel>
-                                <FastField
-                                  name='location'
-                                  component={MyTextinput}
-                                  maintId={maintenance.id}
-                                />
-                              </FormGroup>
-                            </Col>
-                          </Row>
-                          <Row gutter={20} style={{ marginBottom: '20px' }}>
-                            <Col sm={24}>
-                              <FormGroup>
-                                <ControlLabel htmlFor='reason'>
-                                  Reason
-                              </ControlLabel>
-                                <FastField
-                                  name='reason'
-                                  component={MyTextarea}
-                                  maintId={maintenance.id}
-                                />
-                              </FormGroup>
-                            </Col>
-                          </Row>
-                          <Row gutter={20} style={{ marginBottom: '20px' }}>
-                            <Col sm={24}>
-                              <FormGroup>
-                                <ControlLabel
-                                  htmlFor='maintNote'
-                                  style={{
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    alignItems: 'center',
-                                  }}
-                                >
-                                  Note
+                                Note
                                 <HelpBlock style={{ float: 'right' }} tooltip>
-                                    This note will be included in the mail
+                                  This note will be included in the mail
                                 </HelpBlock>
-                                </ControlLabel>
-                                <FastField
-                                  name='maintNote'
-                                  key='maintNote'
-                                  component={MyTextarea}
-                                  maintId={maintenance.id}
-                                />
-                              </FormGroup>
-                            </Col>
-                          </Row>
-                          <Row gutter={20} style={{ marginBottom: '20px' }}>
-                            <Col
-                              xs={8}
+                              </ControlLabel>
+                              <FastField
+                                name='maintNote'
+                                key='maintNote'
+                                component={MyTextarea}
+                                maintId={maintenance.id}
+                              />
+                            </FormGroup>
+                          </Col>
+                        </Row>
+                        <Row gutter={20} style={{ marginBottom: '20px' }}>
+                          <Col
+                            xs={8}
+                            style={{
+                              display: 'flex',
+                              justifyContent: 'center',
+                            }}
+                          >
+                            <FormGroup
                               style={{
                                 display: 'flex',
-                                justifyContent: 'center',
+                                flexDirection: 'column',
+                                alignItems: 'center',
                               }}
                             >
-                              <FormGroup
-                                style={{
-                                  display: 'flex',
-                                  flexDirection: 'column',
-                                  alignItems: 'center',
-                                }}
-                              >
-                                <ControlLabel>Cancelled</ControlLabel>
-                                <Field
-                                  name='cancelled'
-                                  component={MyToggle}
-                                  checkedChildren={<Icon icon='ban' inverse />}
-                                />
-                              </FormGroup>
-                            </Col>
-                            <Col
-                              xs={8}
+                              <ControlLabel>Cancelled</ControlLabel>
+                              <Field
+                                name='cancelled'
+                                component={MyToggle}
+                                checkedChildren={<Icon icon='ban' inverse />}
+                              />
+                            </FormGroup>
+                          </Col>
+                          <Col
+                            xs={8}
+                            style={{
+                              display: 'flex',
+                              justifyContent: 'center',
+                            }}
+                          >
+                            <FormGroup
                               style={{
                                 display: 'flex',
-                                justifyContent: 'center',
+                                flexDirection: 'column',
+                                alignItems: 'center',
                               }}
                             >
-                              <FormGroup
-                                style={{
-                                  display: 'flex',
-                                  flexDirection: 'column',
-                                  alignItems: 'center',
-                                }}
-                              >
-                                <ControlLabel>Emergency</ControlLabel>
-                                <Field
-                                  name='emergency'
-                                  component={MyToggle}
-                                  checkedChildren={
-                                    <Icon icon='hospital-o' inverse />
-                                  }
-                                />
-                              </FormGroup>
-                            </Col>
-                            <Col
-                              xs={8}
+                              <ControlLabel>Emergency</ControlLabel>
+                              <Field
+                                name='emergency'
+                                component={MyToggle}
+                                checkedChildren={
+                                  <Icon icon='hospital-o' inverse />
+                                }
+                              />
+                            </FormGroup>
+                          </Col>
+                          <Col
+                            xs={8}
+                            style={{
+                              display: 'flex',
+                              justifyContent: 'center',
+                            }}
+                          >
+                            <FormGroup
                               style={{
                                 display: 'flex',
-                                justifyContent: 'center',
+                                flexDirection: 'column',
+                                alignItems: 'center',
                               }}
                             >
-                              <FormGroup
-                                style={{
-                                  display: 'flex',
-                                  flexDirection: 'column',
-                                  alignItems: 'center',
-                                }}
-                              >
-                                <ControlLabel>Done</ControlLabel>
-                                <Field
-                                  name='done'
-                                  component={MyToggle}
-                                  checkedChildren={<Icon icon='check' inverse />}
-                                />
-                              </FormGroup>
-                            </Col>
-                          </Row>
-                        </>
-                      )}
+                              <ControlLabel>Done</ControlLabel>
+                              <Field
+                                name='done'
+                                component={MyToggle}
+                                checkedChildren={<Icon icon='check' inverse />}
+                              />
+                            </FormGroup>
+                          </Col>
+                        </Row>
+                      </>
+                    )}
                   </Formik>
                   <Row gutter={20} style={{ marginBottom: '20px' }}>
                     <Col>
@@ -2079,7 +2077,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
             header='Confirm Freeze'
             content={`There is a network freeze for <b>${
               frozenCompany || ''
-              }</b>. Are you sure you want to send this mail?`}
+            }</b>. Are you sure you want to send this mail?`}
             cancelAction={toggleConfirmFreezeModal}
             confirmAction={() =>
               prepareDirectSend(frozenState.recipient, frozenState.cid, false)

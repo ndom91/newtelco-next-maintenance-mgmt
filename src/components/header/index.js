@@ -1,6 +1,5 @@
 import React from 'react'
-import NextAuth, { signout } from 'next-auth/client'
-import Router from 'next/router'
+import NextAuth from 'next-auth/client'
 import Link from 'next/link'
 import Store from '@/newtelco/store'
 import SearchInput from './search'
@@ -9,12 +8,10 @@ import {
   Header,
   Nav,
   Navbar,
-  Icon,
   Dropdown,
   Avatar,
   Badge,
   Divider,
-  Toggle,
 } from 'rsuite'
 import Notify from '@/newtelco-utils/notification'
 
@@ -29,7 +26,7 @@ const NextLink = React.forwardRef((props, ref) => {
 
 const NavLink = props => <Dropdown.Item componentClass={NextLink} {...props} />
 
-const MaintHeader = props => {
+const MaintHeader = () => {
   const [session, loading] = NextAuth.useSession()
   const store = Store.useStore()
   const count = store.get('count')
