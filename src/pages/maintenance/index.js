@@ -13,6 +13,7 @@ import 'flatpickr/dist/themes/airbnb.css'
 import { getUnique, convertDateTime } from '@/newtelco/maintenance/helper'
 import ProtectedIcon from '@/newtelco/ag-grid/protected'
 import SentIcon from '@/newtelco/ag-grid/sent'
+import CustomerCid from '@/newtelco/ag-grid/customerCid'
 import { AgGridReact } from 'ag-grid-react'
 import dynamic from 'next/dynamic'
 import ReadModal from '@/newtelco/maintenance/readmodal'
@@ -334,6 +335,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
         field: 'kundenCID',
         width: 100,
         sort: { direction: 'asc', priority: 0 },
+        cellRenderer: 'customerCid',
       },
       {
         headerName: 'Customer',
@@ -388,6 +390,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
       protectedIcon: ProtectedIcon,
       sentIcon: SentIcon,
       customLoadingOverlay: Loader,
+      customerCid: CustomerCid,
     },
     paginationPageSize: 10,
     rowClass: 'row-class',

@@ -4,15 +4,7 @@ import Link from 'next/link'
 import Store from '@/newtelco/store'
 import SearchInput from './search'
 import './header.css'
-import {
-  Header,
-  Nav,
-  Navbar,
-  Dropdown,
-  Avatar,
-  Badge,
-  Divider,
-} from 'rsuite'
+import { Header, Nav, Navbar, Dropdown, Avatar, Badge, Divider } from 'rsuite'
 import Notify from '@/newtelco-utils/notification'
 
 const NextLink = React.forwardRef((props, ref) => {
@@ -228,9 +220,9 @@ const MaintHeader = () => {
                     height='16'
                     width='16'
                     fill='none'
-                    stroke-linecap='round'
-                    stroke-linejoin='round'
-                    stroke-width='2'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth='2'
                     viewBox='0 0 24 24'
                     stroke='currentColor'
                   >
@@ -270,9 +262,9 @@ const MaintHeader = () => {
                     height='16'
                     width='16'
                     fill='none'
-                    stroke-linecap='round'
-                    stroke-linejoin='round'
-                    stroke-width='2'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth='2'
                     viewBox='0 0 24 24'
                     stroke='currentColor'
                   >

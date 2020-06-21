@@ -211,3 +211,14 @@ textarea::-webkit-scrollbar-thumb,
 .timezone-select div[class='*-menu'] {
   z-index: 9999;
 }
+
+.copy-btn {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: visibility 250ms, opacity 250ms;
+}
+.copy-btn:hover {
+  cursor: pointer;
+}
