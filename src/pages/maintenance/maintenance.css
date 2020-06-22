@@ -214,10 +214,16 @@ textarea::-webkit-scrollbar-thumb,
 
 .copy-btn {
   position: absolute;
-  left: 0;
+  left: 60%;
   top: 50%;
-  transform: translateY(-50%);
+  transform: translate(-50%, -50%);
   transition: visibility 250ms, opacity 250ms;
+  box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.1);
+}
+.copy-btn span {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 .copy-btn:hover {
   cursor: pointer;
