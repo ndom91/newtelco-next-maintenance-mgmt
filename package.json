@@ -7,7 +7,9 @@
     "start": "NEXT_PUBLIC_ENV=production next start -p 4000",
     "build": "next build",
     "analyze": "ANALYZE=true next build",
-    "prettier": "prettier --write \"src/**/*.{js,jsx,json}\""
+    "prettier": "prettier --write \"src/**/*.{js,jsx,json}\"",
+    "cypress:open": "cypress open",
+    "test": "cypress open"
   },
   "keywords": [
     "nextjs",
@@ -75,9 +77,11 @@
   },
   "devDependencies": {
     "@next/bundle-analyzer": "^9.4.2",
+    "@testing-library/cypress": "^6.0.0",
     "ag-grid-community": "^21.2.2",
     "ag-grid-react": "^21.2.2",
     "babel-eslint": "^10.1.0",
+    "cypress": "^4.8.0",
     "dotenv": "^8.2.0",
     "dotenv-webpack": "^1.8.0",
     "prettier": "^2.0.5",
