@@ -1,0 +1,88 @@
+.row-class {
+  vertical-align: center;
+}
+
+.row-cancelled {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.row-emergency {
+  background: repeating-linear-gradient(
+    45deg,
+    #fff,
+    #fff 10px,
+    #c3565f2d 10px,
+    #c3565f2d 20px
+  );
+}
+
+.ag-horizontal-left-spacer::-webkit-scrollbar-track,
+.ag-horizontal-right-spacer::-webkit-scrollbar-track,
+.ag-body-horizontal-scroll-viewport::-webkit-scrollbar-track {
+  border-radius: 10px;
+  background-color: rgba(0,0,0,0);
+}
+
+.ag-horizontal-left-spacer::-webkit-scrollbar,
+.ag-horizontal-right-spacer::-webkit-scrollbar,
+.ag-body-horizontal-scroll-viewport::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+  background-color: transparent;
+}
+
+.ag-horizontal-left-spacer::-webkit-scrollbar-thumb,
+.ag-horizontal-right-spacer::-webkit-scrollbar-thumb,
+.ag-body-horizontal-scroll-viewport::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background-color: rgba(0,0,0,0.4);
+}
+
+.ag-tooltip {
+  font-family: var(--font-body);
+  border: 2px solid var(--secondary) !important;
+  border-radius: 5px !important;
+  background: #fff !important;
+  padding: 10px !important;
+}
+
+div.ag-row-selected {
+  background: repeating-linear-gradient(
+    135deg,
+    var(--background),
+    var(--background) 10px,
+    #67B24628 10px,
+    #67B24628 20px
+  );
+}
+
+.table-wrapper { 
+  width: 100%;
+}
+
+.user-pic {
+  filter: grayscale(100%);
+  transition: all 350ms ease-in-out;
+}
+
+.user-pic:hover {
+  filter: grayscale(0%);
+  box-shadow: 0 5px 10px 1px rgba(0,0,0,0.15);
+}
+
+.ag-root {
+  font-family: var(--font-body);
+}
+
+.ag-header-cell-text {
+  font-family: var(--font-body);
+  font-size: 110%;
+}
+
+.ag-theme-material .ag-ltr .ag-has-focus .ag-cell-focus:not(.ag-cell-range-selected), .ag-theme-material .ag-ltr .ag-has-focus .ag-cell-focus.ag-cell-range-single-cell, .ag-theme-material .ag-ltr .ag-cell-focus.ag-cell-range-single-cell.ag-cell-range-handle, .ag-theme-material .ag-rtl .ag-has-focus .ag-cell-focus:not(.ag-cell-range-selected), .ag-theme-material .ag-rtl .ag-has-focus .ag-cell-focus.ag-cell-range-single-cell, .ag-theme-material .ag-rtl .ag-cell-focus.ag-cell-range-single-cell.ag-cell-range-handle {
+  border: none !important;
+}
+
+.rs-badge-wrapper .rs-badge-content {
+  transform: translate(20%, 20%);
+}

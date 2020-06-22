@@ -1713,7 +1713,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                               <HelpBlock
                                 style={{ margin: '5px', opacity: '0.5' }}
                               >
-                                Time in CEST:{' '}
+                                Europe/Berlin:{' '}
                                 {moment
                                   .tz(
                                     moment.tz(

@@ -274,7 +274,7 @@ const SupplierCIDs = props => {
               >
                 <Form>
                   <FormGroup>
-                    <ControlLabel>Customer</ControlLabel>
+                    <ControlLabel>Supplier</ControlLabel>
                     <Select
                       value={newCompanySelection}
                       className='company-select'
