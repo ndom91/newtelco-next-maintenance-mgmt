@@ -1,3 +1,4 @@
 {
- "baseUrl": "https://maint.newtelco.dev"
+  "baseUrl": "https://maint.newtelco.dev",
+  "chromeWebSecurity": false
 }

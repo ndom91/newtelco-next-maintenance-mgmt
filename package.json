@@ -8,8 +8,8 @@
     "build": "next build",
     "analyze": "ANALYZE=true next build",
     "prettier": "prettier --write \"src/**/*.{js,jsx,json}\"",
-    "cypress:open": "cypress open",
-    "test": "cypress open"
+    "test:e2e:open": "cypress open",
+    "test:e2e:run": "cypress run"
   },
   "keywords": [
     "nextjs",
