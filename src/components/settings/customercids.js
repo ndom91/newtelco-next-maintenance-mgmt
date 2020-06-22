@@ -320,11 +320,11 @@ const CustomerCIDs = props => {
           onHide={toggleCustomerCidAdd}
         >
           <Modal.Header>New Customer CID</Modal.Header>
-          <Modal.Body style={{ overflow: 'visible' }}>
+          <Modal.Body style={{ overflow: 'visible', paddingBottom: '0px' }}>
             <FlexboxGrid
               justify='space-around'
               align='middle'
-              style={{ flexDirection: 'column', height: '450px' }}
+              style={{ flexDirection: 'column', height: '360px' }}
             >
               <FlexboxGrid.Item
                 style={{ fontFamily: 'var(--font-body)', fontSize: '1.1rem' }}
@@ -362,7 +362,13 @@ const CustomerCIDs = props => {
                       placeholder='Supplier CID'
                     />
                   </FormGroup>
-                  <FormGroup>
+                  <FormGroup
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      marginBottom: '20px',
+                    }}
+                  >
                     <ControlLabel>Protected</ControlLabel>
                     <Toggle
                       checked={newProtection}

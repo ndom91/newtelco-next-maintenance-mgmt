@@ -263,11 +263,11 @@ const SupplierCIDs = props => {
           onHide={toggleSupplierCidAdd}
         >
           <Modal.Header>New Supplier CID</Modal.Header>
-          <Modal.Body style={{ overflow: 'visible' }}>
+          <Modal.Body style={{ overflow: 'visible', paddingBottom: '0px' }}>
             <FlexboxGrid
               justify='space-around'
               align='middle'
-              style={{ flexDirection: 'column', height: '350px' }}
+              style={{ flexDirection: 'column', height: '250px' }}
             >
               <FlexboxGrid.Item
                 style={{ fontFamily: 'var(--font-body)', fontSize: '1.1rem' }}

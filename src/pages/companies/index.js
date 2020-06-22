@@ -181,7 +181,6 @@ const Companies = ({ session, suppliers }) => {
     fetch(`/api/companies/maintenances?id=${selectedOption}`)
       .then(resp => resp.json())
       .then(data => {
-        console.log(data)
         setRowData(data.maintenances)
       })
   }

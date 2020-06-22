@@ -242,11 +242,11 @@ const Companies = props => {
         <Modal
           backdrop
           show={openCompanyModal}
-          size='sm'
+          size='xs'
           onHide={toggleCompanyAdd}
         >
           <Modal.Header>New Company</Modal.Header>
-          <Modal.Body>
+          <Modal.Body style={{ paddingBottom: '0px' }}>
             <FlexboxGrid
               justify='space-around'
               align='middle'
@@ -285,7 +285,9 @@ const Companies = props => {
                       value={newRecipient}
                       onChange={value => setNewRecipient(value)}
                     />
-                    <HelpBlock>Seperate multiple with semicolons</HelpBlock>
+                    <HelpBlock style={{ fontSize: '0.8rem' }}>
+                      Seperate multiple with semicolons
+                    </HelpBlock>
                   </FormGroup>
                 </Form>
               </FlexboxGrid.Item>

@@ -311,11 +311,11 @@ const Freeze = props => {
         <Modal
           backdrop
           show={openFreezeAdd}
-          size='sm'
+          size='xs'
           onHide={toggleFreezeAddModal}
         >
           <Modal.Header>New Freeze</Modal.Header>
-          <Modal.Body>
+          <Modal.Body style={{ paddingBottom: '0px' }}>
             <FlexboxGrid
               justify='space-around'
               align='middle'
