@@ -81,25 +81,7 @@ const MaintHeader = () => {
           <Nav>
             <Divider vertical />
             <Link href='/' passHref>
-              <Nav.Item
-              // icon={
-              //   <svg
-              //     height='18'
-              //     width='18'
-              //     fill='none'
-              //     strokeLinecap='round'
-              //     strokeLinejoin='round'
-              //     strokeWidth='2'
-              //     viewBox='0 0 24 24'
-              //     stroke='var(--grey4)'
-              //     style={{ marginRight: '5px' }}
-              //   >
-              //     <path d='M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' />
-              //   </svg>
-              // }
-              >
-                Home
-              </Nav.Item>
+              <Nav.Item>Home</Nav.Item>
             </Link>
             <Link href='/inbox' as='/inbox' passHref>
               <Nav.Item>
@@ -140,6 +122,7 @@ const MaintHeader = () => {
               <SearchInput />
             </div>
             <Divider vertical />
+            <div id='headway_badge'>H</div>
             <Dropdown
               trigger='click'
               className='header-dropdown'

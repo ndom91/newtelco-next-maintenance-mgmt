@@ -86,6 +86,13 @@ export default ({ Component, pageProps }) => {
             id='favicon'
             href='/static/images/favicon/favicon.ico'
           />
+          <script async src='//cdn.headwayapp.co/widget.js'></script>
+					<script>
+						const HW_config = {
+							selector: ".headway_badge",
+							account: "xW3GNx",
+						}
+					</script>
         </Head>
         <Store.Container>
           <Component {...pageProps} />
