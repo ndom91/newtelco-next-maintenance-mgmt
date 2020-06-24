@@ -3,7 +3,7 @@ import Router from 'next/router'
 import Layout from '@/newtelco/layout'
 import dynamic from 'next/dynamic'
 import RequireLogin from '@/newtelco/require-login'
-import NextAuth from 'next-auth/client'
+import { getSession } from 'next-auth/client'
 import MaintPanel from '@/newtelco/panel'
 import UnreadBadge from '@/newtelco/unread'
 import Store from '@/newtelco/store'
@@ -84,19 +84,10 @@ const Index = ({ session }) => {
   }
 }
 
-export async function getServerSideProps({ req, res }) {
-  const session = await NextAuth.session({ req })
-  if (!session) {
-    if (req) {
-      res.writeHead(302, { Location: '/api/auth/signin' })
-      res.end()
-    } else {
-      Router.push('/api/auth/signin')
-    }
-  }
+export async function getServerSideProps(context) {
   return {
     props: {
-      session,
+      session: await getSession(context),
     },
   }
 }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import NextAuth from 'next-auth/client'
+import { getSession } from 'next-auth/client'
 import Layout from '@/newtelco/layout'
 import RequireLogin from '@/newtelco/require-login'
 import './maintenance.css'
@@ -2095,7 +2095,6 @@ const Maintenance = ({ session, serverData, suppliers }) => {
 }
 
 export async function getServerSideProps({ req, query }) {
-  const session = await NextAuth.session({ req })
   const host = req ? req.headers['x-forwarded-host'] : window.location.hostname
   let protocol = 'https:'
   if (host.indexOf('localhost') > -1) {
@@ -2108,7 +2107,7 @@ export async function getServerSideProps({ req, query }) {
       props: {
         serverData: { profile: query },
         suppliers,
-        session,
+        session: await getSession({ req }),
       },
     }
   } else {
@@ -2118,7 +2117,7 @@ export async function getServerSideProps({ req, query }) {
       props: {
         serverData,
         suppliers,
-        session,
+        session: await getSession({ req }),
       },
     }
   }

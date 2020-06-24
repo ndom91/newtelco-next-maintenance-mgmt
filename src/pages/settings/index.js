@@ -1,5 +1,5 @@
 import React from 'react'
-import NextAuth from 'next-auth/client'
+import { getSession } from 'next-auth/client'
 import Link from 'next/link'
 import { withRouter } from 'next/router'
 import RequireLogin from '@/newtelco/require-login'
@@ -68,10 +68,9 @@ const Settings = ({ session, router }) => {
 }
 
 export async function getServerSideProps({ req }) {
-  const session = await NextAuth.session({ req })
   return {
     props: {
-      session,
+      session: await getSession({ req }),
     },
   }
 }

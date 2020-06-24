@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react'
-import { providers } from 'next-auth/client'
+import Router from 'next/router'
+import { getProviders } from 'next-auth/client'
 import { Container, FlexboxGrid, Panel, Content, Button, Col } from 'rsuite'
 import './signin.css'
 
@@ -7,12 +8,12 @@ if (typeof window !== 'undefined') {
   const WebFontLoader = require('webfontloader')
   WebFontLoader.load({
     google: {
-      families: ['Fira Sans:200,400', 'Chivo:300,400,700']
-    }
-  });
+      families: ['Fira Sans:200,400', 'Chivo:300,400,700'],
+    },
+  })
 }
 
-const SignIn = ({ providers }) => (
+const SignIn = ({ providers, session }) => (
   <Container>
     <Content>
       <FlexboxGrid
@@ -89,7 +90,7 @@ const SignIn = ({ providers }) => (
                           fill='#fff'
                         />
                       </svg>
-                        Sign in with {provider.name}
+                      Sign in with {provider.name}
                     </Button>
                   </a>
                 </p>
@@ -106,7 +107,7 @@ export default SignIn
 export async function getServerSideProps(ctx) {
   return {
     props: {
-      providers: await providers(ctx),
+      providers: await getProviders(ctx),
     },
   }
 }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import NextAuth from 'next-auth/client'
+import { getSession } from 'next-auth/client'
 import Layout from '@/newtelco/layout'
 import RequireLogin from '@/newtelco/require-login'
 import useSWR from 'swr'
@@ -283,23 +283,16 @@ const Inbox = ({ session, inboxItems }) => {
 }
 
 export async function getServerSideProps({ req }) {
-  const session = await NextAuth.session({ req })
   const host = req ? req.headers['x-forwarded-host'] : window.location.hostname
   let protocol = 'https:'
   if (host.indexOf('localhost') > -1) {
     protocol = 'http:'
   }
-  const pageRequest = `${protocol}//${host}/v1/api/inbox`
-  const res = await fetch(pageRequest, {
-    mode: 'cors',
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-    },
-  })
+  const res = await fetch(`${protocol}//${host}/v1/api/inbox`)
   const inboxContent = await res.json()
   return {
     props: {
-      session,
+      session: await getSession({ req }),
       inboxItems: inboxContent === 'No unread emails' ? [] : inboxContent,
     },
   }

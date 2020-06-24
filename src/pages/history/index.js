@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react'
-import NextAuth from 'next-auth/client'
+import { getSession } from 'next-auth/client'
 import './history.css'
 import Layout from '@/newtelco/layout'
 import { AgGridReact } from 'ag-grid-react'
@@ -439,7 +439,6 @@ const History = ({ session, data }) => {
 }
 
 export async function getServerSideProps({ req }) {
-  const session = await NextAuth.session({ req })
   const host = req ? req.headers['x-forwarded-host'] : window.location.hostname
   let protocol = 'https:'
   if (host.indexOf('localhost') > -1) {
@@ -451,7 +450,7 @@ export async function getServerSideProps({ req }) {
   return {
     props: {
       data,
-      session,
+      session: await getSession({ req }),
     },
   }
 }
