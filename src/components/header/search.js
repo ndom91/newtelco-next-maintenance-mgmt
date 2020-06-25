@@ -71,6 +71,7 @@ const SearchInput = props => {
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span>
                   <b style={{ fontSize: '90%', fontWeight: '900' }}>
+                    NT-
                     <span dangerouslySetInnerHTML={{ __html: suggestion.id }} />
                   </b>{' '}
                   -{' '}

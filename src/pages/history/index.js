@@ -9,6 +9,7 @@ import moment from 'moment-timezone'
 import Router from 'next/router'
 import RequireLogin from '@/newtelco/require-login'
 import EditBtn from '@/newtelco/ag-grid/edit-btn'
+import MaintId from '@/newtelco/ag-grid/maintId'
 import StartDateTime from '@/newtelco/ag-grid/startdatetime'
 import EndDateTime from '@/newtelco/ag-grid/enddatetime'
 import MailArrived from '@/newtelco/ag-grid/mailarrived'
@@ -52,6 +53,7 @@ const History = ({ session, data }) => {
         field: 'id',
         width: 100,
         pinned: 'left',
+        cellRenderer: 'maintId',
         sort: { direction: 'asc', priority: 0 },
       },
       {
@@ -134,6 +136,7 @@ const History = ({ session, data }) => {
     context: { componentParent: this },
     frameworkComponents: {
       editBtn: EditBtn,
+      maintId: MaintId,
       startdateTime: StartDateTime,
       enddateTime: EndDateTime,
       mailArrived: MailArrived,
