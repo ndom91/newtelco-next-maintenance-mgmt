@@ -324,7 +324,7 @@ const CustomerCIDs = props => {
             <FlexboxGrid
               justify='space-around'
               align='middle'
-              style={{ flexDirection: 'column', height: '360px' }}
+              style={{ flexDirection: 'column', height: '370px' }}
             >
               <FlexboxGrid.Item
                 style={{ fontFamily: 'var(--font-body)', fontSize: '1.1rem' }}
