@@ -6,6 +6,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v1
+	    - name: Cache Cypress
+        id: cache-cypress
+	      uses: actions/cache@v1
+	      with:
+          path: next-maint-cypress
+          key: ${{ runner.os }}-cypress-${{ hashFiles('**/package-lock.json') }}
       - name: Cypress run
         uses: cypress-io/github-action@v1
         timeout-minutes: 10
@@ -20,3 +26,8 @@ jobs:
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           SITE: http://localhost:4000
+          CYPRESS_BASE_URL: http://localhost:4000
+          GOOGLE_USER: ${{ secrets.GOOGLE_USER }}
+          GOOGLE_PW: ${{ secrets.GOOGLE_PW }}
+          COOKIE_NAME: ${{ secrets.COOKIE_NAME }}
+          SITE_NAME: ${{ secrets.SITE_NAME }}
