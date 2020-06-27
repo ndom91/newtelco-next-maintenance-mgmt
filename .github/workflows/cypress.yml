@@ -13,7 +13,7 @@ jobs:
           path: next-maint-cypress
           key: ${{ runner.os }}-cypress-${{ hashFiles('**/package-lock.json') }}
       - name: Cypress run
-        uses: cypress-io/github-action@v1
+        uses: cypress-io/github-action@v2
         timeout-minutes: 10
         with:
           browser: chrome
@@ -25,8 +25,8 @@ jobs:
         env:
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-          SITE: http://localhost:4000
-          CYPRESS_BASE_URL: http://localhost:4000
+          SITE: "http://localhost:4000"
+          CYPRESS_BASE_URL: "http://localhost:4000"
           GOOGLE_USER: ${{ secrets.GOOGLE_USER }}
           GOOGLE_PW: ${{ secrets.GOOGLE_PW }}
           COOKIE_NAME: ${{ secrets.COOKIE_NAME }}
