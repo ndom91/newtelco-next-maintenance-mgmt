@@ -5,16 +5,13 @@ module.exports = (on, config) => {
 }
 
 describe('Login page', () => {
-  /*
-   * Visits the page before each test
-   */
   before(() => {
     cy.log(`Visiting https://maint.newtelco.dev`)
     cy.clearCookies()
     cy.clearLocalStorage()
     cy.visit('/')
   })
-  it('should have a logo', () => {
+  it('Should have logo', () => {
     cy.get('.rs-content img').should('have.length', 1)
   })
   it('Signin with Google Button', () => {
@@ -23,12 +20,9 @@ describe('Login page', () => {
     cy.get('.signin-link').should(
       'have.attr',
       'href',
-      'https://maint.newtelco.dev/api/auth/signin/google'
+      `${Cypress.env('SITE_NAME')}/api/auth/signin/google`
     )
   })
-})
-
-describe('Login', () => {
   it('Login through Google', () => {
     const username = Cypress.env('GOOGLE_USER')
     const password = Cypress.env('GOOGLE_PW')
@@ -76,3 +70,4 @@ describe('Login', () => {
       })
   })
 })
+
