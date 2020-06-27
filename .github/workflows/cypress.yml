@@ -28,7 +28,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           SITE: "http://localhost:4000"
           CYPRESS_BASE_URL: "http://localhost:4000"
-          GOOGLE_USER: ${{ secrets.GOOGLE_USER }}
-          GOOGLE_PW: ${{ secrets.GOOGLE_PW }}
-          COOKIE_NAME: ${{ secrets.COOKIE_NAME }}
-          SITE_NAME: ${{ secrets.SITE_NAME }}
+          CYPRESS_GOOGLE_USER: ${{ secrets.GOOGLE_USER }}
+          CYPRESS_GOOGLE_PW: ${{ secrets.GOOGLE_PW }}
+          CYPRESS_COOKIE_NAME: ${{ secrets.COOKIE_NAME }}
+          CYPRESS_SITE_NAME: ${{ secrets.SITE_NAME }}
