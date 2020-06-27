@@ -6,10 +6,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v1
-	    - name: Cache Cypress
+      - name: Cache Cypress
         id: cache-cypress
-	      uses: actions/cache@v1
-	      with:
+        uses: actions/cache@v1
+        with:
           path: next-maint-cypress
           key: ${{ runner.os }}-cypress-${{ hashFiles('**/package-lock.json') }}
       - name: Cypress run
