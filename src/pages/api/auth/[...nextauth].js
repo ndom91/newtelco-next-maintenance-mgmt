@@ -18,7 +18,6 @@ const options = {
   ],
   pages: {
     signin: '/auth/signin',
-    signout: '/auth/signout',
   },
   session: {
     jwt: true,
