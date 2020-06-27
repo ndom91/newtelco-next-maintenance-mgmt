@@ -12,3 +12,4 @@ public/sw.js
 public/workbox-*
 db_backup
 stats*.json
+cypress.env*
