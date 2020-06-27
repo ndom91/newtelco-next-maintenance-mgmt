@@ -9,7 +9,7 @@
     "analyze": "ANALYZE=true next build",
     "prettier": "prettier --write \"src/**/*.{js,jsx,json}\"",
     "test:e2e:open": "cypress open",
-    "test:e2e:run": "cypress run"
+    "test:e2e:run": "cypress run --record"
   },
   "keywords": [
     "nextjs",
