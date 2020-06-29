@@ -18,6 +18,9 @@ const CommentList = ({ user, id, initialComment }) => {
   const [comments, setComments] = useState([])
 
   useEffect(() => {
+    if (id === 'NEW') {
+      return
+    }
     fetch(`/api/comments?m=${id}`, {
       method: 'get',
     })

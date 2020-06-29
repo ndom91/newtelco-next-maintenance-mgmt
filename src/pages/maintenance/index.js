@@ -1085,7 +1085,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
       incomingFormatted = format(new Date(maileingang), 'yyyy-MM-dd HH:mm:ss')
     }
     const updatedAtFormatted = format(
-      new Date(updatedAt),
+      new Date(updatedAt || Date.now()),
       'yyyy-MM-dd HH:mm:ss'
     )
 
