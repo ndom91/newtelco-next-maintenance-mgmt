@@ -1,5 +1,3 @@
-import { GoogleSocialLogin } from 'cypress-social-logins'
-
 module.exports = (on, config) => {
   on('task', {
     GoogleSocialLogin: GoogleSocialLogin,
@@ -7,14 +5,13 @@ module.exports = (on, config) => {
 }
 
 describe('Login page', () => {
-  /*
-   * Visits the page before each test
-   */
-  beforeEach(() => {
+  before(() => {
     cy.log(`Visiting https://maint.newtelco.dev`)
+    cy.clearCookies()
+    cy.clearLocalStorage()
     cy.visit('/')
   })
-  it('should have a logo', () => {
+  it('Should have logo', () => {
     cy.get('.rs-content img').should('have.length', 1)
   })
   it('Signin with Google Button', () => {
@@ -23,25 +20,26 @@ describe('Login page', () => {
     cy.get('.signin-link').should(
       'have.attr',
       'href',
-      'https://maint.newtelco.dev/api/auth/signin/google'
+      `${Cypress.env('SITE_NAME')}/api/auth/signin/google`
     )
   })
-})
-
-describe('Login', () => {
   it('Login through Google', () => {
-    const username = Cypress.env('device@newtelco.de')
-    const password = Cypress.env('N3wt3lco')
-    const loginUrl = Cypress.env('loginUrl')
-    const cookieName = Cypress.env('cookieName')
+    const username = Cypress.env('GOOGLE_USER')
+    const password = Cypress.env('GOOGLE_PW')
+    const loginUrl = Cypress.env('SITE_NAME')
+    const cookieName = Cypress.env('COOKIE_NAME')
     const socialLoginOptions = {
       username,
       password,
       loginUrl,
       headless: true,
       logs: false,
-      loginSelector: '.signin-link',
-      postLoginSelector: '.rs-panel',
+      isPopup: true,
+      loginSelector: `a[href="${Cypress.env(
+        'SITE_NAME'
+      )}/api/auth/signin/google"]`,
+      postLoginSelector: '.unread-count',
+      getAllBrowserCookies: true,
     }
 
     return cy
@@ -64,7 +62,12 @@ describe('Login', () => {
           Cypress.Cookies.defaults({
             whitelist: cookieName,
           })
+          cy.visit('/api/auth/signout')
+          cy.get('form').submit()
+          cy.clearCookies()
+          cy.clearLocalStorage()
         }
       })
   })
 })
+
