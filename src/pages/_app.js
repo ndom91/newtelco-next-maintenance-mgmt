@@ -16,7 +16,7 @@ export default ({ Component, pageProps }) => {
 
   useEffect(() => {
     if (process.env.NEXT_PUBLIC_ENV === 'production') {
-      if (process.browser && session && session.user) {
+      if (typeof window !== 'undefined' && session) {
         LogRocket.init('ui2vht/next-maintenance')
         LogRocket.identify(session.user.id, {
           name: session.user.name,
