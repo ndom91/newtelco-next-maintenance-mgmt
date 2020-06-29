@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import Router from 'next/router'
-import { getProviders } from 'next-auth/client'
+import { providers, signin } from 'next-auth/client'
 import { Container, FlexboxGrid, Panel, Content, Button, Col } from 'rsuite'
 import './signin.css'
 
@@ -45,11 +45,16 @@ const SignIn = ({ providers, session }) => (
             {providers &&
               Object.values(providers).map(provider => (
                 <p key={provider.name}>
-                  <a href={provider.signinUrl} className='signin-link'>
+                  <a
+                    href={provider.signinUrl}
+                    onClick={e => e.preventDefault()}
+                    className='signin-link'
+                  >
                     <Button
                       id='signin-btn'
                       type='submit'
                       appearance='primary'
+                      onClick={() => signin(provider.id)}
                       block
                       style={{
                         display: 'flex',
@@ -107,7 +112,7 @@ export default SignIn
 export async function getServerSideProps(ctx) {
   return {
     props: {
-      providers: await getProviders(ctx),
+      providers: await providers(ctx),
     },
   }
 }

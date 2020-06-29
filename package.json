@@ -50,7 +50,7 @@
     "logrocket": "^1.0.7",
     "moment-timezone": "^0.5.31",
     "next": "^9.4.2",
-    "next-auth": "^2.1.0",
+    "next-auth": "^2.2.1-beta.0",
     "next-pwa": "^2.4.1",
     "nodemailer": "^6.4.6",
     "nodemailer-direct-transport": "^3.3.2",
