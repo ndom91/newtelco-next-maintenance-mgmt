@@ -3,6 +3,7 @@ import { Rnd } from 'react-rnd'
 import ShadowDom from '../../components/shadowdom'
 import { OutTable, ExcelRenderer } from 'react-excel-renderer'
 import PDF from 'react-pdf-js-infinite'
+import Notify from '@/newtelco-utils/notification'
 import { saveAs } from 'file-saver'
 import {
   Icon,
@@ -16,11 +17,11 @@ import {
   Popover,
   Dropdown,
   Loader,
+  Tag,
 } from 'rsuite'
 
 const ReadModal = ({
   maintenance,
-  openReadModal,
   toggleReadModal,
   incomingAttachments,
   jsonData,
@@ -35,6 +36,12 @@ const ReadModal = ({
   const [currentAttachmentName, setCurrentAttachmentName] = useState('')
   const [attachmentPopoverBody, setAttachmentPopoverBody] = useState('')
   const [faviconLoading, setFaviconLoading] = useState(true)
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(
+      maintenance.incomingSubject || maintenance.subject
+    )
+    Notify('info', 'Subject Copied!')
+  }
 
   const fileTypeIcon = filename => {
     const fileExt = filename.match(/\.[0-9a-z]+$/i)
@@ -298,6 +305,27 @@ const ReadModal = ({
                       readOnly
                       value={maintenance.incomingSubject || maintenance.subject}
                     />
+                    <Tag
+                      style={{
+                        visibility: hover ? 'visible' : 'hidden',
+                        opacity: hover ? '1' : '0',
+                      }}
+                      onClick={copyToClipboard}
+                      className='copy-btn'
+                    >
+                      <svg
+                        height='16'
+                        width='16'
+                        fill='none'
+                        strokeLinecap='round'
+                        strokeLinejoin='round'
+                        strokeWidth='2'
+                        viewBox='0 0 24 24'
+                        stroke='currentColor'
+                      >
+                        <path d='M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3' />
+                      </svg>
+                    </Tag>
                   </InputGroup>
                 </div>
               </FlexboxGrid.Item>
@@ -457,5 +485,7 @@ const ReadModal = ({
     </>
   )
 }
+
+export default ReadModal
 
 export default ReadModal
