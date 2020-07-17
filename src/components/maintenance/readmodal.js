@@ -27,7 +27,8 @@ const ReadModal = ({
   incomingAttachments,
   jsonData,
 }) => {
-  const [hover, setHover] = useState(false)
+  const [hoverFrom, setHoverFrom] = useState(false)
+  const [hoverSubj, setHoverSubj] = useState(false)
   const triggerRef = useRef()
   const [attachmentHTMLContent, setAttachmentHTMLContent] = useState('')
   const [pdfB64, setPdfB64] = useState('')
@@ -38,11 +39,15 @@ const ReadModal = ({
   const [currentAttachmentName, setCurrentAttachmentName] = useState('')
   const [attachmentPopoverBody, setAttachmentPopoverBody] = useState('')
   const [faviconLoading, setFaviconLoading] = useState(true)
-  const copyToClipboard = () => {
+  const copySubjectToClipboard = () => {
     navigator.clipboard.writeText(
       maintenance.incomingSubject || maintenance.subject
     )
     Notify('info', 'Subject Copied To Clipboard!')
+  }
+  const copyFromToClipboard = () => {
+    navigator.clipboard.writeText(maintenance.incomingFrom || maintenance.from)
+    Notify('info', 'Sender Copied To Clipboard!')
   }
 
   const fileTypeIcon = filename => {
@@ -289,6 +294,8 @@ const ReadModal = ({
                   <InputGroup
                     className='modal-textbox'
                     style={{ marginBottom: '5px' }}
+                    onMouseEnter={() => setHoverFrom(true)}
+                    onMouseLeave={() => setHoverFrom(false)}
                   >
                     <InputGroup.Addon style={{ height: '31px' }} type='prepend'>
                       From
@@ -297,11 +304,44 @@ const ReadModal = ({
                       readOnly
                       value={maintenance.incomingFrom || maintenance.from}
                     />
+                    <InputGroup.Button
+                      style={{ width: '50px', backgroundColor: 'transparent' }}
+                    >
+                      <Whisper
+                        placement='bottom'
+                        delay={5000}
+                        speaker={<Tooltip>Copy Sender</Tooltip>}
+                      >
+                        <Tag
+                          style={{
+                            visibility: hoverFrom ? 'visible' : 'hidden',
+                            opacity: hoverFrom ? '1' : '0',
+                            zIndex: hoverFrom ? '999' : '0',
+                            marginRight: '5px',
+                          }}
+                          onClick={copyFromToClipboard}
+                          className='copy-btn'
+                        >
+                          <svg
+                            height='16'
+                            width='16'
+                            fill='none'
+                            strokeLinecap='round'
+                            strokeLinejoin='round'
+                            strokeWidth='2'
+                            viewBox='0 0 24 24'
+                            stroke='currentColor'
+                          >
+                            <path d='M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3' />
+                          </svg>
+                        </Tag>
+                      </Whisper>
+                    </InputGroup.Button>
                   </InputGroup>
                   <InputGroup
                     className='modal-textbox'
-                    onMouseEnter={() => setHover(true)}
-                    onMouseLeave={() => setHover(false)}
+                    onMouseEnter={() => setHoverSubj(true)}
+                    onMouseLeave={() => setHoverSubj(false)}
                   >
                     <InputGroup.Addon style={{ height: '31px' }} type='prepend'>
                       Subject
@@ -321,12 +361,12 @@ const ReadModal = ({
                       >
                         <Tag
                           style={{
-                            visibility: hover ? 'visible' : 'hidden',
-                            opacity: hover ? '1' : '0',
-                            zIndex: hover ? '999' : '0',
+                            visibility: hoverSubj ? 'visible' : 'hidden',
+                            opacity: hoverSubj ? '1' : '0',
+                            zIndex: hoverSubj ? '999' : '0',
                             marginRight: '5px',
                           }}
-                          onClick={copyToClipboard}
+                          onClick={copySubjectToClipboard}
                           className='copy-btn'
                         >
                           <svg
