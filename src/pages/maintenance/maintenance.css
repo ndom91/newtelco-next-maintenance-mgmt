@@ -100,12 +100,15 @@
   margin-left: 15px;
 }
 
+.modal-textbox {
+  padding-right: 10px;
+}
 .mail-read-header {
   padding: 20px 20px 0px 20px !important;
 }
 
-.mail-read-header .modal-textbox {
-  pointer-events: none;
+.mail-read-header .modal-textbox input:hover {
+  cursor: grab;
 }
 
 .mail-read-header:hover {
@@ -113,6 +116,10 @@
 }
 .mail-read-header:active {
   cursor: grabbing;
+}
+
+.copy-btn {
+  transition: opacity 250ms ease-in-out;
 }
 
 .reschedule-header {
