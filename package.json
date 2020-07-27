@@ -1,10 +1,10 @@
 {
   "name": "next-maintenance",
-  "version": "2.2.0",
+  "version": "2.5.0",
   "description": "Newtelco Maintenance App",
   "scripts": {
-    "dev": "NEXT_PUBLIC_ENV=development next -p 4000",
-    "start": "NEXT_PUBLIC_ENV=production next start -p 4000",
+    "dev": "NEXT_PUBLIC_ENV=development next",
+    "start": "NEXT_PUBLIC_ENV=production next start",
     "build": "next build",
     "analyze": "ANALYZE=true next build",
     "prettier": "prettier --write \"src/**/*.{js,jsx,json}\"",
