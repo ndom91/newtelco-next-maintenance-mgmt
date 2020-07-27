@@ -33,7 +33,7 @@ describe('Login page', () => {
       password,
       loginUrl,
       headless: true,
-      logs: false,
+      logs: true,
       isPopup: true,
       loginSelector: `a[href="${Cypress.env(
         'SITE_NAME'
