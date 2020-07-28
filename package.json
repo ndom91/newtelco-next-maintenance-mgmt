@@ -4,7 +4,7 @@
   "description": "Newtelco Maintenance App",
   "scripts": {
     "dev": "NEXT_PUBLIC_ENV=development next",
-    "start": "NEXT_PUBLIC_ENV=production next start -p 4000",
+    "start": "NEXT_PUBLIC_ENV=production next start",
     "build": "next build",
     "analyze": "ANALYZE=true next build",
     "prettier": "prettier --check \"src/**/*.{js,jsx,json}\"",
