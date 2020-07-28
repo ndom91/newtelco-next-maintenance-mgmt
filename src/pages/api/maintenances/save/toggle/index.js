@@ -15,13 +15,11 @@ module.exports = async (req, res) => {
     )
     res.status(200).json({ statusText: 'OK', status: 200 })
   } else {
-    res
-      .status(200)
-      .json({
-        statusText: 'FAIL',
-        status: 500,
-        err: 'Save Failed',
-        details: cidIdsQuery,
-      })
+    res.status(200).json({
+      statusText: 'FAIL',
+      status: 500,
+      err: 'Save Failed',
+      details: cidIdsQuery,
+    })
   }
 }

@@ -18,14 +18,12 @@ module.exports = async (req, res) => {
     const updateHistory = await db.query(
       escape`INSERT INTO changelog (mid, user, action) VALUES (${newId['LAST_INSERT_ID()']}, ${bearbeitetvon}, 'created');`
     )
-    res
-      .status(200)
-      .json({
-        statusText: 'OK',
-        status: 200,
-        newId: newId,
-        update: updateHistory,
-      })
+    res.status(200).json({
+      statusText: 'OK',
+      status: 200,
+      newId: newId,
+      update: updateHistory,
+    })
   } else {
     res
       .status(200)

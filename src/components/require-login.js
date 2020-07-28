@@ -6,9 +6,9 @@ if (typeof window !== 'undefined') {
   const WebFontLoader = require('webfontloader')
   WebFontLoader.load({
     google: {
-      families: ['Fira Sans:200,400', 'Chivo:300,400,700']
-    }
-  });
+      families: ['Fira Sans:200,400', 'Chivo:300,400,700'],
+    },
+  })
 }
 
 const RequireLogin = () => (
@@ -35,7 +35,7 @@ const RequireLogin = () => (
           >
             <p style={{ margin: '20px' }}>
               You must be signed in to view this page.
-              </p>
+            </p>
             <p>
               <Link href='/api/auth/signin'>
                 <Button
@@ -45,7 +45,7 @@ const RequireLogin = () => (
                   block
                 >
                   Sign in
-                  </Button>
+                </Button>
               </Link>
             </p>
           </Panel>
