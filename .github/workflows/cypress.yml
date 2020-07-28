@@ -26,8 +26,8 @@ jobs:
         env:
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-          SITE: "http://localhost:4000"
-          CYPRESS_BASE_URL: "http://localhost:4000"
+          SITE: "http://localhost:3000"
+          CYPRESS_BASE_URL: "http://localhost:3000"
           CYPRESS_GOOGLE_USER: ${{ secrets.GOOGLE_USER }}
           CYPRESS_GOOGLE_PW: ${{ secrets.GOOGLE_PW }}
           CYPRESS_COOKIE_NAME: ${{ secrets.COOKIE_NAME }}
