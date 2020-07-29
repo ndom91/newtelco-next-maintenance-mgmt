@@ -8,7 +8,7 @@ import Store from '@/newtelco/store'
 import { Provider } from 'next-auth/client'
 const LogRocket = require('logrocket')
 
-export default ({ Component, pageProps }) => {
+const App = ({ Component, pageProps }) => {
   const ConditionalWrap = ({ condition, wrap, children }) =>
     condition ? wrap(children) : children
 
@@ -96,6 +96,8 @@ export default ({ Component, pageProps }) => {
     </Provider>
   )
 }
+
+export default App
 
 // export function reportWebVitals (metric) {
 //   if (process.env.NEXT_PUBLIC_VITALS) {
