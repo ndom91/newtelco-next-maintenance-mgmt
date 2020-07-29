@@ -26,7 +26,7 @@ jobs:
         env:
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-          SITE: "http://localhost:3000"
+          NEXTAUTH_URL: "http://localhost:3000"
           CYPRESS_BASE_URL: "http://localhost:3000"
           CYPRESS_GOOGLE_USER: ${{ secrets.GOOGLE_USER }}
           CYPRESS_GOOGLE_PW: ${{ secrets.GOOGLE_PW }}
