@@ -11,6 +11,8 @@ describe('Login page', () => {
 		cy.clearLocalStorage()
 		cy.visit('/auth/signin')
 	})
+	console.log(Cypress.env('GOOGLE_USER'))
+	console.log(Cypress.env('NEXTAUTH_URL'))
 	it('Should have logo', () => {
 		cy.get('.rs-content img').should('have.length', 1)
 	})
