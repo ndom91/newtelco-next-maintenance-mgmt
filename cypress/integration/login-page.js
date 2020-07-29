@@ -20,7 +20,7 @@ describe('Login page', () => {
 		cy.get('.signin-link').should(
 			'have.attr',
 			'href',
-			`${Cypress.env('NEXTAUTH_URL')}/auth/signin/google`
+			`${Cypress.env('NEXTAUTH_URL')}/api/auth/signin/google`
 		)
 	})
 	it('Login through Google', () => {
