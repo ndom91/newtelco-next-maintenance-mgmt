@@ -6,10 +6,10 @@ module.exports = (on, config) => {
 
 describe('Login page', () => {
 	before(() => {
-		cy.log(`Visiting https://maint.newtelco.dev`)
+		cy.log(`Visiting http://localhost:3000/auth/signin`)
 		cy.clearCookies()
 		cy.clearLocalStorage()
-		cy.visit('/')
+		cy.visit('/auth/signin')
 	})
 	it('Should have logo', () => {
 		cy.get('.rs-content img').should('have.length', 1)
@@ -20,7 +20,7 @@ describe('Login page', () => {
 		cy.get('.signin-link').should(
 			'have.attr',
 			'href',
-			`${Cypress.env('NEXTAUTH_URL')}/api/auth/signin/google`
+			`${Cypress.env('NEXTAUTH_URL')}/auth/signin/google`
 		)
 	})
 	it('Login through Google', () => {
