@@ -51,6 +51,7 @@ const SignIn = ({ providers, session }) => {
                   <p key={provider.name}>
                     <a
                       href={provider.signinUrl}
+                      id='signin-link'
                       onClick={e => e.preventDefault()}
                       className='signin-link'
                     >

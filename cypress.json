@@ -1,5 +1,5 @@
 {
-  "baseUrl": "https://maint.newtelco.dev",
+  "baseUrl": "http://localhost:3000",
   "chromeWebSecurity": false,
   "projectId": "v648t3"
 }

@@ -11,11 +11,11 @@ describe('Login page', () => {
 		cy.clearLocalStorage()
 		cy.visit('/auth/signin')
 	})
-	console.log(Cypress.env('GOOGLE_USER'))
-	console.log(Cypress.env('NEXTAUTH_URL'))
+
 	it('Should have logo', () => {
 		cy.get('.rs-content img').should('have.length', 1)
 	})
+
 	it('Signin with Google Button', () => {
 		cy.get('#signin-btn').should('have.length', 1)
 		cy.findByText('Sign in with Google').should('exist')
@@ -25,6 +25,7 @@ describe('Login page', () => {
 			`${Cypress.env('NEXTAUTH_URL')}/api/auth/signin/google`
 		)
 	})
+
 	it('Login through Google', () => {
 		const username = Cypress.env('GOOGLE_USER')
 		const password = Cypress.env('GOOGLE_PW')
@@ -37,12 +38,13 @@ describe('Login page', () => {
 			headless: true,
 			logs: true,
 			isPopup: true,
-			loginSelector: `a[href="${Cypress.env(
-				'NEXTAUTH_URL'
-			)}/api/auth/signin/google"]`,
+			loginSelector: 'input[type="submit"]',
+			loginSelectorDelay: 500,
 			postLoginSelector: '.unread-count',
 			getAllBrowserCookies: true,
 		}
+
+		cy.visit('/auth/signin')
 
 		return cy
 			.task('GoogleSocialLogin', socialLoginOptions)
