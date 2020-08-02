@@ -23,17 +23,6 @@ const MaintHeader = () => {
   const count = store.get('count')
   const night = store.get('night')
 
-  useEffect(() => {
-    const script = document.createElement('script')
-    script.async = true
-    script.src = 'https://cdn.headwayapp.co/widget.js'
-    document.head.appendChild(script)
-    const hwConfig = { selector: '#headway_badge', account: 'xW3GNx' }
-    script.onload = function () {
-      window.Headway.init(hwConfig)
-    }
-  }, [])
-
   let avatarPath
   if (!loading) {
     const username = session.user.email.match(/^([^@]*)@/)[1]
@@ -120,7 +109,6 @@ const MaintHeader = () => {
               </Nav.Item>
             </Link>
           </Nav>
-          <span id='headway_badge'></span>
           <Nav pullRight style={{ margin: '0px 20px' }}>
             <div
               style={{
