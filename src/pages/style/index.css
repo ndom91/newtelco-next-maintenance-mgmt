@@ -4,17 +4,36 @@
   grid-template-columns: 1fr 1.5fr 1.5fr 1.5fr;
   grid-template-rows: 0.5fr 1fr;
   gap: 25px 25px;
-  grid-template-areas: "unread chart1 chart2 recents" "heatmap heatmap heatmap recents";
+  grid-template-areas: 'unread chart1 chart2 recents' 'heatmap heatmap heatmap recents';
   height: 100%;
   width: 100%;
 }
 
-.unread { grid-area: unread; }
+.unread {
+  grid-area: unread;
+}
 
-.heatmap { grid-area: heatmap; }
+.heatmap {
+  grid-area: heatmap;
+}
 
-.recents { grid-area: recents; }
+.recents {
+  grid-area: recents;
+}
 
-.chart1 { grid-area: chart1; }
+.chart1 {
+  grid-area: chart1;
+}
 
-.chart2 { grid-area: chart2; }
+.chart2 {
+  grid-area: chart2;
+}
+
+@media only screen and (max-width: 1430px) {
+  .grid-container {
+    grid-template-columns: 1fr 0fr 1.5fr 1.5fr;
+  }
+  .chart1 {
+    display: none;
+  }
+}
