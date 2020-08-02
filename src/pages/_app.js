@@ -27,7 +27,7 @@ const App = ({ Component, pageProps }) => {
   }, [])
 
   return (
-    <Provider options={{ site: process.env.SITE }} session={session}>
+    <Provider session={pageProps.session}>
       <ConditionalWrap
         condition={process.env.NEXT_PUBLIC_ENV === 'production'}
         wrap={children => (
@@ -98,9 +98,3 @@ const App = ({ Component, pageProps }) => {
 }
 
 export default App
-
-// export function reportWebVitals (metric) {
-//   if (process.env.NEXT_PUBLIC_VITALS) {
-//     console.table('metrics', metric.name, metric.value)
-//   }
-// }

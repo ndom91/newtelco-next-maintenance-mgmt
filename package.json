@@ -3,7 +3,7 @@
   "version": "2.5.0",
   "description": "Newtelco Maintenance App",
   "scripts": {
-    "dev": "NEXT_PUBLIC_ENV=development next",
+    "dev": "NEXT_PUBLIC_ENV=development next -p 4000",
     "start": "NEXT_PUBLIC_ENV=production next start",
     "build": "next build",
     "analyze": "ANALYZE=true next build",
@@ -13,13 +13,7 @@
     "test:e2e:run": "cypress run",
     "test:e2e:ci": "cypress run --record"
   },
-  "keywords": [
-    "nextjs",
-    "react",
-    "smtp",
-    "google-apis",
-    "network-maintenance"
-  ],
+  "keywords": ["nextjs", "react", "smtp", "google-apis", "network-maintenance"],
   "author": "Nico Domino <ndomino@newtelco.de>",
   "homepage": "https://github.com/newtelco/next-maintenance",
   "repository": {
@@ -52,7 +46,7 @@
     "logrocket": "^1.0.7",
     "moment-timezone": "^0.5.31",
     "next": "^9.5.0",
-    "next-auth": "^3.0.0-beta.19",
+    "next-auth": "^3.1.0",
     "next-pwa": "^2.4.1",
     "nodemailer": "^6.4.6",
     "nodemailer-direct-transport": "^3.3.2",
@@ -94,15 +88,14 @@
     "webpack-pwa-manifest": "^4.2.0",
     "ws": "^7.3.0"
   },
-  "browserslist": [
-    "last 2 versions",
-    "> 2%"
-  ],
+  "browserslist": ["last 2 versions", "> 2%"],
   "prettier": {
     "singleQuote": true,
     "trailingComma": "es5",
     "semi": false,
     "jsxSingleQuote": true,
-    "arrowParens": "avoid"
+    "arrowParens": "avoid",
+    "tabWidth": 2,
+    "useTabs": false
   }
 }

@@ -52,7 +52,7 @@ const Index = ({ session }) => {
   const store = Store.useStore()
 
   if (typeof window !== 'undefined' && !session) {
-    Router.push('/api/auth/signin')
+    Router.push('/auth/signin')
   }
 
   if (session) {

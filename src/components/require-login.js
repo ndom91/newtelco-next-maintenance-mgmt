@@ -37,7 +37,7 @@ const RequireLogin = () => (
               You must be signed in to view this page.
             </p>
             <p>
-              <Link href='/api/auth/signin'>
+              <Link href='/auth/signin'>
                 <Button
                   id='signin-btn'
                   type='submit'
