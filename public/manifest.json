@@ -1,6 +1,11 @@
 {
-  "short_name": "NT Maintenance",
   "name": "Newtelco Maintenance",
+	"short_name": "Maintenance",
+  "start_url": "/",
+  "background_color": "#d4d5d8",
+  "display": "standalone",
+	"orientation": "portrait",
+  "theme_color": "#67B246",
   "icons": [
     {
       "src": "/static/images/icons/nt-128.png",
@@ -17,10 +22,5 @@
       "type": "image/png",
       "sizes": "512x512"
     }
-  ],
-  "start_url": "/",
-  "background_color": "#d4d5d8",
-  "display": "standalone",
-  "scope": "/",
-  "theme_color": "#67B246"
+  ]
 }

@@ -39,21 +39,16 @@ const App = ({ Component, pageProps }) => {
       >
         <Head>
           <title>Newtelco Maintenance</title>
-          <meta name='viewport' content='width=device-width, initial-scale=1' />
-          <link
-            rel='apple-touch-icon'
-            sizes='180x180'
-            href='/static/images/favicon/apple-touch-icon.png'
-          />
-          <link
-            rel='mask-icon'
-            href='/static/images/favicon/safari-pinned-tab.svg'
-            color='#67b246'
-          />
           <meta name='msapplication-TileColor' content='#67b246' />
           <meta name='theme-color' content='#eaeaea' />
           <meta name='application-name' content='Newtelco Maintenance' />
           <meta name='apple-mobile-web-app-capable' content='yes' />
+          <meta name='description' content='Newtelco Maintenance Management' />
+          <meta name='format-detection' content='telephone=no' />
+          <meta name='mobile-web-app-capable' content='yes' />
+          <meta name='msapplication-TileColor' content='#67b246' />
+          <meta name='msapplication-tap-highlight' content='no' />
+          <meta name='theme-color' content='#eaeaea' />
           <meta
             name='apple-mobile-web-app-status-bar-style'
             content='default'
@@ -62,12 +57,6 @@ const App = ({ Component, pageProps }) => {
             name='apple-mobile-web-app-title'
             content='Newtelco Maintenance'
           />
-          <meta name='description' content='Newtelco Maintenance Management' />
-          <meta name='format-detection' content='telephone=no' />
-          <meta name='mobile-web-app-capable' content='yes' />
-          <meta name='msapplication-TileColor' content='#67b246' />
-          <meta name='msapplication-tap-highlight' content='no' />
-          <meta name='theme-color' content='#eaeaea' />
           <meta
             name='viewport'
             content='minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no, user-scalable=no, viewport-fit=cover'

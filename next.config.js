@@ -2,7 +2,7 @@ const { parsed: localEnv } = require('dotenv').config({ path: './.env' })
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
 })
-const dev = process.env.NEXT_PUBLIC_ENV === 'development'
+const dev = process.env.NODE_ENV === 'development'
 const path = require('path')
 const webpack = require('webpack')
 const withCSS = require('@zeit/next-css')
@@ -35,14 +35,6 @@ const nextConfig = {
   pwa: {
     dest: 'public',
     disable: dev,
-    // register: true
-    // scope: '/',
-    // sw: 'sw.js',
-    // modifyURLPrefix: {
-    //   '.next': '/_next'
-    // }
-    // clientsClaim: true,
-    // skipWaiting: true,
     runtimeCaching: [
       {
         urlPattern: /api/i,
