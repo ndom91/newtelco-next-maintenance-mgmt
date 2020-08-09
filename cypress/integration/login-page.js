@@ -6,7 +6,7 @@ module.exports = (on, config) => {
 
 describe('Login page', () => {
 	before(() => {
-		cy.log(`Visiting http://localhost:3000/auth/signin`)
+		cy.log(`Visiting ${Cypress.env('NEXTAUTH_URL')}/auth/signin`)
 		cy.clearCookies()
 		cy.clearLocalStorage()
 		cy.visit('/auth/signin')
