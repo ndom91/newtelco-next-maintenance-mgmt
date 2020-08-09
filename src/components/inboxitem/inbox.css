@@ -1,3 +1,7 @@
+.mail-wrapper-panel > .rs-panel-body {
+  padding: 5px;
+}
+
 .mail-wrapper {
   display: flex;
   justify-content: space-around;
@@ -22,6 +26,7 @@
   display: flex;
   justify-content: flex-start;
   margin-left: 10px;
+  padding: 0 10px;
 }
 
 .mail-body {
@@ -31,7 +36,7 @@
 
 .mail-body::-webkit-scrollbar-track {
   border-radius: 10px;
-  background-color: rgba(0,0,0,0);
+  background-color: rgba(0, 0, 0, 0);
 }
 .mail-body::-webkit-scrollbar {
   width: 8px;
@@ -40,7 +45,7 @@
 }
 .mail-body::-webkit-scrollbar-thumb {
   border-radius: 10px;
-  background-color: rgba(0,0,0,0.4);
+  background-color: rgba(0, 0, 0, 0.4);
 }
 
 .modal-textbox {
@@ -49,10 +54,6 @@
 
 .modal-textbox input:hover {
   cursor: default;
-}
-
-.rs-list-item-content .rs-panel-body {
-  padding: 10px;
 }
 
 .rs-list-item-content .rs-btn.rs-btn-icon {

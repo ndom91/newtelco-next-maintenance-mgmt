@@ -604,7 +604,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
     }
     const HtmlBody = generateMail(customerCID)
     const subject = generateMailSubject()
-    sendMail(recipient, customerCID, subject, HtmlBody, false)
+    sendMail(recipient, customerCID, subject, HtmlBody, false, false)
   }
 
   // generate Mail contents

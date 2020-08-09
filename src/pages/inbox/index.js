@@ -36,7 +36,7 @@ const Inbox = ({ session, inboxItems }) => {
     {
       refreshInterval: 30000,
       focusThrottleInterval: 10000,
-      initialData: inboxItems,
+      initialData: inboxMails,
     }
   )
 
