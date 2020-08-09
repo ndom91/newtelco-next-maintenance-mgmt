@@ -189,7 +189,17 @@ const Companies = props => {
 
   const Header = () => {
     return (
-      <FlexboxGrid justify='end' align='middle'>
+      <FlexboxGrid
+        justify='space-between'
+        align='middle'
+        style={{ marginBottom: '20px' }}
+      >
+        <FlexboxGrid.Item>
+          <p style={{ fontFamily: 'var(--font-body)', fontWeight: 100 }}>
+            These are the companies you can select not only as the supplier, but
+            also assign as customer to a CID later on.
+          </p>
+        </FlexboxGrid.Item>
         <FlexboxGrid.Item>
           <ButtonGroup>
             <IconButton
@@ -244,6 +254,7 @@ const Companies = props => {
           show={openCompanyModal}
           size='xs'
           onHide={toggleCompanyAdd}
+          className='add-modal-wrapper'
         >
           <Modal.Header>New Company</Modal.Header>
           <Modal.Body style={{ paddingBottom: '0px' }}>

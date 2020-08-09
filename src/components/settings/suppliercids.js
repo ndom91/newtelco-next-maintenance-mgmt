@@ -194,7 +194,17 @@ const SupplierCIDs = props => {
 
   const Header = () => {
     return (
-      <FlexboxGrid justify='end' align='middle'>
+      <FlexboxGrid
+        justify='space-between'
+        align='middle'
+        style={{ marginBottom: '20px' }}
+      >
+        <FlexboxGrid.Item>
+          <p style={{ fontFamily: 'var(--font-body)', fontWeight: 100 }}>
+            These are the CIDs which must be assigned to a company and can be
+            chosen from the dropdown in the edit form.
+          </p>
+        </FlexboxGrid.Item>
         <FlexboxGrid.Item>
           <ButtonGroup>
             <IconButton
@@ -261,6 +271,7 @@ const SupplierCIDs = props => {
           show={openSupplierCidAdd}
           size='xs'
           onHide={toggleSupplierCidAdd}
+          className='add-supplier-modal'
         >
           <Modal.Header>New Supplier CID</Modal.Header>
           <Modal.Body style={{ overflow: 'visible', paddingBottom: '0px' }}>

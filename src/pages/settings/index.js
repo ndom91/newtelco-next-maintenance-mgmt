@@ -8,7 +8,6 @@ import Companies from '@/newtelco/settings/companies'
 import CustomerCIDs from '@/newtelco/settings/customercids'
 import SupplierCIDs from '@/newtelco/settings/suppliercids'
 import Freeze from '@/newtelco/settings/freeze'
-// import Templates from '@/newtelco/settings/templates'
 import MaintPanel from '@/newtelco/panel'
 import './settings.css'
 import { Nav, FlexboxGrid } from 'rsuite'
@@ -24,13 +23,6 @@ const Settings = ({ session, router }) => {
             <a>Companies</a>
           </Link>
         </Nav.Item>
-        <Nav.Item componentClass='div' active={tab === 'customercids'}>
-          <Link
-            href={{ pathname: '/settings', query: { tab: 'customercids' } }}
-          >
-            <a>Customer CIDs</a>
-          </Link>
-        </Nav.Item>
         <Nav.Item componentClass='div' active={tab === 'suppliercids'}>
           <Link
             href={{ pathname: '/settings', query: { tab: 'suppliercids' } }}
@@ -38,12 +30,18 @@ const Settings = ({ session, router }) => {
             <a>Supplier CIDs</a>
           </Link>
         </Nav.Item>
+        <Nav.Item componentClass='div' active={tab === 'customercids'}>
+          <Link
+            href={{ pathname: '/settings', query: { tab: 'customercids' } }}
+          >
+            <a>Customer CIDs</a>
+          </Link>
+        </Nav.Item>
         <Nav.Item componentClass='div' active={tab === 'freeze'}>
           <Link href={{ pathname: '/settings', query: { tab: 'freeze' } }}>
             <a>Freeze</a>
           </Link>
         </Nav.Item>
-        {/* <Nav.Item>Templates</Nav.Item> */}
       </Nav>
     )
   }
@@ -56,7 +54,6 @@ const Settings = ({ session, router }) => {
             {tab === 'companies' && <Companies />}
             {tab === 'customercids' && <CustomerCIDs />}
             {tab === 'suppliercids' && <SupplierCIDs />}
-            {/* {tab === 'templates' && <Templates />} */}
             {tab === 'freeze' && <Freeze />}
           </FlexboxGrid>
         </MaintPanel>

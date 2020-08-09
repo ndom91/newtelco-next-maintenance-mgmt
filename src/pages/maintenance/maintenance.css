@@ -235,3 +235,46 @@ textarea::-webkit-scrollbar-thumb,
 .copy-btn:hover {
   cursor: pointer;
 }
+
+.ExcelTable2007 {
+  border: 1px solid #67b246;
+  border-width: 1px 0px 0px 1px;
+  font-size: 11pt;
+  font-family: Calibri;
+  font-weight: 100;
+  border-spacing: 0px;
+  border-collapse: collapse;
+  padding: 10px;
+}
+
+.ExcelTable2007 TH {
+  font-weight: bold;
+  font-size: 14px;
+  border: 1px solid #67b246;
+  border-width: 0px 1px 1px 0px;
+  height: 17px;
+  line-height: 17px;
+  padding: 2px 10px;
+}
+
+.ExcelTable2007 TD {
+  border: 0px;
+  background-color: white;
+  padding: 2px 5px;
+  border: 1px solid #bcbcbc;
+  border-width: 0px 1px 1px 0px;
+}
+
+.ExcelTable2007 TD B {
+  border: 0px;
+  background-color: white;
+  font-weight: bold;
+}
+
+.ExcelTable2007 TD.heading {
+  text-align: center;
+  border: 1px solid #67b246;
+  border-width: 0px 1px 1px 0px;
+  font-weight: bold;
+  padding: 3px;
+}

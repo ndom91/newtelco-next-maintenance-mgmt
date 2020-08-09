@@ -13,7 +13,6 @@ import {
   Form,
   FormGroup,
   ControlLabel,
-  HelpBlock,
   Panel,
   IconButton,
   Button,
@@ -251,7 +250,17 @@ const CustomerCIDs = props => {
 
   const Header = () => {
     return (
-      <FlexboxGrid justify='end' align='middle'>
+      <FlexboxGrid
+        justify='space-between'
+        align='middle'
+        style={{ marginBottom: '20px' }}
+      >
+        <FlexboxGrid.Item>
+          <p style={{ fontFamily: 'var(--font-body)', fontWeight: 100 }}>
+            These are our CIDs which are tied to customers and will be displayed
+            on notification mails.
+          </p>
+        </FlexboxGrid.Item>
         <FlexboxGrid.Item>
           <ButtonGroup>
             <IconButton
@@ -318,6 +327,7 @@ const CustomerCIDs = props => {
           show={openCustomerCidAdd}
           size='xs'
           onHide={toggleCustomerCidAdd}
+          className='add-customer-modal'
         >
           <Modal.Header>New Customer CID</Modal.Header>
           <Modal.Body style={{ overflow: 'visible', paddingBottom: '0px' }}>

@@ -41,3 +41,15 @@
   border-radius: 10px;
   background-color: rgba(0, 0, 0, 0.4);
 }
+
+.add-supplier-modal{
+  width: 330px;
+}
+
+.add-customer-modal{
+  width: 330px;
+}
+
+.add-modal .rs-modal {
+  width: 330px;
+}

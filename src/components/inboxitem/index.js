@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import Link from 'next/link'
 import Router from 'next/router'
 import UseAnimations from 'react-useanimations'
+import trash2 from 'react-useanimations/lib/trash2'
 import './inbox.css'
 import {
   Panel,
@@ -142,7 +142,8 @@ const InboxItem = ({ toggle, mail, index, handleDelete }) => {
               }}
               icon={
                 <UseAnimations
-                  animationKey='trash2'
+                  animation={trash2}
+                  strokeColor='var(--grey4)'
                   size={32}
                   style={{
                     color: 'var(--grey4)',
