@@ -59,6 +59,7 @@ const InboxItem = ({ toggle, mail, index, handleDelete }) => {
         <Avatar
           alt='Icon'
           src={faviconUrl || ''}
+          loading={loading}
           size='lg'
           style={{
             backgroundColor: 'transparent',
@@ -82,7 +83,6 @@ const InboxItem = ({ toggle, mail, index, handleDelete }) => {
         <ButtonGroup vertical>
           <Whisper placement='left' speaker={<Tooltip>Read Mail</Tooltip>}>
             <IconButton
-              loading={loading}
               appearance='subtle'
               size='md'
               onClick={() => toggle(mail.id)}

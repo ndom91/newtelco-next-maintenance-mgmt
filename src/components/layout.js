@@ -3,7 +3,6 @@ import Head from 'next/head'
 import MaintHeader from './header'
 import useSWR from 'swr'
 import dynamic from 'next/dynamic'
-import KeyboardShortcuts from './keyboardShortcuts'
 import Store from './store'
 import { Container, Content, Modal, Button, FlexboxGrid } from 'rsuite'
 
@@ -52,19 +51,17 @@ const Layout = ({ children }) => {
       <Head>
         <style>{style}</style>
       </Head>
-      <KeyboardShortcuts>
-        <UnreadFavicon count={store.get('count')} />
-        <Container>
-          <MaintHeader unread={store.get('count')} />
-          <Content>
-            <FlexboxGrid justify='center'>
-              <FlexboxGrid.Item colspan={23} style={{ marginTop: '20px' }}>
-                {children}
-              </FlexboxGrid.Item>
-            </FlexboxGrid>
-          </Content>
-        </Container>
-      </KeyboardShortcuts>
+      <UnreadFavicon count={store.get('count')} />
+      <Container>
+        <MaintHeader unread={store.get('count')} />
+        <Content>
+          <FlexboxGrid justify='center'>
+            <FlexboxGrid.Item colspan={23} style={{ marginTop: '20px' }}>
+              {children}
+            </FlexboxGrid.Item>
+          </FlexboxGrid>
+        </Content>
+      </Container>
     </div>
   )
 }
