@@ -85,6 +85,7 @@ const InboxItem = ({ toggle, mail, index, handleDelete }) => {
             <IconButton
               appearance='subtle'
               size='md'
+              style={{ justifyContent: 'start' }}
               onClick={() => toggle(mail.id)}
               icon={
                 <svg
@@ -110,7 +111,7 @@ const InboxItem = ({ toggle, mail, index, handleDelete }) => {
               style={{
                 flexDirection: 'column',
                 justifyContent: 'center',
-                alignItems: 'center',
+                alignItems: 'start',
                 display: 'flex',
               }}
               icon={
@@ -137,14 +138,16 @@ const InboxItem = ({ toggle, mail, index, handleDelete }) => {
               style={{
                 flexDirection: 'column',
                 justifyContent: 'center',
-                alignItems: 'center',
+                alignItems: 'start',
                 display: 'flex',
+                padding: '4px',
+                paddingLeft: '12px',
               }}
               icon={
                 <UseAnimations
                   animation={trash2}
                   strokeColor='var(--grey4)'
-                  size={32}
+                  size={28}
                   style={{
                     color: 'var(--grey4)',
                     cursor: 'pointer',
