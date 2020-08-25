@@ -783,16 +783,15 @@ const Maintenance = ({ session, serverData, suppliers }) => {
         const statusText = data.response.statusText
 
         if (status === 200 && statusText === 'OK') {
-          const activeRowIndex = customerCids.findIndex(
+          const activeCustomer = customerCids.find(
             el => el.kundenCID === customerCid
           )
-          const kundenCidRow = customerCids[activeRowIndex]
           if (maintenance.cancelled === true && maintenance.done === true) {
-            kundenCidRow.sent = 2
+            activeCustomer.sent = 2
           } else {
-            kundenCidRow.sent = 1
+            activeCustomer.sent = 1
           }
-          const updatedKundenCids = [...customerCids, kundenCidRow]
+          const updatedKundenCids = [...customerCids, activeCustomer]
           const deduplicatedKundenCids = getUnique(
             updatedKundenCids,
             'kundenCID'
@@ -810,7 +809,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
           const maintId = maintenance.id
           const user = session.user.email
           const action = 'sent to'
-          const field = kundenCidRow.name
+          const field = activeCustomer.name
           updateSentProgress()
           fetch(
             `/api/history?mid=${maintId}&user=${user}&field=${field}&action=${action}`,
