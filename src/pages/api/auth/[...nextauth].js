@@ -2,12 +2,6 @@ import 'dotenv/config'
 import NextAuth from 'next-auth'
 import Providers from 'next-auth/providers'
 
-const database = {
-  type: 'sqlite',
-  database: ':memory:',
-  synchronize: true,
-}
-
 const options = {
   site: process.env.SITE,
   providers: [
@@ -26,22 +20,7 @@ const options = {
   jwt: {
     secret: 'aLjPYy0Xk3YJn5AGmyv9gcSYJa60nKP5Qf86i9oPpckiMTCksHNrNaCodjLauB8T',
   },
-  /* callbacks: { */
-  /* 	signin: async (profile, account, metadata) => { */
-  /* 		// console.log(profile, account, metadata) */
-  /* 	}, */
-  /* }, */
-  /* cookies: { */
-  /* 	callbackUrl: { */
-  /* 		name: `__Secure-next-auth.callback-url`, */
-  /* 		options: { */
-  /* 			sameSite: 'lax', */
-  /* 			path: '/', */
-  /* 			secure: true, */
-  /* 		}, */
-  /* 	}, */
-  /* }, */
-  debug: true,
+  debug: false,
 }
 
 export default (req, res) => NextAuth(req, res, options)
