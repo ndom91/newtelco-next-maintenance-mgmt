@@ -8,7 +8,7 @@ module.exports = async (req, res) => {
     companies.id, companies.name 
     FROM companies 
     WHERE companies.mailDomain 
-    LIKE ${mailDomain}
+    LIKE %${mailDomain}%
   `)
   res.status(200).json({ companyResults })
 }
