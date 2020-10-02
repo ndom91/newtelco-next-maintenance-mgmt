@@ -37,17 +37,24 @@ const BarChart = () => {
           data={Users}
           keys={['value']}
           indexBy='person'
-          colors={{ scheme: 'yellow_green' }}
+          colors={{ scheme: 'greens' }}
           colorBy='index'
           enableGridX={false}
           enableGridY={false}
           axisBottom={false}
           padding={0.3}
-          labelTextColor={{ from: 'color', modifiers: [['darker', 1.4]] }}
-          isInteractive={false}
+          labelTextColor={{ from: 'color', modifiers: [['darker', 2.0]] }}
+          isInteractive={true}
           animate
           motionStiffness={170}
           motionDamping={26}
+          borderRadius={3}
+          borderWidth={0}
+          tooltip={({ id, value, data, color }) => (
+            <strong style={{ color }}>
+              {data.person}: {value} maintenances
+            </strong>
+          )}
         />
       </Panel>
     )
