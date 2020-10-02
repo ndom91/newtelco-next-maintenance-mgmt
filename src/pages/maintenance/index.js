@@ -781,45 +781,48 @@ const Maintenance = ({ session, serverData, suppliers }) => {
       .then(data => {
         const status = data.response.status
         const statusText = data.response.statusText
+        console.log(customerCid, customerCids)
 
         if (status === 200 && statusText === 'OK') {
-          const activeCustomer = customerCids.find(
-            el => el.kundenCID === customerCid
-          )
-          if (maintenance.cancelled === true && maintenance.done === true) {
-            activeCustomer.sent = 2
-          } else {
-            activeCustomer.sent = 1
-          }
-          const updatedKundenCids = [...customerCids, activeCustomer]
-          const deduplicatedKundenCids = getUnique(
-            updatedKundenCids,
-            'kundenCID'
-          )
-          setCustomerCids(deduplicatedKundenCids)
+          updateSentProgress()
           if (!isFromSendAll) {
             Notify('success', 'Mail Sent')
           }
-          if (isFromPreview) {
-            setOpenPreviewModal(!openPreviewModal)
-          }
-          if (gridApi.current) {
-            gridApi.current.refreshCells()
-          }
-          const maintId = maintenance.id
-          const user = session.user.email
-          const action = 'sent to'
-          const field = activeCustomer.name
-          updateSentProgress()
-          fetch(
-            `/api/history?mid=${maintId}&user=${user}&field=${field}&action=${action}`,
-            {
-              method: 'get',
-            }
+          const activeCustomer = customerCids.find(
+            el => el.kundenCID === customerCid
           )
-            .then(resp => resp.json())
-            .then(data => {})
-            .catch(err => console.error(`Error updating Audit Log - ${err}`))
+          if (activeCustomer) {
+            if (maintenance.cancelled === true && maintenance.done === true) {
+              activeCustomer.sent = 2
+            } else {
+              activeCustomer.sent = 1
+            }
+            const updatedKundenCids = [...customerCids, activeCustomer]
+            const deduplicatedKundenCids = getUnique(
+              updatedKundenCids,
+              'kundenCID'
+            )
+            setCustomerCids(deduplicatedKundenCids)
+            if (isFromPreview) {
+              setOpenPreviewModal(!openPreviewModal)
+            }
+            if (gridApi.current) {
+              gridApi.current.refreshCells()
+            }
+            const maintId = maintenance.id
+            const user = session.user.email
+            const action = 'sent to'
+            const field = activeCustomer.name
+            fetch(
+              `/api/history?mid=${maintId}&user=${user}&field=${field}&action=${action}`,
+              {
+                method: 'get',
+              }
+            )
+              .then(resp => resp.json())
+              .then(data => {})
+              .catch(err => console.error(`Error updating Audit Log - ${err}`))
+          }
         } else {
           Notify('error', 'Error Sending Mail')
           if (isFromPreview) {
