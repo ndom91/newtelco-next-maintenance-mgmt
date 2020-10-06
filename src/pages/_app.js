@@ -18,7 +18,7 @@ const App = ({ Component, pageProps }) => {
   useEffect(() => {
     if (typeof window !== 'undefined' && session) {
       LogRocket.init('ui2vht/next-maintenance')
-      LogRocket.identify(session.user.id, {
+      LogRocket.identify(session.user.email, {
         name: session.user.name,
         email: session.user.email,
       })
