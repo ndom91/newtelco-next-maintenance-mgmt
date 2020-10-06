@@ -15,15 +15,18 @@ const App = ({ Component, pageProps }) => {
   const { session } = pageProps
 
   useEffect(() => {
-    if (process.env.NEXT_PUBLIC_ENV === 'production') {
-      if (typeof window !== 'undefined' && session) {
-        LogRocket.init('ui2vht/next-maintenance')
-        LogRocket.identify(session.user.id, {
-          name: session.user.name,
-          email: session.user.email,
-        })
-      }
+    if (
+      process.env.NEXT_PUBLIC_ENV === 'production' &&
+      typeof window !== 'undefined' &&
+      session
+    ) {
+      LogRocket.init('ui2vht/next-maintenance')
+      LogRocket.identify(session.user.id, {
+        name: session.user.name,
+        email: session.user.email,
+      })
     }
+    console.log('Logrocket Initialized')
   }, [])
 
   return (
