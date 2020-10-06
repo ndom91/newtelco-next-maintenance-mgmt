@@ -27,8 +27,8 @@ const App = ({ Component, pageProps }) => {
         email: session.user.email,
       })
       setupLogRocketReact(LogRocket)
+      console.log('Logrocket Initialized')
     }
-    console.log('Logrocket Initialized')
   }, [])
 
   return (
