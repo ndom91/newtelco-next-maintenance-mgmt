@@ -16,12 +16,7 @@ const App = ({ Component, pageProps }) => {
   const { session } = pageProps
 
   useEffect(() => {
-    console.log(process.env.NEXT_PUBLIC_ENV, typeof window, session)
-    if (
-      process.env.NEXT_PUBLIC_ENV === 'production' &&
-      typeof window !== 'undefined' &&
-      session
-    ) {
+    if (typeof window !== 'undefined' && session) {
       LogRocket.init('ui2vht/next-maintenance')
       LogRocket.identify(session.user.id, {
         name: session.user.name,
