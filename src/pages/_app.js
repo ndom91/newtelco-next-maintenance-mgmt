@@ -7,6 +7,7 @@ import ErrorBoundary from '@/newtelco/errorboundary'
 import Store from '@/newtelco/store'
 import { Provider } from 'next-auth/client'
 const LogRocket = require('logrocket')
+const setupLogRocketReact = require('logrocket-react')
 
 const App = ({ Component, pageProps }) => {
   const ConditionalWrap = ({ condition, wrap, children }) =>
@@ -25,6 +26,7 @@ const App = ({ Component, pageProps }) => {
         name: session.user.name,
         email: session.user.email,
       })
+      setupLogRocketReact(LogRocket)
     }
     console.log('Logrocket Initialized')
   }, [])
