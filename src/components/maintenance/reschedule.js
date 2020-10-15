@@ -412,7 +412,7 @@ const RescheduleGrid = ({ maintId, user, handleCalendarUpdate }) => {
               pagination
               onCellEditingStopped={handleRescheduleCellEdit}
               animateRows
-              deltaRowDataMode
+              immutableData
               getRowNodeId={data => {
                 return data.rcounter
               }}

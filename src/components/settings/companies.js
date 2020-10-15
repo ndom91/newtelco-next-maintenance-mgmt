@@ -241,7 +241,7 @@ const Companies = props => {
             onCellEditingStopped={handleCellEdit}
             animateRows
             stopEditingWhenGridLosesFocus
-            deltaRowDataMode
+            immutableData
             getRowNodeId={data => {
               return data.id
             }}

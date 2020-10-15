@@ -302,7 +302,7 @@ const CustomerCIDs = props => {
               rowData={rowData}
               onCellEditingStopped={handleCellEdit}
               animateRows
-              deltaRowDataMode
+              immutableData
               getRowNodeId={data => {
                 return data.id
               }}

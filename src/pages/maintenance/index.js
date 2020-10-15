@@ -2011,7 +2011,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                                       rowData={customerCids}
                                       onGridReady={handleGridReady}
                                       pagination
-                                      deltaRowDataMode
+                                      immutableData
                                       getRowNodeId={data => {
                                         return data.kundenCID
                                       }}

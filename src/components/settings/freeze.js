@@ -290,7 +290,7 @@ const Freeze = props => {
             onCellEditingStopped={handleCellEdit}
             rowData={rowData}
             stopEditingWhenGridLosesFocus
-            deltaRowDataMode
+            immutableData
             getRowNodeId={data => {
               return data.id
             }}
