@@ -51,7 +51,7 @@
     "logrocket": "^1.0.10",
     "logrocket-react": "^4.0.1",
     "moment-timezone": "^0.5.31",
-    "next": "^9.5.1",
+    "next": "^10.0.0",
     "next-auth": "^3.1.0",
     "next-pwa": "^3.1.1",
     "react": "^16.13.1",
