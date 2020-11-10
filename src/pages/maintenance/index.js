@@ -781,7 +781,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
       .then(data => {
         const status = data.response.status
         const statusText = data.response.statusText
-        console.log(customerCid, customerCids)
+        // console.log(customerCid, customerCids)
 
         if (status === 200 && statusText === 'OK') {
           updateSentProgress()

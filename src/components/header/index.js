@@ -131,7 +131,7 @@ const MaintHeader = () => {
                   size='md'
                   circle
                   src={avatarPath}
-                  style={{ border: '2px solid #67b246' }}
+                  style={{ border: '1px solid #67b246' }}
                 />
               }
             >

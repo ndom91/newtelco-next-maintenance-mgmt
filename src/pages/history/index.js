@@ -22,7 +22,6 @@ import MaintPanel from '@/newtelco/panel'
 import Notify from '@/newtelco-utils/notification'
 import ConfirmModal from '@/newtelco/confirmmodal'
 import {
-  Icon,
   IconButton,
   ButtonGroup,
   FlexboxGrid,
@@ -72,6 +71,7 @@ const History = ({ session, data }) => {
       {
         headerName: 'Supplier',
         field: 'name',
+        width: 240,
         cellRenderer: 'supplier',
         cellStyle: params => {
           return {

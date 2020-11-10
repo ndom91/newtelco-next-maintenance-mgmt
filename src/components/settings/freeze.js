@@ -3,9 +3,9 @@ import { AgGridReact } from 'ag-grid-react'
 import Select from 'react-select'
 import StartDateTime from '@/newtelco/ag-grid/startdatetime'
 import EndDateTime from '@/newtelco/ag-grid/enddatetime'
-// import Flatpickr from 'react-flatpickr'
+import Flatpickr from 'react-flatpickr'
+import 'flatpickr/dist/themes/airbnb.css'
 import moment from 'moment-timezone'
-import 'flatpickr/dist/themes/material_blue.css'
 import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-material.css'
 import Notify from '@/newtelco-utils/notification'
@@ -23,7 +23,6 @@ import {
   Input,
   ControlLabel,
   HelpBlock,
-  DatePicker,
   Loader,
 } from 'rsuite'
 
@@ -210,6 +209,12 @@ const Freeze = props => {
         })
         setRowData(newRowData)
         setOpenFreezeAdd(!openFreezeAdd)
+        setNewCompany({
+          value: '',
+          label: '',
+        })
+        setNewStartDateTime()
+        setNewEndDateTime()
         gridApi.current.setRowData(newRowData)
       })
       .catch(err => console.error(err))
@@ -339,22 +344,30 @@ const Freeze = props => {
                   </FormGroup>
                   <FormGroup>
                     <ControlLabel>Start Date/Time (in GMT)</ControlLabel>
-                    <DatePicker
-                      style={{ width: '300px' }}
-                      hideSeconds
-                      format='YYYY-MM-DD HH:mm'
-                      value={newStartDateTime || null}
-                      onChange={date => handleNewStartChange(date)}
+                    <Flatpickr
+                      value={newStartDateTime}
+                      data-enable-time
+                      weekNumbers
+                      className='flatpickr'
+                      onChange={handleNewStartChange}
+                      options={{
+                        time_24hr: 'true',
+                        allow_input: 'true',
+                      }}
                     />
                   </FormGroup>
                   <FormGroup>
                     <ControlLabel>End Date/Time (in GMT)</ControlLabel>
-                    <DatePicker
-                      style={{ width: '300px' }}
-                      hideSeconds
-                      format='YYYY-MM-DD HH:mm'
-                      value={newEndDateTime || null}
-                      onChange={date => handleNewEndChange(date)}
+                    <Flatpickr
+                      value={newEndDateTime}
+                      data-enable-time
+                      weekNumbers
+                      className='flatpickr'
+                      onChange={handleNewEndChange}
+                      options={{
+                        time_24hr: 'true',
+                        allow_input: 'true',
+                      }}
                     />
                   </FormGroup>
                   <FormGroup>
