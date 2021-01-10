@@ -9,8 +9,8 @@ import {
   Divider,
   Input,
   IconButton,
-  Icon,
 } from 'rsuite'
+import { Icon } from '@rsuite/icons'
 
 const CommentList = ({ user, id, initialComment }) => {
   const store = Store.useStore()
@@ -151,7 +151,7 @@ const CommentList = ({ user, id, initialComment }) => {
           <FlexboxGrid.Item colspan={4} style={{ marginLeft: '5px' }}>
             <IconButton
               style={{ width: '100%', minWidth: '100px' }}
-              icon={<Icon icon='send' />}
+              icon={<Icon as='send' />}
               onClick={submitComment}
             >
               Submit

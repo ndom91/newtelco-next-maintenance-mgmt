@@ -1,5 +1,6 @@
 import React from 'react'
-import { Icon, Badget } from 'rsuite'
+import { Badget } from 'rsuite'
+import { Icon } from '@rsuite/icons'
 
 const SentIcon = ({ node }) => {
   const { sent } = node.data
@@ -11,7 +12,7 @@ const SentIcon = ({ node }) => {
           <Icon
             style={{ color: 'var(--primary)' }}
             size='lg'
-            icon='check-circle'
+            as='check-circle'
           />
         </Badge>
       </div>
@@ -22,14 +23,14 @@ const SentIcon = ({ node }) => {
         <Icon
           style={{ color: 'var(--primary)' }}
           size='lg'
-          icon='check-circle'
+          as='check-circle'
         />
       </div>
     )
   } else {
     return (
       <div style={{ width: '32px', height: '40px' }}>
-        <Icon size='lg' icon='warning' />
+        <Icon size='lg' as='warning' />
       </div>
     )
   }

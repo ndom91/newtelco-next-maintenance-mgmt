@@ -1,5 +1,6 @@
 import React from 'react'
-import { ButtonGroup, IconButton, Icon } from 'rsuite'
+import { ButtonGroup, IconButton } from 'rsuite'
+import { Icon } from '@rsuite/icons'
 
 const sendMailBtns = props => {
   return (
@@ -15,7 +16,7 @@ const sendMailBtns = props => {
         }
         size='sm'
         appearance='ghost'
-        icon={<Icon icon='send' />}
+        icon={<Icon as='send' />}
       />
       <IconButton
         onClick={() =>
@@ -27,7 +28,7 @@ const sendMailBtns = props => {
         }
         size='sm'
         appearance='ghost'
-        icon={<Icon icon='search' />}
+        icon={<Icon as='search' />}
       />
     </ButtonGroup>
   )

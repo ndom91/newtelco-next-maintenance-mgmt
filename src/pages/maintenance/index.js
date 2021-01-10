@@ -31,8 +31,8 @@ import debounce from 'just-debounce-it'
 import objDiff from '@/newtelco-utils/objdiff'
 import RescheduleGrid from '@/newtelco/maintenance/reschedule'
 
+import { Icon } from '@rsuite/icons'
 import {
-  Icon,
   FormGroup,
   Input,
   ControlLabel,
@@ -292,7 +292,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
           }
           size='sm'
           appearance='ghost'
-          icon={<Icon icon='send' />}
+          icon={<Icon as='send' />}
         />
         <IconButton
           onClick={() =>
@@ -300,7 +300,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
           }
           size='sm'
           appearance='ghost'
-          icon={<Icon icon='search' />}
+          icon={<Icon as='search' />}
         />
       </ButtonGroup>
     )
@@ -1780,7 +1780,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                                         )
                                       }
                                       size='sm'
-                                      icon={<Icon icon='clock-o' />}
+                                      icon={<Icon as='clock-o' />}
                                     />
                                   </Whisper>
                                   <Whisper
@@ -1800,7 +1800,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                                         )
                                       }
                                       size='sm'
-                                      icon={<Icon icon='history' />}
+                                      icon={<Icon as='history' />}
                                     />
                                   </Whisper>
                                 </ButtonGroup>
@@ -1894,7 +1894,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                               <Field
                                 name='cancelled'
                                 component={MyToggle}
-                                checkedChildren={<Icon icon='ban' inverse />}
+                                checkedChildren={<Icon as='ban' inverse />}
                               />
                             </FormGroup>
                           </Col>
@@ -1917,7 +1917,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                                 name='emergency'
                                 component={MyToggle}
                                 checkedChildren={
-                                  <Icon icon='hospital-o' inverse />
+                                  <Icon as='hospital-o' inverse />
                                 }
                               />
                             </FormGroup>
@@ -1940,7 +1940,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                               <Field
                                 name='done'
                                 component={MyToggle}
-                                checkedChildren={<Icon icon='check' inverse />}
+                                checkedChildren={<Icon as='check' inverse />}
                               />
                             </FormGroup>
                           </Col>

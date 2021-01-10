@@ -22,7 +22,6 @@ import {
   FlexboxGrid,
   Whisper,
   Tooltip,
-  Icon,
   Loader,
   IconButton,
   FormGroup,
@@ -33,6 +32,7 @@ import {
   Input,
   Form,
 } from 'rsuite'
+import { Icon } from '@rsuite/icons'
 
 const rescheduleReasons = [
   {
@@ -388,7 +388,7 @@ const RescheduleGrid = ({ maintId, user, handleCalendarUpdate }) => {
               <IconButton
                 appearance='ghost'
                 onClick={() => setOpenRescheduleModal(!openRescheduleModal)}
-                icon={<Icon icon='clock-o' />}
+                icon={<Icon as='clock-o' />}
               >
                 Reschedule
               </IconButton>

@@ -7,7 +7,8 @@ import { getSession } from 'next-auth/client'
 import MaintPanel from '@/newtelco/panel'
 import UnreadBadge from '@/newtelco/unread'
 import Store from '@/newtelco/store'
-import { Loader, Panel, Icon } from 'rsuite'
+import { Loader, Panel } from 'rsuite'
+import { Icon } from '@rsuite/icons'
 import './style/index.css'
 
 const AreaChart = dynamic(() => import('../components/homepage/areachart'), {
@@ -19,7 +20,7 @@ const AreaChart = dynamic(() => import('../components/homepage/areachart'), {
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
           Completed
           <Icon
-            icon='bar-chart'
+            as='bar-chart'
             style={{ color: 'var(--primary)' }}
             size='lg'
           />

@@ -12,7 +12,6 @@ import {
   Modal,
   Avatar,
   IconButton,
-  Icon,
   Input,
   InputGroup,
   Whisper,
@@ -20,6 +19,7 @@ import {
   FlexboxGrid,
   Loader,
 } from 'rsuite'
+import { Icon } from '@rsuite/icons'
 
 const Inbox = ({ session, inboxItems }) => {
   const store = Store.useStore()
@@ -261,7 +261,7 @@ const Inbox = ({ session, inboxItems }) => {
                       appearance='default'
                       style={{ color: 'var(--grey3)' }}
                       size='lg'
-                      icon={<Icon icon='globe' />}
+                      icon={<Icon as='globe' />}
                     />
                   </Whisper>
                 </FlexboxGrid.Item>
@@ -285,7 +285,7 @@ const Inbox = ({ session, inboxItems }) => {
 export async function getServerSideProps({ req }) {
   const host = req ? req.headers['x-forwarded-host'] : window.location.hostname
   let protocol = 'https:'
-  if (host.indexOf('localhost') > -1) {
+  if (host?.indexOf('localhost') > -1) {
     protocol = 'http:'
   }
   const res = await fetch(`${protocol}//${host}/v1/api/inbox`)

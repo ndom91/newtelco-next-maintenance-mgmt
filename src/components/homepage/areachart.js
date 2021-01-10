@@ -1,7 +1,8 @@
 import React from 'react'
 import useSWR from 'swr'
 import Chart from 'react-apexcharts'
-import { Panel, Icon, Loader } from 'rsuite'
+import { Panel, Loader } from 'rsuite'
+import { Icon } from '@rsuite/icons'
 
 const options = {
   chart: {
@@ -99,7 +100,7 @@ const AreaChart = () => {
         header={
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             Completed
-            <Icon icon='tasks' style={{ color: 'var(--primary)' }} size='lg' />
+            <Icon as='tasks' style={{ color: 'var(--primary)' }} size='lg' />
           </div>
         }
         style={{ height: '100%' }}
@@ -121,7 +122,7 @@ const AreaChart = () => {
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             Completed
             <Icon
-              icon='bar-chart'
+              as='bar-chart'
               style={{ color: 'var(--primary)' }}
               size='lg'
             />

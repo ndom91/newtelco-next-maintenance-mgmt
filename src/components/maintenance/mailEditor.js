@@ -9,11 +9,11 @@ import {
   InputGroup,
   Whisper,
   IconButton,
-  Icon,
   Tooltip,
   Placeholder,
   Panel,
 } from 'rsuite'
+import { Icon } from '@rsuite/icons'
 
 const MailEditor = ({
   open,
@@ -95,7 +95,7 @@ const MailEditor = ({
                 appearance='default'
                 style={{ color: 'var(--grey3)' }}
                 size='lg'
-                icon={<Icon icon='send' />}
+                icon={<Icon as='send' />}
               />
             </Whisper>
           </FlexboxGrid.Item>

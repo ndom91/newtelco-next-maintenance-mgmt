@@ -1,7 +1,8 @@
 import React from 'react'
 import useSWR from 'swr'
 import { Bar } from '@nivo/bar'
-import { Panel, Loader, Icon } from 'rsuite'
+import { Panel, Loader } from 'rsuite'
+import { Icon } from '@rsuite/icons'
 
 const BarChart = () => {
   const { data } = useSWR(
@@ -21,7 +22,7 @@ const BarChart = () => {
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             Totals
             <Icon
-              icon='bar-chart'
+              as='bar-chart'
               style={{ color: 'var(--primary)' }}
               size='lg'
             />
@@ -66,7 +67,7 @@ const BarChart = () => {
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             Totals
             <Icon
-              icon='bar-chart'
+              as='bar-chart'
               style={{ color: 'var(--primary)' }}
               size='lg'
             />
