@@ -30,8 +30,6 @@ const Heatmap = () => {
         <div style={{ width: '100%', maxWidth: '1100px', height: '400px' }}>
           <ResponsiveCalendarCanvas
             data={data.maintenances}
-            from='2019-05-09'
-            to='2020-05-09'
             minValue={0}
             maxValue={10}
             emptyColor='#eeeeee'
@@ -47,7 +45,6 @@ const Heatmap = () => {
     )
   } else {
     return (
-      // <div style={{ height: '492px', width: '1200px', maxWidth: '1300px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
       <Panel
         bordered
         header={

@@ -5,7 +5,7 @@ module.exports = async (req, res) => {
   const maintenances = await db.query(escape`
       SELECT COUNT(id) as value, DATE_FORMAT(DATE(maileingang), '%Y-%m-%d') as day
       FROM maintenancedb
-      # WHERE maintenancedb.maileingang >= DATE(CURDATE() - INTERVAL 1 YEAR)
+      WHERE maintenancedb.maileingang >= DATE(CURDATE() - INTERVAL 1 YEAR)
       GROUP BY DATE(maileingang)  
       ORDER BY DATE(maileingang)
       DESC
