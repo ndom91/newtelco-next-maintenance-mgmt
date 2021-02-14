@@ -6,6 +6,7 @@ import PDF from 'react-pdf-js-infinite'
 import Notify from '@/newtelco-utils/notification'
 import { saveAs } from 'file-saver'
 import {
+  Icon,
   Modal,
   FlexboxGrid,
   InputGroup,
@@ -19,7 +20,6 @@ import {
   Tag,
   Tooltip,
 } from 'rsuite'
-import { Icon } from '@rsuite/icons'
 
 const ReadModal = ({
   maintenance,
@@ -417,7 +417,7 @@ const ReadModal = ({
                     >
                       <IconButton
                         size='sm'
-                        icon={<Icon as={fileTypeIcon(attachment.name)} />}
+                        icon={<Icon icon={fileTypeIcon(attachment.name)} />}
                         onClick={() =>
                           showAttachments(attachment.id, attachment.name)
                         }
@@ -487,7 +487,7 @@ const ReadModal = ({
                   colspan={2}
                   style={{ display: 'flex', justifyContent: 'center' }}
                 >
-                  <Icon size='lg' as={fileTypeIcon(currentAttachmentName)} />
+                  <Icon size='lg' icon={fileTypeIcon(currentAttachmentName)} />
                 </FlexboxGrid.Item>
                 <FlexboxGrid.Item
                   colspan={8}

@@ -29,9 +29,17 @@ const MaintHeader = () => {
     if (session.user.image) {
       avatarPath = session.user.image
     } else if (
-      ['alissitsin', 'fwaleska', 'ndomino', 'kmoeller', 'nchachua'].includes(
-        username
-      )
+      [
+        'alissitsin',
+        'fwaleska',
+        'ndomino',
+        'kmoeller',
+        'nchachua',
+        'jskribek',
+        'sstergiou',
+        'nsaldadze',
+        'kkoester',
+      ].includes(username)
     ) {
       avatarPath = `/static/images/avatars/${username}.png`
     } else {
@@ -144,8 +152,7 @@ const MaintHeader = () => {
                   {!loading && session.user.email.match(/^([^@]*)@/)[1]}
                 </strong>
               </Dropdown.Item>
-              <Dropdown.Item divider />
-              <Dropdown.Item eventKey='1'>
+              {/* <Dropdown.Item eventKey='1'>
                 <span
                   onClick={toggleDark}
                   className='night-wrapper'
@@ -187,7 +194,7 @@ const MaintHeader = () => {
                   </svg>
                 </span>
                 Night
-              </Dropdown.Item>
+              </Dropdown.Item> */}
               <Dropdown.Item divider />
               <NavLink
                 icon={
@@ -208,27 +215,6 @@ const MaintHeader = () => {
                 href={{ pathname: '/settings', query: { tab: 'companies' } }}
               >
                 Settings
-              </NavLink>
-              <NavLink
-                icon={
-                  <svg
-                    height='16'
-                    width='16'
-                    fill='none'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth='2'
-                    viewBox='0 0 24 24'
-                    stroke='currentColor'
-                  >
-                    <path d='M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4' />
-                  </svg>
-                }
-                href='https://newtelco.kampsite.co'
-                target='_blank'
-                external
-              >
-                Requests
               </NavLink>
               <NavLink
                 eventKey='2'

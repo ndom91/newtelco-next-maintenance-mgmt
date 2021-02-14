@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import format from 'date-fns/format'
-import { Loader, Timeline } from 'rsuite'
-import { Icon } from '@rsuite/icons'
+import { Loader, Timeline, Icon } from 'rsuite'
 
 const Changelog = ({ maintId }) => {
   const [fetching, setFetching] = useState(false)
@@ -57,7 +56,7 @@ const Changelog = ({ maintId }) => {
             dot = 'question'
           }
           return (
-            <Timeline.Item key={item.id} dot={<Icon as={dot} />}>
+            <Timeline.Item key={item.id} dot={<Icon icon={dot} />}>
               <p>{format(new Date(item.datetime), 'LLL dd, HH:mm')}</p>
               <p>
                 {item.user} {item.action || ''} {item.field || ''}
