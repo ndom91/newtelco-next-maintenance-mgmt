@@ -31,6 +31,8 @@ const Heatmap = () => {
             data={data.maintenances}
             minValue={0}
             maxValue={10}
+            from={'2020-01-01'}
+            to={'2021-01-01'}
             emptyColor='#eeeeee'
             colors={['#C6E2BA', '#8DC574', '#67B246', '#5A9C3D']}
             margin={{ top: 40, right: 40, bottom: 40, left: 40 }}
