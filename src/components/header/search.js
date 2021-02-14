@@ -4,6 +4,7 @@ import algoliasearch from 'algoliasearch'
 import Autocomplete from 'algolia-react-autocomplete'
 import './search.css'
 import { DOMHelper } from 'rsuite'
+const { addClass, removeClass } = DOMHelper
 
 const SearchInput = props => {
   const searchInput = useRef()
@@ -26,42 +27,18 @@ const SearchInput = props => {
 
   const handleClickOutside = event => {
     if (searchInput && !searchInput.current.contains(event.target)) {
-      DOMHelper.addClass(
-        document.querySelector('.aa-dropdown-menus'),
-        'hide-dropdown'
-      )
-      DOMHelper.removeClass(
-        document.querySelector('.aa-dropdown-menus'),
-        'show-dropdown'
-      )
-      DOMHelper.addClass(
-        document.getElementById('aa-search-input'),
-        'search-small'
-      )
-      DOMHelper.removeClass(
-        document.getElementById('aa-search-input'),
-        'search-large'
-      )
+      addClass(document.querySelector('.aa-dropdown-menus'), 'hide-dropdown')
+      removeClass(document.querySelector('.aa-dropdown-menus'), 'show-dropdown')
+      addClass(document.getElementById('aa-search-input'), 'search-small')
+      removeClass(document.getElementById('aa-search-input'), 'search-large')
     }
   }
 
   const restoreVisibility = () => {
-    DOMHelper.removeClass(
-      document.querySelector('.aa-dropdown-menus'),
-      'hide-dropdown'
-    )
-    DOMHelper.addClass(
-      document.querySelector('.aa-dropdown-menus'),
-      'show-dropdown'
-    )
-    DOMHelper.removeClass(
-      document.getElementById('aa-search-input'),
-      'search-small'
-    )
-    DOMHelper.addClass(
-      document.getElementById('aa-search-input'),
-      'search-large'
-    )
+    removeClass(document.querySelector('.aa-dropdown-menus'), 'hide-dropdown')
+    addClass(document.querySelector('.aa-dropdown-menus'), 'show-dropdown')
+    removeClass(document.getElementById('aa-search-input'), 'search-small')
+    addClass(document.getElementById('aa-search-input'), 'search-large')
   }
 
   const algoliaClient = algoliasearch(

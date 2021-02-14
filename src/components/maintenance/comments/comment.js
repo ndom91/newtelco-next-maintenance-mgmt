@@ -1,6 +1,6 @@
 import React from 'react'
 import NextAuth from 'next-auth/client'
-import { Avatar, FlexboxGrid, Dropdown, IconButton } from 'rsuite'
+import { Avatar, FlexboxGrid, Dropdown, Icon, IconButton } from 'rsuite'
 
 const Comment = ({ data, handleDelete }) => {
   const [session, loading] = NextAuth.useSession()

@@ -155,19 +155,19 @@ const nextConfig = {
   lessLoaderOptions: {
     javascriptEnabled: true,
   },
-  // webpack(config, { isServer, buildId, dev }) {
-  //   config.plugins.push(new webpack.EnvironmentPlugin(localEnv))
-  //   HACK_removeMinimizeOptionFromCssLoaders(config)
-  //   config.stats = {
-  //     warningsFilter: warn => warn.indexOf('Conflicting order between:') > -1,
-  //   }
-  //   // eslint-disable-next-line
-  //   new Dotenv({
-  //     path: path.join(__dirname, '.env'),
-  //     systemvars: true,
-  //   })
-  //   return config
-  // },
+  webpack(config, { isServer, buildId, dev }) {
+    config.plugins.push(new webpack.EnvironmentPlugin(localEnv))
+    HACK_removeMinimizeOptionFromCssLoaders(config)
+    config.stats = {
+      warningsFilter: warn => warn.indexOf('Conflicting order between:') > -1,
+    }
+    // eslint-disable-next-line
+    new Dotenv({
+      path: path.join(__dirname, '.env'),
+      systemvars: true,
+    })
+    return config
+  },
 }
 
 module.exports = withBundleAnalyzer(withPWA(withLess(withCSS(nextConfig))))

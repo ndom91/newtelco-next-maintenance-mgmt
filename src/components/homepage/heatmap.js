@@ -1,7 +1,6 @@
 import React from 'react'
 import useSWR from 'swr'
-import { Panel, Loader } from 'rsuite'
-import { Icon } from '@rsuite/icons'
+import { Panel, Loader, Icon } from 'rsuite'
 import { ResponsiveCalendarCanvas } from '@nivo/calendar'
 
 const Heatmap = () => {
@@ -19,7 +18,7 @@ const Heatmap = () => {
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             Calendar
             <Icon
-              as='calendar-o'
+              icon='calendar-o'
               style={{ color: 'var(--primary)' }}
               size='lg'
             />
@@ -51,7 +50,7 @@ const Heatmap = () => {
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             Calendar
             <Icon
-              as='calendar-o'
+              icon='calendar-o'
               style={{ color: 'var(--primary)' }}
               size='lg'
             />

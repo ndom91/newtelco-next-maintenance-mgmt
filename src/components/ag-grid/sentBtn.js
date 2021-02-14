@@ -1,13 +1,12 @@
 import React from 'react'
-import { IconButton, Dropdown } from 'rsuite'
-import { Icon } from '@rsuite/icons'
+import { Icon, IconButton, Dropdown } from 'rsuite'
 
 const sentBtn = props => {
   return (
     <Dropdown
       renderTitle={() => {
         return (
-          <IconButton appearance='subtle' icon={<Icon as='ellipsis-v' />} />
+          <IconButton appearance='subtle' icon={<Icon icon='ellipsis-v' />} />
         )
       }}
       placement='leftStart'

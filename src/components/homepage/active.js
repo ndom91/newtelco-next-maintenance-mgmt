@@ -8,11 +8,11 @@ import {
   Avatar,
   FlexboxGrid,
   Panel,
+  Icon,
   IconButton,
   Dropdown,
   Tag,
 } from 'rsuite'
-import { Icon } from '@rsuite/icons'
 
 const ActiveMaintenances = () => {
   const { data } = useSWR(
@@ -28,7 +28,7 @@ const ActiveMaintenances = () => {
         header={
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             Active & Upcoming
-            <Icon as='bolt' style={{ color: 'var(--primary)' }} size='lg' />
+            <Icon icon='bolt' style={{ color: 'var(--primary)' }} size='lg' />
           </div>
         }
         style={{ height: '100%' }}
@@ -86,7 +86,7 @@ const ActiveMaintenances = () => {
                             'HH:mm - dd.LL.yyyy'
                           )}
                         </Tag>
-                        <Icon as='page-next' />
+                        <Icon icon='page-next' />
                         <Tag>
                           {format(
                             new Date(item.endDateTime),
@@ -101,7 +101,7 @@ const ActiveMaintenances = () => {
                           return (
                             <IconButton
                               appearance='subtle'
-                              icon={<Icon as='ellipsis-v' />}
+                              icon={<Icon icon='ellipsis-v' />}
                             />
                           )
                         }}
@@ -150,7 +150,7 @@ const ActiveMaintenances = () => {
         header={
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             Active
-            <Icon as='bolt' style={{ color: 'var(--primary)' }} size='lg' />
+            <Icon icon='bolt' style={{ color: 'var(--primary)' }} size='lg' />
           </div>
         }
         style={{ height: '100%' }}

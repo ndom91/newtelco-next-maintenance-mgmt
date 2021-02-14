@@ -15,6 +15,7 @@ import {
   Button,
   IconButton,
   ButtonGroup,
+  Icon,
   Modal,
   FlexboxGrid,
   Form,
@@ -24,7 +25,6 @@ import {
   HelpBlock,
   Loader,
 } from 'rsuite'
-import { Icon } from '@rsuite/icons'
 
 const Freeze = props => {
   const gridApi = useRef()
@@ -258,7 +258,7 @@ const Freeze = props => {
           <ButtonGroup>
             <IconButton
               onClick={toggleFreezeAddModal}
-              icon={<Icon as='plus-circle' />}
+              icon={<Icon icon='plus-circle' />}
               appearance='ghost'
               placement='right'
             >
@@ -266,7 +266,7 @@ const Freeze = props => {
             </IconButton>
             <IconButton
               onClick={toggleFreezeDeleteModal}
-              icon={<Icon as='trash' />}
+              icon={<Icon icon='trash' />}
               appearance='ghost'
               placement='right'
             >

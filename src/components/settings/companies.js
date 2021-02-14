@@ -5,6 +5,7 @@ import 'ag-grid-community/dist/styles/ag-theme-material.css'
 import Notify from '@/newtelco-utils/notification'
 import ConfirmModal from '@/newtelco/confirmmodal'
 import {
+  Icon,
   Button,
   IconButton,
   ButtonGroup,
@@ -18,7 +19,6 @@ import {
   Modal,
   Loader,
 } from 'rsuite'
-import { Icon } from '@rsuite/icons'
 
 const Companies = props => {
   const gridOptions = {
@@ -204,7 +204,7 @@ const Companies = props => {
           <ButtonGroup>
             <IconButton
               onClick={toggleCompanyAdd}
-              icon={<Icon as='plus-circle' />}
+              icon={<Icon icon='plus-circle' />}
               appearance='ghost'
               placement='right'
             >
@@ -212,7 +212,7 @@ const Companies = props => {
             </IconButton>
             <IconButton
               onClick={toggleCompanyDeleteModal}
-              icon={<Icon as='trash' />}
+              icon={<Icon icon='trash' />}
               appearance='ghost'
               placement='right'
             >

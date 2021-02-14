@@ -10,6 +10,7 @@ import {
   Button,
   ButtonGroup,
   IconButton,
+  Icon,
   Form,
   FormGroup,
   Input,
@@ -18,7 +19,6 @@ import {
   ControlLabel,
   Loader,
 } from 'rsuite'
-import { Icon } from '@rsuite/icons'
 
 const SupplierCIDs = props => {
   const gridApi = useRef()
@@ -209,7 +209,7 @@ const SupplierCIDs = props => {
           <ButtonGroup>
             <IconButton
               onClick={toggleSupplierCidAdd}
-              icon={<Icon as='plus-circle' />}
+              icon={<Icon icon='plus-circle' />}
               appearance='ghost'
               placement='right'
             >
@@ -217,7 +217,7 @@ const SupplierCIDs = props => {
             </IconButton>
             <IconButton
               onClick={toggleSupplierCidDeleteModal}
-              icon={<Icon as='trash' />}
+              icon={<Icon icon='trash' />}
               appearance='ghost'
               placement='right'
             >
