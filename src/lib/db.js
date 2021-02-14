@@ -1,6 +1,5 @@
 const mysql = require('serverless-mysql')
 
-// console.log(process.env)
 const db = mysql({
   config: {
     host: process.env.MYSQL_HOST,

@@ -251,18 +251,18 @@ const Maintenance = ({ session, serverData, suppliers }) => {
   const [sentProgress, setSentProgress] = useState(0)
   const [activeTab, setActiveTab] = useState('customer')
   const [maintHistory, setMaintHistory] = useState({
-    timezone: serverData.profile.timezone || undefined,
-    supplier: serverData.profile.lieferant,
-    startDateTime: serverData.profile.startDateTime,
-    endDateTime: serverData.profile.endDateTime,
-    supplierCids: serverData.profile.derenCIDid?.split(',').map(Number) || '',
-    impact: serverData.profile.impact,
-    location: serverData.profile.location,
-    reason: serverData.profile.reason,
-    maintNote: serverData.profile.maintNote,
-    cancelled: !!+serverData.profile.cancelled,
-    emergency: !!+serverData.profile.emergency,
-    done: !!+serverData.profile.done,
+    timezone: serverData.profile?.timezone || undefined,
+    supplier: serverData.profile?.lieferant,
+    startDateTime: serverData.profile?.startDateTime,
+    endDateTime: serverData.profile?.endDateTime,
+    supplierCids: serverData.profile?.derenCIDid?.split(',').map(Number) || '',
+    impact: serverData.profile?.impact,
+    location: serverData.profile?.location,
+    reason: serverData.profile?.reason,
+    maintNote: serverData.profile?.maintNote,
+    cancelled: !!+serverData.profile?.cancelled,
+    emergency: !!+serverData.profile?.emergency,
+    done: !!+serverData.profile?.done,
   })
   const [frozenState, setFrozenState] = useState({
     recipient: '',

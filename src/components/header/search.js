@@ -42,8 +42,8 @@ const SearchInput = props => {
   }
 
   const algoliaClient = algoliasearch(
-    'O7K4XJKBHU',
-    '769a2cd0f2b32f30d4dc9ab78a643c0d'
+    process.env.ALGOLIA_APPKEY,
+    process.env.ALGOLIA_APIKEY
   )
 
   const indexes = [
@@ -86,9 +86,9 @@ const SearchInput = props => {
                       fill='none'
                       width='1.1em'
                       style={{ marginBottom: '-3px', marginRight: '-2px' }}
-                      stroke-linecap='round'
-                      stroke-linejoin='round'
-                      stroke-width='2'
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                      strokeWidth='2'
                       stroke='currentColor'
                       viewBox='0 0 24 24'
                     >
@@ -117,9 +117,9 @@ const SearchInput = props => {
                       fill='none'
                       width='1.3em'
                       style={{ marginBottom: '-3px', marginRight: '2px' }}
-                      stroke-linecap='round'
-                      stroke-linejoin='round'
-                      stroke-width='2'
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                      strokeWidth='2'
                       stroke='currentColor'
                       viewBox='0 0 24 24'
                     >
@@ -141,9 +141,9 @@ const SearchInput = props => {
                       fill='none'
                       width='1.3em'
                       style={{ marginBottom: '-3px', marginRight: '2px' }}
-                      stroke-linecap='round'
-                      stroke-linejoin='round'
-                      stroke-width='2'
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                      strokeWidth='2'
                       stroke='currentColor'
                       viewBox='0 0 24 24'
                     >
@@ -172,9 +172,9 @@ const SearchInput = props => {
                     fill='none'
                     width='1.3em'
                     style={{ marginRight: '2px' }}
-                    stroke-linecap='round'
-                    stroke-linejoin='round'
-                    stroke-width='2'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth='2'
                     stroke='currentColor'
                     viewBox='0 0 24 24'
                   >
@@ -188,9 +188,9 @@ const SearchInput = props => {
                       <svg
                         fill='none'
                         width='0.5em'
-                        stroke-linecap='round'
-                        stroke-linejoin='round'
-                        stroke-width='2'
+                        strokeLinecap='round'
+                        strokeLinejoin='round'
+                        strokeWidth='2'
                         stroke='currentColor'
                         viewBox='0 0 24 24'
                       >
@@ -219,7 +219,10 @@ const SearchInput = props => {
   ]
 
   const handleSearchSelection = selection => {
-    const newLocation = `/maintenance?id=${selection.id}`
+    const newLocation = `/maintenance?id=${selection.id
+      .toString()
+      .match(/\d+/g)
+      .join('')}`
     Router.push(newLocation)
   }
 
