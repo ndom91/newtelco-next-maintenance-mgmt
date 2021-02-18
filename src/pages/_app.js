@@ -6,8 +6,16 @@ import Head from 'next/head'
 import ErrorBoundary from '@/newtelco/errorboundary'
 import Store from '@/newtelco/store'
 import { Provider } from 'next-auth/client'
+import * as Sentry from '@sentry/node'
 const LogRocket = require('logrocket')
 const setupLogRocketReact = require('logrocket-react')
+
+if (process.env.NEXT_PUBLIC_SENTRY_DSN) {
+  Sentry.init({
+    enabled: process.env.NODE_ENV === 'production',
+    dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+  })
+}
 
 const App = ({ Component, pageProps }) => {
   const ConditionalWrap = ({ condition, wrap, children }) =>

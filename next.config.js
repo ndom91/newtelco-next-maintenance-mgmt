@@ -11,6 +11,22 @@ const withPWA = require('next-pwa')
 const Dotenv = require('dotenv-webpack')
 require('dotenv').config()
 
+const SentryWebpackPlugin = require('@sentry/webpack-plugin')
+const {
+  NEXT_PUBLIC_SENTRY_DSN: SENTRY_DSN,
+  SENTRY_ORG,
+  SENTRY_PROJECT,
+  SENTRY_AUTH_TOKEN,
+  NODE_ENV,
+  VERCEL_GITHUB_COMMIT_SHA,
+  VERCEL_GITLAB_COMMIT_SHA,
+  VERCEL_BITBUCKET_COMMIT_SHA,
+} = process.env
+
+const COMMIT_SHA = VERCEL_GITHUB_COMMIT_SHA
+
+process.env.SENTRY_DSN = SENTRY_DSN
+
 function HACK_removeMinimizeOptionFromCssLoaders(config) {
   // console.warn(
   //   'HACK: Removing `minimize` option from `css-loader` entries in Webpack config'
@@ -29,6 +45,7 @@ function HACK_removeMinimizeOptionFromCssLoaders(config) {
 const nextConfig = {
   target: 'server',
   compress: false,
+  productionBrowserSourceMaps: true, // For Sentry
   experimental: {
     modern: true,
   },
@@ -160,6 +177,28 @@ const nextConfig = {
     HACK_removeMinimizeOptionFromCssLoaders(config)
     config.stats = {
       warningsFilter: warn => warn.indexOf('Conflicting order between:') > -1,
+    }
+    if (!isServer) {
+      config.resolve.alias['@sentry/node'] = '@sentry/react'
+    }
+    if (
+      SENTRY_DSN &&
+      SENTRY_ORG &&
+      SENTRY_PROJECT &&
+      SENTRY_AUTH_TOKEN &&
+      COMMIT_SHA &&
+      NODE_ENV === 'production'
+    ) {
+      config.plugins.push(
+        new SentryWebpackPlugin({
+          include: '.next',
+          ignore: ['node_modules'],
+          urlPrefix: '~/_next',
+          release: COMMIT_SHA,
+          org: 'newtelco-gmbh',
+          project: 'next-maintenance',
+        })
+      )
     }
     // eslint-disable-next-line
     new Dotenv({
