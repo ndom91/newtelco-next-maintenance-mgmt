@@ -192,7 +192,6 @@ const nextConfig = {
         ),
       })
     )
-    console.log(NODE_ENV)
     if (
       SENTRY_DSN &&
       SENTRY_ORG &&

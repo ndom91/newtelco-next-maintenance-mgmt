@@ -1,5 +1,5 @@
 import React from 'react'
-import { Icon, Badget } from 'rsuite'
+import { Icon, Badge } from 'rsuite'
 
 const SentIcon = ({ node }) => {
   const { sent } = node.data

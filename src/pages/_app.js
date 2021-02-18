@@ -10,8 +10,6 @@ import { initSentry } from '../lib/sentry'
 const LogRocket = require('logrocket')
 const setupLogRocketReact = require('logrocket-react')
 
-initSentry()
-
 const App = ({ Component, pageProps }) => {
   const ConditionalWrap = ({ condition, wrap, children }) =>
     condition ? wrap(children) : children
@@ -19,6 +17,7 @@ const App = ({ Component, pageProps }) => {
   const { session } = pageProps
 
   useEffect(() => {
+    initSentry()
     if (typeof window !== 'undefined' && session) {
       LogRocket.init('ui2vht/next-maintenance')
       LogRocket.identify(session.user.email, {
