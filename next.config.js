@@ -49,6 +49,7 @@ const nextConfig = {
   experimental: {
     modern: true,
   },
+  maximumFileSizeToCacheInBytes: 5242880,
   pwa: {
     dest: 'public',
     disable: dev,
