@@ -176,13 +176,13 @@ const nextConfig = {
   env: {
     NEXT_PUBLIC_COMMIT_SHA: COMMIT_SHA,
   },
-  webpack(config, { isServer, buildId, dev }) {
+  webpack(config, options) {
     config.plugins.push(new webpack.EnvironmentPlugin(localEnv))
     HACK_removeMinimizeOptionFromCssLoaders(config)
     config.stats = {
       warningsFilter: warn => warn.indexOf('Conflicting order between:') > -1,
     }
-    if (!isServer) {
+    if (!options.isServer) {
       config.resolve.alias['@sentry/node'] = '@sentry/browser'
     }
     config.plugins.push(
