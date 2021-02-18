@@ -6,6 +6,7 @@ import Head from 'next/head'
 import ErrorBoundary from '@/newtelco/errorboundary'
 import Store from '@/newtelco/store'
 import { Provider } from 'next-auth/client'
+import * as Sentry from '@sentry/node'
 import { initSentry } from '../lib/sentry'
 const LogRocket = require('logrocket')
 const setupLogRocketReact = require('logrocket-react')
@@ -23,6 +24,11 @@ const App = ({ Component, pageProps }) => {
       LogRocket.identify(session.user.email, {
         name: session.user.name,
         email: session.user.email,
+      })
+      LogRocket.getSessionURL(sessionURL => {
+        Sentry.configureScope(scope => {
+          scope.setExtra('sessionURL', sessionURL)
+        })
       })
       setupLogRocketReact(LogRocket)
       // console.log('Logrocket Initialized')
