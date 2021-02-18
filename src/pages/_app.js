@@ -6,7 +6,7 @@ import Head from 'next/head'
 import ErrorBoundary from '@/newtelco/errorboundary'
 import Store from '@/newtelco/store'
 import { Provider } from 'next-auth/client'
-import initSentry from '../lib/sentry'
+import { initSentry } from '../lib/sentry'
 const LogRocket = require('logrocket')
 const setupLogRocketReact = require('logrocket-react')
 
