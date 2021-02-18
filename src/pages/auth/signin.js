@@ -4,15 +4,6 @@ import { getSession, providers, signin } from 'next-auth/client'
 import { Container, FlexboxGrid, Panel, Content, Button, Col } from 'rsuite'
 import './signin.css'
 
-if (typeof window !== 'undefined') {
-  const WebFontLoader = require('webfontloader')
-  WebFontLoader.load({
-    google: {
-      families: ['Fira Sans:200,400', 'Chivo:300,400,700'],
-    },
-  })
-}
-
 const SignIn = ({ providers, session }) => {
   if (typeof window !== 'undefined' && session) {
     Router.push('/')

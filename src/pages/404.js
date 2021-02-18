@@ -68,7 +68,7 @@ const Maintenance404 = () => {
                     </svg>
                   }
                 >
-                  Back Home
+                  Go Back Home
                 </IconButton>
               </Link>
             </Panel>
