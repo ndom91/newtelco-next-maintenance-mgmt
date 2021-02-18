@@ -29,7 +29,7 @@
   grid-area: chart2;
 }
 
-@media only screen and (max-width: 1430px) {
+@media only screen and (max-width: 1750px) {
   .grid-container {
     grid-template-columns: 1fr 0fr 1.5fr 1.5fr;
   }

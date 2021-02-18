@@ -33,6 +33,8 @@
   "dependencies": {
     "@nivo/bar": "^0.62.0",
     "@nivo/calendar": "^0.62.0",
+    "@sentry/browser": "^6.2.0",
+    "@sentry/integrations": "^6.2.0",
     "@sentry/node": "^6.2.0",
     "@sentry/react": "^6.2.0",
     "@sentry/webpack-plugin": "^1.14.0",

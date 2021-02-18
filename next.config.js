@@ -173,6 +173,9 @@ const nextConfig = {
   lessLoaderOptions: {
     javascriptEnabled: true,
   },
+  env: {
+    NEXT_PUBLIC_COMMIT_SHA: COMMIT_SHA,
+  },
   webpack(config, { isServer, buildId, dev }) {
     config.plugins.push(new webpack.EnvironmentPlugin(localEnv))
     HACK_removeMinimizeOptionFromCssLoaders(config)
@@ -180,8 +183,16 @@ const nextConfig = {
       warningsFilter: warn => warn.indexOf('Conflicting order between:') > -1,
     }
     if (!isServer) {
-      config.resolve.alias['@sentry/node'] = '@sentry/react'
+      config.resolve.alias['@sentry/node'] = '@sentry/browser'
     }
+    config.plugins.push(
+      new options.webpack.DefinePlugin({
+        'process.env.NEXT_IS_SERVER': JSON.stringify(
+          options.isServer.toString()
+        ),
+      })
+    )
+    console.log(NODE_ENV)
     if (
       SENTRY_DSN &&
       SENTRY_ORG &&
@@ -194,6 +205,7 @@ const nextConfig = {
         new SentryWebpackPlugin({
           include: '.next',
           ignore: ['node_modules'],
+          stripPrefix: ['webpack://_N_E/'],
           urlPrefix: '~/_next',
           release: COMMIT_SHA,
           org: 'newtelco-gmbh',
@@ -203,6 +215,7 @@ const nextConfig = {
     }
     // eslint-disable-next-line
     new Dotenv({
+      NEXT_PUBLIC_COMMIT_SHA: COMMIT_SHA,
       path: path.join(__dirname, '.env'),
       systemvars: true,
     })
