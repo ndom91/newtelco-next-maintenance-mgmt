@@ -1,7 +1,7 @@
 import * as Sentry from '@sentry/node'
 import { RewriteFrames } from '@sentry/integrations'
 
-export const initSentry = () => {
+export const initSentry = user => {
   if (process.env.NEXT_PUBLIC_SENTRY_DSN) {
     const integrations = []
     if (
@@ -31,5 +31,7 @@ export const initSentry = () => {
       dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
       release: process.env.NEXT_PUBLIC_COMMIT_SHA,
     })
+
+    Sentry.setUser(user)
   }
 }

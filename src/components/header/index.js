@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import NextAuth from 'next-auth/client'
 import Link from 'next/link'
 import Store from '@/newtelco/store'
@@ -21,7 +21,7 @@ const MaintHeader = () => {
   const [session, loading] = NextAuth.useSession()
   const store = Store.useStore()
   const count = store.get('count')
-  const night = store.get('night')
+  // const night = store.get('night')
 
   let avatarPath
   if (!loading) {
@@ -47,10 +47,10 @@ const MaintHeader = () => {
     }
   }
 
-  const toggleDark = e => {
-    e.stopPropagation()
-    store.set('night')(!store.get('night'))
-  }
+  // const toggleDark = e => {
+  //   e.stopPropagation()
+  //   store.set('night')(!store.get('night'))
+  // }
 
   return (
     <Header className='header-wrapper'>

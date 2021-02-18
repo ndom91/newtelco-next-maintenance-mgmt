@@ -17,7 +17,7 @@ const App = ({ Component, pageProps }) => {
   const { session } = pageProps
 
   useEffect(() => {
-    initSentry()
+    initSentry(pageProps.session?.user)
     if (typeof window !== 'undefined' && session) {
       LogRocket.init('ui2vht/next-maintenance')
       LogRocket.identify(session.user.email, {
