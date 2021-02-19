@@ -8,6 +8,7 @@ module.exports = async (req, res) => {
     left join companies on maintenancedb.lieferant = companies.id
     where DATE(NOW()) like DATE(startDateTime) 
     or NOW() between startDateTime and endDateTime
+    and maintenancedb.cancelled not like 1
   `)
   res.status(200).json({ query })
 }

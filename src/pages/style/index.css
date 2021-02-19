@@ -37,3 +37,6 @@
     display: none;
   }
 }
+.active-btn-group .rs-btn.rs-btn-icon {
+  padding-left: 14px;
+}
