@@ -1648,6 +1648,9 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                               <ControlLabel htmlFor='senderMaintenanceId'>
                                 Sender Maintenance ID
                               </ControlLabel>
+                              <HelpBlock style={{ marginTop: '0px', float: 'right' }} tooltip>
+                                Maintenance ID in Sender's System - For Documentation Purposes Only
+                              </HelpBlock>
                               <FastField
                                 name='senderMaintenanceId'
                                 component={MyTextinput}

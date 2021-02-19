@@ -59,6 +59,7 @@ const History = ({ session, data }) => {
         headerName: 'By',
         field: 'bearbeitetvon',
         cellRenderer: 'edittedby',
+        tooltipField: 'bearbeitetvon',
         width: 100,
         cellStyle: params => {
           return {
@@ -82,14 +83,14 @@ const History = ({ session, data }) => {
         },
       },
       {
+        headerName: 'Supplier CID',
+        field: 'derenCID',
+        tooltipField: 'derenCID',
+      },
+      {
         headerName: 'Sender Maint ID',
         field: 'senderMaintenanceId',
         tooltipField: 'senderMaintenanceId',
-      },
-      {
-        headerName: 'Their CID',
-        field: 'derenCID',
-        tooltipField: 'derenCID',
       },
       {
         headerName: 'Start',
@@ -114,7 +115,7 @@ const History = ({ session, data }) => {
         cellRenderer: 'mailArrived',
       },
       {
-        headerName: 'Updated',
+        headerName: 'Last Updated',
         field: 'updatedAt',
         cellRenderer: 'updatedAt',
       },
@@ -133,7 +134,11 @@ const History = ({ session, data }) => {
       {
         headerName: 'Complete',
         field: 'done',
-        width: 100,
+        resizable: false,
+        sortable: false,
+        filter: false,
+        selectable: false,
+        width: 105,
         pinned: 'right',
         cellRenderer: 'complete',
       },
@@ -422,7 +427,7 @@ const History = ({ session, data }) => {
         {openConfirmDeleteModal && (
           <ConfirmModal
             header='Confirm Delete'
-            content={`Are you sure you want to delete maintenance #${idToDelete}`}
+            content={`Are you sure you want to delete maintenance NT-${idToDelete}`}
             show={openConfirmDeleteModal}
             onHide={toggleConfirmDelete}
             cancelAction={toggleConfirmDelete}
