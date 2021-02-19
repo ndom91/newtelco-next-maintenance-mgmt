@@ -82,7 +82,7 @@ const History = ({ session, data }) => {
         },
       },
       {
-        headerName: 'Their Maint ID',
+        headerName: 'Sender Maint ID',
         field: 'senderMaintenanceId',
         tooltipField: 'senderMaintenanceId',
       },
