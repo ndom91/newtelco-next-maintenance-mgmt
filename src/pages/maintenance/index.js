@@ -207,7 +207,7 @@ const AutoSave = ({ debounceMs, id }) => {
   } else if (Object.keys(formik.errors).length > 0) {
     result = `Error: ${formik.errors.error}`
   } else if (lastSaved !== null) {
-    result = `Last Saved: ${lastSaved}`
+    result = lastSaved
   }
   return (
     <div
@@ -1536,6 +1536,8 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                     validateOnBlur={false}
                     initialValues={{
                       timezone: serverData.profile.timezone,
+                      senderMaintenanceId:
+                        serverData.profile.senderMaintenanceId,
                       supplier: serverData.profile.lieferant,
                       startDateTime: serverData.profile.startDateTime,
                       endDateTime: serverData.profile.endDateTime,
@@ -1593,8 +1595,36 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                     }) => (
                       <>
                         <Row gutter={20} style={{ marginBottom: '20px' }}>
-                          <Col sm={24} xs={24}>
+                          <Col sm={12} xs={12}>
                             <AutoSave debounceMs={1000} id={maintenance.id} />
+                          </Col>
+                          <Col sm={12} xs={12}>
+                            <div
+                              style={{
+                                color: 'var(--grey2)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'flex-end',
+                              }}
+                            >
+                              <svg
+                                xmlns='http://www.w3.org/2000/svg'
+                                fill='none'
+                                width='18'
+                                height='18'
+                                viewBox='0 0 24 24'
+                                stroke='currentColor'
+                              >
+                                <path
+                                  strokeLinecap='round'
+                                  strokeLinejoin='round'
+                                  strokeWidth={2}
+                                  d='M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207'
+                                />
+                              </svg>
+                              {/* Mail Arrived:{' '} */}
+                              {convertDateTime(maintenance.maileingang)}
+                            </div>
                           </Col>
                         </Row>
                         <Row gutter={20} style={{ marginBottom: '20px' }}>
@@ -1616,17 +1646,13 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                           </Col>
                           <Col sm={12} xs={24}>
                             <FormGroup>
-                              <ControlLabel htmlFor='maileingang'>
-                                Mail Arrived
+                              <ControlLabel htmlFor='senderMaintenanceId'>
+                                Sender Maintenance ID
                               </ControlLabel>
-                              <Input
-                                tabIndex='-1'
-                                readOnly
-                                id='maileingang-input'
-                                name='maileingang'
-                                type='text'
-                                value={convertDateTime(maintenance.maileingang)}
-                                disabled
+                              <FastField
+                                name='senderMaintenanceId'
+                                component={MyTextinput}
+                                maintId={maintenance.id}
                               />
                             </FormGroup>
                           </Col>

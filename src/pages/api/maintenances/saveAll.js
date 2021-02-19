@@ -2,14 +2,6 @@ const db = require('../../../lib/db')
 const escape = require('sql-template-strings')
 
 module.exports = async (req, res) => {
-  const toSqlDatetime = inputDate => {
-    const date = new Date(inputDate)
-    // const dateWithOffest = new Date(
-    //   date.getTime() - date.getTimezoneOffset() * 60000
-    // )
-    return date.toISOString().slice(0, 19).replace('T', ' ')
-  }
-
   const maintId = req.body.id
   const values = req.body.values
   const user = req.body.user
@@ -18,6 +10,7 @@ module.exports = async (req, res) => {
     UPDATE maintenancedb 
     SET
       cancelled = ${values.cancelled},
+      senderMaintenanceId = ${values.senderMaintenanceId},
       done = ${values.done},
       emergency = ${values.emergency},
       startDateTime = ${values.startDateTime},
@@ -44,6 +37,7 @@ module.exports = async (req, res) => {
     supplier: 'supplier',
     supplierCids: 'supplier cids',
     timezone: 'timezone',
+    senderMaintenanceId: 'sender maintenance id',
   }
   let updateHistory
   if (field) {
