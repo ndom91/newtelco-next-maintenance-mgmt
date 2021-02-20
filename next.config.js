@@ -1,15 +1,9 @@
-const { parsed: localEnv } = require('dotenv').config({ path: './.env' })
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
 })
-const dev = process.env.NODE_ENV === 'development'
-const path = require('path')
 const webpack = require('webpack')
 const withCSS = require('@zeit/next-css')
 const withLess = require('@zeit/next-less')
-// const withPWA = require('next-pwa')
-const Dotenv = require('dotenv-webpack')
-require('dotenv').config()
 
 const SentryWebpackPlugin = require('@sentry/webpack-plugin')
 const {
@@ -50,10 +44,6 @@ const nextConfig = {
     modern: true,
   },
   maximumFileSizeToCacheInBytes: 5242880,
-  // pwa: {
-  //   dest: 'public',
-  //   disable: dev,
-  // },
   lessLoaderOptions: {
     javascriptEnabled: true,
   },
@@ -61,7 +51,7 @@ const nextConfig = {
     NEXT_PUBLIC_COMMIT_SHA: COMMIT_SHA,
   },
   webpack(config, options) {
-    config.plugins.push(new webpack.EnvironmentPlugin(localEnv))
+    // config.plugins.push(new webpack.EnvironmentPlugin(localEnv))
     HACK_removeMinimizeOptionFromCssLoaders(config)
     config.stats = {
       warningsFilter: warn => warn.indexOf('Conflicting order between:') > -1,
@@ -96,12 +86,6 @@ const nextConfig = {
         })
       )
     }
-    // eslint-disable-next-line
-    new Dotenv({
-      NEXT_PUBLIC_COMMIT_SHA: COMMIT_SHA,
-      path: path.join(__dirname, '.env'),
-      systemvars: true,
-    })
     return config
   },
 }

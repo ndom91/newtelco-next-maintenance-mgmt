@@ -42,8 +42,8 @@ const SearchInput = props => {
   }
 
   const algoliaClient = algoliasearch(
-    process.env.ALGOLIA_APPKEY,
-    process.env.ALGOLIA_APIKEY
+    process.env.NEXT_PUBLIC_ALGOLIA_APPKEY,
+    process.env.NEXT_PUBLIC_ALGOLIA_APIKEY
   )
 
   const indexes = [

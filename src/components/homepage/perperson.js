@@ -41,7 +41,7 @@ const BarChart = () => {
           colorBy='index'
           enableGridX={false}
           enableGridY={false}
-          axisBottom={false}
+          axisBottom={null}
           padding={0.3}
           labelTextColor={{ from: 'color', modifiers: [['darker', 2.0]] }}
           isInteractive={true}

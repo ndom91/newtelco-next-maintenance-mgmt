@@ -395,9 +395,9 @@ const History = ({ session, data }) => {
                     width='20'
                     height='20'
                     fill='none'
-                    stroke-linecap='round'
-                    stroke-linejoin='round'
-                    stroke-width='1'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth='1'
                     viewBox='0 0 24 24'
                     stroke='var(--grey4)'
                     style={{ marginRight: '5px' }}
