@@ -63,7 +63,7 @@
     "react-dom": "^17.0.1",
     "react-excel-renderer": "^1.1.0",
     "react-flatpickr": "^3.10.4",
-    "react-pdf-js-infinite": "^1.2.0",
+    "react-pdf": "^5.2.0",
     "react-rnd": "^10.2.1",
     "react-select": "^3.1.0",
     "react-useanimations": "^2.0.5",

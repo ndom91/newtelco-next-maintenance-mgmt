@@ -5,6 +5,8 @@ const webpack = require('webpack')
 const withCSS = require('@zeit/next-css')
 const withLess = require('@zeit/next-less')
 
+// Less Loader Workaround: https://github.com/vercel/next-plugins/issues/598#issuecomment-702907049
+
 const SentryWebpackPlugin = require('@sentry/webpack-plugin')
 const {
   NEXT_PUBLIC_SENTRY_DSN: SENTRY_DSN,
@@ -51,7 +53,6 @@ const nextConfig = {
     NEXT_PUBLIC_COMMIT_SHA: COMMIT_SHA,
   },
   webpack(config, options) {
-    // config.plugins.push(new webpack.EnvironmentPlugin(localEnv))
     HACK_removeMinimizeOptionFromCssLoaders(config)
     config.stats = {
       warningsFilter: warn => warn.indexOf('Conflicting order between:') > -1,

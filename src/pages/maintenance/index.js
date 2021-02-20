@@ -68,7 +68,6 @@ const MyTextarea = ({ field, form, ...props }) => {
       key={field.name}
       componentClass='textarea'
       name={field.name}
-      defaultValue=''
       disabled={props.maintId === 'NEW'}
       value={field.value}
       onChange={option => form.setFieldValue(field.name, option)}

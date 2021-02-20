@@ -2,7 +2,9 @@ import React, { useState, useRef } from 'react'
 import { Rnd } from 'react-rnd'
 import ShadowDom from '../../components/shadowdom'
 import { OutTable, ExcelRenderer } from 'react-excel-renderer'
-import PDF from 'react-pdf-js-infinite'
+import { Document, Page } from 'react-pdf'
+import { pdfjs } from 'react-pdf'
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`
 import Notify from '@/newtelco-utils/notification'
 import { saveAs } from 'file-saver'
 import {
@@ -497,6 +499,7 @@ const ReadModal = ({
                     fontFamily: 'var(--font-body)',
                     fontSize: '1.2rem',
                     marginLeft: '5px',
+                    pointerEvents: 'none',
                   }}
                 >
                   {currentAttachmentName}
@@ -522,7 +525,11 @@ const ReadModal = ({
               ) : null}
               {filetype === 'pdf' ? (
                 <div className='attachment-body excel'>
-                  <PDF file={pdfB64} scale={1.75} />
+                  {pdfB64 && (
+                    <Document file={pdfB64}>
+                      <Page scale={1.75} pageIndex={0} />
+                    </Document>
+                  )}
                 </div>
               ) : null}
               {filetype === 'html' ? (
