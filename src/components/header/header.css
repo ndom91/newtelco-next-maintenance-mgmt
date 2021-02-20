@@ -25,3 +25,7 @@
 .rs-navbar-nav .rs-nav-item > .rs-nav-item-content:first-of-type {
   display: flex;
 }
+
+.rs-navbar-nav .rs-nav-item a {
+  font-size: 16px;
+}

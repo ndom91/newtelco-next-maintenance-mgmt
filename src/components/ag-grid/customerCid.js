@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import Notify from '@/newtelco-utils/notification'
 import { Tag } from 'rsuite'
 
-const CustomerCid = props => {
+export const CustomerCid = props => {
   const [hover, setHover] = useState(false)
   const copyToClipboard = () => {
     navigator.clipboard.writeText(props.data.kundenCID)
@@ -38,5 +38,3 @@ const CustomerCid = props => {
     </div>
   )
 }
-
-export default CustomerCid

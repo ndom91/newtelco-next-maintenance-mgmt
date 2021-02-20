@@ -2,7 +2,7 @@ import React from 'react'
 import Link from 'next/link'
 import { IconButton, Whisper, Tooltip } from 'rsuite'
 
-const EditBtn = ({ node }) => {
+export const EditBtn = ({ node }) => {
   return (
     <Link
       href={{ pathname: '/maintenance', query: { id: node.data.id } }}
@@ -34,5 +34,3 @@ const EditBtn = ({ node }) => {
     </Link>
   )
 }
-
-export default EditBtn

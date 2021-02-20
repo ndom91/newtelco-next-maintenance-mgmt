@@ -1,7 +1,7 @@
 import React from 'react'
 import { Badge } from 'rsuite'
 
-const RescheduledIcon = ({ node }) => {
+export const RescheduledIcon = ({ node }) => {
   if (node.data.rescheduled) {
     return (
       // Rescheduled
@@ -52,5 +52,3 @@ const RescheduledIcon = ({ node }) => {
     )
   }
 }
-
-export default RescheduledIcon

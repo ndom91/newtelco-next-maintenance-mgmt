@@ -1,6 +1,6 @@
 import React from 'react'
 
-const CompleteIcon = ({ node }) => {
+export const CompleteIcon = ({ node }) => {
   if (node.data.done !== 1) {
     if (node.data.done === 0) {
       return (
@@ -65,5 +65,3 @@ const CompleteIcon = ({ node }) => {
     )
   }
 }
-
-export default CompleteIcon

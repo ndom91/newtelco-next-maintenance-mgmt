@@ -45,13 +45,16 @@ const BarChart = () => {
           padding={0.3}
           labelTextColor={{ from: 'color', modifiers: [['darker', 2.0]] }}
           isInteractive={true}
+          theme={{
+            fontSize: '13px',
+          }}
           animate
           motionStiffness={170}
           motionDamping={26}
           borderRadius={3}
           borderWidth={0}
           tooltip={({ id, value, data, color }) => (
-            <strong style={{ color }}>
+            <strong style={{ color: '#67b246' }}>
               {data.person}: {value} maintenances
             </strong>
           )}

@@ -31,7 +31,8 @@
 
 @media only screen and (max-width: 1750px) {
   .grid-container {
-    grid-template-columns: 1fr 0fr 1.5fr 1.5fr;
+    grid-template-columns: 1fr 1.5fr 1.5fr;
+    grid-template-areas: 'unread chart2 recents' 'heatmap heatmap recents';
   }
   .chart1 {
     display: none;
@@ -39,4 +40,8 @@
 }
 .active-btn-group .rs-btn.rs-btn-icon {
   padding-left: 14px;
+}
+
+.rs-panel-body text {
+  font-family: Fira Sans !important;
 }

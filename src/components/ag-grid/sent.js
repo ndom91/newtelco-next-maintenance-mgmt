@@ -1,7 +1,7 @@
 import React from 'react'
 import { Icon, Badge } from 'rsuite'
 
-const SentIcon = ({ node }) => {
+export const SentIcon = ({ node }) => {
   const { sent } = node.data
 
   if (sent === '2' || sent === 2) {
@@ -34,5 +34,3 @@ const SentIcon = ({ node }) => {
     )
   }
 }
-
-export default SentIcon

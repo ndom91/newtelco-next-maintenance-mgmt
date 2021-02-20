@@ -2,7 +2,7 @@ import React from 'react'
 import { isValid } from 'date-fns'
 import moment from 'moment-timezone'
 
-const EndDateTime = ({ node }) => {
+export const EndDateTime = ({ node }) => {
   let dateTime
   if (isValid(new Date(node.data.endDateTime))) {
     const intDateTime = moment.tz(node.data.endDateTime, 'GMT')
@@ -13,5 +13,3 @@ const EndDateTime = ({ node }) => {
   }
   return <span>{dateTime}</span>
 }
-
-export default EndDateTime

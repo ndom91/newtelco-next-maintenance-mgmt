@@ -8,19 +8,21 @@ import 'ag-grid-community/dist/styles/ag-theme-material.css'
 import moment from 'moment-timezone'
 import Router from 'next/router'
 import RequireLogin from '@/newtelco/require-login'
-import EditBtn from '@/newtelco/ag-grid/edit-btn'
-import MaintId from '@/newtelco/ag-grid/maintId'
-import StartDateTime from '@/newtelco/ag-grid/startdatetime'
-import EndDateTime from '@/newtelco/ag-grid/enddatetime'
-import MailArrived from '@/newtelco/ag-grid/mailarrived'
-import UpdatedAt from '@/newtelco/ag-grid/updatedat'
-import Supplier from '@/newtelco/ag-grid/supplier'
-import RescheduledIcon from '@/newtelco/ag-grid/rescheduled'
-import CompleteIcon from '@/newtelco/ag-grid/complete'
-import EdittedBy from '@/newtelco/ag-grid/edittedby'
 import MaintPanel from '@/newtelco/panel'
 import Notify from '@/newtelco-utils/notification'
 import ConfirmModal from '@/newtelco/confirmmodal'
+import {
+  EditBtn,
+  MaintId,
+  StartDateTime,
+  EndDateTime,
+  MailArrived,
+  UpdatedAt,
+  Supplier,
+  RescheduledIcon,
+  CompleteIcon,
+  EdittedBy,
+} from '@/newtelco/ag-grid'
 import {
   IconButton,
   ButtonGroup,
@@ -333,9 +335,9 @@ const History = ({ session, data }) => {
                     fill='none'
                     strokeLinecap='round'
                     strokeLinejoin='round'
-                    strokeWidth='2'
+                    strokeWidth='1'
                     viewBox='0 0 24 24'
-                    stroke='currentColor'
+                    stroke='var(--grey4)'
                     style={{ marginRight: '5px' }}
                   >
                     <path d='M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z' />
@@ -343,10 +345,13 @@ const History = ({ session, data }) => {
                 }
                 style={{
                   padding: '0 20px',
-                  color: 'var(--grey4)',
+                  color: '#272c36',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
+                  fontFamily: 'Fira Sans',
+                  fontWeight: '200',
+                  fontSize: '14px',
                 }}
               >
                 New
@@ -361,9 +366,9 @@ const History = ({ session, data }) => {
                     fill='none'
                     strokeLinecap='round'
                     strokeLinejoin='round'
-                    strokeWidth='2'
+                    strokeWidth='1'
                     viewBox='0 0 24 24'
-                    stroke='currentColor'
+                    stroke='var(--grey4)'
                     style={{ marginRight: '5px' }}
                   >
                     <path d='M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16' />
@@ -373,8 +378,11 @@ const History = ({ session, data }) => {
                   padding: '0 20px',
                   display: 'flex',
                   alignItems: 'center',
-                  color: 'var(--grey4)',
+                  color: '#272c36',
                   justifyContent: 'space-between',
+                  fontFamily: 'Fira Sans',
+                  fontWeight: '200',
+                  fontSize: '14px',
                 }}
               >
                 Delete
@@ -389,9 +397,9 @@ const History = ({ session, data }) => {
                     fill='none'
                     stroke-linecap='round'
                     stroke-linejoin='round'
-                    stroke-width='2'
+                    stroke-width='1'
                     viewBox='0 0 24 24'
-                    stroke='currentColor'
+                    stroke='var(--grey4)'
                     style={{ marginRight: '5px' }}
                   >
                     <path d='M8 16a5 5 0 01-.916-9.916 5.002 5.002 0 019.832 0A5.002 5.002 0 0116 16m-7 3l3 3m0 0l3-3m-3 3V10' />
@@ -400,9 +408,12 @@ const History = ({ session, data }) => {
                 style={{
                   padding: '0 20px',
                   display: 'flex',
-                  color: 'var(--grey4)',
+                  color: '#272c36',
                   alignItems: 'center',
                   justifyContent: 'space-between',
+                  fontFamily: 'Fira Sans',
+                  fontWeight: '200',
+                  fontSize: '14px',
                 }}
               >
                 Export

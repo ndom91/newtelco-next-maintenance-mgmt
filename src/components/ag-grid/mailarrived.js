@@ -1,7 +1,7 @@
 import React from 'react'
 import { format, isValid } from 'date-fns'
 
-const MailArrived = ({ node }) => {
+export const MailArrived = ({ node }) => {
   let dateTime
   if (isValid(new Date(node.data.maileingang))) {
     dateTime = format(new Date(node.data.maileingang), 'dd.MM.yyyy HH:mm')
@@ -10,5 +10,3 @@ const MailArrived = ({ node }) => {
   }
   return <span>{dateTime}</span>
 }
-
-export default MailArrived

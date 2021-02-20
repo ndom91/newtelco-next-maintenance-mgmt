@@ -2,7 +2,7 @@ import React from 'react'
 import { isValid } from 'date-fns'
 import moment from 'moment-timezone'
 
-const StartDateTime = ({ node }) => {
+export const StartDateTime = ({ node }) => {
   let dateTime
   if (isValid(new Date(node.data.startDateTime))) {
     const intDateTime = moment.tz(node.data.startDateTime, 'GMT')
@@ -13,5 +13,3 @@ const StartDateTime = ({ node }) => {
   }
   return <span>{dateTime}</span>
 }
-
-export default StartDateTime

@@ -7,15 +7,18 @@ import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-material.css'
 import moment from 'moment-timezone'
 import RequireLogin from '@/newtelco/require-login'
-import EditBtn from '@/newtelco/ag-grid/edit-btn'
-import StartDateTime from '@/newtelco/ag-grid/startdatetime'
-import EndDateTime from '@/newtelco/ag-grid/enddatetime'
-import MailArrived from '@/newtelco/ag-grid/mailarrived'
-import UpdatedAt from '@/newtelco/ag-grid/updatedat'
-import Supplier from '@/newtelco/ag-grid/supplier'
-import RescheduledIcon from '@/newtelco/ag-grid/rescheduled'
-import CompleteIcon from '@/newtelco/ag-grid/complete'
-import EdittedBy from '@/newtelco/ag-grid/edittedby'
+import {
+  EditBtn,
+  MaintId,
+  StartDateTime,
+  EndDateTime,
+  MailArrived,
+  UpdatedAt,
+  Supplier,
+  RescheduledIcon,
+  CompleteIcon,
+  EdittedBy,
+} from '@/newtelco/ag-grid'
 import MaintPanel from '@/newtelco/panel'
 import { IconButton, ButtonGroup, SelectPicker } from 'rsuite'
 
@@ -42,6 +45,7 @@ const Companies = ({ session, suppliers }) => {
         field: 'id',
         width: 100,
         pinned: 'left',
+        cellRenderer: 'maintId',
         sort: { direction: 'desc', priority: 0 },
       },
       {
@@ -56,6 +60,11 @@ const Companies = ({ session, suppliers }) => {
             justifyContent: 'center',
           }
         },
+      },
+      {
+        headerName: 'Sender Maint Id',
+        field: 'senderMaintenanceId',
+        tooltipField: 'senderMaintenanceId',
       },
       {
         headerName: 'Their CID',
@@ -116,6 +125,7 @@ const Companies = ({ session, suppliers }) => {
       enddateTime: EndDateTime,
       mailArrived: MailArrived,
       updatedAt: UpdatedAt,
+      maintId: MaintId,
       supplier: Supplier,
       complete: CompleteIcon,
       edittedby: EdittedBy,

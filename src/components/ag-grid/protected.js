@@ -1,6 +1,6 @@
 import React from 'react'
 
-const ProtectedIcon = ({ node }) => {
+export const ProtectedIcon = ({ node }) => {
   if (node && node.data) {
     if (node.data.protected === '1' || node.data.protected === true) {
       // Lock Closed
@@ -53,5 +53,3 @@ const ProtectedIcon = ({ node }) => {
     )
   }
 }
-
-export default ProtectedIcon

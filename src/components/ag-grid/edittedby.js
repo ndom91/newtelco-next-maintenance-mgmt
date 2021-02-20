@@ -1,6 +1,6 @@
 import React from 'react'
 
-const EdittedBy = ({ node }) => {
+export const EdittedBy = ({ node }) => {
   let avatarFile = 'avatar.svg'
   if (node?.data?.bearbeitetvon) {
     avatarFile = `${node.data.bearbeitetvon}.png`
@@ -19,5 +19,3 @@ const EdittedBy = ({ node }) => {
     </>
   )
 }
-
-export default EdittedBy

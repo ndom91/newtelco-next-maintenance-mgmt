@@ -1,7 +1,7 @@
 import React from 'react'
 import { FlexboxGrid } from 'rsuite'
 
-const UpdatedAt = ({ node }) => {
+export const Supplier = ({ node }) => {
   return (
     <FlexboxGrid justify='start' align='middle'>
       <FlexboxGrid.Item>
@@ -17,5 +17,3 @@ const UpdatedAt = ({ node }) => {
     </FlexboxGrid>
   )
 }
-
-export default UpdatedAt

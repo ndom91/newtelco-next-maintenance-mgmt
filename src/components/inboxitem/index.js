@@ -74,8 +74,8 @@ const InboxItem = ({ toggle, mail, index, handleDelete }) => {
             style={{ flexDirection: 'column' }}
           >
             <FlexboxGrid.Item>
-              <h5>{mail.from}</h5>
-              <h5>{mail.subject}</h5>
+              <h6>{mail.from}</h6>
+              <h6>{mail.subject}</h6>
               <div>{mail.snippet}</div>
             </FlexboxGrid.Item>
           </FlexboxGrid>

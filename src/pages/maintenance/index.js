@@ -11,9 +11,7 @@ import moment from 'moment-timezone'
 import Flatpickr from 'react-flatpickr'
 import 'flatpickr/dist/themes/airbnb.css'
 import { getUnique, convertDateTime } from '@/newtelco/maintenance/helper'
-import ProtectedIcon from '@/newtelco/ag-grid/protected'
-import SentIcon from '@/newtelco/ag-grid/sent'
-import CustomerCid from '@/newtelco/ag-grid/customerCid'
+import { ProtectedIcon, SentIcon, CustomerCid } from '@/newtelco/ag-grid'
 import { AgGridReact } from 'ag-grid-react'
 import dynamic from 'next/dynamic'
 import ReadModal from '@/newtelco/maintenance/readmodal'
@@ -1648,8 +1646,12 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                               <ControlLabel htmlFor='senderMaintenanceId'>
                                 Sender Maintenance ID
                               </ControlLabel>
-                              <HelpBlock style={{ marginTop: '0px', float: 'right' }} tooltip>
-                                Maintenance ID in Sender's System - For Documentation Purposes Only
+                              <HelpBlock
+                                style={{ marginTop: '0px', float: 'right' }}
+                                tooltip
+                              >
+                                Maintenance ID in Sender's System - For
+                                Documentation Purposes Only
                               </HelpBlock>
                               <FastField
                                 name='senderMaintenanceId'

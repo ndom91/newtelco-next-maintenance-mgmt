@@ -1,7 +1,7 @@
 import React from 'react'
 import { ButtonGroup, IconButton, Icon } from 'rsuite'
 
-const sendMailBtns = props => {
+export const sendMailBtns = props => {
   return (
     <ButtonGroup>
       <IconButton
@@ -32,5 +32,3 @@ const sendMailBtns = props => {
     </ButtonGroup>
   )
 }
-
-export default sendMailBtns

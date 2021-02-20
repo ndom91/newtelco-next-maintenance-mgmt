@@ -1,7 +1,7 @@
 import React from 'react'
 import { Icon, IconButton, Dropdown } from 'rsuite'
 
-const sentBtn = props => {
+export const sentBtn = props => {
   return (
     <Dropdown
       renderTitle={() => {
@@ -35,5 +35,3 @@ const sentBtn = props => {
     </Dropdown>
   )
 }
-
-export default sentBtn

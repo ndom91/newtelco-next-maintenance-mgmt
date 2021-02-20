@@ -3,7 +3,7 @@ import { AgGridReact } from 'ag-grid-react'
 import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-material.css'
 import Select from 'react-select'
-import ProtectedIcon from '@/newtelco/ag-grid/protected'
+import { ProtectedIcon } from '@/newtelco/ag-grid'
 import Notify from '@/newtelco-utils/notification'
 import ConfirmModal from '@/newtelco/confirmmodal'
 import {

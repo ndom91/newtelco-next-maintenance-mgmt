@@ -1,9 +1,11 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { AgGridReact } from 'ag-grid-react'
-import StartDateTime from '@/newtelco/ag-grid/startdatetime'
-import EndDateTime from '@/newtelco/ag-grid/enddatetime'
-import sentBtn from '@/newtelco/ag-grid/sentBtn'
-import SentIcon from '@/newtelco/ag-grid/sent'
+import {
+  StartDateTime,
+  EndDateTime,
+  sentBtn,
+  SentIcon,
+} from '@/newtelco/ag-grid'
 import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-material.css'
 import Store from '@/newtelco/store'
