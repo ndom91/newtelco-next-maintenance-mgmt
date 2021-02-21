@@ -16,4 +16,4 @@ steps:
   displayName: 'npm install and build'
 - task: gitsync@1
   inputs:
-    GitRepoUrl: 'https://b404e260ac79dea204282f59201e8d3821549602@github.com/newtelco/next-maintenance.git'
+    GitRepoUrl: 'https://$(GITHUB_KEY)@github.com/newtelco/next-maintenance.git'
