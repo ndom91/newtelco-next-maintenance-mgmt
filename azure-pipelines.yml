@@ -1,9 +1,6 @@
 trigger:
 - 'main'
 
-pool:
-  {{ pool }}
-
 steps:
 - task: NodeTool@0
   inputs:
