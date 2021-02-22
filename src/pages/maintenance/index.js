@@ -250,6 +250,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
   const [maintHistory, setMaintHistory] = useState({
     timezone: serverData.profile?.timezone || undefined,
     supplier: serverData.profile?.lieferant,
+    senderMaintenanceId: serverData.profile?.senderMaintenanceId,
     startDateTime: serverData.profile?.startDateTime,
     endDateTime: serverData.profile?.endDateTime,
     supplierCids: serverData.profile?.derenCIDid?.split(',').map(Number) || '',
@@ -753,16 +754,6 @@ const Maintenance = ({ session, serverData, suppliers }) => {
     let subject = subj || mailPreviewSubject
     const to = recipient || mailPreviewRecipients
 
-    // if (+maintenance.emergency) {
-    //   subject = `[EMERGENCY] ${subject}`
-    // }
-    // if (+maintenance.cancelled) {
-    //   subject = `[CANCELLED] ${subject}`
-    // }
-    // if (store.get('rescheduleData').length !== 0) {
-    //   subject = `[RESCHEDULED] ${subject}-${store.get('rescheduleData')[store.get('rescheduleData').length - 1].rcounter}`
-    // }
-
     fetch('/v1/api/mail/send', {
       method: 'post',
       body: JSON.stringify({
@@ -778,7 +769,6 @@ const Maintenance = ({ session, serverData, suppliers }) => {
       .then(data => {
         const status = data.response.status
         const statusText = data.response.statusText
-        // console.log(customerCid, customerCids)
 
         if (status === 200 && statusText === 'OK') {
           updateSentProgress()
