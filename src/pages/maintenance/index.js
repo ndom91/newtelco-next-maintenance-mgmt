@@ -863,7 +863,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
     const endDateTime = currentMaint.endDateTime
 
     let derenCid = ''
-    currentMaint.supplierCids.forEach(supp => {
+    currentMaint.supplierCids?.forEach(supp => {
       const supplierLabel = supplierCids.filter(
         supplier => supplier.value === supp
       )
