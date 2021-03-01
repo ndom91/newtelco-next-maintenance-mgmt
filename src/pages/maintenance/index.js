@@ -69,7 +69,7 @@ const MyTextarea = ({ field, form, ...props }) => {
       componentClass='textarea'
       name={field.name}
       disabled={props.maintId === 'NEW'}
-      value={field.value}
+      value={field.value || ''}
       onChange={option => form.setFieldValue(field.name, option)}
     />
   )
@@ -210,21 +210,23 @@ const AutoSave = ({ debounceMs, id }) => {
     <div
       style={{ color: 'var(--grey2)', display: 'flex', alignItems: 'center' }}
     >
-      <svg
-        xmlns='http://www.w3.org/2000/svg'
-        width='18'
-        height='18'
-        viewBox='0 0 24 24'
-        fill='none'
-        stroke='var(--grey2)'
-        strokeWidth='2'
-        strokeLinecap='round'
-        strokeLinejoin='round'
-      >
-        <path d='M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z' />
-        <polyline points='17 21 17 13 7 13 7 21' />
-        <polyline points='7 3 7 8 15 8' />
-      </svg>
+      <Whisper placement='top' speaker={<Tooltip>Last Saved</Tooltip>}>
+        <svg
+          xmlns='http://www.w3.org/2000/svg'
+          width='18'
+          height='18'
+          viewBox='0 0 24 24'
+          fill='none'
+          stroke='var(--grey2)'
+          strokeWidth='2'
+          strokeLinecap='round'
+          strokeLinejoin='round'
+        >
+          <path d='M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z' />
+          <polyline points='17 21 17 13 7 13 7 21' />
+          <polyline points='7 3 7 8 15 8' />
+        </svg>
+      </Whisper>
       <span style={{ marginLeft: '5px' }}>{result}</span>
     </div>
   )
@@ -284,22 +286,26 @@ const Maintenance = ({ session, serverData, suppliers }) => {
   }) => {
     return (
       <ButtonGroup>
-        <IconButton
-          onClick={() =>
-            prepareDirectSend(maintenanceRecipient, kundenCID, frozen, name)
-          }
-          size='sm'
-          appearance='ghost'
-          icon={<Icon icon='send' />}
-        />
-        <IconButton
-          onClick={() =>
-            togglePreviewModal(maintenanceRecipient, kundenCID, protection)
-          }
-          size='sm'
-          appearance='ghost'
-          icon={<Icon icon='search' />}
-        />
+        <Whisper placement='bottom' speaker={<Tooltip>Direct Send</Tooltip>}>
+          <IconButton
+            onClick={() =>
+              prepareDirectSend(maintenanceRecipient, kundenCID, frozen, name)
+            }
+            size='sm'
+            appearance='ghost'
+            icon={<Icon icon='send' />}
+          />
+        </Whisper>
+        <Whisper placement='bottom' speaker={<Tooltip>Preview Mail</Tooltip>}>
+          <IconButton
+            onClick={() =>
+              togglePreviewModal(maintenanceRecipient, kundenCID, protection)
+            }
+            size='sm'
+            appearance='ghost'
+            icon={<Icon icon='search' />}
+          />
+        </Whisper>
       </ButtonGroup>
     )
   }
@@ -862,14 +868,13 @@ const Maintenance = ({ session, serverData, suppliers }) => {
     const startDateTime = currentMaint.startDateTime
     const endDateTime = currentMaint.endDateTime
 
-    let derenCid = ''
-    currentMaint.supplierCids?.forEach(supp => {
-      const supplierLabel = supplierCids.filter(
-        supplier => supplier.value === supp
+    let derenCidString = []
+    currentMaint.supplierCids?.forEach(supplierCidId => {
+      const supplierCid = supplierCids.find(
+        supplier => supplier.value === supplierCidId
       )
-      derenCid += ` ${supplierLabel[0].label}`
+      derenCidString.push(supplierCid.label)
     })
-    derenCid = derenCid.trim()
 
     let cids = ''
     customerCids.forEach(cid => {
@@ -887,7 +892,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
       body: JSON.stringify({
         company: company,
         cids: cids,
-        supplierCID: derenCid,
+        supplierCID: derenCidString.join(' ').trim(),
         maintId: maintId,
         startDateTime: startDE,
         endDateTime: endDE,
@@ -1218,17 +1223,33 @@ const Maintenance = ({ session, serverData, suppliers }) => {
     const HeaderCenter = () => {
       return (
         <div>
-          <Button
-            appearance='subtle'
-            size='lg'
-            style={{
-              display: 'inline',
-              fontSize: '1.1em',
-              fontWeight: '200',
-            }}
+          <Whisper
+            placement='left'
+            speaker={<Tooltip>Open Company History</Tooltip>}
           >
-            {maintenance.name}
-          </Button>
+            <Button
+              appearance='subtle'
+              size='lg'
+              onClick={() =>
+                Router.push(
+                  {
+                    pathname: '/companies',
+                    query: {
+                      company: maintenance.name,
+                    },
+                  },
+                  '/companies'
+                )
+              }
+              style={{
+                display: 'inline',
+                fontSize: '1.1em',
+                fontWeight: '200',
+              }}
+            >
+              {maintenance.name}
+            </Button>
+          </Whisper>
           <div
             appearance='subtle'
             size='lg'
@@ -1594,21 +1615,26 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                                 justifyContent: 'flex-end',
                               }}
                             >
-                              <svg
-                                xmlns='http://www.w3.org/2000/svg'
-                                fill='none'
-                                width='18'
-                                height='18'
-                                viewBox='0 0 24 24'
-                                stroke='currentColor'
+                              <Whisper
+                                placement='top'
+                                speaker={<Tooltip>Mail Arrived</Tooltip>}
                               >
-                                <path
-                                  strokeLinecap='round'
-                                  strokeLinejoin='round'
-                                  strokeWidth={2}
-                                  d='M3 19v-8.93a2 2 0 01.89-1.664l7-4.666a2 2 0 012.22 0l7 4.666A2 2 0 0121 10.07V19M3 19a2 2 0 002 2h14a2 2 0 002-2M3 19l6.75-4.5M21 19l-6.75-4.5M3 10l6.75 4.5M21 10l-6.75 4.5m0 0l-1.14.76a2 2 0 01-2.22 0l-1.14-.76'
-                                />
-                              </svg>
+                                <svg
+                                  xmlns='http://www.w3.org/2000/svg'
+                                  fill='none'
+                                  width='18'
+                                  height='18'
+                                  viewBox='0 0 24 24'
+                                  stroke='currentColor'
+                                >
+                                  <path
+                                    strokeLinecap='round'
+                                    strokeLinejoin='round'
+                                    strokeWidth={2}
+                                    d='M3 19v-8.93a2 2 0 01.89-1.664l7-4.666a2 2 0 012.22 0l7 4.666A2 2 0 0121 10.07V19M3 19a2 2 0 002 2h14a2 2 0 002-2M3 19l6.75-4.5M21 19l-6.75-4.5M3 10l6.75 4.5M21 10l-6.75 4.5m0 0l-1.14.76a2 2 0 01-2.22 0l-1.14-.76'
+                                  />
+                                </svg>
+                              </Whisper>
                               {convertDateTime(maintenance.maileingang)}
                             </div>
                           </Col>
@@ -1639,8 +1665,8 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                                 style={{ marginTop: '0px', float: 'right' }}
                                 tooltip
                               >
-                                Maintenance ID in Sender's System - For
-                                Documentation Purposes Only
+                                Maintenance ID in Suppliers System <br />
+                                For Documentation Purposes Only
                               </HelpBlock>
                               <FastField
                                 name='senderMaintenanceId'
@@ -1806,7 +1832,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                                     placement='bottom'
                                     speaker={
                                       <Tooltip>
-                                        Use Time Difference Text
+                                        Use Suggested Time Difference Text
                                       </Tooltip>
                                     }
                                   >

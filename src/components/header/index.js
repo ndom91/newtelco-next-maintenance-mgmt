@@ -149,12 +149,17 @@ const MaintHeader = () => {
             >
               <Dropdown.Item
                 panel
-                style={{ padding: '10px', textAlign: 'right', width: '105px' }}
+                style={{
+                  padding: '10px',
+                  textAlign: 'right',
+                  width: '105px',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
               >
                 <p>Signed in as</p>
-                <strong>
-                  {!loading && session.user.email.match(/^([^@]*)@/)[1]}
-                </strong>
+                <strong>{!loading && session.user.name}</strong>
               </Dropdown.Item>
               {/* <Dropdown.Item eventKey='1'>
                 <span
