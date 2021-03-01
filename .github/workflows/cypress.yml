@@ -1,8 +1,9 @@
-name: Cypress (Chrome) Tests
+name: Cypress Tests
 on: [push, pull_request]
 jobs:
   cypress-run:
     runs-on: ubuntu-latest
+    name: Test newtelco/next-maintenance
     steps:
       - name: Checkout
         uses: actions/checkout@v2
