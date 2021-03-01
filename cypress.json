@@ -1,5 +1,6 @@
 {
   "baseUrl": "http://localhost:4000",
   "chromeWebSecurity": false,
-  "projectId": "v648t3"
+  "projectId": "v648t3",
+  "experimentalStudio": true
 }
