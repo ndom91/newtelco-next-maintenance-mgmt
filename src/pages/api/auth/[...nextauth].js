@@ -44,7 +44,7 @@ const options = {
   jwt: {
     secret: 'aLjPYy0Xk3YJn5AGmyv9gcSYJa60nKP5Qf86i9oPpckiMTCksHNrNaCodjLauB8T',
   },
-  debug: true,
+  debug: false,
 }
 
 export default (req, res) => NextAuth(req, res, options)

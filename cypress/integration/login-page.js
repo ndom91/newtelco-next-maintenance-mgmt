@@ -18,11 +18,8 @@ describe('Login page', () => {
   it('Signin with Dummy Provider', () => {
     cy.visit('/auth/signin')
     cy.findByText('Sign in with Credentials').click()
-    cy.get('a.unread-count', { timeout: 30000 })
 
-    // cy.visit('/api/auth/signout')
-    // cy.get('form').submit()
-    // cy.clearCookies()
-    // cy.clearLocalStorage()
+    // Check for Unread Count on Home Dashbaord
+    cy.get('a.unread-count', { timeout: 30000 })
   })
 })
