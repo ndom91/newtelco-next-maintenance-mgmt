@@ -1,8 +1,3 @@
-module.exports = (on, config) => {
-	on('task', {
-		GoogleSocialLogin: GoogleSocialLogin,
-	})
-}
 
 describe('Login page', () => {
 	before(() => {
@@ -16,61 +11,18 @@ describe('Login page', () => {
 		cy.get('.rs-content img').should('have.length', 1)
 	})
 
-	it('Signin with Google Button', () => {
-		cy.get('#signin-btn').should('have.length', 1)
-		cy.findByText('Sign in with Google').should('exist')
-		cy.get('.signin-link').should(
-			'have.attr',
-			'href',
-			`${Cypress.env('NEXTAUTH_URL')}/api/auth/signin/google`
-		)
+	it('Signin with Dummy Provider should exist', () => {
+		cy.get('#signin-btn').should('have.length', 2)
+		cy.findByText('Sign in with Credentials').should('exist')
 	})
 
-	it('Login through Google', () => {
-		const username = Cypress.env('GOOGLE_USER')
-		const password = Cypress.env('GOOGLE_PW')
-		const loginUrl = Cypress.env('NEXTAUTH_URL')
-		const cookieName = Cypress.env('COOKIE_NAME')
-		const socialLoginOptions = {
-			username,
-			password,
-			loginUrl,
-			headless: true,
-			logs: true,
-			isPopup: true,
-			loginSelector: 'input[type="submit"]',
-			loginSelectorDelay: 500,
-			postLoginSelector: '.unread-count',
-			getAllBrowserCookies: true,
-		}
-
+	it('Signin with Dummy Provider', () => {
 		cy.visit('/auth/signin')
+		cy.findByText('Sign in with Credentials').click()
 
-		return cy
-			.task('GoogleSocialLogin', socialLoginOptions)
-			.then(({ cookies }) => {
-				cy.clearCookies()
-
-				const cookie = cookies
-					.filter(cookie => cookie.name === cookieName)
-					.pop()
-				if (cookie) {
-					cy.setCookie(cookie.name, cookie.value, {
-						domain: cookie.domain,
-						expiry: cookie.expires,
-						httpOnly: cookie.httpOnly,
-						path: cookie.path,
-						secure: cookie.secure,
-					})
-
-					Cypress.Cookies.defaults({
-						whitelist: cookieName,
-					})
-					cy.visit('/api/auth/signout')
-					cy.get('form').submit()
-					cy.clearCookies()
-					cy.clearLocalStorage()
-				}
-			})
+		cy.visit('/api/auth/signout')
+		cy.get('form').submit()
+		// cy.clearCookies()
+		// cy.clearLocalStorage()
 	})
 })
