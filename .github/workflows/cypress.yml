@@ -18,16 +18,16 @@ jobs:
         with:
           browser: chrome
           record: true
-          group: "next-maintenance"
+          group: 'next-maintenance'
           build: npm run build
           start: npm start
-          wait-on: http://localhost:3000
+          wait-on: http://localhost:4000
           env: true
         env:
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-          CYPRESS_NEXTAUTH_URL: "http://localhost:3000"
-          CYPRESS_BASE_URL: "http://localhost:3000"
+          CYPRESS_NEXTAUTH_URL: 'http://localhost:4000'
+          CYPRESS_BASE_URL: 'http://localhost:4000'
           CYPRESS_GOOGLE_USER: ${{ secrets.GOOGLE_USER }}
           CYPRESS_GOOGLE_PW: ${{ secrets.GOOGLE_PW }}
           CYPRESS_COOKIE_NAME: ${{ secrets.COOKIE_NAME }}
