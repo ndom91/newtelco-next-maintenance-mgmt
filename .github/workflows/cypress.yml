@@ -22,7 +22,6 @@ jobs:
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           CYPRESS_NEXTAUTH_URL: 'http://localhost:4000'
-          NEXTAUTH_URL: 'http://localhost:4000'
           CYPRESS_BASE_URL: 'http://localhost:4000'
           CYPRESS_SITE_NAME: ${{ secrets.SITE_NAME }}
       - uses: actions/upload-artifact@v1
