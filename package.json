@@ -4,7 +4,7 @@
   "description": "Newtelco Maintenance App",
   "scripts": {
     "dev": "NEXT_PUBLIC_ENV=development next -p 4000",
-    "ci": "NEXT_PUBLIC_ENV=CI next -p 4000",
+    "ci": "NEXT_PUBLIC_ENV=CI next start -p 4000",
     "start": "NEXT_PUBLIC_ENV=production next start -p 4000",
     "build": "next build",
     "analyze": "ANALYZE=true next build",
