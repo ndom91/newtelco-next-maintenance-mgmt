@@ -25,7 +25,7 @@ const MaintHeader = () => {
 
   let avatarPath
   if (!loading) {
-    const username = session.user.email.match(/^([^@]*)@/)[1]
+    const username = session.user.email?.match(/^([^@]*)@/)[1]
     if (session.user.image) {
       avatarPath = session.user.image
     } else if (
@@ -43,7 +43,7 @@ const MaintHeader = () => {
     ) {
       avatarPath = `/static/images/avatars/${username}.png`
     } else {
-      avatarPath = `https://api.adorable.io/avatars/128/${session.user.name}.png`
+      avatarPath = `https://i.pravatar.cc/128?u=${session.user.name}`
     }
   }
 
