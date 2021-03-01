@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import Notify from '@/newtelco-utils/notification'
-import { Tag } from 'rsuite'
+import { Tag, Whisper, Tooltip } from 'rsuite'
 
 export const CustomerCid = props => {
   const [hover, setHover] = useState(false)
@@ -14,27 +14,32 @@ export const CustomerCid = props => {
       onMouseLeave={() => setHover(false)}
     >
       {props.data.kundenCID}
-      <Tag
-        style={{
-          visibility: hover ? 'visible' : 'hidden',
-          opacity: hover ? '1' : '0',
-        }}
-        onClick={copyToClipboard}
-        className='copy-btn'
+      <Whisper
+        placement='bottom'
+        speaker={<Tooltip>Copy to Clipboard</Tooltip>}
       >
-        <svg
-          height='16'
-          width='16'
-          fill='none'
-          strokeLinecap='round'
-          strokeLinejoin='round'
-          strokeWidth='2'
-          viewBox='0 0 24 24'
-          stroke='currentColor'
+        <Tag
+          style={{
+            visibility: hover ? 'visible' : 'hidden',
+            opacity: hover ? '1' : '0',
+          }}
+          onClick={copyToClipboard}
+          className='copy-btn'
         >
-          <path d='M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3' />
-        </svg>
-      </Tag>
+          <svg
+            height='16'
+            width='16'
+            fill='none'
+            strokeLinecap='round'
+            strokeLinejoin='round'
+            strokeWidth='2'
+            viewBox='0 0 24 24'
+            stroke='currentColor'
+          >
+            <path d='M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3' />
+          </svg>
+        </Tag>
+      </Whisper>
     </div>
   )
 }

@@ -25,7 +25,7 @@ const MaintHeader = () => {
 
   let avatarPath
   if (!loading) {
-    const username = session.user.email.match(/^([^@]*)@/)[1]
+    const username = session.user.email?.match(/^([^@]*)@/)[1]
     if (session.user.image) {
       avatarPath = session.user.image
     } else if (
@@ -43,7 +43,7 @@ const MaintHeader = () => {
     ) {
       avatarPath = `/static/images/avatars/${username}.png`
     } else {
-      avatarPath = `https://api.adorable.io/avatars/128/${session.user.name}.png`
+      avatarPath = `https://i.pravatar.cc/128?u=${session.user.name}`
     }
   }
 
@@ -149,12 +149,17 @@ const MaintHeader = () => {
             >
               <Dropdown.Item
                 panel
-                style={{ padding: '10px', textAlign: 'right', width: '105px' }}
+                style={{
+                  padding: '10px',
+                  textAlign: 'right',
+                  width: '105px',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
               >
                 <p>Signed in as</p>
-                <strong>
-                  {!loading && session.user.email.match(/^([^@]*)@/)[1]}
-                </strong>
+                <strong>{!loading && session.user.name}</strong>
               </Dropdown.Item>
               {/* <Dropdown.Item eventKey='1'>
                 <span

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useRef, useEffect, useState } from 'react'
 import { getSession } from 'next-auth/client'
 import './companies.css'
 import Layout from '@/newtelco/layout'
@@ -22,7 +22,7 @@ import {
 import MaintPanel from '@/newtelco/panel'
 import { IconButton, ButtonGroup, SelectPicker } from 'rsuite'
 
-const Companies = ({ session, suppliers }) => {
+const Companies = ({ session, suppliers, company }) => {
   const gridOptions = {
     defaultColDef: {
       resizable: true,
@@ -62,7 +62,7 @@ const Companies = ({ session, suppliers }) => {
         },
       },
       {
-        headerName: 'Sender Maint Id',
+        headerName: 'Sender Maint ID',
         field: 'senderMaintenanceId',
         tooltipField: 'senderMaintenanceId',
       },
@@ -160,9 +160,17 @@ const Companies = ({ session, suppliers }) => {
   }
 
   const gridApi = useRef()
-
   const [rowData, setRowData] = useState([])
   const [selectedNewCompany, setSelectedNewCompany] = useState([])
+
+  useEffect(() => {
+    if (company) {
+      const selectedCompany = suppliers.companies.find(
+        supplier => supplier.label === company
+      )
+      handleNewCompanySelect(selectedCompany.value)
+    }
+  }, [])
 
   const handleGridReady = params => {
     gridApi.current = params.api
@@ -199,7 +207,7 @@ const Companies = ({ session, suppliers }) => {
     return (
       <Layout>
         <MaintPanel
-          header='Company Overview'
+          header='Company History'
           buttons={
             <>
               <SelectPicker
@@ -263,7 +271,7 @@ const Companies = ({ session, suppliers }) => {
   }
 }
 
-export async function getServerSideProps({ req }) {
+export async function getServerSideProps({ req, query }) {
   const host = req ? req.headers['x-forwarded-host'] : window.location.hostname
   let protocol = 'https:'
   if (host.indexOf('localhost') > -1) {
@@ -274,6 +282,7 @@ export async function getServerSideProps({ req }) {
   return {
     props: {
       session: await getSession({ req }),
+      company: query?.company || '',
       suppliers,
     },
   }

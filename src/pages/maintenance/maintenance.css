@@ -278,3 +278,7 @@ textarea::-webkit-scrollbar-thumb,
   font-weight: bold;
   padding: 3px;
 }
+
+.ag-theme-material .ag-has-focus .ag-cell-focus:not(.ag-cell-range-select) {
+  border-color: transparent !important;
+}

@@ -25,13 +25,8 @@ const MailEditor = ({
   sendMail,
   onEditorChange,
 }) => {
-  const [faviconLoading, setFaviconLoading] = useState(false)
-  const [editorLoading, setEditorLoading] = useState(false)
-
-  useEffect(() => {
-    setFaviconLoading(true)
-    setEditorLoading(true)
-  }, [])
+  const [faviconLoading, setFaviconLoading] = useState(true)
+  const [editorLoading, setEditorLoading] = useState(true)
 
   return (
     <Modal
