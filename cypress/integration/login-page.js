@@ -20,6 +20,6 @@ describe('Login page', () => {
     cy.findByText('Sign in with Credentials').click()
 
     // Check for Unread Count on Home Dashbaord
-    cy.get('a.unread-count', { timeout: 30000 })
+    cy.get('a.unread-count', { timeout: 30000 }).should('exist')
   })
 })
