@@ -39,12 +39,7 @@ const App = ({ Component, pageProps }) => {
     <Provider session={pageProps.session}>
       <ConditionalWrap
         condition={process.env.NEXT_PUBLIC_ENV === 'production'}
-        wrap={children => (
-          <ErrorBoundary>
-            {children}
-            <img src='https://analytics.newtelco.dev/ingress/7e406c80-f4f1-40f4-8407-1b0493dc86d1/pixel.gif' />
-          </ErrorBoundary>
-        )}
+        wrap={children => <ErrorBoundary>{children}</ErrorBoundary>}
       >
         <Head>
           <title>Newtelco Maintenance</title>
