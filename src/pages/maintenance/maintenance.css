@@ -282,3 +282,7 @@ textarea::-webkit-scrollbar-thumb,
 .ag-theme-material .ag-has-focus .ag-cell-focus:not(.ag-cell-range-select) {
   border-color: transparent !important;
 }
+
+.maintenance--input::placeholder {
+  color: rgba(94, 94, 94, 0.4);
+}

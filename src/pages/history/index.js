@@ -63,7 +63,7 @@ const History = ({ session, data }) => {
         cellRenderer: 'edittedby',
         tooltipField: 'bearbeitetvon',
         width: 100,
-        cellStyle: params => {
+        cellStyle: () => {
           return {
             display: 'flex',
             alignItems: 'center',
@@ -76,7 +76,7 @@ const History = ({ session, data }) => {
         field: 'name',
         width: 240,
         cellRenderer: 'supplier',
-        cellStyle: params => {
+        cellStyle: () => {
           return {
             display: 'flex',
             alignItems: 'center',
@@ -335,7 +335,7 @@ const History = ({ session, data }) => {
                     fill='none'
                     strokeLinecap='round'
                     strokeLinejoin='round'
-                    strokeWidth='1'
+                    strokeWidth='2'
                     viewBox='0 0 24 24'
                     stroke='var(--grey4)'
                     style={{ marginRight: '5px' }}
@@ -366,7 +366,7 @@ const History = ({ session, data }) => {
                     fill='none'
                     strokeLinecap='round'
                     strokeLinejoin='round'
-                    strokeWidth='1'
+                    strokeWidth='2'
                     viewBox='0 0 24 24'
                     stroke='var(--grey4)'
                     style={{ marginRight: '5px' }}
@@ -397,7 +397,7 @@ const History = ({ session, data }) => {
                     fill='none'
                     strokeLinecap='round'
                     strokeLinejoin='round'
-                    strokeWidth='1'
+                    strokeWidth='2'
                     viewBox='0 0 24 24'
                     stroke='var(--grey4)'
                     style={{ marginRight: '5px' }}

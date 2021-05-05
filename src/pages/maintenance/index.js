@@ -1,33 +1,37 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { getSession } from 'next-auth/client'
-import Layout from '@/newtelco/layout'
-import RequireLogin from '@/newtelco/require-login'
-import './maintenance.css'
-import Router, { useRouter } from 'next/router'
 import Head from 'next/head'
-import MailEditor from '@/newtelco/maintenance/mailEditor'
-import { format, isValid, formatDistance, parseISO } from 'date-fns'
-import moment from 'moment-timezone'
-import Flatpickr from 'react-flatpickr'
-import 'flatpickr/dist/themes/airbnb.css'
-import { getUnique, convertDateTime } from '@/newtelco/maintenance/helper'
-import { ProtectedIcon, SentIcon, CustomerCid } from '@/newtelco/ag-grid'
-import { AgGridReact } from 'ag-grid-react'
 import dynamic from 'next/dynamic'
-import ReadModal from '@/newtelco/maintenance/readmodal'
+import Router, { useRouter } from 'next/router'
+
+import Layout from '@/newtelco/layout'
 import Store from '@/newtelco/store'
-import ConfirmModal from '@/newtelco/confirmmodal'
-import CommentList from '@/newtelco/maintenance/comments/list'
 import MaintPanel from '@/newtelco/panel'
+import RequireLogin from '@/newtelco/require-login'
+import ConfirmModal from '@/newtelco/confirmmodal'
+import { ProtectedIcon, SentIcon, CustomerCid } from '@/newtelco/ag-grid'
+
+import tzOptions from '@/newtelco/maintenance/timezoneOptions'
+import MailEditor from '@/newtelco/maintenance/mailEditor'
+import CommentList from '@/newtelco/maintenance/comments/list'
+import RescheduleGrid from '@/newtelco/maintenance/reschedule'
+import { getUnique, convertDateTime } from '@/newtelco/maintenance/helper'
+
+import Notify from '@/newtelco-utils/notification'
+import objDiff from '@/newtelco-utils/objdiff'
+
+import Select from 'react-select'
+import moment from 'moment-timezone'
+import debounce from 'just-debounce-it'
+import Flatpickr from 'react-flatpickr'
+import { AgGridReact } from 'ag-grid-react'
+import { Formik, FastField, Field, useFormikContext } from 'formik'
+import { format, isValid, formatDistance, parseISO } from 'date-fns'
+
 import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-material.css'
-import Notify from '@/newtelco-utils/notification'
-import { Formik, FastField, Field, useFormikContext } from 'formik'
-import tzOptions from '@/newtelco/maintenance/timezoneOptions'
-import Select from 'react-select'
-import debounce from 'just-debounce-it'
-import objDiff from '@/newtelco-utils/objdiff'
-import RescheduleGrid from '@/newtelco/maintenance/reschedule'
+import 'flatpickr/dist/themes/airbnb.css'
+import './maintenance.css'
 
 import {
   Icon,
@@ -59,6 +63,9 @@ import {
 const Changelog = dynamic(() => import('@/newtelco/maintenance/timeline'), {
   ssr: false,
 })
+const ReadModal = dynamic(() => import('@/newtelco/maintenance/readmodal'), {
+  ssr: false,
+})
 
 const MyTextarea = ({ field, form, ...props }) => {
   return (
@@ -82,6 +89,7 @@ const MyTextinput = ({ field, form, placeholder = '', ...props }) => {
       value={field.value || ''}
       disabled={props.maintId === 'NEW'}
       placeholder={placeholder}
+      className='maintenance--input'
       onChange={option => form.setFieldValue(field.name, option)}
     />
   )
@@ -125,13 +133,13 @@ const MyDateTime = ({ field, form, ...props }) => {
         allow_input: 'true',
       }}
       className='flatpickr'
-      render={({ defaultValue, value, ...props }, ref) => {
+      render={({ defaultValue, ...props }, ref) => {
         const curTimezone = tzOptions.filter(
           opt => opt.value === form.values.timezone
         )
         let tzDisplay = ''
         if (curTimezone[0]) {
-          const regex = /(GMT(\-|\+)?([0-1][0-9]:[0-5][0-9])?)/i
+          const regex = /(GMT(-|\+)?([0-1][0-9]:[0-5][0-9])?)/i
           tzDisplay = curTimezone[0].label.match(regex)[0]
         }
         return (
@@ -811,10 +819,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
               {
                 method: 'get',
               }
-            )
-              .then(resp => resp.json())
-              .then(data => {})
-              .catch(err => console.error(`Error updating Audit Log - ${err}`))
+            ).catch(err => console.error(`Error updating Audit Log - ${err}`))
           }
         } else {
           Notify('error', 'Error Sending Mail')
@@ -873,7 +878,9 @@ const Maintenance = ({ session, serverData, suppliers }) => {
       const supplierCid = supplierCids.find(
         supplier => supplier.value === supplierCidId
       )
-      derenCidString.push(supplierCid.label)
+      if (supplierCid) {
+        derenCidString.push(supplierCid?.label || '')
+      }
     })
 
     let cids = ''
@@ -929,9 +936,6 @@ const Maintenance = ({ session, serverData, suppliers }) => {
             },
           })
             .then(resp => resp.json())
-            .then(data => {
-              // console.log(data)
-            })
             .catch(err => console.error(err))
         } else if (statusText === 'failed') {
           Notify('error', 'Error Creating Calendar Entry', data.statusText)
@@ -951,7 +955,9 @@ const Maintenance = ({ session, serverData, suppliers }) => {
       const supplierLabel = supplierCids.filter(
         supplier => supplier.value === supp
       )
-      derenCid += ` ${supplierLabel[0].label}`
+      if (supplierLabel[0].label) {
+        derenCid += ` ${supplierLabel[0].label}`
+      }
     })
     derenCid = derenCid.trim()
 
@@ -1594,13 +1600,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                       }
                     }}
                   >
-                    {({
-                      values,
-                      handleChange,
-                      handleBlur,
-                      handleSubmit,
-                      setFieldValue,
-                    }) => (
+                    {({ values, setFieldValue }) => (
                       <>
                         <Row gutter={20} style={{ marginBottom: '20px' }}>
                           <Col sm={12} xs={12}>
@@ -1626,6 +1626,9 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                                   height='18'
                                   viewBox='0 0 24 24'
                                   stroke='currentColor'
+                                  style={{
+                                    marginRight: '3px',
+                                  }}
                                 >
                                   <path
                                     strokeLinecap='round'
