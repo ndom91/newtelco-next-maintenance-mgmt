@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useRef, useEffect } from 'react'
 import Router from 'next/router'
 import algoliasearch from 'algoliasearch'
 import Autocomplete from 'algolia-react-autocomplete'
@@ -6,12 +6,12 @@ import './search.css'
 import { DOMHelper } from 'rsuite'
 const { addClass, removeClass } = DOMHelper
 
-const SearchInput = props => {
+const SearchInput = () => {
   const searchInput = useRef()
   const toCamelCase = str => {
     return str
       .split(' ')
-      .map(function (word, index) {
+      .map(word => {
         return ' ' + word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
       })
       .join('')
@@ -50,13 +50,11 @@ const SearchInput = props => {
     {
       source: algoliaClient.initIndex('maintenance'),
       displayKey: 'name',
+      /* eslint-disable react/display-name */
       templates: {
         suggestion: suggestion => {
           if (suggestion._highlightResult) {
-            Object.keys(suggestion._highlightResult).forEach(function (
-              key,
-              index
-            ) {
+            Object.keys(suggestion._highlightResult).forEach(key => {
               if (
                 suggestion._highlightResult[key].matchLevel &&
                 suggestion._highlightResult[key].matchLevel !== 'none'
@@ -217,6 +215,7 @@ const SearchInput = props => {
       },
     },
   ]
+  /* eslint-enable react/display-name */
 
   const handleSearchSelection = selection => {
     const newLocation = `/maintenance?id=${selection.id

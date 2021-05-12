@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react'
 import { Rnd } from 'react-rnd'
 import ShadowDom from '../../components/shadowdom'
+import DOMPurify from 'dompurify'
 import { OutTable, ExcelRenderer } from 'react-excel-renderer'
 import { Document, Page } from 'react-pdf'
 import { pdfjs } from 'react-pdf'
@@ -445,7 +446,9 @@ const ReadModal = ({
           >
             <ShadowDom>
               <div
-                dangerouslySetInnerHTML={{ __html: maintenance.incomingBody }}
+                dangerouslySetInnerHTML={{
+                  __html: DOMPurify.sanitize(maintenance.incomingBody),
+                }}
               />
             </ShadowDom>
           </Modal.Body>
@@ -537,7 +540,7 @@ const ReadModal = ({
                   <div className='attachment-body html'>
                     <div
                       dangerouslySetInnerHTML={{
-                        __html: attachmentHTMLContent,
+                        __html: DOMPurify.sanitize(attachmentHTMLContent),
                       }}
                     />
                   </div>

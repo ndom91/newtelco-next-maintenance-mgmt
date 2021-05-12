@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react'
 import { getSession } from 'next-auth/client'
 import Layout from '@/newtelco/layout'
 import RequireLogin from '@/newtelco/require-login'
-import useSWR from 'swr'
 import MaintPanel from '@/newtelco/panel'
 import InboxItem from '@/newtelco/inboxitem'
 import Notify from '@/newtelco-utils/notification'
 import Store from '@/newtelco/store'
+import useSWR from 'swr'
+import DOMPurify from 'dompurify'
 import {
   List,
   Modal,
@@ -83,8 +84,7 @@ const Inbox = ({ session, inboxItems }) => {
       // const htmlRegex2 = new RegExp('<([a-z]+)[^>]*(?<!/)>', 'gi')
       // const htmlRegex3 = new RegExp('<meta .*>', 'gi')
 
-      if (htmlRegex.test(mailBody)) {
-      } else {
+      if (!htmlRegex.test(mailBody)) {
         mailBody = `<pre>${mailBody}</pre>`
       }
       const modalInfo = {
@@ -269,7 +269,9 @@ const Inbox = ({ session, inboxItems }) => {
             </Modal.Header>
             <Modal.Body className='mail-body'>
               <div
-                dangerouslySetInnerHTML={{ __html: modalInfo.body }}
+                dangerouslySetInnerHTML={{
+                  __html: DOMPurify.sanitize(modalInfo.body),
+                }}
                 style={{ padding: '20px' }}
               />
             </Modal.Body>

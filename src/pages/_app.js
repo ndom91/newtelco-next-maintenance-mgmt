@@ -31,7 +31,6 @@ const App = ({ Component, pageProps }) => {
         })
       })
       setupLogRocketReact(LogRocket)
-      // console.log('Logrocket Initialized')
     }
   }, [])
 
