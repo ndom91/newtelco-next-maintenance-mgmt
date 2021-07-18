@@ -7,7 +7,6 @@
     "ci": "NEXT_PUBLIC_ENV=CI next start -p 4000",
     "start": "NEXT_PUBLIC_ENV=production next start -p 4000",
     "build": "next build",
-    "analyze": "ANALYZE=true next build",
     "prettier": "prettier --check \"src/**/*.{js,jsx,json}\"",
     "prettier:fix": "prettier --write \"src/**/*.{js,jsx,json}\"",
     "cy:open": "cypress open",
@@ -36,7 +35,6 @@
     "@nivo/calendar": "^0.62.0",
     "@sentry/nextjs": "^6.9.0",
     "@tinymce/tinymce-react": "^3.12.6",
-    "@zeit/next-less": "^1.0.1",
     "algolia-react-autocomplete": "^1.0.5",
     "algoliasearch": "^4.10.3",
     "apexcharts": "^3.27.2",
@@ -45,7 +43,6 @@
     "file-saver": "^2.0.5",
     "formik": "^2.2.9",
     "just-debounce-it": "^1.5.0",
-    "less": "^4.1.1",
     "lodash.isarray": "^4.0.0",
     "lodash.isequal": "^4.5.0",
     "lodash.isobject": "^3.0.2",
@@ -64,7 +61,6 @@
     "react-rnd": "^10.3.4",
     "react-select": "^4.3.1",
     "react-useanimations": "^2.0.6",
-    "rsuite": "^4.10.2",
     "serverless-mysql": "^1.5.4",
     "sql-template-strings": "^2.2.2",
     "swr": "^0.5.6",
@@ -74,7 +70,6 @@
   "devDependencies": {
     "@commitlint/cli": "^12.1.4",
     "@commitlint/config-conventional": "^12.1.4",
-    "@next/bundle-analyzer": "^11.0.1",
     "@testing-library/cypress": "^7.0.6",
     "ag-grid-community": "^25.3.0",
     "ag-grid-react": "^25.3.0",
@@ -87,10 +82,7 @@
     "husky": "^7.0.1",
     "lint-staged": "^11.0.1",
     "prettier": "^2.3.2",
-    "simple-git-hooks": "^2.5.1",
-    "webpack": "^5.45.1",
-    "webpack-bundle-analyzer": "^4.4.2",
-    "webpack-cli": "^4.7.2"
+    "simple-git-hooks": "^2.5.1"
   },
   "prettier": {
     "singleQuote": true,
