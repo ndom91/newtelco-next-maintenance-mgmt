@@ -1,15 +1,15 @@
 import React from 'react'
 import { Icon, IconButton, Dropdown } from 'rsuite'
 
-export const sentBtn = props => {
+export const sentBtn = (props) => {
   return (
     <Dropdown
       renderTitle={() => {
         return (
-          <IconButton appearance='subtle' icon={<Icon icon='ellipsis-v' />} />
+          <IconButton appearance="subtle" icon={<Icon icon="ellipsis-v" />} />
         )
       }}
-      placement='leftStart'
+      placement="leftStart"
     >
       <Dropdown.Item
         onClick={() =>

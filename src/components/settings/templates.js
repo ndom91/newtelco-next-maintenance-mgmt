@@ -47,15 +47,15 @@ export default class Templates extends React.Component {
     return (
       <>
         <CardBody>
-          <Container className='container-exterior'>
-            <CardHeader className='container-header'>
+          <Container className="container-exterior">
+            <CardHeader className="container-header">
               Maintenance Email
               {/* <FontAwesomeIcon width='1.125em' style={{ marginRight: '10px' }} icon={faAt} /> */}
             </CardHeader>
-            <Container className='container-border'>
+            <Container className="container-border">
               <TinyEditor
                 initialValue={this.state.mailText}
-                apiKey='ttv2x1is9joc0fi7v6f6rzi0u98w2mpehx53mnc1277omr7s'
+                apiKey="ttv2x1is9joc0fi7v6f6rzi0u98w2mpehx53mnc1277omr7s"
                 onBlur={this.handleMailBlur}
                 init={{
                   height: 500,
@@ -74,15 +74,15 @@ export default class Templates extends React.Component {
               />
             </Container>
           </Container>
-          <Container className='container-exterior'>
-            <CardHeader className='container-header'>
+          <Container className="container-exterior">
+            <CardHeader className="container-header">
               Maintenance Calendar
               {/* <FontAwesomeIcon width='1.125em' style={{ marginRight: '10px' }} icon={faCalendarAlt} /> */}
             </CardHeader>
-            <Container className='container-border'>
+            <Container className="container-border">
               <TinyEditor
                 initialValue={this.state.calendarText}
-                apiKey='ttv2x1is9joc0fi7v6f6rzi0u98w2mpehx53mnc1277omr7s'
+                apiKey="ttv2x1is9joc0fi7v6f6rzi0u98w2mpehx53mnc1277omr7s"
                 onBlur={this.handleCalBlur}
                 init={{
                   height: 300,

@@ -9,7 +9,7 @@ const cypressLogin = Providers.Credentials({
     password: { label: 'Password', type: 'password' },
   },
   async authorize(credentials) {
-    const user = credentials => {
+    const user = (credentials) => {
       return {
         id: 1,
         name: 'J Smith',

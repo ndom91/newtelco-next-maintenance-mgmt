@@ -2,7 +2,7 @@ import React from 'react'
 import Select from 'react-select'
 import moment from 'moment-timezone'
 
-const _t = s => {
+const _t = (s) => {
   if (i18n !== null && i18n[s]) {
     return i18n[s]
   }
@@ -171,7 +171,7 @@ const i18n = {
 const options = []
 moment.tz
   .names()
-  .filter(tz => {
+  .filter((tz) => {
     return timezones.includes(tz)
   })
   .reduce((memo, tz) => {
@@ -199,7 +199,7 @@ class TimezoneSelector extends React.Component {
     }
   }
 
-  handleChange = selectedOption => {
+  handleChange = (selectedOption) => {
     this.setState({ selectedOption })
   }
 
@@ -208,7 +208,7 @@ class TimezoneSelector extends React.Component {
 
     return (
       <Select
-        className='maint-select'
+        className="maint-select"
         value={this.props.value || selectedOption}
         onChange={this.props.onChange || this.handleChange}
         options={options}

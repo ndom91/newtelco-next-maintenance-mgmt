@@ -71,13 +71,13 @@ const MyTextarea = ({ field, form, ...props }) => {
   return (
     <Input
       rows={3}
-      type='text'
+      type="text"
       key={field.name}
-      componentClass='textarea'
+      componentClass="textarea"
       name={field.name}
       disabled={props.maintId === 'NEW'}
       value={field.value || ''}
-      onChange={option => form.setFieldValue(field.name, option)}
+      onChange={(option) => form.setFieldValue(field.name, option)}
     />
   )
 }
@@ -89,8 +89,8 @@ const MyTextinput = ({ field, form, placeholder = '', ...props }) => {
       value={field.value || ''}
       disabled={props.maintId === 'NEW'}
       placeholder={placeholder}
-      className='maintenance--input'
-      onChange={option => form.setFieldValue(field.name, option)}
+      className="maintenance--input"
+      onChange={(option) => form.setFieldValue(field.name, option)}
     />
   )
 }
@@ -103,7 +103,7 @@ const MyDateTime = ({ field, form, ...props }) => {
       disabled={props.maintId === 'NEW'}
       data-enable-time
       weekNumbers
-      onChange={option => {
+      onChange={(option) => {
         const rawValue = moment(option[0])
           .format('YYYY-MM-DD HH:mm:ss')
           .toString()
@@ -132,10 +132,10 @@ const MyDateTime = ({ field, form, ...props }) => {
         time_24hr: 'true',
         allow_input: 'true',
       }}
-      className='flatpickr'
+      className="flatpickr"
       render={({ defaultValue, ...props }, ref) => {
         const curTimezone = tzOptions.filter(
-          opt => opt.value === form.values.timezone
+          (opt) => opt.value === form.values.timezone
         )
         let tzDisplay = ''
         if (curTimezone[0]) {
@@ -160,7 +160,7 @@ const MyTagPicker = ({ field, form, ...props }) => {
     <TagPicker
       name={field.name}
       value={field.value}
-      onChange={option => {
+      onChange={(option) => {
         form.setFieldValue(field.name, option)
         if (!option && props.customerCids.length) {
           props.setCustomerCids([])
@@ -179,7 +179,7 @@ const MyTagPicker = ({ field, form, ...props }) => {
       data={props.supplierCids}
       block
       cleanable
-      placeholder='Please select a CID'
+      placeholder="Please select a CID"
       disabled={props.maintId === 'NEW'}
     />
   )
@@ -218,21 +218,21 @@ const AutoSave = ({ debounceMs, id }) => {
     <div
       style={{ color: 'var(--grey2)', display: 'flex', alignItems: 'center' }}
     >
-      <Whisper placement='top' speaker={<Tooltip>Last Saved</Tooltip>}>
+      <Whisper placement="top" speaker={<Tooltip>Last Saved</Tooltip>}>
         <svg
-          xmlns='http://www.w3.org/2000/svg'
-          width='18'
-          height='18'
-          viewBox='0 0 24 24'
-          fill='none'
-          stroke='var(--grey2)'
-          strokeWidth='2'
-          strokeLinecap='round'
-          strokeLinejoin='round'
+          xmlns="http://www.w3.org/2000/svg"
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="var(--grey2)"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
         >
-          <path d='M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z' />
-          <polyline points='17 21 17 13 7 13 7 21' />
-          <polyline points='7 3 7 8 15 8' />
+          <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+          <polyline points="17 21 17 13 7 13 7 21" />
+          <polyline points="7 3 7 8 15 8" />
         </svg>
       </Whisper>
       <span style={{ marginLeft: '5px' }}>{result}</span>
@@ -294,24 +294,24 @@ const Maintenance = ({ session, serverData, suppliers }) => {
   }) => {
     return (
       <ButtonGroup>
-        <Whisper placement='bottom' speaker={<Tooltip>Direct Send</Tooltip>}>
+        <Whisper placement="bottom" speaker={<Tooltip>Direct Send</Tooltip>}>
           <IconButton
             onClick={() =>
               prepareDirectSend(maintenanceRecipient, kundenCID, frozen, name)
             }
-            size='sm'
-            appearance='ghost'
-            icon={<Icon icon='send' />}
+            size="sm"
+            appearance="ghost"
+            icon={<Icon icon="send" />}
           />
         </Whisper>
-        <Whisper placement='bottom' speaker={<Tooltip>Preview Mail</Tooltip>}>
+        <Whisper placement="bottom" speaker={<Tooltip>Preview Mail</Tooltip>}>
           <IconButton
             onClick={() =>
               togglePreviewModal(maintenanceRecipient, kundenCID, protection)
             }
-            size='sm'
-            appearance='ghost'
-            icon={<Icon icon='search' />}
+            size="sm"
+            appearance="ghost"
+            icon={<Icon icon="search" />}
           />
         </Whisper>
       </ButtonGroup>
@@ -426,8 +426,8 @@ const Maintenance = ({ session, serverData, suppliers }) => {
       fetch(`/api/companies/domain?id=${serverData.profile.name}`, {
         method: 'get',
       })
-        .then(resp => resp.json())
-        .then(data => {
+        .then((resp) => resp.json())
+        .then((data) => {
           if (!data.companyResults[0]) {
             fetchSupplierCids()
             return
@@ -445,7 +445,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
           formRef.current.setFieldValue('supplier', companyId)
           gridApi.current.hideOverlay()
         })
-        .catch(err => console.error(`Error - ${err}`))
+        .catch((err) => console.error(`Error - ${err}`))
     } else {
       // prepare page for existing maintenance
       const { cancelled, emergency, done } = serverData.profile
@@ -485,7 +485,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
   //
   /// /////////////////////////////////////////////////////////
 
-  const handleGridReady = params => {
+  const handleGridReady = (params) => {
     gridApi.current = params.api
     if (customerCids.length === 0) {
       gridApi.current.showLoadingOverlay()
@@ -500,7 +500,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
   /// /////////////////////////////////////////////////////////
 
   // fetch supplier CIDs
-  const fetchSupplierCids = lieferantId => {
+  const fetchSupplierCids = (lieferantId) => {
     if (!lieferantId) {
       setSupplierCids([{ label: 'Invalid Supplier ID', value: '1' }])
       return
@@ -508,8 +508,8 @@ const Maintenance = ({ session, serverData, suppliers }) => {
     fetch(`/api/lieferantcids?id=${lieferantId}`, {
       method: 'get',
     })
-      .then(resp => resp.json())
-      .then(data => {
+      .then((resp) => resp.json())
+      .then((data) => {
         if (!data.lieferantCIDsResult) {
           setSupplierCids([
             { label: 'No CIDs available for this Supplier', value: '1' },
@@ -518,11 +518,11 @@ const Maintenance = ({ session, serverData, suppliers }) => {
         }
         setSupplierCids(data.lieferantCIDsResult)
       })
-      .catch(err => console.error(`Error - ${err}`))
+      .catch((err) => console.error(`Error - ${err}`))
   }
 
   // fetch customer CIDs based on selected Supplier CID
-  const fetchCustomerCids = lieferantCidId => {
+  const fetchCustomerCids = (lieferantCidId) => {
     if (!lieferantCidId) {
       gridApi.current.hideOverlay()
       return
@@ -536,15 +536,15 @@ const Maintenance = ({ session, serverData, suppliers }) => {
         'Content-Type': 'application/json',
       },
     })
-      .then(resp => resp.json())
-      .then(data => {
+      .then((resp) => resp.json())
+      .then((data) => {
         gridApi.current.showLoadingOverlay()
         let currentSentStatus = 0
         if (maintenance.done) {
           currentSentStatus = 1
         }
         const kundencids = data.kundenCIDsResult
-        kundencids.forEach(cid => {
+        kundencids.forEach((cid) => {
           cid.sent = currentSentStatus
           cid.frozen = false
           cid.protected = !!+cid.protected
@@ -554,14 +554,14 @@ const Maintenance = ({ session, serverData, suppliers }) => {
         gridApi.current.hideOverlay()
         uniqueKundenCids.length && checkFreezeStatus(uniqueKundenCids)
       })
-      .catch(err => console.error(`Error - ${err}`))
+      .catch((err) => console.error(`Error - ${err}`))
   }
 
-  const checkFreezeStatus = cids => {
+  const checkFreezeStatus = (cids) => {
     const startDate = maintenance.startDateTime
     const endDate = maintenance.endDateTime
     const uniqueCustomers = []
-    cids.forEach(cid => {
+    cids.forEach((cid) => {
       uniqueCustomers.push(cid.kunde)
     })
     fetch('/api/maintenances/freeze', {
@@ -575,13 +575,13 @@ const Maintenance = ({ session, serverData, suppliers }) => {
         'Content-Type': 'application/json',
       },
     })
-      .then(resp => resp.json())
-      .then(data => {
+      .then((resp) => resp.json())
+      .then((data) => {
         if (data.freezeQuery.length !== 0) {
           const customerCidEntries = customerCids
-          data.freezeQuery.forEach(freezeResult => {
+          data.freezeQuery.forEach((freezeResult) => {
             const frozenCidIndex = customerCidEntries.findIndex(
-              el => el.kunde === freezeResult.companyId
+              (el) => el.kunde === freezeResult.companyId
             )
             Notify(
               'error',
@@ -596,7 +596,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
           }
         }
       })
-      .catch(err => console.error(`Error - ${err}`))
+      .catch((err) => console.error(`Error - ${err}`))
   }
 
   /// /////////////////////////////////////////////////////////
@@ -752,7 +752,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
     isFromSendAll
   ) => {
     const activeRowIndex = customerCids.findIndex(
-      el => el.kundenCID === customerCid
+      (el) => el.kundenCID === customerCid
     )
     const kundenCidRow = customerCids[activeRowIndex]
     if (kundenCidRow && kundenCidRow.frozen) {
@@ -779,8 +779,8 @@ const Maintenance = ({ session, serverData, suppliers }) => {
         'Content-Type': 'application/json',
       },
     })
-      .then(resp => resp.json())
-      .then(data => {
+      .then((resp) => resp.json())
+      .then((data) => {
         const status = data.response.status
         const statusText = data.response.statusText
 
@@ -790,7 +790,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
             Notify('success', 'Mail Sent')
           }
           const activeCustomer = customerCids.find(
-            el => el.kundenCID === customerCid
+            (el) => el.kundenCID === customerCid
           )
           if (activeCustomer) {
             if (maintenance.cancelled === true && maintenance.done === true) {
@@ -819,7 +819,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
               {
                 method: 'get',
               }
-            ).catch(err => console.error(`Error updating Audit Log - ${err}`))
+            ).catch((err) => console.error(`Error updating Audit Log - ${err}`))
           }
         } else {
           Notify('error', 'Error Sending Mail')
@@ -828,7 +828,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
           }
         }
       })
-      .catch(err => console.error(`Error - ${err}`))
+      .catch((err) => console.error(`Error - ${err}`))
   }
 
   const handleSendAll = () => {
@@ -856,7 +856,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
   const updateSentProgress = () => {
     if (customerCids.length !== 0) {
       let progressSent = 0
-      customerCids.forEach(cid => {
+      customerCids.forEach((cid) => {
         if (cid.sent === 1 || cid.sent === 2) {
           progressSent += 1
         }
@@ -874,9 +874,9 @@ const Maintenance = ({ session, serverData, suppliers }) => {
     const endDateTime = currentMaint.endDateTime
 
     let derenCidString = []
-    currentMaint.supplierCids?.forEach(supplierCidId => {
+    currentMaint.supplierCids?.forEach((supplierCidId) => {
       const supplierCid = supplierCids.find(
-        supplier => supplier.value === supplierCidId
+        (supplier) => supplier.value === supplierCidId
       )
       if (supplierCid) {
         derenCidString.push(supplierCid?.label || '')
@@ -884,7 +884,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
     })
 
     let cids = ''
-    customerCids.forEach(cid => {
+    customerCids.forEach((cid) => {
       cids += ` ${cid.kundenCID}`
     })
     cids = cids.trim()
@@ -909,8 +909,8 @@ const Maintenance = ({ session, serverData, suppliers }) => {
         'Content-Type': 'application/json',
       },
     })
-      .then(resp => resp.json())
-      .then(data => {
+      .then((resp) => resp.json())
+      .then((data) => {
         const status = data.status
         const statusText = data.statusText
 
@@ -935,13 +935,13 @@ const Maintenance = ({ session, serverData, suppliers }) => {
               'Content-Type': 'application/json',
             },
           })
-            .then(resp => resp.json())
-            .catch(err => console.error(err))
+            .then((resp) => resp.json())
+            .catch((err) => console.error(err))
         } else if (statusText === 'failed') {
           Notify('error', 'Error Creating Calendar Entry', data.statusText)
         }
       })
-      .catch(err => console.error(`Error - ${err}`))
+      .catch((err) => console.error(`Error - ${err}`))
   }
 
   function handleCalendarUpdate(startDateTime, endDateTime, rcounter) {
@@ -951,9 +951,9 @@ const Maintenance = ({ session, serverData, suppliers }) => {
     const currentMaint = formRef.current.values
 
     let derenCid = ''
-    currentMaint.supplierCids.forEach(supp => {
+    currentMaint.supplierCids.forEach((supp) => {
       const supplierLabel = supplierCids.filter(
-        supplier => supplier.value === supp
+        (supplier) => supplier.value === supp
       )
       if (supplierLabel[0].label) {
         derenCid += ` ${supplierLabel[0].label}`
@@ -962,7 +962,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
     derenCid = derenCid.trim()
 
     let cids = ''
-    customerCids.forEach(cid => {
+    customerCids.forEach((cid) => {
       cids += ` ${cid.kundenCID}`
     })
     cids = cids.trim()
@@ -984,13 +984,13 @@ const Maintenance = ({ session, serverData, suppliers }) => {
           'Content-Type': 'application/json',
         },
       })
-        .then(resp => resp.json())
-        .then(data => {
+        .then((resp) => resp.json())
+        .then((data) => {
           if (data.status === 200 && data.statusText === 'OK') {
             Notify('success', 'Calendar Entry Rescheduled')
           }
         })
-        .catch(err => console.error(err))
+        .catch((err) => console.error(err))
     } else {
       Notify('warning', 'No Calendar Entry ID Available!')
     }
@@ -1002,7 +1002,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
   //
   /// /////////////////////////////////////////////////////////
 
-  const handleEditorChange = data => {
+  const handleEditorChange = (data) => {
     setMailBodyText(data.level.content)
   }
 
@@ -1027,8 +1027,8 @@ const Maintenance = ({ session, serverData, suppliers }) => {
       fetch(`/v1/api/mail/${mailId}`, {
         method: 'get',
       })
-        .then(resp => resp.json())
-        .then(data => {
+        .then((resp) => resp.json())
+        .then((data) => {
           let mailBody
           const htmlRegex = new RegExp(
             /<(?:"[^"]*"[`"]*|'[^']*'['"]*|[^'">])+>/,
@@ -1053,7 +1053,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
           })
           setOpenReadModal(!openReadModal)
         })
-        .catch(err => console.error(`Error - ${err}`))
+        .catch((err) => console.error(`Error - ${err}`))
     } else {
       setOpenReadModal(!openReadModal)
     }
@@ -1070,13 +1070,8 @@ const Maintenance = ({ session, serverData, suppliers }) => {
   /// /////////////////////////////////////////////////////////
 
   const handleCreateOnClick = () => {
-    const {
-      bearbeitetvon,
-      maileingang,
-      lieferant,
-      mailId,
-      updatedAt,
-    } = maintenance
+    const { bearbeitetvon, maileingang, lieferant, mailId, updatedAt } =
+      maintenance
 
     let incomingFormatted
     if (mailId === 'NT') {
@@ -1102,8 +1097,8 @@ const Maintenance = ({ session, serverData, suppliers }) => {
         'Content-Type': 'application/json',
       },
     })
-      .then(resp => resp.json())
-      .then(data => {
+      .then((resp) => resp.json())
+      .then((data) => {
         const newId = data.newId['LAST_INSERT_ID()']
         const newMaint = { ...maintenance, id: newId }
         setMaintenance(newMaint)
@@ -1116,7 +1111,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
           Notify('error', 'Create Error', data.err)
         }
       })
-      .catch(err => console.error(err))
+      .catch((err) => console.error(err))
 
     // mark mail as read in connected gmail inbox
     const incomingMailId = maintenance.mailId || maintenance.receivedmail
@@ -1128,15 +1123,15 @@ const Maintenance = ({ session, serverData, suppliers }) => {
           'Content-Type': 'application/json',
         },
       })
-        .then(resp => resp.json())
-        .then(data => {
+        .then((resp) => resp.json())
+        .then((data) => {
           if (data.status === 'complete') {
             Notify('success', 'Message Removed from Inbox')
           } else if (data.id === 500) {
             Notify('error', 'Error Removing Message from Inbox')
           }
         })
-        .catch(err => console.error(`Error - ${err}`))
+        .catch((err) => console.error(`Error - ${err}`))
     }
   }
 
@@ -1162,23 +1157,23 @@ const Maintenance = ({ session, serverData, suppliers }) => {
   if (session) {
     const HeaderLeft = () => {
       return (
-        <ButtonGroup size='md'>
+        <ButtonGroup size="md">
           <IconButton
-            appearance='subtle'
+            appearance="subtle"
             onClick={() => Router.push('/history')}
             icon={
               <svg
-                width='18'
-                height='18'
+                width="18"
+                height="18"
                 style={{ marginRight: '10px' }}
-                fill='none'
-                strokeLinecap='round'
-                strokeLinejoin='round'
-                strokeWidth='2'
-                viewBox='0 0 24 24'
-                stroke='currentColor'
+                fill="none"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
               >
-                <path d='M11 15l-3-3m0 0l3-3m-3 3h8M3 12a9 9 0 1118 0 9 9 0 01-18 0z' />
+                <path d="M11 15l-3-3m0 0l3-3m-3 3h8M3 12a9 9 0 1118 0 9 9 0 01-18 0z" />
               </svg>
             }
             style={{
@@ -1191,25 +1186,25 @@ const Maintenance = ({ session, serverData, suppliers }) => {
             Back
           </IconButton>
           <Whisper
-            placement='bottom'
+            placement="bottom"
             speaker={<Tooltip>Open Incoming Mail</Tooltip>}
           >
             <IconButton
-              appearance='subtle'
+              appearance="subtle"
               onClick={toggleReadModal}
               icon={
                 <svg
-                  width='18'
-                  height='18'
+                  width="18"
+                  height="18"
                   style={{ marginRight: '10px' }}
-                  fill='none'
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  strokeWidth='2'
-                  viewBox='0 0 24 24'
-                  stroke='currentColor'
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
                 >
-                  <path d='M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207' />
+                  <path d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
                 </svg>
               }
               style={{
@@ -1230,12 +1225,12 @@ const Maintenance = ({ session, serverData, suppliers }) => {
       return (
         <div>
           <Whisper
-            placement='left'
+            placement="left"
             speaker={<Tooltip>Open Company History</Tooltip>}
           >
             <Button
-              appearance='subtle'
-              size='lg'
+              appearance="subtle"
+              size="lg"
               onClick={() =>
                 Router.push(
                   {
@@ -1257,8 +1252,8 @@ const Maintenance = ({ session, serverData, suppliers }) => {
             </Button>
           </Whisper>
           <div
-            appearance='subtle'
-            size='lg'
+            appearance="subtle"
+            size="lg"
             style={{
               display: 'inline',
               color: 'var(--grey4)',
@@ -1277,27 +1272,27 @@ const Maintenance = ({ session, serverData, suppliers }) => {
 
     const HeaderRight = () => {
       return (
-        <ButtonGroup size='md'>
+        <ButtonGroup size="md">
           <Whisper
-            placement='bottom'
+            placement="bottom"
             speaker={<Tooltip>Create Calendar Entry</Tooltip>}
           >
             <IconButton
-              appearance='subtle'
+              appearance="subtle"
               onClick={handleCalendarCreate}
               icon={
                 <svg
-                  width='18'
-                  height='18'
+                  width="18"
+                  height="18"
                   style={{ marginRight: '10px' }}
-                  fill='none'
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  strokeWidth='2'
-                  viewBox='0 0 24 24'
-                  stroke='currentColor'
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
                 >
-                  <path d='M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z' />
+                  <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
               }
               style={{
@@ -1312,25 +1307,25 @@ const Maintenance = ({ session, serverData, suppliers }) => {
           </Whisper>
           {maintenance.id === 'NEW' ? (
             <Whisper
-              placement='bottom'
+              placement="bottom"
               speaker={<Tooltip>Create New Maintenance</Tooltip>}
             >
               <IconButton
-                appearance='subtle'
+                appearance="subtle"
                 onClick={handleCreateOnClick}
                 icon={
                   <svg
-                    width='18'
-                    height='18'
+                    width="18"
+                    height="18"
                     style={{ marginRight: '10px' }}
-                    fill='none'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth='2'
-                    viewBox='0 0 24 24'
-                    stroke='currentColor'
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
                   >
-                    <path d='M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13' />
+                    <path d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
                   </svg>
                 }
                 style={{
@@ -1339,32 +1334,32 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                   alignItems: 'center',
                   justifyContent: 'space-between',
                 }}
-                className='create-btn'
+                className="create-btn"
               >
                 Save
               </IconButton>
             </Whisper>
           ) : (
             <Whisper
-              placement='bottom'
+              placement="bottom"
               speaker={<Tooltip>Send All Notification Mails</Tooltip>}
             >
               <IconButton
-                appearance='subtle'
+                appearance="subtle"
                 onClick={handleSendAll}
                 icon={
                   <svg
-                    width='18'
-                    height='18'
+                    width="18"
+                    height="18"
                     style={{ marginRight: '10px' }}
-                    fill='none'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth='2'
-                    viewBox='0 0 24 24'
-                    stroke='currentColor'
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
                   >
-                    <path d='M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z' />
+                    <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
                 }
                 style={{
@@ -1390,11 +1385,11 @@ const Maintenance = ({ session, serverData, suppliers }) => {
           name={field.name}
           value={
             tzOptions
-              ? tzOptions.find(option => option.value === field.value)
+              ? tzOptions.find((option) => option.value === field.value)
               : ''
           }
-          onChange={option => form.setFieldValue(field.name, option.value)}
-          className='timezone-select'
+          onChange={(option) => form.setFieldValue(field.name, option.value)}
+          className="timezone-select"
         />
       )
     }
@@ -1406,12 +1401,12 @@ const Maintenance = ({ session, serverData, suppliers }) => {
           name={field.name}
           disabled={maintenance.id === 'NEW'}
           value={field.value}
-          onChange={option => {
+          onChange={(option) => {
             fetch(`/api/lieferantcids?id=${option}`, {
               method: 'get',
             })
-              .then(resp => resp.json())
-              .then(data => {
+              .then((resp) => resp.json())
+              .then((data) => {
                 if (!data.lieferantCIDsResult) {
                   setSupplierCids([
                     {
@@ -1425,19 +1420,19 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                   ...maintenance,
                   lieferant: option,
                   name: suppliers.companies.find(
-                    options => options.value === option
+                    (options) => options.value === option
                   ).label,
                 })
                 setSupplierCids(data.lieferantCIDsResult)
                 setCustomerCids([])
                 gridApi.current.hideOverlay()
               })
-              .catch(err => console.error(err))
+              .catch((err) => console.error(err))
             form.setFieldValue(field.name, option)
             form.setFieldValue('supplierCids', [])
           }}
           data={suppliers?.companies || []}
-          placeholder='Please select a Supplier'
+          placeholder="Please select a Supplier"
         />
       )
     }
@@ -1445,12 +1440,12 @@ const Maintenance = ({ session, serverData, suppliers }) => {
     const MyToggle = ({ field, form, checkedChildren = '' }) => {
       return (
         <Toggle
-          size='lg'
+          size="lg"
           disabled={maintenance.id === 'NEW'}
           checkedChildren={checkedChildren}
           checked={field.value}
           name={field.name}
-          onChange={option => {
+          onChange={(option) => {
             form.setFieldValue(field.name, option)
 
             // Actions required on marking 'Done':
@@ -1464,8 +1459,8 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                     'Content-Type': 'application/json',
                   },
                 })
-                  .then(resp => resp.json())
-                  .then(data => {
+                  .then((resp) => resp.json())
+                  .then((data) => {
                     if (data.id === 500) {
                       Notify(
                         'error',
@@ -1474,11 +1469,11 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                       )
                     }
                   })
-                  .catch(err => console.error(`Error - ${err}`))
+                  .catch((err) => console.error(`Error - ${err}`))
               }
               // Set 'impacted CIDs'
               let impactedCids = ''
-              customerCids.forEach(entry => {
+              customerCids.forEach((entry) => {
                 impactedCids += ` ${entry.kundenCID}`
               })
               fetch('/api/maintenances/save/impactedcids', {
@@ -1492,13 +1487,13 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                   'Content-Type': 'application/json',
                 },
               })
-                .then(resp => resp.json())
-                .then(data => {
+                .then((resp) => resp.json())
+                .then((data) => {
                   if (!data.status === 200) {
                     Notify('error', 'Impacted CIDs Not Saved')
                   }
                 })
-                .catch(err => console.error(`Error - ${err}`))
+                .catch((err) => console.error(`Error - ${err}`))
 
               // update algolia search index with latest created maintenance
               fetch('/v1/api/search/update', {
@@ -1522,7 +1517,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
           <Message
             full
             showIcon
-            type='info'
+            type="info"
             description='Remember to click "Save" before continuing to work!'
             style={{ position: 'fixed', zIndex: '999' }}
           />
@@ -1531,14 +1526,14 @@ const Maintenance = ({ session, serverData, suppliers }) => {
           <title>{`NT-${maintenance.id} | Newtelco Maintenance`}</title>
         </Head>
         <MaintPanel
-          className='maintpanel maintenance-header'
+          className="maintpanel maintenance-header"
           header={<HeaderLeft />}
           center={<HeaderCenter />}
           buttons={<HeaderRight />}
         >
           <FlexboxGrid
-            justify='space-around'
-            align='top'
+            justify="space-around"
+            align="top"
             style={{ width: '100%' }}
           >
             <FlexboxGrid.Item colspan={11} style={{ margin: '0 10px' }}>
@@ -1616,25 +1611,25 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                               }}
                             >
                               <Whisper
-                                placement='top'
+                                placement="top"
                                 speaker={<Tooltip>Mail Arrived</Tooltip>}
                               >
                                 <svg
-                                  xmlns='http://www.w3.org/2000/svg'
-                                  fill='none'
-                                  width='18'
-                                  height='18'
-                                  viewBox='0 0 24 24'
-                                  stroke='currentColor'
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  fill="none"
+                                  width="18"
+                                  height="18"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
                                   style={{
                                     marginRight: '3px',
                                   }}
                                 >
                                   <path
-                                    strokeLinecap='round'
-                                    strokeLinejoin='round'
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
                                     strokeWidth={2}
-                                    d='M3 19v-8.93a2 2 0 01.89-1.664l7-4.666a2 2 0 012.22 0l7 4.666A2 2 0 0121 10.07V19M3 19a2 2 0 002 2h14a2 2 0 002-2M3 19l6.75-4.5M21 19l-6.75-4.5M3 10l6.75 4.5M21 10l-6.75 4.5m0 0l-1.14.76a2 2 0 01-2.22 0l-1.14-.76'
+                                    d="M3 19v-8.93a2 2 0 01.89-1.664l7-4.666a2 2 0 012.22 0l7 4.666A2 2 0 0121 10.07V19M3 19a2 2 0 002 2h14a2 2 0 002-2M3 19l6.75-4.5M21 19l-6.75-4.5M3 10l6.75 4.5M21 10l-6.75 4.5m0 0l-1.14.76a2 2 0 01-2.22 0l-1.14-.76"
                                   />
                                 </svg>
                               </Whisper>
@@ -1645,15 +1640,15 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                         <Row gutter={20} style={{ marginBottom: '20px' }}>
                           <Col sm={12} xs={24}>
                             <FormGroup>
-                              <ControlLabel htmlFor='edited-by'>
+                              <ControlLabel htmlFor="edited-by">
                                 Created By
                               </ControlLabel>
                               <Input
-                                tabIndex='-1'
+                                tabIndex="-1"
                                 readOnly
-                                id='edited-by-input'
-                                name='edited-by'
-                                type='text'
+                                id="edited-by-input"
+                                name="edited-by"
+                                type="text"
                                 value={maintenance.bearbeitetvon}
                                 disabled
                               />
@@ -1661,7 +1656,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                           </Col>
                           <Col sm={12} xs={24}>
                             <FormGroup>
-                              <ControlLabel htmlFor='senderMaintenanceId'>
+                              <ControlLabel htmlFor="senderMaintenanceId">
                                 Sender Maintenance ID
                               </ControlLabel>
                               <HelpBlock
@@ -1672,7 +1667,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                                 For Documentation Purposes Only
                               </HelpBlock>
                               <FastField
-                                name='senderMaintenanceId'
+                                name="senderMaintenanceId"
                                 component={MyTextinput}
                                 maintId={maintenance.id}
                               />
@@ -1682,22 +1677,22 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                         <Row gutter={20} style={{ marginBottom: '20px' }}>
                           <Col sm={12} xs={24}>
                             <FormGroup>
-                              <ControlLabel htmlFor='supplier'>
+                              <ControlLabel htmlFor="supplier">
                                 Timezone
                               </ControlLabel>
                               <FastField
-                                name='timezone'
+                                name="timezone"
                                 component={TimezoneSelector}
                               />
                             </FormGroup>
                           </Col>
                           <Col sm={12} xs={24}>
                             <FormGroup>
-                              <ControlLabel htmlFor='supplier'>
+                              <ControlLabel htmlFor="supplier">
                                 Supplier
                               </ControlLabel>
                               <FastField
-                                name='supplier'
+                                name="supplier"
                                 component={SupplierSelector}
                               />
                             </FormGroup>
@@ -1707,7 +1702,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                           <Col sm={12} xs={24}>
                             <FormGroup>
                               <ControlLabel
-                                htmlFor='start-datetime'
+                                htmlFor="start-datetime"
                                 style={{
                                   display: 'flex',
                                   justifyContent: 'space-between',
@@ -1717,7 +1712,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                                 Start Date/Time
                               </ControlLabel>
                               <FastField
-                                name='startDateTime'
+                                name="startDateTime"
                                 startDateTime={values.startDateTime}
                                 endDateTime={values.endDateTime}
                                 setImpactPlaceholder={setImpactPlaceholder}
@@ -1743,7 +1738,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                           <Col sm={12} xs={24}>
                             <FormGroup>
                               <ControlLabel
-                                htmlFor='end-datetime'
+                                htmlFor="end-datetime"
                                 style={{
                                   display: 'flex',
                                   justifyContent: 'space-between',
@@ -1753,7 +1748,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                                 End Date/Time
                               </ControlLabel>
                               <FastField
-                                name='endDateTime'
+                                name="endDateTime"
                                 startDateTime={values.startDateTime}
                                 endDateTime={values.endDateTime}
                                 setImpactPlaceholder={setImpactPlaceholder}
@@ -1780,11 +1775,11 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                         <Row gutter={20} style={{ marginBottom: '20px' }}>
                           <Col sm={24}>
                             <FormGroup>
-                              <ControlLabel htmlFor='their-cid'>
+                              <ControlLabel htmlFor="their-cid">
                                 {maintenance.name} CID
                               </ControlLabel>
                               <Field
-                                name='supplierCids'
+                                name="supplierCids"
                                 customerCids={customerCids}
                                 setCustomerCids={setCustomerCids}
                                 fetchCustomerCids={fetchCustomerCids}
@@ -1799,7 +1794,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                           <Col sm={12} xs={24}>
                             <FormGroup>
                               <ControlLabel
-                                htmlFor='impact'
+                                htmlFor="impact"
                                 style={{
                                   display: 'flex',
                                   justifyContent: 'space-between',
@@ -1808,11 +1803,11 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                               >
                                 Impact
                                 <ButtonGroup
-                                  size='sm'
+                                  size="sm"
                                   style={{ float: 'right' }}
                                 >
                                   <Whisper
-                                    placement='bottom'
+                                    placement="bottom"
                                     speaker={
                                       <Tooltip>
                                         Use 50ms Protection Switch Text
@@ -1820,19 +1815,19 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                                     }
                                   >
                                     <IconButton
-                                      id='protectionswitchtext'
+                                      id="protectionswitchtext"
                                       onClick={() =>
                                         setFieldValue(
                                           'impact',
                                           '50ms protection switch'
                                         )
                                       }
-                                      size='sm'
-                                      icon={<Icon icon='clock-o' />}
+                                      size="sm"
+                                      icon={<Icon icon="clock-o" />}
                                     />
                                   </Whisper>
                                   <Whisper
-                                    placement='bottom'
+                                    placement="bottom"
                                     speaker={
                                       <Tooltip>
                                         Use Suggested Time Difference Text
@@ -1840,21 +1835,21 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                                     }
                                   >
                                     <IconButton
-                                      id='impactplaceholdertext'
+                                      id="impactplaceholdertext"
                                       onClick={() =>
                                         setFieldValue(
                                           'impact',
                                           impactPlaceholder
                                         )
                                       }
-                                      size='sm'
-                                      icon={<Icon icon='history' />}
+                                      size="sm"
+                                      icon={<Icon icon="history" />}
                                     />
                                   </Whisper>
                                 </ButtonGroup>
                               </ControlLabel>
                               <FastField
-                                name='impact'
+                                name="impact"
                                 component={MyTextinput}
                                 placeholder={impactPlaceholder}
                                 maintId={maintenance.id}
@@ -1871,13 +1866,13 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                               }}
                             >
                               <ControlLabel
-                                htmlFor='location'
+                                htmlFor="location"
                                 style={{ marginBottom: '10px' }}
                               >
                                 Location
                               </ControlLabel>
                               <FastField
-                                name='location'
+                                name="location"
                                 component={MyTextinput}
                                 maintId={maintenance.id}
                               />
@@ -1887,11 +1882,11 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                         <Row gutter={20} style={{ marginBottom: '20px' }}>
                           <Col sm={24}>
                             <FormGroup>
-                              <ControlLabel htmlFor='reason'>
+                              <ControlLabel htmlFor="reason">
                                 Reason
                               </ControlLabel>
                               <FastField
-                                name='reason'
+                                name="reason"
                                 component={MyTextarea}
                                 maintId={maintenance.id}
                               />
@@ -1902,7 +1897,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                           <Col sm={24}>
                             <FormGroup>
                               <ControlLabel
-                                htmlFor='maintNote'
+                                htmlFor="maintNote"
                                 style={{
                                   display: 'flex',
                                   justifyContent: 'space-between',
@@ -1915,8 +1910,8 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                                 </HelpBlock>
                               </ControlLabel>
                               <FastField
-                                name='maintNote'
-                                key='maintNote'
+                                name="maintNote"
+                                key="maintNote"
                                 component={MyTextarea}
                                 maintId={maintenance.id}
                               />
@@ -1940,9 +1935,9 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                             >
                               <ControlLabel>Cancelled</ControlLabel>
                               <Field
-                                name='cancelled'
+                                name="cancelled"
                                 component={MyToggle}
-                                checkedChildren={<Icon icon='ban' inverse />}
+                                checkedChildren={<Icon icon="ban" inverse />}
                               />
                             </FormGroup>
                           </Col>
@@ -1962,10 +1957,10 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                             >
                               <ControlLabel>Emergency</ControlLabel>
                               <Field
-                                name='emergency'
+                                name="emergency"
                                 component={MyToggle}
                                 checkedChildren={
-                                  <Icon icon='hospital-o' inverse />
+                                  <Icon icon="hospital-o" inverse />
                                 }
                               />
                             </FormGroup>
@@ -1986,9 +1981,9 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                             >
                               <ControlLabel>Done</ControlLabel>
                               <Field
-                                name='done'
+                                name="done"
                                 component={MyToggle}
-                                checkedChildren={<Icon icon='check' inverse />}
+                                checkedChildren={<Icon icon="check" inverse />}
                               />
                             </FormGroup>
                           </Col>
@@ -2011,18 +2006,18 @@ const Maintenance = ({ session, serverData, suppliers }) => {
               </Panel>
             </FlexboxGrid.Item>
             <FlexboxGrid.Item colspan={11} style={{ margin: '0 10px' }}>
-              <Panel bordered className='panel-right'>
+              <Panel bordered className="panel-right">
                 <Nav
                   justified
-                  appearance='tabs'
+                  appearance="tabs"
                   reversed
                   activeKey={activeTab}
-                  onSelect={key => setActiveTab(key)}
+                  onSelect={(key) => setActiveTab(key)}
                   style={{ marginTop: '-1px' }}
                 >
-                  <Nav.Item eventKey='customer'>Customer CIDs</Nav.Item>
-                  <Nav.Item eventKey='reschedule'>Reschedule</Nav.Item>
-                  <Nav.Item eventKey='changelog'>Changelog</Nav.Item>
+                  <Nav.Item eventKey="customer">Customer CIDs</Nav.Item>
+                  <Nav.Item eventKey="reschedule">Reschedule</Nav.Item>
+                  <Nav.Item eventKey="changelog">Changelog</Nav.Item>
                 </Nav>
                 <Grid fluid>
                   <Row>
@@ -2048,7 +2043,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                                   }}
                                 >
                                   <div
-                                    className='ag-theme-material'
+                                    className="ag-theme-material"
                                     style={{
                                       height: '100%',
                                       width: '100%',
@@ -2060,7 +2055,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                                       onGridReady={handleGridReady}
                                       pagination
                                       immutableData
-                                      getRowNodeId={data => {
+                                      getRowNodeId={(data) => {
                                         return data.kundenCID
                                       }}
                                     />
@@ -2127,7 +2122,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
           <ConfirmModal
             show={openConfirmFreezeModal}
             onHide={toggleConfirmFreezeModal}
-            header='Confirm Freeze'
+            header="Confirm Freeze"
             content={`There is a network freeze for <b>${
               frozenCompany || ''
             }</b>. Are you sure you want to send this mail?`}

@@ -1,7 +1,7 @@
 import * as Sentry from '@sentry/node'
 import { RewriteFrames } from '@sentry/integrations'
 
-export const initSentry = user => {
+export const initSentry = (user) => {
   if (process.env.NEXT_PUBLIC_SENTRY_DSN) {
     const integrations = []
     if (
@@ -13,7 +13,7 @@ export const initSentry = user => {
       // app:///_next
       integrations.push(
         new RewriteFrames({
-          iteratee: frame => {
+          iteratee: (frame) => {
             frame.filename = frame.filename.replace(
               process.env.NEXT_PUBLIC_SENTRY_SERVER_ROOT_DIR,
               'app:///'

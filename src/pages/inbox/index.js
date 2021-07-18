@@ -33,7 +33,7 @@ const Inbox = ({ session, inboxItems }) => {
   const [inboxMails, setInboxMails] = useState(inboxItems)
   const { data } = useSWR(
     '/v1/api/inbox',
-    url => fetch(url).then(res => res.json()),
+    (url) => fetch(url).then((res) => res.json()),
     {
       refreshInterval: 30000,
       focusThrottleInterval: 10000,
@@ -53,8 +53,8 @@ const Inbox = ({ session, inboxItems }) => {
           fetch(`/v1/api/favicon?d=${mailDomain}`, {
             method: 'get',
           })
-            .then(resp => resp.json())
-            .then(data => {
+            .then((resp) => resp.json())
+            .then((data) => {
               const iconUrl = data.icons
               const newInboxMails = inboxMails
               if (data.icons.substr(0, 4) !== 'http') {
@@ -72,9 +72,9 @@ const Inbox = ({ session, inboxItems }) => {
     }
   }, [])
 
-  const toggle = mailId => {
+  const toggle = (mailId) => {
     if (mailId) {
-      const activeMail = inboxMails.findIndex(el => el.id === mailId)
+      const activeMail = inboxMails.findIndex((el) => el.id === mailId)
 
       let mailBody = inboxMails[activeMail].body
       const htmlRegex = new RegExp(
@@ -117,18 +117,18 @@ const Inbox = ({ session, inboxItems }) => {
           'Content-Type': 'application/json',
         },
       })
-        .then(resp => resp.json())
-        .then(data => {
+        .then((resp) => resp.json())
+        .then((data) => {
           const text = data.translatedText
           setOgModalBody(modalBody)
           setModalInfo({ ...modalInfo, body: text })
           setIsTranslated(!isTranslated)
         })
-        .catch(err => console.error(`Error - ${err}`))
+        .catch((err) => console.error(`Error - ${err}`))
     }
   }
 
-  const onDelete = mailId => {
+  const onDelete = (mailId) => {
     fetch('/v1/api/inbox/delete', {
       method: 'post',
       body: JSON.stringify({ m: mailId }),
@@ -138,13 +138,13 @@ const Inbox = ({ session, inboxItems }) => {
         'Content-Type': 'application/json',
       },
     })
-      .then(resp => resp.json())
-      .then(data => {
+      .then((resp) => resp.json())
+      .then((data) => {
         if (data.status === 'complete') {
           Notify('success', 'Message Deleted')
           const newUnread = store.get('count') - 1
           const array = inboxMails
-          const index = inboxMails.findIndex(el => el.id === data.id)
+          const index = inboxMails.findIndex((el) => el.id === data.id)
           if (index !== -1) {
             array.splice(index, 1)
             setInboxMails(array)
@@ -152,23 +152,23 @@ const Inbox = ({ session, inboxItems }) => {
           }
         }
       })
-      .catch(err => console.error(`Error - ${err}`))
+      .catch((err) => console.error(`Error - ${err}`))
   }
 
   if (session) {
     return (
       <Layout>
-        <MaintPanel header='Inbox'>
+        <MaintPanel header="Inbox">
           {inboxMails.length === 0 ? (
             <FlexboxGrid
-              justify='center'
-              align='middle'
+              justify="center"
+              align="middle"
               style={{ margin: '40px 0' }}
             >
               <FlexboxGrid.Item>
                 <img
-                  src='/static/images/inbox0.svg'
-                  alt='Inbox'
+                  src="/static/images/inbox0.svg"
+                  alt="Inbox"
                   style={{ width: '400px' }}
                 />
                 <h4 style={{ textAlign: 'center' }}>
@@ -196,18 +196,18 @@ const Inbox = ({ session, inboxItems }) => {
         </MaintPanel>
         {isOpen && (
           <Modal
-            className='mail-modal-body'
+            className="mail-modal-body"
             autoFocus
             backdrop
             show={isOpen}
-            size='lg'
+            size="lg"
             onHide={() => toggle(null)}
             full
           >
             <Modal.Header>
               <FlexboxGrid
-                justify='start'
-                align='middle'
+                justify="start"
+                align="middle"
                 style={{ width: '100%' }}
               >
                 <FlexboxGrid.Item
@@ -216,7 +216,7 @@ const Inbox = ({ session, inboxItems }) => {
                 >
                   {faviconLoading && <Loader />}
                   <Avatar
-                    size='lg'
+                    size="lg"
                     src={modalInfo.favicon}
                     style={{
                       backgroundColor: 'transparent',
@@ -226,26 +226,26 @@ const Inbox = ({ session, inboxItems }) => {
                   />
                 </FlexboxGrid.Item>
                 <FlexboxGrid.Item colspan={20}>
-                  <div className='modal-preview-text-wrapper'>
-                    <InputGroup className='modal-textbox'>
+                  <div className="modal-preview-text-wrapper">
+                    <InputGroup className="modal-textbox">
                       <InputGroup.Addon
                         style={{ height: '31px' }}
-                        type='prepend'
+                        type="prepend"
                       >
                         From
                       </InputGroup.Addon>
-                      <Input readonly='readonly' value={modalInfo.from} />
+                      <Input readonly="readonly" value={modalInfo.from} />
                     </InputGroup>
-                    <InputGroup className='modal-textbox'>
+                    <InputGroup className="modal-textbox">
                       <InputGroup.Addon
                         style={{ height: '31px' }}
-                        type='prepend'
+                        type="prepend"
                       >
                         Subject
                       </InputGroup.Addon>
                       <Input
-                        type='text'
-                        readonly='readonly'
+                        type="text"
+                        readonly="readonly"
                         value={modalInfo.subject}
                       />
                     </InputGroup>
@@ -254,20 +254,20 @@ const Inbox = ({ session, inboxItems }) => {
                 <FlexboxGrid.Item colspan={1} style={{ marginLeft: '30px' }}>
                   <Whisper
                     speaker={<Tooltip>Translate</Tooltip>}
-                    placement='bottom'
+                    placement="bottom"
                   >
                     <IconButton
                       onClick={handleTranslate}
-                      appearance='default'
+                      appearance="default"
                       style={{ color: 'var(--grey3)' }}
-                      size='lg'
-                      icon={<Icon icon='globe' />}
+                      size="lg"
+                      icon={<Icon icon="globe" />}
                     />
                   </Whisper>
                 </FlexboxGrid.Item>
               </FlexboxGrid>
             </Modal.Header>
-            <Modal.Body className='mail-body'>
+            <Modal.Body className="mail-body">
               <div
                 dangerouslySetInnerHTML={{
                   __html: DOMPurify.sanitize(modalInfo.body),

@@ -62,7 +62,7 @@ const options = {
 const AreaChart = () => {
   const { data } = useSWR(
     '/api/homepage/barchart',
-    (...args) => fetch(...args).then(res => res.json()),
+    (...args) => fetch(...args).then((res) => res.json()),
     { suspense: false, revalidateOnFocus: false }
   )
 
@@ -70,11 +70,11 @@ const AreaChart = () => {
     const userSeries = []
     const returnSeries = []
     const users = Array.from(
-      new Set(data.query.map(obj => JSON.stringify({ user: obj.user })))
+      new Set(data.query.map((obj) => JSON.stringify({ user: obj.user })))
     ).map(JSON.parse)
-    users.forEach(user => {
+    users.forEach((user) => {
       const userData = data.query
-        .filter(x => x.user === user.user)
+        .filter((x) => x.user === user.user)
         .sort((a, b) => {
           return a.year > b.year
             ? -1
@@ -88,8 +88,8 @@ const AreaChart = () => {
         })
       userSeries.push(userData)
     })
-    userSeries.forEach(user => {
-      const data = user.map(user => [user.date, user.count])
+    userSeries.forEach((user) => {
+      const data = user.map((user) => [user.date, user.count])
       returnSeries.push({ data: data, name: user[0].user })
     })
 
@@ -99,7 +99,7 @@ const AreaChart = () => {
         header={
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             Completed
-            <Icon icon='tasks' style={{ color: 'var(--primary)' }} size='lg' />
+            <Icon icon="tasks" style={{ color: 'var(--primary)' }} size="lg" />
           </div>
         }
         style={{ height: '100%' }}
@@ -107,7 +107,7 @@ const AreaChart = () => {
         <Chart
           options={options}
           series={returnSeries}
-          type='area'
+          type="area"
           width={400}
           height={220}
         />
@@ -121,9 +121,9 @@ const AreaChart = () => {
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             Completed
             <Icon
-              icon='bar-chart'
+              icon="bar-chart"
               style={{ color: 'var(--primary)' }}
-              size='lg'
+              size="lg"
             />
           </div>
         }

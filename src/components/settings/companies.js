@@ -20,7 +20,7 @@ import {
   Loader,
 } from 'rsuite'
 
-const Companies = props => {
+const Companies = (props) => {
   const gridOptions = {
     defaultColDef: {
       resizable: true,
@@ -72,15 +72,15 @@ const Companies = props => {
     fetch('/api/companies', {
       method: 'get',
     })
-      .then(resp => resp.json())
-      .then(data => {
+      .then((resp) => resp.json())
+      .then((data) => {
         setRowData(data.companies)
         gridApi.current.hideOverlay()
       })
-      .catch(err => console.error(err))
+      .catch((err) => console.error(err))
   }, [])
 
-  const handleGridReady = params => {
+  const handleGridReady = (params) => {
     gridApi.current = params.api
     gridApi.current.showLoadingOverlay()
     params.api.sizeColumnsToFit()
@@ -95,17 +95,17 @@ const Companies = props => {
     fetch(`/api/settings/delete/companies?id=${companyToDelete.id}`, {
       method: 'get',
     })
-      .then(resp => resp.json())
-      .then(data => {
+      .then((resp) => resp.json())
+      .then((data) => {
         if (data.deleteCompanyQuery.affectedRows === 1) {
           Notify('success', `${companyToDelete.name} Deleted`)
         } else {
           Notify('warning', 'Error', data.err)
         }
       })
-      .catch(err => console.error(err))
+      .catch((err) => console.error(err))
 
-    const newRowData = rowData.filter(el => el.id !== companyToDelete.id)
+    const newRowData = rowData.filter((el) => el.id !== companyToDelete.id)
     setRowData(newRowData)
     setOpenConfirmDeleteModal(!openConfirmDeleteModal)
   }
@@ -135,8 +135,8 @@ const Companies = props => {
         method: 'get',
       }
     )
-      .then(resp => resp.json())
-      .then(data => {
+      .then((resp) => resp.json())
+      .then((data) => {
         const insertId = data.insertCompanyQuery.insertId
         if (
           data.insertCompanyQuery.affectedRows === 1 &&
@@ -157,10 +157,10 @@ const Companies = props => {
         setOpenCompanyModal(!openCompanyModal)
         gridApi.current.setRowData(newRowData)
       })
-      .catch(err => console.error(err))
+      .catch((err) => console.error(err))
   }
 
-  const handleCellEdit = params => {
+  const handleCellEdit = (params) => {
     const id = params.data.id
     const newName = params.data.name
     const newDomain = params.data.mailDomain
@@ -176,22 +176,22 @@ const Companies = props => {
         method: 'get',
       }
     )
-      .then(resp => resp.json())
-      .then(data => {
+      .then((resp) => resp.json())
+      .then((data) => {
         if (data.updateCompanyQuery.affectedRows === 1) {
           Notify('success', `${newName} Updated`)
         } else {
           Notify('warning', 'Error', data.err)
         }
       })
-      .catch(err => console.error(err))
+      .catch((err) => console.error(err))
   }
 
   const Header = () => {
     return (
       <FlexboxGrid
-        justify='space-between'
-        align='middle'
+        justify="space-between"
+        align="middle"
         style={{ marginBottom: '20px' }}
       >
         <FlexboxGrid.Item>
@@ -204,17 +204,17 @@ const Companies = props => {
           <ButtonGroup>
             <IconButton
               onClick={toggleCompanyAdd}
-              icon={<Icon icon='plus-circle' />}
-              appearance='ghost'
-              placement='right'
+              icon={<Icon icon="plus-circle" />}
+              appearance="ghost"
+              placement="right"
             >
               Add
             </IconButton>
             <IconButton
               onClick={toggleCompanyDeleteModal}
-              icon={<Icon icon='trash' />}
-              appearance='ghost'
-              placement='right'
+              icon={<Icon icon="trash" />}
+              appearance="ghost"
+              placement="right"
             >
               Delete
             </IconButton>
@@ -225,10 +225,10 @@ const Companies = props => {
   }
 
   return (
-    <div style={{ width: '100%' }} className='section'>
+    <div style={{ width: '100%' }} className="section">
       <Panel header={<Header />}>
         <div
-          className='ag-theme-material'
+          className="ag-theme-material"
           style={{
             height: '700px',
             width: '100%',
@@ -242,7 +242,7 @@ const Companies = props => {
             animateRows
             stopEditingWhenGridLosesFocus
             immutableData
-            getRowNodeId={data => {
+            getRowNodeId={(data) => {
               return data.id
             }}
           />
@@ -252,15 +252,15 @@ const Companies = props => {
         <Modal
           backdrop
           show={openCompanyModal}
-          size='xs'
+          size="xs"
           onHide={toggleCompanyAdd}
-          className='add-modal-wrapper'
+          className="add-modal-wrapper"
         >
           <Modal.Header>New Company</Modal.Header>
           <Modal.Body style={{ paddingBottom: '0px' }}>
             <FlexboxGrid
-              justify='space-around'
-              align='middle'
+              justify="space-around"
+              align="middle"
               style={{ flexDirection: 'column', height: '350px' }}
             >
               <FlexboxGrid.Item
@@ -270,31 +270,31 @@ const Companies = props => {
                   <FormGroup>
                     <ControlLabel>Name</ControlLabel>
                     <Input
-                      key='input-name'
-                      name='name'
-                      type='text'
+                      key="input-name"
+                      name="name"
+                      type="text"
                       value={newName}
-                      onChange={value => setNewName(value)}
+                      onChange={(value) => setNewName(value)}
                     />
                   </FormGroup>
                   <FormGroup>
                     <ControlLabel>Domain</ControlLabel>
                     <Input
-                      key='input-domain'
-                      name='domain'
-                      type='text'
+                      key="input-domain"
+                      name="domain"
+                      type="text"
                       value={newDomain}
-                      onChange={value => setNewDomain(value)}
+                      onChange={(value) => setNewDomain(value)}
                     />
                   </FormGroup>
                   <FormGroup>
                     <ControlLabel>Recipients</ControlLabel>
                     <Input
-                      key='input-recipient'
-                      name='recipients'
-                      type='text'
+                      key="input-recipient"
+                      name="recipients"
+                      type="text"
                       value={newRecipient}
-                      onChange={value => setNewRecipient(value)}
+                      onChange={(value) => setNewRecipient(value)}
                     />
                     <HelpBlock style={{ fontSize: '0.8rem' }}>
                       Seperate multiple with semicolons
@@ -305,14 +305,14 @@ const Companies = props => {
               <FlexboxGrid.Item>
                 <ButtonGroup block style={{ width: '20em' }}>
                   <Button
-                    appearance='default'
+                    appearance="default"
                     onClick={toggleCompanyAdd}
                     style={{ width: '50%' }}
                   >
                     Cancel
                   </Button>
                   <Button
-                    appearance='primary'
+                    appearance="primary"
                     onClick={handleAddCompany}
                     style={{ width: '50%' }}
                   >
@@ -326,7 +326,7 @@ const Companies = props => {
       )}
       {openConfirmDeleteModal && (
         <ConfirmModal
-          header='Confirm Delete'
+          header="Confirm Delete"
           content={`Are you sure you want to delete ${companyToDelete.name} (${companyToDelete.id})`}
           show={openConfirmDeleteModal}
           onHide={toggleCompanyDeleteModal}

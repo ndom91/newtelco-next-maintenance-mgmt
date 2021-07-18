@@ -19,9 +19,9 @@ const AreaChart = dynamic(() => import('../components/homepage/areachart'), {
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
           Completed
           <Icon
-            icon='bar-chart'
+            icon="bar-chart"
             style={{ color: 'var(--primary)' }}
-            size='lg'
+            size="lg"
           />
         </div>
       }
@@ -58,21 +58,21 @@ const Index = ({ session }) => {
   if (session) {
     return (
       <Layout>
-        <MaintPanel header='Maintenance'>
-          <div className='grid-container'>
-            <div className='unread'>
+        <MaintPanel header="Maintenance">
+          <div className="grid-container">
+            <div className="unread">
               <UnreadBadge count={store.get('count')} />
             </div>
-            <div className='heatmap'>
+            <div className="heatmap">
               <Heatmap />
             </div>
-            <div className='recents'>
+            <div className="recents">
               <ActiveMaintenances />
             </div>
-            <div className='chart1'>
+            <div className="chart1">
               <AreaChart />
             </div>
-            <div className='chart2'>
+            <div className="chart2">
               <BarChart />
             </div>
           </div>

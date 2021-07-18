@@ -1,7 +1,7 @@
 import React from 'react'
 import { ButtonGroup, IconButton, Icon } from 'rsuite'
 
-export const sendMailBtns = props => {
+export const sendMailBtns = (props) => {
   return (
     <ButtonGroup>
       <IconButton
@@ -13,9 +13,9 @@ export const sendMailBtns = props => {
             props.data.name
           )
         }
-        size='sm'
-        appearance='ghost'
-        icon={<Icon icon='send' />}
+        size="sm"
+        appearance="ghost"
+        icon={<Icon icon="send" />}
       />
       <IconButton
         onClick={() =>
@@ -25,9 +25,9 @@ export const sendMailBtns = props => {
             props.data.protected
           )
         }
-        size='sm'
-        appearance='ghost'
-        icon={<Icon icon='search' />}
+        size="sm"
+        appearance="ghost"
+        icon={<Icon icon="search" />}
       />
     </ButtonGroup>
   )

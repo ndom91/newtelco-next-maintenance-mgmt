@@ -158,7 +158,7 @@ const tzi18n = {
   'Pacific/Tongatapu': "Nuku'alofa",
 }
 
-const _t = s => {
+const _t = (s) => {
   if (tzi18n !== null && tzi18n[s]) {
     return tzi18n[s]
   }
@@ -170,7 +170,7 @@ const tzOptions = []
 
 moment.tz
   .names()
-  .filter(tz => {
+  .filter((tz) => {
     return timezones.includes(tz)
   })
   .reduce((memo, tz) => {

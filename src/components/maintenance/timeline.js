@@ -11,18 +11,18 @@ const Changelog = ({ maintId }) => {
     fetch(`/api/maintenances/history?mid=${maintId}`, {
       method: 'get',
     })
-      .then(resp => resp.json())
-      .then(data => {
+      .then((resp) => resp.json())
+      .then((data) => {
         setMaintHistory(data.historyQuery)
         setFetching(false)
       })
-      .catch(err => console.error(err))
+      .catch((err) => console.error(err))
   }, [])
 
   if (maintHistory.length !== 0) {
     return (
-      <Timeline align='left'>
-        {maintHistory.map(item => {
+      <Timeline align="left">
+        {maintHistory.map((item) => {
           let dot
           if (/.cid/.test(item.field)) {
             dot = 'realtime'

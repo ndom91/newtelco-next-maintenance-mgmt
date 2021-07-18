@@ -6,7 +6,7 @@ module.exports = async (req, res) => {
   const respArray = []
   const cidArray = lieferantCIDid.split(',')
   let cidString = ''
-  cidArray.forEach(cid => {
+  cidArray.forEach((cid) => {
     cidString += `,"${cid}"`
   })
   cidString = cidString.substr(1, cidString.length)
@@ -14,7 +14,7 @@ module.exports = async (req, res) => {
   const lieferantCIDsResult = await db.query(`
     SELECT lieferantCID.id as value, lieferantCID.derenCID as label FROM lieferantCID WHERE lieferantCID.id IN ${cidString}
   `)
-  lieferantCIDsResult.forEach(cid => {
+  lieferantCIDsResult.forEach((cid) => {
     respArray.push(cid)
   })
   const count = await db.query(escape`

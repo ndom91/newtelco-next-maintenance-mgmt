@@ -14,9 +14,9 @@ const MaintPanel = ({
       return <span>{header}</span>
     } else {
       return (
-        <FlexboxGrid justify='space-between' align='middle'>
+        <FlexboxGrid justify="space-between" align="middle">
           <FlexboxGrid.Item>{header}</FlexboxGrid.Item>
-          <FlexboxGrid.Item className='header-middle'>
+          <FlexboxGrid.Item className="header-middle">
             {center}
           </FlexboxGrid.Item>
           <FlexboxGrid.Item>{buttons}</FlexboxGrid.Item>
@@ -26,7 +26,7 @@ const MaintPanel = ({
   }
   return (
     <Panel
-      className='maintpanel'
+      className="maintpanel"
       header={Header()}
       bordered
       shaded
@@ -35,7 +35,7 @@ const MaintPanel = ({
       {...props}
     >
       <FlexboxGrid
-        justify='space-around'
+        justify="space-around"
         colSpan={23}
         style={{ padding: '20px', width: '100%' }}
       >

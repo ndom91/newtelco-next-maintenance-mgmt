@@ -162,21 +162,21 @@ const History = ({ session, data }) => {
     paginationPageSize: 10,
     rowClass: 'row-class',
     rowClassRules: {
-      'row-completed': params => {
+      'row-completed': (params) => {
         const done = params.data.done
         if (done === 'true' || done === '1') {
           return true
         }
         return false
       },
-      'row-cancelled': params => {
+      'row-cancelled': (params) => {
         const cancelled = params.data.cancelled
         if (cancelled === 'true' || cancelled === '1') {
           return true
         }
         return false
       },
-      'row-emergency': params => {
+      'row-emergency': (params) => {
         const emergency = params.data.emergency
         if (emergency === 'true' || emergency === '1') {
           return true
@@ -195,11 +195,11 @@ const History = ({ session, data }) => {
   const [newMaintenanceInfo, setNewMaintenanceInfo] = useState([])
   const [idToDelete, setIdToDelete] = useState('')
 
-  const handleGridReady = params => {
+  const handleGridReady = (params) => {
     gridApi.current = params.api
   }
 
-  const onFirstDataRendered = params => {
+  const onFirstDataRendered = (params) => {
     params.columnApi.autoSizeColumns()
     params.api.redrawRows()
   }
@@ -219,7 +219,7 @@ const History = ({ session, data }) => {
     setOpenNewModal(!openNewModal)
   }
 
-  const handleNewCompanySelect = selectedOption => {
+  const handleNewCompanySelect = (selectedOption) => {
     setSelectedNewCompany(selectedOption)
   }
 
@@ -227,17 +227,17 @@ const History = ({ session, data }) => {
     fetch(`/api/maintenances/delete?maintId=${idToDelete}`, {
       method: 'get',
     })
-      .then(resp => resp.json())
-      .then(data => {
+      .then((resp) => resp.json())
+      .then((data) => {
         if (data.status === 200 && data.statusText === 'OK') {
           Notify('info', 'Maintenance Deleted')
         } else {
           Notify('error', 'Error Deleting Maintenance', data.err)
         }
       })
-      .catch(err => console.error(err))
+      .catch((err) => console.error(err))
 
-    const newRowData = rowData.filter(el => el.id !== idToDelete)
+    const newRowData = rowData.filter((el) => el.id !== idToDelete)
     setOpenConfirmDeleteModal(!openConfirmDeleteModal)
     setRowData(newRowData)
   }
@@ -264,14 +264,14 @@ const History = ({ session, data }) => {
       fetch('/api/companies/select', {
         method: 'get',
       })
-        .then(resp => resp.json())
-        .then(data => {
+        .then((resp) => resp.json())
+        .then((data) => {
           setNewMaintenanceInfo(data.companiesDomains)
         })
     }
   }
 
-  const createNewMaintenance = newCompanyDomain => {
+  const createNewMaintenance = (newCompanyDomain) => {
     Router.push({
       pathname: '/maintenance',
       query: {
@@ -286,8 +286,8 @@ const History = ({ session, data }) => {
   const NewMaintenanceSelect = () => {
     return (
       <FlexboxGrid
-        justify='center'
-        align='middle'
+        justify="center"
+        align="middle"
         style={{ fontSize: '1.0rem', width: '200px' }}
       >
         <FlexboxGrid.Item>
@@ -300,8 +300,8 @@ const History = ({ session, data }) => {
             onOpen={handleSelectOpen}
             onSearch={handleSelectOpen}
             data={newMaintenanceInfo}
-            placeholder='Please select a Company'
-            renderMenu={menu => {
+            placeholder="Please select a Company"
+            renderMenu={(menu) => {
               if (newMaintenanceInfo.length === 0) {
                 return (
                   <div style={{ marginTop: '100px' }}>
@@ -322,25 +322,25 @@ const History = ({ session, data }) => {
     return (
       <Layout>
         <MaintPanel
-          header='History'
+          header="History"
           buttons={
             <ButtonGroup>
               <IconButton
-                appearance='subtle'
+                appearance="subtle"
                 onClick={handleToggleNewModal}
                 icon={
                   <svg
-                    width='20'
-                    height='20'
-                    fill='none'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth='2'
-                    viewBox='0 0 24 24'
-                    stroke='var(--grey4)'
+                    width="20"
+                    height="20"
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    viewBox="0 0 24 24"
+                    stroke="var(--grey4)"
                     style={{ marginRight: '5px' }}
                   >
-                    <path d='M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z' />
+                    <path d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 }
                 style={{
@@ -357,21 +357,21 @@ const History = ({ session, data }) => {
                 New
               </IconButton>
               <IconButton
-                appearance='subtle'
+                appearance="subtle"
                 onClick={handleDeleteMaintOpen}
                 icon={
                   <svg
-                    width='20'
-                    height='20'
-                    fill='none'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth='2'
-                    viewBox='0 0 24 24'
-                    stroke='var(--grey4)'
+                    width="20"
+                    height="20"
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    viewBox="0 0 24 24"
+                    stroke="var(--grey4)"
                     style={{ marginRight: '5px' }}
                   >
-                    <path d='M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16' />
+                    <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                   </svg>
                 }
                 style={{
@@ -388,21 +388,21 @@ const History = ({ session, data }) => {
                 Delete
               </IconButton>
               <IconButton
-                appearance='subtle'
+                appearance="subtle"
                 onClick={handleGridExport}
                 icon={
                   <svg
-                    width='20'
-                    height='20'
-                    fill='none'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth='2'
-                    viewBox='0 0 24 24'
-                    stroke='var(--grey4)'
+                    width="20"
+                    height="20"
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    viewBox="0 0 24 24"
+                    stroke="var(--grey4)"
                     style={{ marginRight: '5px' }}
                   >
-                    <path d='M8 16a5 5 0 01-.916-9.916 5.002 5.002 0 019.832 0A5.002 5.002 0 0116 16m-7 3l3 3m0 0l3-3m-3 3V10' />
+                    <path d="M8 16a5 5 0 01-.916-9.916 5.002 5.002 0 019.832 0A5.002 5.002 0 0116 16m-7 3l3 3m0 0l3-3m-3 3V10" />
                   </svg>
                 }
                 style={{
@@ -422,7 +422,7 @@ const History = ({ session, data }) => {
           }
         >
           <div
-            className='ag-theme-material'
+            className="ag-theme-material"
             style={{ height: '700px', width: '100%' }}
           >
             <AgGridReact
@@ -437,7 +437,7 @@ const History = ({ session, data }) => {
         </MaintPanel>
         {openConfirmDeleteModal && (
           <ConfirmModal
-            header='Confirm Delete'
+            header="Confirm Delete"
             content={`Are you sure you want to delete maintenance NT-${idToDelete}`}
             show={openConfirmDeleteModal}
             onHide={toggleConfirmDelete}
@@ -447,7 +447,7 @@ const History = ({ session, data }) => {
         )}
         {openNewModal && (
           <ConfirmModal
-            header='New Maintenance'
+            header="New Maintenance"
             content={<NewMaintenanceSelect />}
             show={openNewModal}
             onHide={handleToggleNewModal}

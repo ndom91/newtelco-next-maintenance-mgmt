@@ -17,7 +17,7 @@ const InboxItem = ({ toggle, mail, index, handleDelete }) => {
   const [loading, setLoading] = useState(true)
   const [faviconUrl, setFaviconUrl] = useState('')
 
-  const createMaint = mail => {
+  const createMaint = (mail) => {
     Router.push({
       pathname: '/maintenance',
       query: {
@@ -38,8 +38,8 @@ const InboxItem = ({ toggle, mail, index, handleDelete }) => {
       fetch(`/v1/api/favicon?d=${mail.domain}`, {
         method: 'get',
       })
-        .then(resp => resp.json())
-        .then(data => {
+        .then((resp) => resp.json())
+        .then((data) => {
           const iconUrl = data.icons
           if (data.icons.substr(0, 4) !== 'http') {
             setFaviconUrl(`https://${iconUrl}`)
@@ -54,23 +54,23 @@ const InboxItem = ({ toggle, mail, index, handleDelete }) => {
   }, [mail])
 
   return (
-    <Panel key={mail.id} className='mail-wrapper-panel'>
-      <div className='mail-wrapper'>
+    <Panel key={mail.id} className="mail-wrapper-panel">
+      <div className="mail-wrapper">
         <Avatar
-          alt='Icon'
+          alt="Icon"
           src={faviconUrl || ''}
           loading={loading}
-          size='lg'
+          size="lg"
           style={{
             backgroundColor: 'transparent',
             width: '70px',
           }}
           onLoad={() => setLoading(false)}
         />
-        <div className='mail-info'>
+        <div className="mail-info">
           <FlexboxGrid
-            justify='start'
-            align='middle'
+            justify="start"
+            align="middle"
             style={{ flexDirection: 'column' }}
           >
             <FlexboxGrid.Item>
@@ -81,33 +81,33 @@ const InboxItem = ({ toggle, mail, index, handleDelete }) => {
           </FlexboxGrid>
         </div>
         <ButtonGroup vertical>
-          <Whisper placement='left' speaker={<Tooltip>Read Mail</Tooltip>}>
+          <Whisper placement="left" speaker={<Tooltip>Read Mail</Tooltip>}>
             <IconButton
-              appearance='subtle'
-              size='md'
+              appearance="subtle"
+              size="md"
               style={{ justifyContent: 'start' }}
               onClick={() => toggle(mail.id)}
               icon={
                 <svg
-                  fill='none'
-                  height='24'
-                  width='24'
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  strokeWidth='2'
-                  viewBox='0 0 24 24'
-                  stroke='var(--grey4)'
+                  fill="none"
+                  height="24"
+                  width="24"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                  stroke="var(--grey4)"
                 >
-                  <path d='M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z'></path>
+                  <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
                 </svg>
               }
             />
           </Whisper>
-          <Whisper placement='left' speaker={<Tooltip>Edit</Tooltip>}>
+          <Whisper placement="left" speaker={<Tooltip>Edit</Tooltip>}>
             <IconButton
-              appearance='subtle'
+              appearance="subtle"
               onClick={() => createMaint(mail)}
-              size='md'
+              size="md"
               style={{
                 flexDirection: 'column',
                 justifyContent: 'center',
@@ -116,24 +116,24 @@ const InboxItem = ({ toggle, mail, index, handleDelete }) => {
               }}
               icon={
                 <svg
-                  height='24'
-                  width='24'
-                  fill='none'
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  strokeWidth='2'
-                  stroke='var(--grey4)'
-                  viewBox='0 0 24 24'
+                  height="24"
+                  width="24"
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  stroke="var(--grey4)"
+                  viewBox="0 0 24 24"
                 >
-                  <path d='M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z' />
+                  <path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                 </svg>
               }
             />
           </Whisper>
-          <Whisper placement='left' speaker={<Tooltip>Delete</Tooltip>}>
+          <Whisper placement="left" speaker={<Tooltip>Delete</Tooltip>}>
             <IconButton
-              appearance='subtle'
-              size='md'
+              appearance="subtle"
+              size="md"
               onClick={() => handleDelete(mail.id)}
               style={{
                 flexDirection: 'column',
@@ -146,7 +146,7 @@ const InboxItem = ({ toggle, mail, index, handleDelete }) => {
               icon={
                 <UseAnimations
                   animation={trash2}
-                  strokeColor='var(--grey4)'
+                  strokeColor="var(--grey4)"
                   size={28}
                   style={{
                     color: 'var(--grey4)',

@@ -24,8 +24,8 @@ const CommentList = ({ user, id, initialComment }) => {
     fetch(`/api/comments?m=${id}`, {
       method: 'get',
     })
-      .then(resp => resp.json())
-      .then(data => {
+      .then((resp) => resp.json())
+      .then((data) => {
         let comments = data.comments
         if (initialComment) {
           comments.push({
@@ -41,7 +41,7 @@ const CommentList = ({ user, id, initialComment }) => {
           setComments(comments)
         }
       })
-      .catch(err => console.error(err))
+      .catch((err) => console.error(err))
   }, [id])
 
   useEffect(() => {
@@ -57,7 +57,7 @@ const CommentList = ({ user, id, initialComment }) => {
     }
   }, [initialComment])
 
-  const reverseArrayInPlace = arr => {
+  const reverseArrayInPlace = (arr) => {
     for (var i = 0; i <= arr.length / 2; i++) {
       const el = arr[i]
       arr[i] = arr[arr.length - 1 - i]
@@ -80,8 +80,8 @@ const CommentList = ({ user, id, initialComment }) => {
         'Content-Type': 'application/json',
       },
     })
-      .then(r => r.json())
-      .then(resp => {
+      .then((r) => r.json())
+      .then((resp) => {
         if (resp.comments.affectedRows === 1) {
           const newComments = comments
           const now = new Date()
@@ -96,12 +96,12 @@ const CommentList = ({ user, id, initialComment }) => {
           Notify('success', 'Comment Posted')
         }
       })
-      .catch(err => {
+      .catch((err) => {
         Notify('error', 'Post Error', err)
       })
   }
 
-  const deleteComment = commentId => {
+  const deleteComment = (commentId) => {
     fetch('/api/comments/delete', {
       method: 'post',
       body: JSON.stringify({
@@ -111,15 +111,15 @@ const CommentList = ({ user, id, initialComment }) => {
         'Content-Type': 'application/json',
       },
     })
-      .then(r => r.json())
-      .then(resp => {
+      .then((r) => r.json())
+      .then((resp) => {
         if (resp.comments.affectedRows === 1) {
-          const newComments = comments.filter(el => el.id !== commentId)
+          const newComments = comments.filter((el) => el.id !== commentId)
           setComments(newComments)
           Notify('success', 'Comment Deleted')
         }
       })
-      .catch(err => {
+      .catch((err) => {
         Notify('error', 'Delete Error', err)
       })
   }
@@ -127,7 +127,7 @@ const CommentList = ({ user, id, initialComment }) => {
   return (
     <FlexboxGrid
       style={{ flexDirection: 'column', alignItems: 'center' }}
-      align='middle'
+      align="middle"
     >
       <FlexboxGrid.Item colspan={22}>
         <Divider />
@@ -144,14 +144,14 @@ const CommentList = ({ user, id, initialComment }) => {
         </div>
       </FlexboxGrid.Item>
       <FlexboxGrid.Item colspan={22}>
-        <FlexboxGrid justify='space-between' align='middle'>
+        <FlexboxGrid justify="space-between" align="middle">
           <FlexboxGrid.Item colspan={19}>
-            <Input value={comment} onChange={e => setComment(e)} />
+            <Input value={comment} onChange={(e) => setComment(e)} />
           </FlexboxGrid.Item>
           <FlexboxGrid.Item colspan={4} style={{ marginLeft: '5px' }}>
             <IconButton
               style={{ width: '100%', minWidth: '100px' }}
-              icon={<Icon icon='send' />}
+              icon={<Icon icon="send" />}
               onClick={submitComment}
             >
               Submit
@@ -174,7 +174,7 @@ const CommentList = ({ user, id, initialComment }) => {
               <Loader />
             </div>
           ) : comments.length > 0 ? (
-            comments.map(comm => {
+            comments.map((comm) => {
               return (
                 <List.Item key={comm.id}>
                   <Comment data={comm} handleDelete={deleteComment} />

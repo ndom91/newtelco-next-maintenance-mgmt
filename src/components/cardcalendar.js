@@ -1,11 +1,11 @@
 import React from 'react'
 import moment from 'moment-timezone'
 
-const CardCalendar = props => {
+const CardCalendar = (props) => {
   return (
-    <div className='cal-wrapper'>
-      <div className='cal-header' />
-      <div className='date-wrapper'>
+    <div className="cal-wrapper">
+      <div className="cal-header" />
+      <div className="date-wrapper">
         <span>{moment(props.date).format('HH:mm:ss').substr(0, 5)}</span>
         <br />
         <span>{moment(props.date).format('MMM DD')}</span>

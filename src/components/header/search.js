@@ -8,10 +8,10 @@ const { addClass, removeClass } = DOMHelper
 
 const SearchInput = () => {
   const searchInput = useRef()
-  const toCamelCase = str => {
+  const toCamelCase = (str) => {
     return str
       .split(' ')
-      .map(word => {
+      .map((word) => {
         return ' ' + word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
       })
       .join('')
@@ -25,7 +25,7 @@ const SearchInput = () => {
     }
   }, [])
 
-  const handleClickOutside = event => {
+  const handleClickOutside = (event) => {
     if (searchInput && !searchInput.current.contains(event.target)) {
       addClass(document.querySelector('.aa-dropdown-menus'), 'hide-dropdown')
       removeClass(document.querySelector('.aa-dropdown-menus'), 'show-dropdown')
@@ -52,9 +52,9 @@ const SearchInput = () => {
       displayKey: 'name',
       /* eslint-disable react/display-name */
       templates: {
-        suggestion: suggestion => {
+        suggestion: (suggestion) => {
           if (suggestion._highlightResult) {
-            Object.keys(suggestion._highlightResult).forEach(key => {
+            Object.keys(suggestion._highlightResult).forEach((key) => {
               if (
                 suggestion._highlightResult[key].matchLevel &&
                 suggestion._highlightResult[key].matchLevel !== 'none'
@@ -81,17 +81,17 @@ const SearchInput = () => {
                 {suggestion.location && (
                   <span>
                     <svg
-                      fill='none'
-                      width='1.1em'
+                      fill="none"
+                      width="1.1em"
                       style={{ marginBottom: '-3px', marginRight: '-2px' }}
-                      strokeLinecap='round'
-                      strokeLinejoin='round'
-                      strokeWidth='2'
-                      stroke='currentColor'
-                      viewBox='0 0 24 24'
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
                     >
-                      <path d='M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z'></path>
-                      <path d='M15 11a3 3 0 11-6 0 3 3 0 016 0z'></path>
+                      <path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                      <path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                     </svg>
                     <span
                       style={{ fontSize: '80%' }}
@@ -112,16 +112,16 @@ const SearchInput = () => {
                 {suggestion.startDateTime && (
                   <span>
                     <svg
-                      fill='none'
-                      width='1.3em'
+                      fill="none"
+                      width="1.3em"
                       style={{ marginBottom: '-3px', marginRight: '2px' }}
-                      strokeLinecap='round'
-                      strokeLinejoin='round'
-                      strokeWidth='2'
-                      stroke='currentColor'
-                      viewBox='0 0 24 24'
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
                     >
-                      <path d='M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'></path>
+                      <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
                     <span
                       dangerouslySetInnerHTML={{
@@ -136,16 +136,16 @@ const SearchInput = () => {
                 {suggestion.endDateTime && (
                   <span>
                     <svg
-                      fill='none'
-                      width='1.3em'
+                      fill="none"
+                      width="1.3em"
                       style={{ marginBottom: '-3px', marginRight: '2px' }}
-                      strokeLinecap='round'
-                      strokeLinejoin='round'
-                      strokeWidth='2'
-                      stroke='currentColor'
-                      viewBox='0 0 24 24'
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
                     >
-                      <path d='M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'></path>
+                      <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
                     <span
                       dangerouslySetInnerHTML={{
@@ -167,16 +167,16 @@ const SearchInput = () => {
                   }}
                 >
                   <svg
-                    fill='none'
-                    width='1.3em'
+                    fill="none"
+                    width="1.3em"
                     style={{ marginRight: '2px' }}
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth='2'
-                    stroke='currentColor'
-                    viewBox='0 0 24 24'
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
                   >
-                    <path d='M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z'></path>
+                    <path d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                   </svg>
                   <span
                     dangerouslySetInnerHTML={{ __html: suggestion.derenCID }}
@@ -184,15 +184,15 @@ const SearchInput = () => {
                   {suggestion.betroffeneCIDs && (
                     <>
                       <svg
-                        fill='none'
-                        width='0.5em'
-                        strokeLinecap='round'
-                        strokeLinejoin='round'
-                        strokeWidth='2'
-                        stroke='currentColor'
-                        viewBox='0 0 24 24'
+                        fill="none"
+                        width="0.5em"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
                       >
-                        <path d='M9 5l7 7-7 7'></path>
+                        <path d="M9 5l7 7-7 7"></path>
                       </svg>
                       <span
                         style={{
@@ -217,7 +217,7 @@ const SearchInput = () => {
   ]
   /* eslint-enable react/display-name */
 
-  const handleSearchSelection = selection => {
+  const handleSearchSelection = (selection) => {
     const newLocation = `/maintenance?id=${selection.id
       .toString()
       .match(/\d+/g)
@@ -229,13 +229,13 @@ const SearchInput = () => {
     <div ref={searchInput} style={{ width: '400px' }}>
       <Autocomplete indexes={indexes} onSelectionChange={handleSearchSelection}>
         <input
-          key='input'
-          type='search'
-          id='aa-search-input'
-          className='rs-input'
-          placeholder='Search'
-          name='search'
-          autoComplete='off'
+          key="input"
+          type="search"
+          id="aa-search-input"
+          className="rs-input"
+          placeholder="Search"
+          name="search"
+          autoComplete="off"
           onFocus={restoreVisibility}
         />
       </Autocomplete>

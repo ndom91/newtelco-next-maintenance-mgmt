@@ -76,11 +76,11 @@ const RescheduleGrid = ({ maintId, user, handleCalendarUpdate }) => {
     fetch(`/api/reschedule?id=${maintId}`, {
       method: 'get',
     })
-      .then(resp => resp.json())
-      .then(data => {
+      .then((resp) => resp.json())
+      .then((data) => {
         store.set('rescheduleData')(data.reschedules)
       })
-      .catch(err => console.error(`Error Loading Reschedules - ${err}`))
+      .catch((err) => console.error(`Error Loading Reschedules - ${err}`))
   }, [])
 
   const gridOptions = {
@@ -165,7 +165,7 @@ const RescheduleGrid = ({ maintId, user, handleCalendarUpdate }) => {
     },
   }
 
-  const handleRescheduleGridReady = params => {
+  const handleRescheduleGridReady = (params) => {
     rescheduleGridApi.current = params.api
     params.api.setRowData(store.get('rescheduleData'))
   }
@@ -176,12 +176,12 @@ const RescheduleGrid = ({ maintId, user, handleCalendarUpdate }) => {
   //
   /// /////////////////////////////////////////////////////////
 
-  const handleRescheduleStartDateTimeChange = date => {
+  const handleRescheduleStartDateTimeChange = (date) => {
     const startDateTime = moment(date[0]).format('YYYY-MM-DD HH:mm:ss')
     setReschedule({ ...reschedule, startDateTime })
   }
 
-  const handleRescheduleEndDateTimeChange = date => {
+  const handleRescheduleEndDateTimeChange = (date) => {
     const endDateTime = moment(date[0]).format('YYYY-MM-DD HH:mm:ss')
     setReschedule({ ...reschedule, endDateTime })
   }
@@ -211,7 +211,7 @@ const RescheduleGrid = ({ maintId, user, handleCalendarUpdate }) => {
         rcounter: store.get('rescheduleData').length + 1,
         user: user,
         reason: rescheduleReasons.find(
-          reason => reason.value === reschedule.reason
+          (reason) => reason.value === reschedule.reason
         ).label,
       }),
       headers: {
@@ -219,8 +219,8 @@ const RescheduleGrid = ({ maintId, user, handleCalendarUpdate }) => {
         'Content-Type': 'application/json',
       },
     })
-      .then(resp => resp.json())
-      .then(data => {
+      .then((resp) => resp.json())
+      .then((data) => {
         if (data.insertRescheduleQuery.affectedRows === 1) {
           setOpenRescheduleModal(!openRescheduleModal)
           Notify('success', 'Reschedule Save Complete')
@@ -231,7 +231,7 @@ const RescheduleGrid = ({ maintId, user, handleCalendarUpdate }) => {
             endDateTime: moment(newEndDateTime).format(),
             impact: reschedule.impact,
             reason: rescheduleReasons.find(
-              reason => reason.value === reschedule.reason
+              (reason) => reason.value === reschedule.reason
             ).label,
             sent: 0,
           })
@@ -248,19 +248,19 @@ const RescheduleGrid = ({ maintId, user, handleCalendarUpdate }) => {
           rescheduleGridApi.current.setRowData(data)
         }
       })
-      .catch(err => console.error(`Error Saving Reschedule - ${err}`))
+      .catch((err) => console.error(`Error Saving Reschedule - ${err}`))
 
     fetch(`/api/reschedule/increment?id=${maintId}`, {
       method: 'get',
     })
-      .then(resp => resp.json())
-      .then(data => {
+      .then((resp) => resp.json())
+      .then((data) => {
         // console.log(data.rescheduleInc)
       })
-      .catch(err => console.error(`Error Incrementing Reschedule - ${err}`))
+      .catch((err) => console.error(`Error Incrementing Reschedule - ${err}`))
   }
 
-  const handleRescheduleCellEdit = params => {
+  const handleRescheduleCellEdit = (params) => {
     const rcounter = params.data.rcounter
     const newStartDateTime = moment(params.data.startDateTime).format(
       'YYYY.MM.DD HH:mm:ss'
@@ -285,13 +285,13 @@ const RescheduleGrid = ({ maintId, user, handleCalendarUpdate }) => {
         'Content-Type': 'application/json',
       },
     })
-      .then(resp => resp.json())
-      .then(data => {
+      .then((resp) => resp.json())
+      .then((data) => {
         if (data.editRescheduleQuery.affectedRows === 1) {
           Notify('success', 'Reschedule Edit Success')
         }
       })
-      .catch(err => console.error(`Reschedule Edit Error - ${err}`))
+      .catch((err) => console.error(`Reschedule Edit Error - ${err}`))
   }
 
   function toggleRescheduleSentBtn(rcounter) {
@@ -324,13 +324,13 @@ const RescheduleGrid = ({ maintId, user, handleCalendarUpdate }) => {
         'Content-Type': 'application/json',
       },
     })
-      .then(resp => resp.json())
-      .then(data => {
+      .then((resp) => resp.json())
+      .then((data) => {
         if (data.editRescheduleQuery.affectedRows === 1) {
           Notify('success', 'Reschedule Sent Change Success')
         }
       })
-      .catch(err => console.error(`Reschedule Sent Change Error - ${err}`))
+      .catch((err) => console.error(`Reschedule Sent Change Error - ${err}`))
 
     rescheduleGridApi.current.refreshCells()
   }
@@ -361,13 +361,15 @@ const RescheduleGrid = ({ maintId, user, handleCalendarUpdate }) => {
         'Content-Type': 'application/json',
       },
     })
-      .then(resp => resp.json())
-      .then(data => {
+      .then((resp) => resp.json())
+      .then((data) => {
         if (data.deleteRescheduleQuery.affectedRows === 1) {
           Notify('success', 'Reschedule Delete Success')
           const newRescheduleData = store
             .get('rescheduleData')
-            .filter(resched => resched.rcounter !== rescheduleToDelete.rcounter)
+            .filter(
+              (resched) => resched.rcounter !== rescheduleToDelete.rcounter
+            )
           rescheduleGridApi.current.setRowData(newRescheduleData)
           setOpenConfirmDeleteModal(!openConfirmDeleteModal)
           store.set('rescheduleData')(newRescheduleData)
@@ -375,22 +377,22 @@ const RescheduleGrid = ({ maintId, user, handleCalendarUpdate }) => {
           Notify('error', 'Reschedule Delete Error')
         }
       })
-      .catch(err => console.error(`Reschedule Delete Error - ${err}`))
+      .catch((err) => console.error(`Reschedule Delete Error - ${err}`))
   }
 
   return (
     <Container style={{ padding: '20px' }}>
       <Row style={{ marginBottom: '20px' }}>
-        <FlexboxGrid justify='end'>
+        <FlexboxGrid justify="end">
           <FlexboxGrid.Item>
             <Whisper
-              placement='bottom'
+              placement="bottom"
               speaker={<Tooltip>Create New Reschedule</Tooltip>}
             >
               <IconButton
-                appearance='ghost'
+                appearance="ghost"
                 onClick={() => setOpenRescheduleModal(!openRescheduleModal)}
-                icon={<Icon icon='clock-o' />}
+                icon={<Icon icon="clock-o" />}
               >
                 Reschedule
               </IconButton>
@@ -401,7 +403,7 @@ const RescheduleGrid = ({ maintId, user, handleCalendarUpdate }) => {
       <Row>
         <Col style={{ width: '100%', height: '400px' }}>
           <div
-            className='ag-theme-material'
+            className="ag-theme-material"
             style={{
               height: '100%',
               width: '100%',
@@ -415,7 +417,7 @@ const RescheduleGrid = ({ maintId, user, handleCalendarUpdate }) => {
               onCellEditingStopped={handleRescheduleCellEdit}
               animateRows
               immutableData
-              getRowNodeId={data => {
+              getRowNodeId={(data) => {
                 return data.rcounter
               }}
               stopEditingWhenGridLosesFocus
@@ -439,15 +441,15 @@ const RescheduleGrid = ({ maintId, user, handleCalendarUpdate }) => {
             zIndex: '6',
             boxShadow: '0px 0px 10px 1px var(--grey3)',
           }}
-          dragHandleClassName='reschedule-header'
+          dragHandleClassName="reschedule-header"
         >
           <Modal.Header
-            className='reschedule reschedule-header'
+            className="reschedule reschedule-header"
             onHide={() => setOpenRescheduleModal(!openRescheduleModal)}
           >
             <FlexboxGrid
-              justify='center'
-              align='middle'
+              justify="center"
+              align="middle"
               style={{ pointerEvents: 'none' }}
             >
               <FlexboxGrid.Item
@@ -461,33 +463,33 @@ const RescheduleGrid = ({ maintId, user, handleCalendarUpdate }) => {
             </FlexboxGrid>
           </Modal.Header>
           <Modal.Body
-            className='modal-body reschedule'
+            className="modal-body reschedule"
             style={{ marginTop: '0px', paddingBottom: '0px' }}
           >
             <FlexboxGrid
-              justify='space-around'
-              align='middle'
+              justify="space-around"
+              align="middle"
               style={{ flexDirection: 'column', height: '520px' }}
             >
               <FlexboxGrid.Item style={{ padding: '30px' }}>
                 <Form>
                   <FormGroup style={{ margin: '20px' }}>
-                    <label htmlFor='supplier'>Timezone</label>
+                    <label htmlFor="supplier">Timezone</label>
                     <Select
                       options={tzOptions}
-                      name='reschedule-timezone'
+                      name="reschedule-timezone"
                       value={{
                         value: reschedule.timezone,
                         label: reschedule.timezoneLabel,
                       }}
-                      onChange={selection =>
+                      onChange={(selection) =>
                         setReschedule({
                           ...reschedule,
                           timezone: selection.value,
                           timezoneLabel: selection.label,
                         })
                       }
-                      className='timezone-select'
+                      className="timezone-select"
                     />
                   </FormGroup>
                   <FormGroup style={{ margin: '20px' }}>
@@ -495,9 +497,9 @@ const RescheduleGrid = ({ maintId, user, handleCalendarUpdate }) => {
                     <Flatpickr
                       data-enable-time
                       options={{ time_24hr: 'true', allow_input: 'true' }}
-                      className='flatpickr end-date-time'
+                      className="flatpickr end-date-time"
                       value={reschedule.startDateTime || null}
-                      onChange={date =>
+                      onChange={(date) =>
                         handleRescheduleStartDateTimeChange(date)
                       }
                     />
@@ -507,35 +509,37 @@ const RescheduleGrid = ({ maintId, user, handleCalendarUpdate }) => {
                     <Flatpickr
                       data-enable-time
                       options={{ time_24hr: 'true', allow_input: 'true' }}
-                      className='flatpickr end-date-time'
+                      className="flatpickr end-date-time"
                       value={reschedule.endDateTime || null}
-                      onChange={date => handleRescheduleEndDateTimeChange(date)}
+                      onChange={(date) =>
+                        handleRescheduleEndDateTimeChange(date)
+                      }
                     />
                   </FormGroup>
                   <FormGroup style={{ margin: '20px' }}>
-                    <label htmlFor='resched-impact'>New Impact</label>
+                    <label htmlFor="resched-impact">New Impact</label>
                     <Input
-                      id='resched-impact'
-                      name='resched-impact'
-                      type='text'
+                      id="resched-impact"
+                      name="resched-impact"
+                      type="text"
                       value={reschedule.impact}
-                      onChange={value =>
+                      onChange={(value) =>
                         setReschedule({ ...reschedule, impact: value })
                       }
                     />
                   </FormGroup>
                   <FormGroup style={{ margin: '20px' }}>
-                    <label htmlFor='resched-reason'>New Reason</label>
+                    <label htmlFor="resched-reason">New Reason</label>
                     <SelectPicker
                       cleanable
                       style={{ width: '100%' }}
-                      placement='top'
+                      placement="top"
                       searchable={false}
                       value={reschedule.reason}
-                      onChange={value =>
+                      onChange={(value) =>
                         setReschedule({ ...reschedule, reason: value })
                       }
-                      placeholder='Please select a reason for reschedule'
+                      placeholder="Please select a reason for reschedule"
                       data={rescheduleReasons}
                     />
                   </FormGroup>
@@ -544,7 +548,7 @@ const RescheduleGrid = ({ maintId, user, handleCalendarUpdate }) => {
               <FlexboxGrid.Item colspan={18}>
                 <ButtonGroup justified>
                   <Button
-                    appearance='subtle'
+                    appearance="subtle"
                     onClick={() => setOpenRescheduleModal(!openRescheduleModal)}
                   >
                     Cancel
@@ -560,7 +564,7 @@ const RescheduleGrid = ({ maintId, user, handleCalendarUpdate }) => {
         <ConfirmModal
           show={openConfirmDeleteModal}
           onHide={toggleConfirmDeleteRescheduleModal}
-          header='Confirm Delete'
+          header="Confirm Delete"
           content={`Are you sure you want to delete ${rescheduleToDelete.id}`}
           cancelAction={toggleConfirmDeleteRescheduleModal}
           confirmAction={handleDeleteReschedule}

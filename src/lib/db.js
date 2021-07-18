@@ -10,7 +10,7 @@ const db = mysql({
   },
 })
 
-exports.query = async query => {
+exports.query = async (query) => {
   try {
     const results = await db.query(query)
     await db.end()

@@ -6,7 +6,7 @@ import { ResponsiveCalendarCanvas } from '@nivo/calendar'
 const Heatmap = () => {
   const { data } = useSWR(
     '/api/homepage/heatmap',
-    (...args) => fetch(...args).then(res => res.json()),
+    (...args) => fetch(...args).then((res) => res.json()),
     { revalidateOnFocus: false }
   )
 
@@ -18,9 +18,9 @@ const Heatmap = () => {
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             Calendar
             <Icon
-              icon='calendar-o'
+              icon="calendar-o"
               style={{ color: 'var(--primary)' }}
-              size='lg'
+              size="lg"
             />
           </div>
         }
@@ -33,13 +33,13 @@ const Heatmap = () => {
             maxValue={10}
             from={'2020-01-01'}
             to={'2021-01-01'}
-            emptyColor='#eeeeee'
+            emptyColor="#eeeeee"
             colors={['#C6E2BA', '#8DC574', '#67B246', '#5A9C3D']}
             margin={{ top: 40, right: 40, bottom: 40, left: 40 }}
             yearSpacing={40}
-            monthBorderColor='#ffffff'
+            monthBorderColor="#ffffff"
             dayBorderWidth={2}
-            dayBorderColor='#ffffff'
+            dayBorderColor="#ffffff"
           />
         </div>
       </Panel>
@@ -52,9 +52,9 @@ const Heatmap = () => {
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             Calendar
             <Icon
-              icon='calendar-o'
+              icon="calendar-o"
               style={{ color: 'var(--primary)' }}
-              size='lg'
+              size="lg"
             />
           </div>
         }

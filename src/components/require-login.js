@@ -15,8 +15,8 @@ const RequireLogin = () => (
   <Container>
     <Content>
       <FlexboxGrid
-        justify='center'
-        align='middle'
+        justify="center"
+        align="middle"
         style={{ height: '70vh', flexDirection: 'column' }}
       >
         <FlexboxGrid.Item
@@ -28,7 +28,7 @@ const RequireLogin = () => (
           xs={18}
         >
           <Panel
-            header='Session'
+            header="Session"
             bordered
             shaded
             style={{ backgroundColor: '#fff' }}
@@ -37,11 +37,11 @@ const RequireLogin = () => (
               You must be signed in to view this page.
             </p>
             <p>
-              <Link href='/auth/signin'>
+              <Link href="/auth/signin">
                 <Button
-                  id='signin-btn'
-                  type='submit'
-                  appearance='primary'
+                  id="signin-btn"
+                  type="submit"
+                  appearance="primary"
                   block
                 >
                   Sign in

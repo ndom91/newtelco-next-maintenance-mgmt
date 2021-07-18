@@ -1,8 +1,12 @@
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
 })
+const { withSentryConfig } = require('@sentry/nextjs')
 const withLess = require('@zeit/next-less')
 // Less Loader Workaround: https://github.com/vercel/next-plugins/issues/598#issuecomment-702907049
+const SentryWebpackPluginOptions = {
+  silent: true,
+}
 
 function HACK_removeMinimizeOptionFromCssLoaders(config) {
   // console.warn(
@@ -45,4 +49,7 @@ const nextConfig = {
   },
 }
 
-module.exports = withBundleAnalyzer(withLess(nextConfig))
+module.exports = withSentryConfig(
+  withBundleAnalyzer(withLess(nextConfig)),
+  SentryWebpackPluginOptions
+)

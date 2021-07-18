@@ -11,10 +11,10 @@ const DarkmodeSwitch = ({ value, onChange }) => {
       <div style={{ display: 'flex', alignItems: 'flex-end' }}>
         <S.Wrapper
           onClick={onChange}
-          role='button'
-          className='darkmode-wrapper'
+          role="button"
+          className="darkmode-wrapper"
           tabIndex={0}
-          onKeyPress={e => {
+          onKeyPress={(e) => {
             if (e.which === 13 || e.which === 32) {
               onChange(e)
             }
@@ -52,9 +52,9 @@ const DarkmodeSwitch = ({ value, onChange }) => {
             >
               {/* <S.Moon icon={faMoon} />  */}
               {value ? (
-                <FontAwesomeIcon icon={faMoon} width='0.5em' />
+                <FontAwesomeIcon icon={faMoon} width="0.5em" />
               ) : (
-                <FontAwesomeIcon icon={faSun} width='0.8em' />
+                <FontAwesomeIcon icon={faSun} width="0.8em" />
               )}
             </S.Circle>
           </S.DayNightSwitch>

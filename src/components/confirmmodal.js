@@ -13,7 +13,7 @@ const ConfirmModal = ({
   ...props
 }) => {
   return (
-    <Modal backdrop show={show} size='sm' onHide={onHide} {...props}>
+    <Modal backdrop show={show} size="sm" onHide={onHide} {...props}>
       <Modal.Header
         style={{
           fontWeight: '100',
@@ -29,8 +29,8 @@ const ConfirmModal = ({
         }}
       >
         <FlexboxGrid
-          justify='space-around'
-          align='middle'
+          justify="space-around"
+          align="middle"
           style={{ flexDirection: 'column', height: height || '150px' }}
         >
           <FlexboxGrid.Item
@@ -41,14 +41,14 @@ const ConfirmModal = ({
           <FlexboxGrid.Item>
             <ButtonGroup block style={{ width: buttonWidth || '30em' }}>
               <Button
-                appearance='default'
+                appearance="default"
                 onClick={cancelAction}
                 style={{ width: '50%' }}
               >
                 Cancel
               </Button>
               <Button
-                appearance='primary'
+                appearance="primary"
                 onClick={confirmAction}
                 style={{ width: '50%' }}
               >

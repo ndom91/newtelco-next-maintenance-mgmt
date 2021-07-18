@@ -8,14 +8,14 @@ const UnreadBadge = ({ count }) => (
     header={
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
         Unread
-        <Icon icon='envelope-o' style={{ color: 'var(--primary)' }} size='lg' />
+        <Icon icon="envelope-o" style={{ color: 'var(--primary)' }} size="lg" />
       </div>
     }
     bordered
-    className='unread-panel'
+    className="unread-panel"
   >
-    <Link href='/inbox' passHref>
-      <a className='unread-count'>{count}</a>
+    <Link href="/inbox" passHref>
+      <a className="unread-count">{count}</a>
     </Link>
   </Panel>
 )

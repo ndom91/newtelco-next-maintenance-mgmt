@@ -6,7 +6,7 @@ import { Panel, Loader, Icon } from 'rsuite'
 const BarChart = () => {
   const { data } = useSWR(
     '/api/homepage/perperson',
-    (...args) => fetch(...args).then(res => res.json()),
+    (...args) => fetch(...args).then((res) => res.json()),
     { suspense: false, revalidateOnFocus: false }
   )
 
@@ -21,9 +21,9 @@ const BarChart = () => {
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             Totals
             <Icon
-              icon='bar-chart'
+              icon="bar-chart"
               style={{ color: 'var(--primary)' }}
-              size='lg'
+              size="lg"
             />
           </div>
         }
@@ -32,13 +32,13 @@ const BarChart = () => {
         <Bar
           width={400}
           height={250}
-          layout='horizontal'
+          layout="horizontal"
           margin={{ top: 26, right: 20, bottom: 26, left: 70 }}
           data={Users}
           keys={['value']}
-          indexBy='person'
+          indexBy="person"
           colors={{ scheme: 'greens' }}
-          colorBy='index'
+          colorBy="index"
           enableGridX={false}
           enableGridY={false}
           axisBottom={null}
@@ -69,9 +69,9 @@ const BarChart = () => {
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             Totals
             <Icon
-              icon='bar-chart'
+              icon="bar-chart"
               style={{ color: 'var(--primary)' }}
-              size='lg'
+              size="lg"
             />
           </div>
         }

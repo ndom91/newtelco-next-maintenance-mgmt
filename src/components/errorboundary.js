@@ -25,8 +25,8 @@ export default class ErrorBoundary extends React.Component {
         <Container>
           <Content>
             <FlexboxGrid
-              justify='center'
-              align='middle'
+              justify="center"
+              align="middle"
               style={{
                 height: '70vh',
                 flexDirection: 'column',
@@ -51,12 +51,12 @@ export default class ErrorBoundary extends React.Component {
                   shaded
                   style={{ backgroundColor: '#fff', padding: '20px' }}
                 >
-                  <Container className='container-border'>
+                  <Container className="container-border">
                     <img
                       style={{ marginBottom: '50px' }}
-                      width='500px'
-                      src='/static/images/error.svg'
-                      alt='error'
+                      width="500px"
+                      src="/static/images/error.svg"
+                      alt="error"
                     />
                     <h4 style={{ textAlign: 'center', marginBottom: '10px' }}>
                       Oops — something's gone wrong.
@@ -70,7 +70,7 @@ export default class ErrorBoundary extends React.Component {
                       style={{ marginTop: '20px', width: '100%' }}
                     >
                       <Button
-                        componentClass='a'
+                        componentClass="a"
                         href={`mailto:ndomino@newtelco.de?subject=${encodeURIComponent(
                           'Newtelco Maintenance - Error'
                         )}&body=${encodeURIComponent(
@@ -82,7 +82,7 @@ export default class ErrorBoundary extends React.Component {
                         Report
                       </Button>
                       <Button
-                        appearance='primary'
+                        appearance="primary"
                         onClick={() => window.location.reload(true)}
                       >
                         Try Again

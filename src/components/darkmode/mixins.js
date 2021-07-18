@@ -13,11 +13,16 @@ export const grid = ({
 
 export const fixedSize = (width, height = width) => ({ width, height })
 
-export const applyTheme = name => ({ theme }) => theme[name]
+export const applyTheme =
+  (name) =>
+  ({ theme }) =>
+    theme[name]
 
-export const whenTheme = (name, val) => ({ theme }) => ({
-  ...(theme.name === name && val),
-})
+export const whenTheme =
+  (name, val) =>
+  ({ theme }) => ({
+    ...(theme.name === name && val),
+  })
 
 export const hover = (hover = {}, active = {}, alternative = {}) => ({
   cursor: 'pointer',
@@ -27,15 +32,17 @@ export const hover = (hover = {}, active = {}, alternative = {}) => ({
   '&:active': active,
 })
 
-export const getThemeColor = (name, p = 'color') => ({ theme }) => ({
-  [p]: theme.colors[name],
-})
+export const getThemeColor =
+  (name, p = 'color') =>
+  ({ theme }) => ({
+    [p]: theme.colors[name],
+  })
 
-export const when = (name, val, whenNot) => obj => ({
+export const when = (name, val, whenNot) => (obj) => ({
   ...(obj[name] && val),
   ...(!obj[name] && whenNot),
 })
 
-export const whenNot = (name, val) => obj => ({
+export const whenNot = (name, val) => (obj) => ({
   ...(!obj[name] && val),
 })

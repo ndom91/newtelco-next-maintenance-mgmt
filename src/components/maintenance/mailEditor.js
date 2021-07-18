@@ -30,22 +30,22 @@ const MailEditor = ({
 
   return (
     <Modal
-      className='modal-preview-send'
+      className="modal-preview-send"
       backdrop
-      size='lg'
+      size="lg"
       show={open}
       onHide={onHide}
     >
       <Modal.Header>
-        <FlexboxGrid justify='start' align='middle' style={{ width: '100%' }}>
+        <FlexboxGrid justify="start" align="middle" style={{ width: '100%' }}>
           <FlexboxGrid.Item
             colspan={3}
             style={{ display: 'flex', justifyContent: 'center' }}
           >
             {faviconLoading && <Loader />}
             <Avatar
-              size='lg'
-              src='/v1/api/faviconUrl?d=newtelco.de'
+              size="lg"
+              src="/v1/api/faviconUrl?d=newtelco.de"
               style={{
                 backgroundColor: 'transparent',
                 display: faviconLoading ? 'none' : 'block',
@@ -54,43 +54,43 @@ const MailEditor = ({
             />
           </FlexboxGrid.Item>
           <FlexboxGrid.Item colspan={19}>
-            <div className='modal-preview-text-wrapper'>
+            <div className="modal-preview-text-wrapper">
               <InputGroup
-                className='modal-textbox'
+                className="modal-textbox"
                 style={{ marginBottom: '2px' }}
               >
-                <InputGroup.Addon style={{ height: '31px' }} type='prepend'>
+                <InputGroup.Addon style={{ height: '31px' }} type="prepend">
                   To
                 </InputGroup.Addon>
                 <Input readOnly value={recipients} />
               </InputGroup>
               <InputGroup
-                className='modal-textbox'
+                className="modal-textbox"
                 style={{ marginBottom: '2px' }}
               >
-                <InputGroup.Addon style={{ height: '31px' }} type='prepend'>
+                <InputGroup.Addon style={{ height: '31px' }} type="prepend">
                   CC
                 </InputGroup.Addon>
-                <Input type='text' readOnly value='service@newtelco.de' />
+                <Input type="text" readOnly value="service@newtelco.de" />
               </InputGroup>
-              <InputGroup className='modal-textbox'>
-                <InputGroup.Addon style={{ height: '31px' }} type='prepend'>
+              <InputGroup className="modal-textbox">
+                <InputGroup.Addon style={{ height: '31px' }} type="prepend">
                   Subject
                 </InputGroup.Addon>
-                <Input type='text' readOnly value={subject} />
+                <Input type="text" readOnly value={subject} />
               </InputGroup>
             </div>
           </FlexboxGrid.Item>
           <FlexboxGrid.Item colspan={1} style={{ marginLeft: '30px' }}>
-            <Whisper speaker={<Tooltip>Send Mail</Tooltip>} placement='bottom'>
+            <Whisper speaker={<Tooltip>Send Mail</Tooltip>} placement="bottom">
               <IconButton
                 onClick={() =>
                   sendMail(recipients, customerCid, subject, body, true)
                 }
-                appearance='default'
+                appearance="default"
                 style={{ color: 'var(--grey3)' }}
-                size='lg'
-                icon={<Icon icon='send' />}
+                size="lg"
+                icon={<Icon icon="send" />}
               />
             </Whisper>
           </FlexboxGrid.Item>

@@ -28,7 +28,7 @@ const Layout = ({ children }) => {
 
   const { data } = useSWR(
     '/v1/api/count',
-    url => fetch(url).then(res => res.json()),
+    (url) => fetch(url).then((res) => res.json()),
     { refreshInterval: 30000, focusThrottleInterval: 10000 }
   )
 
@@ -36,12 +36,12 @@ const Layout = ({ children }) => {
     store.set('count')(data ? data.count : 0)
   }, [data])
 
-  store.on('night').subscribe(night => {
+  store.on('night').subscribe((night) => {
     fetch(
       night ? '/static/css/rsuite-dark.css' : '/static/css/rsuite-default.css'
     )
-      .then(response => response.text())
-      .then(data => {
+      .then((response) => response.text())
+      .then((data) => {
         setStyle(data)
       })
   })
@@ -55,7 +55,7 @@ const Layout = ({ children }) => {
       <Container>
         <MaintHeader unread={store.get('count')} />
         <Content>
-          <FlexboxGrid justify='center'>
+          <FlexboxGrid justify="center">
             <FlexboxGrid.Item colspan={23} style={{ marginTop: '20px' }}>
               {children}
             </FlexboxGrid.Item>

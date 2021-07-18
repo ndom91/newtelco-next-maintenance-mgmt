@@ -7,8 +7,8 @@ const Maintenance404 = () => {
     <Container>
       <Content>
         <FlexboxGrid
-          justify='center'
-          align='middle'
+          justify="center"
+          align="middle"
           style={{ height: '70vh', flexDirection: 'column' }}
         >
           <FlexboxGrid.Item
@@ -22,12 +22,12 @@ const Maintenance404 = () => {
             <div style={{ marginBottom: '40px' }}>
               <img
                 style={{ width: '70%', margin: '0 auto' }}
-                src='/static/images/nt-black.png'
-                alt='Newtelco Logo'
+                src="/static/images/nt-black.png"
+                alt="Newtelco Logo"
               />
             </div>
             <Panel
-              header='Page Not Found'
+              header="Page Not Found"
               bordered
               shaded
               style={{ backgroundColor: '#fff' }}
@@ -38,9 +38,9 @@ const Maintenance404 = () => {
               </p>
               <Link href={{ pathname: '/' }} as={'/'} passHref>
                 <IconButton
-                  size='md'
+                  size="md"
                   block
-                  appearance='subtle'
+                  appearance="subtle"
                   style={{
                     paddingLeft: '12px',
                     border: '1px solid var(--primary)',
@@ -51,19 +51,19 @@ const Maintenance404 = () => {
                   }}
                   icon={
                     <svg
-                      xmlns='http://www.w3.org/2000/svg'
-                      fill='none'
-                      height='18'
-                      width='18'
-                      viewBox='0 0 24 24'
-                      stroke='var(--primary)'
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      height="18"
+                      width="18"
+                      viewBox="0 0 24 24"
+                      stroke="var(--primary)"
                       style={{ marginRight: '10px' }}
                     >
                       <path
-                        strokeLinecap='round'
-                        strokeLinejoin='round'
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
                         strokeWidth={2}
-                        d='M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6'
+                        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
                       />
                     </svg>
                   }

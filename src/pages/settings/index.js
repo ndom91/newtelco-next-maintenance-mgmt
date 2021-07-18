@@ -17,27 +17,27 @@ const Settings = ({ session, router }) => {
 
   const SettingsNav = () => {
     return (
-      <Nav appearance='subtle'>
-        <Nav.Item key={tab} componentClass='div' active={tab === 'companies'}>
+      <Nav appearance="subtle">
+        <Nav.Item key={tab} componentClass="div" active={tab === 'companies'}>
           <Link href={{ pathname: '/settings', query: { tab: 'companies' } }}>
             <a>Companies</a>
           </Link>
         </Nav.Item>
-        <Nav.Item componentClass='div' active={tab === 'suppliercids'}>
+        <Nav.Item componentClass="div" active={tab === 'suppliercids'}>
           <Link
             href={{ pathname: '/settings', query: { tab: 'suppliercids' } }}
           >
             <a>Supplier CIDs</a>
           </Link>
         </Nav.Item>
-        <Nav.Item componentClass='div' active={tab === 'customercids'}>
+        <Nav.Item componentClass="div" active={tab === 'customercids'}>
           <Link
             href={{ pathname: '/settings', query: { tab: 'customercids' } }}
           >
             <a>Customer CIDs</a>
           </Link>
         </Nav.Item>
-        <Nav.Item componentClass='div' active={tab === 'freeze'}>
+        <Nav.Item componentClass="div" active={tab === 'freeze'}>
           <Link href={{ pathname: '/settings', query: { tab: 'freeze' } }}>
             <a>Freeze</a>
           </Link>
@@ -49,8 +49,8 @@ const Settings = ({ session, router }) => {
   if (session) {
     return (
       <Layout>
-        <MaintPanel header='Settings' buttons={<SettingsNav />}>
-          <FlexboxGrid align='top' justify='center' style={{ width: '100%' }}>
+        <MaintPanel header="Settings" buttons={<SettingsNav />}>
+          <FlexboxGrid align="top" justify="center" style={{ width: '100%' }}>
             {tab === 'companies' && <Companies />}
             {tab === 'customercids' && <CustomerCIDs />}
             {tab === 'suppliercids' && <SupplierCIDs />}

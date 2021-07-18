@@ -20,7 +20,7 @@ import {
   Loader,
 } from 'rsuite'
 
-const SupplierCIDs = props => {
+const SupplierCIDs = (props) => {
   const gridApi = useRef()
   const gridColumnApi = useRef()
   const [openSupplierCidAdd, setOpenSupplierCidAdd] = useState(false)
@@ -68,24 +68,24 @@ const SupplierCIDs = props => {
     fetch('/api/lieferantcids/settings', {
       method: 'get',
     })
-      .then(resp => resp.json())
-      .then(data => {
+      .then((resp) => resp.json())
+      .then((data) => {
         gridApi.current.hideOverlay()
         setRowData(data.lieferantCIDsResult)
       })
-      .catch(err => console.error(err))
+      .catch((err) => console.error(err))
     // fill Companies Select
     fetch('/api/companies/selectmaint', {
       method: 'get',
     })
-      .then(resp => resp.json())
-      .then(data => {
+      .then((resp) => resp.json())
+      .then((data) => {
         setCompanySelections(data.companies)
       })
-      .catch(err => console.error(`Error - ${err}`))
+      .catch((err) => console.error(`Error - ${err}`))
   }, [])
 
-  const handleGridReady = params => {
+  const handleGridReady = (params) => {
     gridApi.current = params.api
     gridApi.current.showLoadingOverlay()
     gridColumnApi.current = params.columnApi
@@ -96,7 +96,7 @@ const SupplierCIDs = props => {
     setOpenSupplierCidAdd(!openSupplierCidAdd)
   }
 
-  const handleCompanyChange = selectedOption => {
+  const handleCompanyChange = (selectedOption) => {
     setNewCompanySelection({
       value: selectedOption.value,
       label: selectedOption.label,
@@ -107,17 +107,17 @@ const SupplierCIDs = props => {
     fetch(`/api/settings/delete/suppliercids?id=${supplierCidToDelete.id}`, {
       method: 'get',
     })
-      .then(resp => resp.json())
-      .then(data => {
+      .then((resp) => resp.json())
+      .then((data) => {
         if (data.deleteSupplierCidQuery.affectedRows === 1) {
           Notify('success', `${supplierCidToDelete.name} Deleted`)
         } else {
           Notify('warning', 'Error', data.err)
         }
       })
-      .catch(err => console.error(err))
+      .catch((err) => console.error(err))
 
-    const newRowData = rowData.filter(el => el.id !== supplierCidToDelete.id)
+    const newRowData = rowData.filter((el) => el.id !== supplierCidToDelete.id)
     setRowData(newRowData)
     setOpenConfirmDeleteModal(!openConfirmDeleteModal)
   }
@@ -145,8 +145,8 @@ const SupplierCIDs = props => {
         method: 'get',
       }
     )
-      .then(resp => resp.json())
-      .then(data => {
+      .then((resp) => resp.json())
+      .then((data) => {
         const insertId = data.insertSupplierCidQuery.insertId
         if (
           data.insertSupplierCidQuery.affectedRows === 1 &&
@@ -166,10 +166,10 @@ const SupplierCIDs = props => {
         setOpenSupplierCidAdd(!openSupplierCidAdd)
         gridApi.current.setRowData(newRowData)
       })
-      .catch(err => console.error(err))
+      .catch((err) => console.error(err))
   }
 
-  const handleCellEdit = params => {
+  const handleCellEdit = (params) => {
     const id = params.data.id
     const newSupplierCid = params.data.derenCID
 
@@ -181,22 +181,22 @@ const SupplierCIDs = props => {
         method: 'get',
       }
     )
-      .then(resp => resp.json())
-      .then(data => {
+      .then((resp) => resp.json())
+      .then((data) => {
         if (data.updateSupplierCidQuery.affectedRows === 1) {
           Notify('success', `${newSupplierCid} Updated`)
         } else {
           Notify('warning', 'Error', data.err)
         }
       })
-      .catch(err => console.error(err))
+      .catch((err) => console.error(err))
   }
 
   const Header = () => {
     return (
       <FlexboxGrid
-        justify='space-between'
-        align='middle'
+        justify="space-between"
+        align="middle"
         style={{ marginBottom: '20px' }}
       >
         <FlexboxGrid.Item>
@@ -209,17 +209,17 @@ const SupplierCIDs = props => {
           <ButtonGroup>
             <IconButton
               onClick={toggleSupplierCidAdd}
-              icon={<Icon icon='plus-circle' />}
-              appearance='ghost'
-              placement='right'
+              icon={<Icon icon="plus-circle" />}
+              appearance="ghost"
+              placement="right"
             >
               Add
             </IconButton>
             <IconButton
               onClick={toggleSupplierCidDeleteModal}
-              icon={<Icon icon='trash' />}
-              appearance='ghost'
-              placement='right'
+              icon={<Icon icon="trash" />}
+              appearance="ghost"
+              placement="right"
             >
               Delete
             </IconButton>
@@ -230,11 +230,11 @@ const SupplierCIDs = props => {
   }
 
   return (
-    <div style={{ width: '100%' }} className='section'>
+    <div style={{ width: '100%' }} className="section">
       <Panel header={<Header />}>
-        <div className='table-wrapper'>
+        <div className="table-wrapper">
           <div
-            className='ag-theme-material'
+            className="ag-theme-material"
             style={{
               height: '700px',
               width: '100%',
@@ -248,7 +248,7 @@ const SupplierCIDs = props => {
               rowData={rowData}
               stopEditingWhenGridLosesFocus
               immutableData
-              getRowNodeId={data => {
+              getRowNodeId={(data) => {
                 return data.id
               }}
             />
@@ -259,7 +259,7 @@ const SupplierCIDs = props => {
         <ConfirmModal
           show={openConfirmDeleteModal}
           onHide={toggleSupplierCidDeleteModal}
-          header='Confirm Delete'
+          header="Confirm Delete"
           content={`Are you sure you want to delete ${supplierCidToDelete.name} (${supplierCidToDelete.id})`}
           cancelAction={toggleSupplierCidDeleteModal}
           confirmAction={handleDelete}
@@ -269,15 +269,15 @@ const SupplierCIDs = props => {
         <Modal
           backdrop
           show={openSupplierCidAdd}
-          size='xs'
+          size="xs"
           onHide={toggleSupplierCidAdd}
-          className='add-supplier-modal'
+          className="add-supplier-modal"
         >
           <Modal.Header>New Supplier CID</Modal.Header>
           <Modal.Body style={{ overflow: 'visible', paddingBottom: '0px' }}>
             <FlexboxGrid
-              justify='space-around'
-              align='middle'
+              justify="space-around"
+              align="middle"
               style={{ flexDirection: 'column', height: '250px' }}
             >
               <FlexboxGrid.Item
@@ -288,21 +288,21 @@ const SupplierCIDs = props => {
                     <ControlLabel>Supplier</ControlLabel>
                     <Select
                       value={newCompanySelection}
-                      className='company-select'
+                      className="company-select"
                       onChange={handleCompanyChange}
                       options={companySelections}
                       noOptionsMessage={() => 'No Companies Available'}
-                      placeholder='Company'
+                      placeholder="Company"
                     />
                   </FormGroup>
                   <FormGroup>
                     <ControlLabel>Supplier CID</ControlLabel>
                     <Input
-                      id='updated-by'
-                      name='updated-by'
-                      type='text'
+                      id="updated-by"
+                      name="updated-by"
+                      type="text"
                       value={newSupplierCid}
-                      onChange={value => setNewSupplierCid(value)}
+                      onChange={(value) => setNewSupplierCid(value)}
                     />
                   </FormGroup>
                 </Form>
@@ -310,14 +310,14 @@ const SupplierCIDs = props => {
               <FlexboxGrid.Item>
                 <ButtonGroup block style={{ width: '20em' }}>
                   <Button
-                    appearance='default'
+                    appearance="default"
                     onClick={toggleSupplierCidAdd}
                     style={{ width: '50%' }}
                   >
                     Cancel
                   </Button>
                   <Button
-                    appearance='primary'
+                    appearance="primary"
                     onClick={handleAddSupplierCid}
                     style={{ width: '50%' }}
                   >

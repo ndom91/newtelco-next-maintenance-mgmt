@@ -7,13 +7,13 @@ export const EdittedBy = ({ node }) => {
   }
   return (
     <>
-      <span className='user-pic-wrapper'>
+      <span className="user-pic-wrapper">
         <img
-          className='user-pic'
+          className="user-pic"
           style={{ border: '2px solid #67B246', borderRadius: '50%' }}
           src={`/static/images/avatars/${avatarFile}`}
-          width='32px'
-          height='32px'
+          width="32px"
+          height="32px"
         />
       </span>
     </>

@@ -6,7 +6,7 @@ const UnreadCount = () => {
   const [faviconEl, setFaviconEl] = useState({})
   const store = Store.useStore()
 
-  const getFavicon = count => {
+  const getFavicon = (count) => {
     const favicon = document.getElementById('favicon')
     if (favicon) {
       const faviconSize = 16
@@ -53,7 +53,7 @@ const UnreadCount = () => {
     }
   }
 
-  store.on('count').subscribe(async count => {
+  store.on('count').subscribe(async (count) => {
     if (typeof window !== 'undefined' && count !== 0) {
       const fav = getFavicon(count)
       fav && setFaviconEl(fav)

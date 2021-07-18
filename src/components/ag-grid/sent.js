@@ -10,8 +10,8 @@ export const SentIcon = ({ node }) => {
         <Badge content={sent}>
           <Icon
             style={{ color: 'var(--primary)' }}
-            size='lg'
-            icon='check-circle'
+            size="lg"
+            icon="check-circle"
           />
         </Badge>
       </div>
@@ -21,15 +21,15 @@ export const SentIcon = ({ node }) => {
       <div style={{ width: '32px', height: '40px' }}>
         <Icon
           style={{ color: 'var(--primary)' }}
-          size='lg'
-          icon='check-circle'
+          size="lg"
+          icon="check-circle"
         />
       </div>
     )
   } else {
     return (
       <div style={{ width: '32px', height: '40px' }}>
-        <Icon size='lg' icon='warning' />
+        <Icon size="lg" icon="warning" />
       </div>
     )
   }
