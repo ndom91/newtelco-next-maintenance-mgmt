@@ -16,3 +16,4 @@ cypress.env*
 cypress/videos/**
 cypress/screenshots/**
 public/*.map
+sentry.properties
