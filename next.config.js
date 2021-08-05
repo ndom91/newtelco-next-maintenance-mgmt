@@ -1,36 +1,14 @@
-const withBundleAnalyzer = require('@next/bundle-analyzer')({
-  enabled: process.env.ANALYZE === 'true',
-})
-const webpack = require('webpack')
-const withCSS = require('@zeit/next-css')
-const withLess = require('@zeit/next-less')
-
-// Less Loader Workaround: https://github.com/vercel/next-plugins/issues/598#issuecomment-702907049
-
-const SentryWebpackPlugin = require('@sentry/webpack-plugin')
-const {
-  NEXT_PUBLIC_SENTRY_DSN: SENTRY_DSN,
-  SENTRY_ORG,
-  SENTRY_PROJECT,
-  SENTRY_AUTH_TOKEN,
-  NODE_ENV,
-  VERCEL_GITHUB_COMMIT_SHA,
-  VERCEL_GITLAB_COMMIT_SHA,
-  VERCEL_BITBUCKET_COMMIT_SHA,
-} = process.env
-
-const COMMIT_SHA = VERCEL_GITHUB_COMMIT_SHA
-
-process.env.SENTRY_DSN = SENTRY_DSN
+const MiniCssExtractPlugin = require("mini-css-extract-plugin")
+const { withSentryConfig } = require("@sentry/nextjs")
 
 function HACK_removeMinimizeOptionFromCssLoaders(config) {
   // console.warn(
   //   'HACK: Removing `minimize` option from `css-loader` entries in Webpack config'
   // )
-  config.module.rules.forEach(rule => {
+  config.module.rules.forEach((rule) => {
     if (Array.isArray(rule.use)) {
-      rule.use.forEach(u => {
-        if (u.loader === 'css-loader' && u.options) {
+      rule.use.forEach((u) => {
+        if (u.loader === "css-loader" && u.options) {
           delete u.options.minimize
         }
       })
@@ -38,57 +16,55 @@ function HACK_removeMinimizeOptionFromCssLoaders(config) {
   })
 }
 
+const SentryWebpackPluginOptions = {
+  // Additional config options for the Sentry Webpack plugin. Keep in mind that
+  // the following options are set automatically, and overriding them is not
+  // recommended:
+  //   release, url, org, project, authToken, configFile, stripPrefix,
+  //   urlPrefix, include, ignore
+
+  silent: true, // Suppresses all logs
+  // For all available options, see:
+  // https://github.com/getsentry/sentry-webpack-plugin#options.
+}
+
+/**
+ * @type {import('next').NextConfig}
+ */
 const nextConfig = {
-  target: 'server',
   compress: false,
   productionBrowserSourceMaps: true, // For Sentry
-  experimental: {
-    modern: true,
-  },
   maximumFileSizeToCacheInBytes: 5242880,
-  lessLoaderOptions: {
-    javascriptEnabled: true,
-  },
-  env: {
-    NEXT_PUBLIC_COMMIT_SHA: COMMIT_SHA,
-  },
-  webpack(config, options) {
-    HACK_removeMinimizeOptionFromCssLoaders(config)
-    config.stats = {
-      warningsFilter: warn => warn.indexOf('Conflicting order between:') > -1,
-    }
-    if (!options.isServer) {
-      config.resolve.alias['@sentry/node'] = '@sentry/browser'
-    }
+  webpack(config) {
+    //   HACK_removeMinimizeOptionFromCssLoaders(config)
+    config.module.rules.push({
+      test: /\.(le|c)ss$/,
+      use: [
+        MiniCssExtractPlugin.loader,
+        {
+          loader: "css-loader",
+        },
+        {
+          loader: "less-loader",
+          options: {
+            sourceMap: true,
+            lessOptions: {
+              javascriptEnabled: true,
+            },
+          },
+        },
+      ],
+    })
+
     config.plugins.push(
-      new options.webpack.DefinePlugin({
-        'process.env.NEXT_IS_SERVER': JSON.stringify(
-          options.isServer.toString()
-        ),
+      new MiniCssExtractPlugin({
+        filename: "static/css/[name].css",
+        chunkFilename: "static/css/[contenthash].css",
       })
     )
-    if (
-      SENTRY_DSN &&
-      SENTRY_ORG &&
-      SENTRY_PROJECT &&
-      SENTRY_AUTH_TOKEN &&
-      COMMIT_SHA &&
-      NODE_ENV === 'production'
-    ) {
-      config.plugins.push(
-        new SentryWebpackPlugin({
-          include: '.next',
-          ignore: ['node_modules'],
-          stripPrefix: ['webpack://_N_E/'],
-          urlPrefix: '~/_next',
-          release: COMMIT_SHA,
-          org: 'newtelco-gmbh',
-          project: 'next-maintenance',
-        })
-      )
-    }
+
     return config
   },
 }
 
-module.exports = withBundleAnalyzer(withLess(withCSS(nextConfig)))
+module.exports = withSentryConfig(nextConfig, SentryWebpackPluginOptions)

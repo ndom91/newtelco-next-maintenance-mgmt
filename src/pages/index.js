@@ -1,39 +1,37 @@
-import React from 'react'
-import Router from 'next/router'
-import Layout from '@/newtelco/layout'
-import dynamic from 'next/dynamic'
-import RequireLogin from '@/newtelco/require-login'
-import { getSession } from 'next-auth/client'
-import MaintPanel from '@/newtelco/panel'
-import UnreadBadge from '@/newtelco/unread'
-import Store from '@/newtelco/store'
-import { Loader, Panel, Icon } from 'rsuite'
-import './style/index.css'
+import Router from "next/router"
+import dynamic from "next/dynamic"
+import { getSession } from "next-auth/client"
+import { Loader, Panel, Icon } from "rsuite"
+import Layout from "@/newtelco/layout"
+import RequireLogin from "@/newtelco/require-login"
+import MaintPanel from "@/newtelco/panel"
+import UnreadBadge from "@/newtelco/unread"
+import Store from "@/newtelco/store"
 
-const AreaChart = dynamic(() => import('../components/homepage/areachart'), {
+const AreaChart = dynamic(() => import("../components/homepage/areachart"), {
   ssr: false,
   loading: () => (
     <Panel
       bordered
       header={
-        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
           Completed
           <Icon
-            icon='bar-chart'
-            style={{ color: 'var(--primary)' }}
-            size='lg'
+            icon="bar-chart"
+            style={{ color: "var(--primary)" }}
+            size="lg"
           />
         </div>
       }
-      style={{ height: '100%' }}
+      style={{ height: "100%" }}
     >
       <div
         style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          width: '100%',
-          height: '200px',
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          width: "100%",
+          height: "200px",
         }}
       >
         <Loader />
@@ -42,37 +40,37 @@ const AreaChart = dynamic(() => import('../components/homepage/areachart'), {
   ),
 })
 
-const Heatmap = dynamic(() => import('../components/homepage/heatmap'))
-const BarChart = dynamic(() => import('../components/homepage/perperson'))
+const Heatmap = dynamic(() => import("../components/homepage/heatmap"))
+const BarChart = dynamic(() => import("../components/homepage/perperson"))
 const ActiveMaintenances = dynamic(() =>
-  import('../components/homepage/active')
+  import("../components/homepage/active")
 )
 
 const Index = ({ session }) => {
   const store = Store.useStore()
 
-  if (typeof window !== 'undefined' && !session) {
-    Router.push('/auth/signin')
+  if (typeof window !== "undefined" && !session) {
+    Router.push("/auth/signin")
   }
 
   if (session) {
     return (
       <Layout>
-        <MaintPanel header='Maintenance'>
-          <div className='grid-container'>
-            <div className='unread'>
-              <UnreadBadge count={store.get('count')} />
+        <MaintPanel header="Maintenance">
+          <div className="grid-container">
+            <div className="unread">
+              <UnreadBadge count={store.get("count")} />
             </div>
-            <div className='heatmap'>
+            <div className="heatmap">
               <Heatmap />
             </div>
-            <div className='recents'>
+            <div className="recents">
               <ActiveMaintenances />
             </div>
-            <div className='chart1'>
+            <div className="chart1">
               <AreaChart />
             </div>
-            <div className='chart2'>
+            <div className="chart2">
               <BarChart />
             </div>
           </div>
