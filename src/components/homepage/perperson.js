@@ -1,4 +1,3 @@
-import React from "react"
 import useSWR from "swr"
 import { Bar } from "@nivo/bar"
 import { Panel, Loader, Icon } from "rsuite"
@@ -43,7 +42,7 @@ const BarChart = () => {
           enableGridY={false}
           axisBottom={null}
           padding={0.3}
-          labelTextColor={{ from: "color", modifiers: [["darker", 2.0]] }}
+          // labelTextColor={{ from: "color", modifiers: [["darker", 2.0]] }}
           isInteractive={true}
           theme={{
             fontSize: "13px",

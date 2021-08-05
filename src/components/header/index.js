@@ -23,10 +23,9 @@ const MaintHeader = () => {
   const [session, loading] = NextAuth.useSession()
   const store = Store.useStore()
   const count = store.get("count")
-  // const night = store.get('night')
 
   let avatarPath
-  if (!loading) {
+  if (!loading && session) {
     const username = session.user.email?.match(/^([^@]*)@/)[1]
     if (session.user.image) {
       avatarPath = session.user.image
@@ -48,11 +47,6 @@ const MaintHeader = () => {
       avatarPath = `https://i.pravatar.cc/128?u=${session.user.name}`
     }
   }
-
-  // const toggleDark = e => {
-  //   e.stopPropagation()
-  //   store.set('night')(!store.get('night'))
-  // }
 
   return (
     <Header className="header-wrapper">
