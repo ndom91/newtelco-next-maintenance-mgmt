@@ -1,6 +1,6 @@
-import React from 'react'
-import Select from 'react-select'
-import { Editor as TinyEditor } from '@tinymce/tinymce-react'
+import React from "react"
+import Select from "react-select"
+import { Editor as TinyEditor } from "@tinymce/tinymce-react"
 
 export default class Templates extends React.Component {
   static async getInitialProps({ req, query }) {
@@ -20,8 +20,8 @@ export default class Templates extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      mailText: '',
-      calendarText: '',
+      mailText: "",
+      calendarText: "",
       openSupplierCidAdd: false,
     }
     this.handleMailBlur = this.handleMailBlur.bind(this)
@@ -47,24 +47,24 @@ export default class Templates extends React.Component {
     return (
       <>
         <CardBody>
-          <Container className='container-exterior'>
-            <CardHeader className='container-header'>
+          <Container className="container-exterior">
+            <CardHeader className="container-header">
               Maintenance Email
               {/* <FontAwesomeIcon width='1.125em' style={{ marginRight: '10px' }} icon={faAt} /> */}
             </CardHeader>
-            <Container className='container-border'>
+            <Container className="container-border">
               <TinyEditor
                 initialValue={this.state.mailText}
-                apiKey='ttv2x1is9joc0fi7v6f6rzi0u98w2mpehx53mnc1277omr7s'
+                apiKey="ttv2x1is9joc0fi7v6f6rzi0u98w2mpehx53mnc1277omr7s"
                 onBlur={this.handleMailBlur}
                 init={{
                   height: 500,
                   menubar: true,
                   statusbar: true,
                   plugins: [
-                    'advlist autolink lists link image print preview anchor',
-                    'searchreplace code',
-                    'insertdatetime table paste code help wordcount',
+                    "advlist autolink lists link image print preview anchor",
+                    "searchreplace code",
+                    "insertdatetime table paste code help wordcount",
                   ],
                   toolbar: `undo redo | formatselect | bold italic backcolor | 
                     alignleft aligncenter alignright alignjustify | 
@@ -74,29 +74,29 @@ export default class Templates extends React.Component {
               />
             </Container>
           </Container>
-          <Container className='container-exterior'>
-            <CardHeader className='container-header'>
+          <Container className="container-exterior">
+            <CardHeader className="container-header">
               Maintenance Calendar
               {/* <FontAwesomeIcon width='1.125em' style={{ marginRight: '10px' }} icon={faCalendarAlt} /> */}
             </CardHeader>
-            <Container className='container-border'>
+            <Container className="container-border">
               <TinyEditor
                 initialValue={this.state.calendarText}
-                apiKey='ttv2x1is9joc0fi7v6f6rzi0u98w2mpehx53mnc1277omr7s'
+                apiKey="ttv2x1is9joc0fi7v6f6rzi0u98w2mpehx53mnc1277omr7s"
                 onBlur={this.handleCalBlur}
                 init={{
                   height: 300,
                   menubar: true,
                   statusbar: true,
                   plugins: [
-                    'advlist autolink lists link image print preview anchor',
-                    'searchreplace code',
-                    'insertdatetime table paste code help wordcount',
+                    "advlist autolink lists link image print preview anchor",
+                    "searchreplace code",
+                    "insertdatetime table paste code help wordcount",
                   ],
                   toolbar: `undo redo | formatselect | bold italic backcolor | 
                     alignleft aligncenter alignright alignjustify | 
                     bullist numlist outdent indent | removeformat | help`,
-                  content_style: 'html { color: #828282 }',
+                  content_style: "html { color: #828282 }",
                 }}
                 onChange={this.handleCalChange}
               />

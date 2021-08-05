@@ -1,5 +1,5 @@
-const db = require('../../../../lib/db')
-const escape = require('sql-template-strings')
+const db = require("../../../../lib/db")
+const escape = require("sql-template-strings")
 
 module.exports = async (req, res) => {
   const maintId = req.body.mid
@@ -7,7 +7,7 @@ module.exports = async (req, res) => {
   const newStartDateTime = req.body.sdt
   const newEndDateTime = req.body.edt
   const rid = req.body.rcounter
-  const user = req.body.user.substring(0, req.body.user.lastIndexOf('@'))
+  const user = req.body.user.substring(0, req.body.user.lastIndexOf("@"))
   const editRescheduleQuery = await db.query(escape`
     UPDATE reschedule SET impact = ${newImpact}, sdt = ${newStartDateTime}, edt = ${newEndDateTime} WHERE maintenanceid = ${maintId} AND rcounter LIKE ${rid}
   `)

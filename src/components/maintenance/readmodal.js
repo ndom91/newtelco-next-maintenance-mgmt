@@ -1,13 +1,13 @@
-import React, { useState, useRef } from 'react'
-import { Rnd } from 'react-rnd'
-import ShadowDom from '../../components/shadowdom'
-import DOMPurify from 'dompurify'
-import { OutTable, ExcelRenderer } from 'react-excel-renderer'
-import { Document, Page } from 'react-pdf'
-import { pdfjs } from 'react-pdf'
+import React, { useState, useRef } from "react"
+import { Rnd } from "react-rnd"
+import ShadowDom from "../../components/shadowdom"
+import DOMPurify from "dompurify"
+import { OutTable, ExcelRenderer } from "react-excel-renderer"
+import { Document, Page } from "react-pdf"
+import { pdfjs } from "react-pdf"
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`
-import Notify from '@/newtelco-utils/notification'
-import { saveAs } from 'file-saver'
+import Notify from "@/newtelco-utils/notification"
+import { saveAs } from "file-saver"
 import {
   Icon,
   Modal,
@@ -22,7 +22,7 @@ import {
   Loader,
   Tag,
   Tooltip,
-} from 'rsuite'
+} from "rsuite"
 
 const ReadModal = ({
   maintenance,
@@ -33,46 +33,46 @@ const ReadModal = ({
   const [hoverFrom, setHoverFrom] = useState(false)
   const [hoverSubj, setHoverSubj] = useState(false)
   const triggerRef = useRef()
-  const [attachmentHTMLContent, setAttachmentHTMLContent] = useState('')
-  const [pdfB64, setPdfB64] = useState('')
+  const [attachmentHTMLContent, setAttachmentHTMLContent] = useState("")
+  const [pdfB64, setPdfB64] = useState("")
   const [openAttachmentModal, setOpenAttachmentModal] = useState(false)
-  const [rows, setRows] = useState('')
-  const [cols, setCols] = useState('')
-  const [filetype, setFiletype] = useState('')
-  const [currentAttachmentName, setCurrentAttachmentName] = useState('')
-  const [attachmentPopoverBody, setAttachmentPopoverBody] = useState('')
+  const [rows, setRows] = useState("")
+  const [cols, setCols] = useState("")
+  const [filetype, setFiletype] = useState("")
+  const [currentAttachmentName, setCurrentAttachmentName] = useState("")
+  const [attachmentPopoverBody, setAttachmentPopoverBody] = useState("")
   const [faviconLoading, setFaviconLoading] = useState(true)
   const copySubjectToClipboard = () => {
     navigator.clipboard.writeText(
       maintenance.incomingSubject || maintenance.subject
     )
-    Notify('info', 'Subject Copied To Clipboard!')
+    Notify("info", "Subject Copied To Clipboard!")
   }
   const copyFromToClipboard = () => {
     navigator.clipboard.writeText(maintenance.incomingFrom || maintenance.from)
-    Notify('info', 'Sender Copied To Clipboard!')
+    Notify("info", "Sender Copied To Clipboard!")
   }
 
-  const fileTypeIcon = filename => {
+  const fileTypeIcon = (filename) => {
     const fileExt = filename.match(/\.[0-9a-z]+$/i)
     switch (fileExt[0]) {
-      case '.xlsx':
-        return 'file-excel-o'
-      case '.xls':
-        return 'file-excel-o'
-      case '.pdf':
-        return 'file-pdf-o'
-      case '.html':
-        return 'html5'
+      case ".xlsx":
+        return "file-excel-o"
+      case ".xls":
+        return "file-excel-o"
+      case ".pdf":
+        return "file-pdf-o"
+      case ".html":
+        return "html5"
       default:
-        return 'file-o'
+        return "file-o"
     }
   }
 
   const showAttachments = (id, filename) => {
     function fixBase64(binaryData) {
       var base64str = binaryData
-      var binary = atob(base64str.replace(/\s/g, ''))
+      var binary = atob(base64str.replace(/\s/g, ""))
       var len = binary.length
       var buffer = new ArrayBuffer(len)
       var view = new Uint8Array(buffer)
@@ -88,45 +88,44 @@ const ReadModal = ({
       saveAs(fileData, filename)
     }
     if (id !== null) {
-      let filetype = ''
+      let filetype = ""
       const fileExt = filename.match(/\.[0-9a-z]+$/i)
       switch (fileExt[0]) {
-        case '.xlsx':
-          filetype = 'excel'
+        case ".xlsx":
+          filetype = "excel"
           break
-        case '.xls':
-          filetype = 'excel'
+        case ".xls":
+          filetype = "excel"
           break
-        case '.pdf':
-          filetype = 'pdf'
+        case ".pdf":
+          filetype = "pdf"
           break
-        case '.html':
-          filetype = 'html'
+        case ".html":
+          filetype = "html"
           break
       }
-      if (filetype === 'excel') {
-        const excelIndex = incomingAttachments.findIndex(el => el.id === id)
+      if (filetype === "excel") {
+        const excelIndex = incomingAttachments.findIndex((el) => el.id === id)
         const file = incomingAttachments[excelIndex]
         const filedata = file.data
         const mime = file.mime
         const filename = file.name
-        let base64 = filedata.replace(/_/g, '/')
-        base64 = base64.replace(/-/g, '+')
+        let base64 = filedata.replace(/_/g, "/")
+        base64 = base64.replace(/-/g, "+")
         const base64Fixed = fixBase64(base64)
         var fileData = new Blob([base64Fixed], {
-          type:
-            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;',
+          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;",
         })
 
         ExcelRenderer(fileData, (err, resp) => {
           if (err) {
             console.error(err)
           } else {
-            resp.cols.forEach(col => {
+            resp.cols.forEach((col) => {
               col.name = resp.rows[0][col.key]
               col.key = col.key + 1
             })
-            resp.cols.unshift({ key: 0, name: '' })
+            resp.cols.unshift({ key: 0, name: "" })
             resp.rows.shift()
             setFiletype(filetype)
             setCols(resp.cols)
@@ -150,16 +149,16 @@ const ReadModal = ({
             )
           }
         })
-      } else if (filetype === 'pdf') {
-        const pdfIndex = incomingAttachments.findIndex(el => el.id === id)
+      } else if (filetype === "pdf") {
+        const pdfIndex = incomingAttachments.findIndex((el) => el.id === id)
         const file = incomingAttachments[pdfIndex]
         const filedata = file.data
         const mime = file.mime
         const filename = file.name
-        let base64 = filedata.replace(/_/g, '/')
-        base64 = base64.replace(/-/g, '+')
+        let base64 = filedata.replace(/_/g, "/")
+        base64 = base64.replace(/-/g, "+")
         const base64Fixed = fixBase64(base64)
-        const fileData = new Blob([base64Fixed], { type: 'application/pdf' })
+        const fileData = new Blob([base64Fixed], { type: "application/pdf" })
         setFiletype(filetype)
         setPdfB64(fileData)
         setCurrentAttachmentName(filename)
@@ -179,14 +178,14 @@ const ReadModal = ({
             </Dropdown.Item>
           </Dropdown.Menu>
         )
-      } else if (filetype === 'html') {
-        const fileIndex = incomingAttachments.findIndex(el => el.id === id)
+      } else if (filetype === "html") {
+        const fileIndex = incomingAttachments.findIndex((el) => el.id === id)
         const file = incomingAttachments[fileIndex]
         const filedata = file.data
         const filename = file.name
         const mime = file.mime
-        let base64 = filedata.replace(/_/g, '/')
-        base64 = base64.replace(/-/g, '+')
+        let base64 = filedata.replace(/_/g, "/")
+        base64 = base64.replace(/-/g, "+")
         setFiletype(filetype)
         setAttachmentHTMLContent(window.atob(base64))
         setCurrentAttachmentName(filename)
@@ -207,12 +206,12 @@ const ReadModal = ({
           </Dropdown.Menu>
         )
       } else {
-        const fileIndex = incomingAttachments.findIndex(el => el.id === id)
+        const fileIndex = incomingAttachments.findIndex((el) => el.id === id)
         const file = incomingAttachments[fileIndex]
         const mime = file.mime
         const rawData = file.data
-        let base64 = rawData.replace(/_/g, '/')
-        base64 = base64.replace(/-/g, '+')
+        let base64 = rawData.replace(/_/g, "/")
+        base64 = base64.replace(/-/g, "+")
         setAttachmentPopoverBody(
           <Dropdown.Menu onSelect={() => triggerRef.current.hide()}>
             <Dropdown.Item disabled eventKey={1}>
@@ -242,65 +241,65 @@ const ReadModal = ({
           height: 600,
         }}
         style={{
-          background: 'var(--white)',
-          overflow: 'hidden',
-          borderRadius: '5px',
-          zIndex: '101',
-          boxShadow: '0px 0px 15px -3px var(--grey3)',
+          background: "var(--white)",
+          overflow: "hidden",
+          borderRadius: "5px",
+          zIndex: "101",
+          boxShadow: "0px 0px 15px -3px var(--grey3)",
         }}
-        bounds='window'
-        dragHandleClassName='mail-read-header'
+        bounds="window"
+        dragHandleClassName="mail-read-header"
       >
         <div
           style={{
-            borderRadius: '15px',
-            position: 'relative',
-            height: 'calc(100% - 112px)',
+            borderRadius: "15px",
+            position: "relative",
+            height: "calc(100% - 112px)",
           }}
         >
-          <Modal.Header className='mail-read-header' onHide={toggleReadModal}>
+          <Modal.Header className="mail-read-header" onHide={toggleReadModal}>
             <FlexboxGrid
-              justify='start'
-              align='middle'
-              style={{ width: '100%' }}
+              justify="start"
+              align="middle"
+              style={{ width: "100%" }}
             >
               <FlexboxGrid.Item
                 colspan={3}
-                style={{ display: 'flex', justifyContent: 'center' }}
+                style={{ display: "flex", justifyContent: "center" }}
               >
                 {faviconLoading && (
                   <div
                     style={{
-                      width: '100%',
-                      height: '60px',
-                      display: 'flex',
-                      justifyContent: 'center',
-                      alignItems: 'center',
+                      width: "100%",
+                      height: "60px",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
                     }}
                   >
                     <Loader />
                   </div>
                 )}
                 <Avatar
-                  size='lg'
+                  size="lg"
                   src={`/v1/api/faviconUrl?d=${jsonData.profile.mailDomain}`}
                   style={
                     faviconLoading
-                      ? { visibility: 'hidden', backgroundColor: 'transparent' }
-                      : { backgroundColor: 'transparent' }
+                      ? { visibility: "hidden", backgroundColor: "transparent" }
+                      : { backgroundColor: "transparent" }
                   }
                   onLoad={() => setFaviconLoading(false)}
                 />
               </FlexboxGrid.Item>
               <FlexboxGrid.Item colspan={19}>
-                <div className='modal-preview-text-wrapper'>
+                <div className="modal-preview-text-wrapper">
                   <InputGroup
-                    className='modal-textbox'
-                    style={{ marginBottom: '5px' }}
+                    className="modal-textbox"
+                    style={{ marginBottom: "5px" }}
                     onMouseEnter={() => setHoverFrom(true)}
                     onMouseLeave={() => setHoverFrom(false)}
                   >
-                    <InputGroup.Addon style={{ height: '31px' }} type='prepend'>
+                    <InputGroup.Addon style={{ height: "31px" }} type="prepend">
                       From
                     </InputGroup.Addon>
                     <Input
@@ -308,81 +307,81 @@ const ReadModal = ({
                       value={maintenance.incomingFrom || maintenance.from}
                     />
                     <InputGroup.Button
-                      style={{ width: '50px', backgroundColor: 'transparent' }}
+                      style={{ width: "50px", backgroundColor: "transparent" }}
                     >
                       <Whisper
-                        placement='bottom'
+                        placement="bottom"
                         delay={5000}
                         speaker={<Tooltip>Copy Sender</Tooltip>}
                       >
                         <Tag
                           style={{
-                            visibility: hoverFrom ? 'visible' : 'hidden',
-                            opacity: hoverFrom ? '1' : '0',
-                            zIndex: hoverFrom ? '999' : '0',
-                            marginRight: '5px',
+                            visibility: hoverFrom ? "visible" : "hidden",
+                            opacity: hoverFrom ? "1" : "0",
+                            zIndex: hoverFrom ? "999" : "0",
+                            marginRight: "5px",
                           }}
                           onClick={copyFromToClipboard}
-                          className='copy-btn'
+                          className="copy-btn"
                         >
                           <svg
-                            height='16'
-                            width='16'
-                            fill='none'
-                            strokeLinecap='round'
-                            strokeLinejoin='round'
-                            strokeWidth='2'
-                            viewBox='0 0 24 24'
-                            stroke='currentColor'
+                            height="16"
+                            width="16"
+                            fill="none"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
                           >
-                            <path d='M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3' />
+                            <path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
                           </svg>
                         </Tag>
                       </Whisper>
                     </InputGroup.Button>
                   </InputGroup>
                   <InputGroup
-                    className='modal-textbox'
+                    className="modal-textbox"
                     onMouseEnter={() => setHoverSubj(true)}
                     onMouseLeave={() => setHoverSubj(false)}
                   >
-                    <InputGroup.Addon style={{ height: '31px' }} type='prepend'>
+                    <InputGroup.Addon style={{ height: "31px" }} type="prepend">
                       Subject
                     </InputGroup.Addon>
                     <Input
-                      type='text'
+                      type="text"
                       readOnly
                       value={maintenance.incomingSubject || maintenance.subject}
                     />
                     <InputGroup.Button
-                      style={{ width: '50px', backgroundColor: 'transparent' }}
+                      style={{ width: "50px", backgroundColor: "transparent" }}
                     >
                       <Whisper
-                        placement='bottom'
+                        placement="bottom"
                         delay={5000}
                         speaker={<Tooltip>Copy Subject</Tooltip>}
                       >
                         <Tag
                           style={{
-                            visibility: hoverSubj ? 'visible' : 'hidden',
-                            opacity: hoverSubj ? '1' : '0',
-                            zIndex: hoverSubj ? '999' : '0',
-                            marginRight: '5px',
+                            visibility: hoverSubj ? "visible" : "hidden",
+                            opacity: hoverSubj ? "1" : "0",
+                            zIndex: hoverSubj ? "999" : "0",
+                            marginRight: "5px",
                           }}
                           onClick={copySubjectToClipboard}
-                          className='copy-btn'
+                          className="copy-btn"
                         >
                           <svg
-                            height='16'
-                            width='16'
-                            fill='none'
-                            strokeLinecap='round'
-                            strokeLinejoin='round'
-                            strokeWidth='2'
-                            viewBox='0 0 24 24'
-                            stroke='currentColor'
+                            height="16"
+                            width="16"
+                            fill="none"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
                           >
-                            <path d='M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3' />
+                            <path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
                           </svg>
                         </Tag>
                       </Whisper>
@@ -394,10 +393,10 @@ const ReadModal = ({
             <div
               style={{
                 flexGrow: Array.isArray(maintenance.incomingAttachments)
-                  ? '1'
-                  : '0',
-                width: '100%',
-                marginTop: '5px',
+                  ? "1"
+                  : "0",
+                width: "100%",
+                marginTop: "5px",
               }}
             >
               {Array.isArray(maintenance.incomingAttachments) &&
@@ -406,8 +405,8 @@ const ReadModal = ({
                   return (
                     <Whisper
                       key={attachment.id}
-                      placement='bottomStart'
-                      trigger='click'
+                      placement="bottomStart"
+                      trigger="click"
                       triggerRef={triggerRef}
                       speaker={
                         <Popover
@@ -419,12 +418,12 @@ const ReadModal = ({
                       }
                     >
                       <IconButton
-                        size='sm'
+                        size="sm"
                         icon={<Icon icon={fileTypeIcon(attachment.name)} />}
                         onClick={() =>
                           showAttachments(attachment.id, attachment.name)
                         }
-                        style={{ marginLeft: '10px' }}
+                        style={{ marginLeft: "10px" }}
                       >
                         {attachment.name}
                       </IconButton>
@@ -434,13 +433,13 @@ const ReadModal = ({
             </div>
           </Modal.Header>
           <Modal.Body
-            className='read-mail-body'
+            className="read-mail-body"
             style={{
               height: `calc(100% - ${
                 Array.isArray(maintenance.incomingAttachments) &&
                 maintenance.incomingAttachments.length !== 0
-                  ? '50px'
-                  : '20px'
+                  ? "50px"
+                  : "20px"
               })`,
             }}
           >
@@ -460,49 +459,49 @@ const ReadModal = ({
             x: window.outerWidth / 2,
             y: 225,
             width: window.outerWidth / 3,
-            height: 'auto',
+            height: "auto",
           }}
           style={{
-            backgroundColor: 'var(--background)',
-            overflow: 'hidden',
-            borderRadius: '5px',
-            zIndex: '101',
-            boxShadow: '0px 0px 10px 1px var(--grey3)',
+            backgroundColor: "var(--background)",
+            overflow: "hidden",
+            borderRadius: "5px",
+            zIndex: "101",
+            boxShadow: "0px 0px 10px 1px var(--grey3)",
           }}
-          bounds='window'
-          dragHandleClassName='modal-attachment-header-text'
+          bounds="window"
+          dragHandleClassName="modal-attachment-header-text"
         >
-          <div style={{ borderRadius: '15px', position: 'relative' }}>
+          <div style={{ borderRadius: "15px", position: "relative" }}>
             <Modal.Header
-              className='modal-attachment-header-text'
+              className="modal-attachment-header-text"
               onHide={() => setOpenAttachmentModal(!openAttachmentModal)}
               style={{
-                borderRadius: '0px',
-                display: 'flex',
-                justifyContent: 'space-between',
-                backgroundColor: 'var(--grey1)',
+                borderRadius: "0px",
+                display: "flex",
+                justifyContent: "space-between",
+                backgroundColor: "var(--grey1)",
               }}
             >
               <FlexboxGrid
-                justify='start'
-                align='middle'
-                style={{ width: '100%', height: '60px', padding: '15px 20px' }}
+                justify="start"
+                align="middle"
+                style={{ width: "100%", height: "60px", padding: "15px 20px" }}
               >
                 <FlexboxGrid.Item
                   colspan={2}
-                  style={{ display: 'flex', justifyContent: 'center' }}
+                  style={{ display: "flex", justifyContent: "center" }}
                 >
-                  <Icon size='lg' icon={fileTypeIcon(currentAttachmentName)} />
+                  <Icon size="lg" icon={fileTypeIcon(currentAttachmentName)} />
                 </FlexboxGrid.Item>
                 <FlexboxGrid.Item
                   colspan={8}
                   style={{
-                    display: 'flex',
-                    justifyContent: 'start',
-                    fontFamily: 'var(--font-body)',
-                    fontSize: '1.2rem',
-                    marginLeft: '5px',
-                    pointerEvents: 'none',
+                    display: "flex",
+                    justifyContent: "start",
+                    fontFamily: "var(--font-body)",
+                    fontSize: "1.2rem",
+                    marginLeft: "5px",
+                    pointerEvents: "none",
                   }}
                 >
                   {currentAttachmentName}
@@ -511,23 +510,23 @@ const ReadModal = ({
             </Modal.Header>
             <Modal.Body
               style={
-                filetype === 'pdf'
-                  ? { overflow: 'scroll', height: '450px' }
-                  : { padding: '20px', marginTop: '0px' }
+                filetype === "pdf"
+                  ? { overflow: "scroll", height: "450px" }
+                  : { padding: "20px", marginTop: "0px" }
               }
             >
-              {filetype === 'excel' ? (
-                <div className='attachment-body pdf'>
+              {filetype === "excel" ? (
+                <div className="attachment-body pdf">
                   <OutTable
                     data={rows}
                     columns={cols}
-                    tableClassName='ExcelTable2007'
-                    tableHeaderRowClass='heading'
+                    tableClassName="ExcelTable2007"
+                    tableHeaderRowClass="heading"
                   />
                 </div>
               ) : null}
-              {filetype === 'pdf' ? (
-                <div className='attachment-body excel'>
+              {filetype === "pdf" ? (
+                <div className="attachment-body excel">
                   {pdfB64 && (
                     <Document file={pdfB64}>
                       <Page scale={1.75} pageIndex={0} />
@@ -535,9 +534,9 @@ const ReadModal = ({
                   )}
                 </div>
               ) : null}
-              {filetype === 'html' ? (
+              {filetype === "html" ? (
                 <ShadowDom>
-                  <div className='attachment-body html'>
+                  <div className="attachment-body html">
                     <div
                       dangerouslySetInnerHTML={{
                         __html: DOMPurify.sanitize(attachmentHTMLContent),

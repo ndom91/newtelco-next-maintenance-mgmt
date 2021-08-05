@@ -8,7 +8,6 @@ const SignIn = ({ providers, session }) => {
   if (typeof window !== "undefined" && session) {
     Router.push("/")
   }
-  console.log(providers)
   return (
     <Container>
       <Content>

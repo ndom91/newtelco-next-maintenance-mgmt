@@ -1,20 +1,20 @@
-import React from 'react'
+import React from "react"
 // import { ThemeProvider } from 'styled-components'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faMoon, faSun } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faMoon, faSun } from "@fortawesome/free-solid-svg-icons"
 
-import * as S from './styles'
+import * as S from "./styles"
 
 const DarkmodeSwitch = ({ value, onChange }) => {
   return (
     <ThemeProvider theme={{ clicked: value }}>
-      <div style={{ display: 'flex', alignItems: 'flex-end' }}>
+      <div style={{ display: "flex", alignItems: "flex-end" }}>
         <S.Wrapper
           onClick={onChange}
-          role='button'
-          className='darkmode-wrapper'
+          role="button"
+          className="darkmode-wrapper"
           tabIndex={0}
-          onKeyPress={e => {
+          onKeyPress={(e) => {
             if (e.which === 13 || e.which === 32) {
               onChange(e)
             }
@@ -23,8 +23,8 @@ const DarkmodeSwitch = ({ value, onChange }) => {
           <S.DayNightSwitch
             style={
               value
-                ? { backgroundColor: '#272727' }
-                : { backgroundColor: '#67B246' }
+                ? { backgroundColor: "#272727" }
+                : { backgroundColor: "#67B246" }
             }
           >
             <S.Stars>
@@ -39,22 +39,22 @@ const DarkmodeSwitch = ({ value, onChange }) => {
               style={
                 value
                   ? {
-                      backgroundColor: '#272727',
-                      border: '2px solid #fff',
-                      color: '#fff',
+                      backgroundColor: "#272727",
+                      border: "2px solid #fff",
+                      color: "#fff",
                     }
                   : {
-                      backgroundColor: '#797676',
-                      border: '2px solid #fff',
-                      color: '#fff',
+                      backgroundColor: "#797676",
+                      border: "2px solid #fff",
+                      color: "#fff",
                     }
               }
             >
               {/* <S.Moon icon={faMoon} />  */}
               {value ? (
-                <FontAwesomeIcon icon={faMoon} width='0.5em' />
+                <FontAwesomeIcon icon={faMoon} width="0.5em" />
               ) : (
-                <FontAwesomeIcon icon={faSun} width='0.8em' />
+                <FontAwesomeIcon icon={faSun} width="0.8em" />
               )}
             </S.Circle>
           </S.DayNightSwitch>

@@ -1,5 +1,5 @@
-const db = require('../../../lib/db')
-const escape = require('sql-template-strings')
+const db = require("../../../lib/db")
+const escape = require("sql-template-strings")
 
 module.exports = async (req, res) => {
   const companyIds = req.body.companys

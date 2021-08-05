@@ -1,5 +1,5 @@
-import React from 'react'
-import { Modal, FlexboxGrid, ButtonGroup, ButtonToolbar, Button } from 'rsuite'
+import React from "react"
+import { Modal, FlexboxGrid, ButtonGroup, ButtonToolbar, Button } from "rsuite"
 
 const ConfirmModal = ({
   header,
@@ -13,44 +13,44 @@ const ConfirmModal = ({
   ...props
 }) => {
   return (
-    <Modal backdrop show={show} size='sm' onHide={onHide} {...props}>
+    <Modal backdrop show={show} size="sm" onHide={onHide} {...props}>
       <Modal.Header
         style={{
-          fontWeight: '100',
-          fontSize: '1.5rem',
-          fontFamily: 'var(--font-body)',
+          fontWeight: "100",
+          fontSize: "1.5rem",
+          fontFamily: "var(--font-body)",
         }}
       >
         {header}
       </Modal.Header>
       <Modal.Body
         style={{
-          paddingBottom: '0px',
+          paddingBottom: "0px",
         }}
       >
         <FlexboxGrid
-          justify='space-around'
-          align='middle'
-          style={{ flexDirection: 'column', height: height || '150px' }}
+          justify="space-around"
+          align="middle"
+          style={{ flexDirection: "column", height: height || "150px" }}
         >
           <FlexboxGrid.Item
-            style={{ fontFamily: 'var(--font-body)', fontSize: '1.1rem' }}
+            style={{ fontFamily: "var(--font-body)", fontSize: "1.1rem" }}
           >
             {content}
           </FlexboxGrid.Item>
           <FlexboxGrid.Item>
-            <ButtonGroup block style={{ width: buttonWidth || '30em' }}>
+            <ButtonGroup block style={{ width: buttonWidth || "30em" }}>
               <Button
-                appearance='default'
+                appearance="default"
                 onClick={cancelAction}
-                style={{ width: '50%' }}
+                style={{ width: "50%" }}
               >
                 Cancel
               </Button>
               <Button
-                appearance='primary'
+                appearance="primary"
                 onClick={confirmAction}
-                style={{ width: '50%' }}
+                style={{ width: "50%" }}
               >
                 Confirm
               </Button>

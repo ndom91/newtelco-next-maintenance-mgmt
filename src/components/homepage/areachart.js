@@ -1,11 +1,11 @@
-import React from 'react'
-import useSWR from 'swr'
-import Chart from 'react-apexcharts'
-import { Panel, Icon, Loader } from 'rsuite'
+import React from "react"
+import useSWR from "swr"
+import Chart from "react-apexcharts"
+import { Panel, Icon, Loader } from "rsuite"
 
 const options = {
   chart: {
-    type: 'area',
+    type: "area",
     height: 250,
     stacked: false,
     zoom: {
@@ -22,7 +22,7 @@ const options = {
     size: 0,
   },
   stroke: {
-    curve: 'smooth',
+    curve: "smooth",
   },
   tooltip: {
     shared: true,
@@ -31,7 +31,7 @@ const options = {
     show: false,
   },
   fill: {
-    type: 'gradient',
+    type: "gradient",
     gradient: {
       shadeIntensity: 1,
       opacityFrom: 0.7,
@@ -43,7 +43,7 @@ const options = {
     show: false,
   },
   xaxis: {
-    type: 'datetime',
+    type: "datetime",
     axisTicks: {
       show: false,
     },
@@ -55,14 +55,14 @@ const options = {
     show: false,
   },
   theme: {
-    palette: 'palette4', // upto palette10
+    palette: "palette4", // upto palette10
   },
 }
 
 const AreaChart = () => {
   const { data } = useSWR(
-    '/api/homepage/barchart',
-    (...args) => fetch(...args).then(res => res.json()),
+    "/api/homepage/barchart",
+    (...args) => fetch(...args).then((res) => res.json()),
     { suspense: false, revalidateOnFocus: false }
   )
 
@@ -70,11 +70,11 @@ const AreaChart = () => {
     const userSeries = []
     const returnSeries = []
     const users = Array.from(
-      new Set(data.query.map(obj => JSON.stringify({ user: obj.user })))
+      new Set(data.query.map((obj) => JSON.stringify({ user: obj.user })))
     ).map(JSON.parse)
-    users.forEach(user => {
+    users.forEach((user) => {
       const userData = data.query
-        .filter(x => x.user === user.user)
+        .filter((x) => x.user === user.user)
         .sort((a, b) => {
           return a.year > b.year
             ? -1
@@ -88,8 +88,8 @@ const AreaChart = () => {
         })
       userSeries.push(userData)
     })
-    userSeries.forEach(user => {
-      const data = user.map(user => [user.date, user.count])
+    userSeries.forEach((user) => {
+      const data = user.map((user) => [user.date, user.count])
       returnSeries.push({ data: data, name: user[0].user })
     })
 
@@ -97,17 +97,17 @@ const AreaChart = () => {
       <Panel
         bordered
         header={
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
             Completed
-            <Icon icon='tasks' style={{ color: 'var(--primary)' }} size='lg' />
+            <Icon icon="tasks" style={{ color: "var(--primary)" }} size="lg" />
           </div>
         }
-        style={{ height: '100%' }}
+        style={{ height: "100%" }}
       >
         <Chart
           options={options}
           series={returnSeries}
-          type='area'
+          type="area"
           width={400}
           height={220}
         />
@@ -118,24 +118,24 @@ const AreaChart = () => {
       <Panel
         bordered
         header={
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
             Completed
             <Icon
-              icon='bar-chart'
-              style={{ color: 'var(--primary)' }}
-              size='lg'
+              icon="bar-chart"
+              style={{ color: "var(--primary)" }}
+              size="lg"
             />
           </div>
         }
-        style={{ height: '100%' }}
+        style={{ height: "100%" }}
       >
         <div
           style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            width: '100%',
-            height: '200px',
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            width: "100%",
+            height: "200px",
           }}
         >
           <Loader />

@@ -1,5 +1,5 @@
-const db = require('../../../../../lib/db')
-const escape = require('sql-template-strings')
+const db = require("../../../../../lib/db")
+const escape = require("sql-template-strings")
 
 module.exports = async (req, res) => {
   const cids = req.body.cids
@@ -10,10 +10,10 @@ module.exports = async (req, res) => {
     escape`UPDATE maintenancedb SET betroffeneCIDs = ${cids}, updatedBy = ${updatedBy} WHERE id = ${maintId}`
   )
   if (affectedCIDsQuery.affectedRows >= 1) {
-    res.status(200).json({ statusText: 'OK', status: 200 })
+    res.status(200).json({ statusText: "OK", status: 200 })
   } else {
     res
       .status(200)
-      .json({ statusText: 'FAIL', status: 500, err: affectedCIDsQuery })
+      .json({ statusText: "FAIL", status: 500, err: affectedCIDsQuery })
   }
 }

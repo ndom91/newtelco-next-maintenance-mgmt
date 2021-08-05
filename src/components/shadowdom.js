@@ -1,12 +1,12 @@
-import React, { useEffect, useState, useRef } from 'react'
-import { createPortal } from 'react-dom'
+import React, { useEffect, useState, useRef } from "react"
+import { createPortal } from "react-dom"
 
 const ShadowDom = ({ children }) => {
   const shadowRef = useRef()
   const [shadowRoot, setShadowRoot] = useState(null)
 
   useEffect(() => {
-    const shadowRoot2 = shadowRef.current.attachShadow({ mode: 'open' })
+    const shadowRoot2 = shadowRef.current.attachShadow({ mode: "open" })
     setShadowRoot(shadowRoot2)
   }, [])
 

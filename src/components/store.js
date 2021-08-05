@@ -1,10 +1,10 @@
-import { createConnectedStore } from 'undux'
+import { createConnectedStore } from "undux"
 
 export default createConnectedStore({
   count: 0,
   session: {},
   maintenance: {},
-  impactPlaceholder: '',
+  impactPlaceholder: "",
   comments: [],
   rescheduleData: [],
   night: false,

@@ -1,75 +1,75 @@
 const margin = {
-  horizontal: 'marginRight',
-  vertical: 'marginBottom',
+  horizontal: "marginRight",
+  vertical: "marginBottom",
 }
 
 export const flex = {
   horizontal: {
-    display: 'flex',
-    flexDirection: 'row',
+    display: "flex",
+    flexDirection: "row",
   },
   vertical: {
-    display: 'flex',
-    flexDirection: 'column',
+    display: "flex",
+    flexDirection: "column",
   },
   flexWrap: {
-    display: 'flex',
-    flexWrap: 'wrap',
+    display: "flex",
+    flexWrap: "wrap",
   },
   centerHorizontal: {
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   wrap: {
-    flexWrap: 'wrap',
+    flexWrap: "wrap",
   },
   horizontalReverse: {
-    display: 'flex',
-    flexDirection: 'row-reverse',
+    display: "flex",
+    flexDirection: "row-reverse",
   },
   verticalReverse: {
-    display: 'flex',
-    flexDirection: 'column-reverse',
+    display: "flex",
+    flexDirection: "column-reverse",
   },
   noWrap: {
-    flexWrap: 'nowrap',
+    flexWrap: "nowrap",
   },
   centerHorizontalH: {
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   centerHorizontalV: {
-    alignItems: 'center',
+    alignItems: "center",
   },
   centerVertical: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   centerVerticalH: {
-    alignItems: 'center',
+    alignItems: "center",
   },
   centerVerticalV: {
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   spaceAround: {
-    justifyContent: 'space-around',
+    justifyContent: "space-around",
   },
   spaceBetween: {
-    justifyContent: 'space-between',
+    justifyContent: "space-between",
   },
   justifyEnd: {
-    justifyContent: 'flex-end',
+    justifyContent: "flex-end",
   },
   alignStart: {
-    alignContent: 'flex-start',
+    alignContent: "flex-start",
   },
   stretchSelf: {
-    alignSelf: 'stretch',
+    alignSelf: "stretch",
   },
-  spaceChildren: (space, direction = 'horizontal') => ({
-    '& > *': {
+  spaceChildren: (space, direction = "horizontal") => ({
+    "& > *": {
       [margin[direction]]: space,
     },
-    '& > *:last-child': {
+    "& > *:last-child": {
       [margin[direction]]: 0,
     },
   }),

@@ -1,11 +1,11 @@
-import React, { useEffect, useState, useRef } from 'react'
-import { AgGridReact } from 'ag-grid-react'
-import 'ag-grid-community/dist/styles/ag-grid.css'
-import 'ag-grid-community/dist/styles/ag-theme-material.css'
-import Select from 'react-select'
-import { ProtectedIcon } from '@/newtelco/ag-grid'
-import Notify from '@/newtelco-utils/notification'
-import ConfirmModal from '@/newtelco/confirmmodal'
+import React, { useEffect, useState, useRef } from "react"
+import { AgGridReact } from "ag-grid-react"
+import "ag-grid-community/dist/styles/ag-grid.css"
+import "ag-grid-community/dist/styles/ag-theme-material.css"
+import Select from "react-select"
+import { ProtectedIcon } from "@/newtelco/ag-grid"
+import Notify from "@/newtelco-utils/notification"
+import ConfirmModal from "@/newtelco/confirmmodal"
 import {
   Modal,
   FlexboxGrid,
@@ -20,14 +20,14 @@ import {
   ButtonGroup,
   Toggle,
   Loader,
-} from 'rsuite'
+} from "rsuite"
 
-const CustomerCIDs = props => {
+const CustomerCIDs = (props) => {
   const gridApi = useRef()
   const gridColumnApi = useRef()
-  const [newNewtelcoCid, setNewNewtelcoCid] = useState('')
-  const [customerCidIdToDelete, setCustomerCidIdToDelete] = useState('')
-  const [customerNameToDelete, setCustomerNameToDelete] = useState('')
+  const [newNewtelcoCid, setNewNewtelcoCid] = useState("")
+  const [customerCidIdToDelete, setCustomerCidIdToDelete] = useState("")
+  const [customerNameToDelete, setCustomerNameToDelete] = useState("")
   const [rowData, setRowData] = useState([])
   const [companySelections, setCompanySelections] = useState([])
   const [supplierSelections, setSupplierSelections] = useState([])
@@ -47,81 +47,81 @@ const CustomerCIDs = props => {
     },
     columnDefs: [
       {
-        headerName: 'ID',
-        field: 'id',
+        headerName: "ID",
+        field: "id",
         width: 60,
         editable: false,
       },
       {
-        headerName: 'Newtelco CID',
-        field: 'kundenCID',
+        headerName: "Newtelco CID",
+        field: "kundenCID",
         width: 200,
       },
       {
-        headerName: 'Customer',
-        field: 'name',
+        headerName: "Customer",
+        field: "name",
         width: 200,
         // sort: { direction: 'asc', priority: 0 },
         editable: false,
       },
       {
-        headerName: 'Their CID',
-        field: 'derenCID',
+        headerName: "Their CID",
+        field: "derenCID",
         width: 200,
         editable: false,
       },
       {
-        headerName: 'Protected',
-        field: 'protected',
+        headerName: "Protected",
+        field: "protected",
         width: 80,
-        cellRenderer: 'protectedIcon',
+        cellRenderer: "protectedIcon",
         cellStyle: {
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '100%',
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100%",
         },
       },
     ],
-    rowSelection: 'single',
+    rowSelection: "single",
     frameworkComponents: {
       protectedIcon: ProtectedIcon,
       customLoadingOverlay: Loader,
     },
-    loadingOverlayComponent: 'customLoadingOverlay',
+    loadingOverlayComponent: "customLoadingOverlay",
   }
 
   useEffect(() => {
-    fetch('/api/customercids', {
-      method: 'get',
+    fetch("/api/customercids", {
+      method: "get",
     })
-      .then(resp => resp.json())
-      .then(data => {
+      .then((resp) => resp.json())
+      .then((data) => {
         gridApi.current.hideOverlay()
         setRowData(data.customercids)
       })
-      .catch(err => console.error(err))
+      .catch((err) => console.error(err))
     // fill Companies Select
-    fetch('/api/companies/selectmaint', {
-      method: 'get',
+    fetch("/api/companies/selectmaint", {
+      method: "get",
     })
-      .then(resp => resp.json())
-      .then(data => {
+      .then((resp) => resp.json())
+      .then((data) => {
         setCompanySelections(data.companies)
       })
-      .catch(err => console.error(`Error - ${err}`))
+      .catch((err) => console.error(`Error - ${err}`))
     // fill Supplier Select
-    fetch('/api/lieferantcids/select', {
-      method: 'get',
+    fetch("/api/lieferantcids/select", {
+      method: "get",
     })
-      .then(resp => resp.json())
-      .then(data => {
+      .then((resp) => resp.json())
+      .then((data) => {
         setSupplierSelections(data.lieferantCids)
       })
-      .catch(err => console.error(`Error - ${err}`))
+      .catch((err) => console.error(`Error - ${err}`))
   }, [])
 
-  const handleGridReady = params => {
+  const handleGridReady = (params) => {
     gridApi.current = params.api
     gridApi.current.showLoadingOverlay()
     gridColumnApi.current = params.columnApi
@@ -132,14 +132,14 @@ const CustomerCIDs = props => {
     setOpenCustomerCidAdd(!openCustomerCidAdd)
   }
 
-  const handleCompanyChange = selectedOption => {
+  const handleCompanyChange = (selectedOption) => {
     setNewCompanySelection({
       value: selectedOption.value,
       label: selectedOption.label,
     })
   }
 
-  const handleSupplierCidChange = selectedOption => {
+  const handleSupplierCidChange = (selectedOption) => {
     setNewSupplierSelection({
       value: selectedOption.value,
       label: selectedOption.label,
@@ -148,19 +148,19 @@ const CustomerCIDs = props => {
 
   const handleDelete = () => {
     fetch(`/api/settings/delete/customercids?id=${customerCidIdToDelete}`, {
-      method: 'get',
+      method: "get",
     })
-      .then(resp => resp.json())
-      .then(data => {
+      .then((resp) => resp.json())
+      .then((data) => {
         if (data.deleteCustomerCidQuery.affectedRows === 1) {
-          Notify('success', `${customerNameToDelete} Deleted`)
+          Notify("success", `${customerNameToDelete} Deleted`)
         } else {
-          Notify('warning', 'Error', data.err)
+          Notify("warning", "Error", data.err)
         }
       })
-      .catch(err => console.error(err))
+      .catch((err) => console.error(err))
 
-    const newRowData = rowData.filter(el => el.id !== customerCidIdToDelete)
+    const newRowData = rowData.filter((el) => el.id !== customerCidIdToDelete)
     setRowData(newRowData)
     setOpenConfirmDeleteModal(!openConfirmDeleteModal)
   }
@@ -175,7 +175,7 @@ const CustomerCIDs = props => {
         setCustomerCidIdToDelete(customerCidId)
         setCustomerNameToDelete(customerCidName)
       } else {
-        Notify('warning', 'Please select a Customer CID')
+        Notify("warning", "Please select a Customer CID")
       }
     }
   }
@@ -190,41 +190,41 @@ const CustomerCIDs = props => {
         newProtection
       )}&supplier=${encodeURIComponent(newSupplierSelection.value)}`,
       {
-        method: 'get',
+        method: "get",
       }
     )
-      .then(resp => resp.json())
-      .then(data => {
+      .then((resp) => resp.json())
+      .then((data) => {
         const insertId = data.insertCustomerCidQuery.insertId
         if (
           data.insertCustomerCidQuery.affectedRows === 1 &&
           data.insertCustomerCidQuery.warningCount === 0
         ) {
-          Notify('success', `${newNewtelcoCid} Added`)
+          Notify("success", `${newNewtelcoCid} Added`)
         } else {
-          Notify('warning', 'Error', data.err)
+          Notify("warning", "Error", data.err)
         }
         const newRowData = rowData
-        const newProtectionValue = newProtection ? '1' : '0'
+        const newProtectionValue = newProtection ? "1" : "0"
         newRowData.push({
           id: insertId,
           derenCID: newSupplierSelection.label,
           kundenCID: newNewtelcoCid,
           name: newCompanySelection.label,
-          protected: newProtectionValue || '0',
+          protected: newProtectionValue || "0",
         })
         setRowData(newRowData)
         setOpenCustomerCidAdd(!openCustomerCidAdd)
         setNewCompanySelection([])
-        setNewNewtelcoCid('')
-        setNewProtection('')
+        setNewNewtelcoCid("")
+        setNewProtection("")
         setNewSupplierSelection([])
         gridApi.current.setRowData(newRowData)
       })
-      .catch(err => console.error(err))
+      .catch((err) => console.error(err))
   }
 
-  const handleCellEdit = params => {
+  const handleCellEdit = (params) => {
     const id = params.data.id
     const newCustomerCid = params.data.kundenCID
     const newProtected = params.data.protected
@@ -234,29 +234,29 @@ const CustomerCIDs = props => {
         newCustomerCid
       )}&protected=${encodeURIComponent(newProtected)}`,
       {
-        method: 'get',
+        method: "get",
       }
     )
-      .then(resp => resp.json())
-      .then(data => {
+      .then((resp) => resp.json())
+      .then((data) => {
         if (data.updateCustomerCidQuery.affectedRows === 1) {
-          Notify('success', `${newCustomerCid} Updated`)
+          Notify("success", `${newCustomerCid} Updated`)
         } else {
-          Notify('warning', 'Error', data.err)
+          Notify("warning", "Error", data.err)
         }
       })
-      .catch(err => console.error(err))
+      .catch((err) => console.error(err))
   }
 
   const Header = () => {
     return (
       <FlexboxGrid
-        justify='space-between'
-        align='middle'
-        style={{ marginBottom: '20px' }}
+        justify="space-between"
+        align="middle"
+        style={{ marginBottom: "20px" }}
       >
         <FlexboxGrid.Item>
-          <p style={{ fontFamily: 'var(--font-body)', fontWeight: 100 }}>
+          <p style={{ fontFamily: "var(--font-body)", fontWeight: 100 }}>
             These are our CIDs which are tied to customers and will be displayed
             on notification mails.
           </p>
@@ -265,17 +265,17 @@ const CustomerCIDs = props => {
           <ButtonGroup>
             <IconButton
               onClick={toggleCustomerCidAdd}
-              icon={<Icon icon='plus-circle' />}
-              appearance='ghost'
-              placement='right'
+              icon={<Icon icon="plus-circle" />}
+              appearance="ghost"
+              placement="right"
             >
               Add
             </IconButton>
             <IconButton
               onClick={toggleCustomerCidDeleteModal}
-              icon={<Icon icon='trash' />}
-              appearance='ghost'
-              placement='right'
+              icon={<Icon icon="trash" />}
+              appearance="ghost"
+              placement="right"
             >
               Delete
             </IconButton>
@@ -286,14 +286,14 @@ const CustomerCIDs = props => {
   }
 
   return (
-    <div style={{ width: '100%' }} className='section'>
+    <div style={{ width: "100%" }} className="section">
       <Panel header={<Header />}>
-        <div className='table-wrapper'>
+        <div className="table-wrapper">
           <div
-            className='ag-theme-material'
+            className="ag-theme-material"
             style={{
-              height: '700px',
-              width: '100%',
+              height: "700px",
+              width: "100%",
             }}
           >
             <AgGridReact
@@ -303,7 +303,7 @@ const CustomerCIDs = props => {
               onCellEditingStopped={handleCellEdit}
               animateRows
               immutableData
-              getRowNodeId={data => {
+              getRowNodeId={(data) => {
                 return data.id
               }}
               stopEditingWhenGridLosesFocus
@@ -315,7 +315,7 @@ const CustomerCIDs = props => {
         <ConfirmModal
           show={openConfirmDeleteModal}
           onHide={toggleCustomerCidDeleteModal}
-          header='Confirm Delete'
+          header="Confirm Delete"
           content={`Are you sure you want to delete ${customerNameToDelete} (${customerCidIdToDelete})`}
           cancelAction={toggleCustomerCidDeleteModal}
           confirmAction={handleDelete}
@@ -325,58 +325,58 @@ const CustomerCIDs = props => {
         <Modal
           backdrop
           show={openCustomerCidAdd}
-          size='xs'
+          size="xs"
           onHide={toggleCustomerCidAdd}
-          className='add-customer-modal'
+          className="add-customer-modal"
         >
           <Modal.Header>New Customer CID</Modal.Header>
-          <Modal.Body style={{ overflow: 'visible', paddingBottom: '0px' }}>
+          <Modal.Body style={{ overflow: "visible", paddingBottom: "0px" }}>
             <FlexboxGrid
-              justify='space-around'
-              align='middle'
-              style={{ flexDirection: 'column', height: '370px' }}
+              justify="space-around"
+              align="middle"
+              style={{ flexDirection: "column", height: "370px" }}
             >
               <FlexboxGrid.Item
-                style={{ fontFamily: 'var(--font-body)', fontSize: '1.1rem' }}
+                style={{ fontFamily: "var(--font-body)", fontSize: "1.1rem" }}
               >
                 <Form>
                   <FormGroup>
                     <ControlLabel>Newtelco CID</ControlLabel>
                     <Input
-                      key='input-name'
-                      name='name'
-                      type='text'
+                      key="input-name"
+                      name="name"
+                      type="text"
                       value={newNewtelcoCid}
-                      onChange={value => setNewNewtelcoCid(value)}
+                      onChange={(value) => setNewNewtelcoCid(value)}
                     />
                   </FormGroup>
                   <FormGroup>
                     <ControlLabel>Customer</ControlLabel>
                     <Select
                       value={newCompanySelection}
-                      className='company-select'
+                      className="company-select"
                       onChange={handleCompanyChange}
                       options={companySelections}
-                      noOptionsMessage={() => 'No Companies Available'}
-                      placeholder='Company'
+                      noOptionsMessage={() => "No Companies Available"}
+                      placeholder="Company"
                     />
                   </FormGroup>
                   <FormGroup>
                     <ControlLabel>Supplier CID</ControlLabel>
                     <Select
                       value={newSupplierSelection}
-                      className='company-select'
+                      className="company-select"
                       onChange={handleSupplierCidChange}
                       options={supplierSelections}
-                      noOptionsMessage={() => 'No Supplier CIDs Available'}
-                      placeholder='Supplier CID'
+                      noOptionsMessage={() => "No Supplier CIDs Available"}
+                      placeholder="Supplier CID"
                     />
                   </FormGroup>
                   <FormGroup
                     style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      marginBottom: '20px',
+                      display: "flex",
+                      justifyContent: "space-between",
+                      marginBottom: "20px",
                     }}
                   >
                     <ControlLabel>Protected</ControlLabel>
@@ -388,18 +388,18 @@ const CustomerCIDs = props => {
                 </Form>
               </FlexboxGrid.Item>
               <FlexboxGrid.Item>
-                <ButtonGroup block style={{ width: '20em' }}>
+                <ButtonGroup block style={{ width: "20em" }}>
                   <Button
-                    appearance='default'
+                    appearance="default"
                     onClick={toggleCustomerCidAdd}
-                    style={{ width: '50%' }}
+                    style={{ width: "50%" }}
                   >
                     Cancel
                   </Button>
                   <Button
-                    appearance='primary'
+                    appearance="primary"
                     onClick={handleAddCustomerCid}
-                    style={{ width: '50%' }}
+                    style={{ width: "50%" }}
                   >
                     Confirm
                   </Button>
@@ -413,10 +413,10 @@ const CustomerCIDs = props => {
   )
 }
 CustomerCIDs.getInitialProps = async ({ req, query }) => {
-  const host = req && (req.headers['x-forwarded-host'] ?? req.headers['host'])
-  const protocol = 'https:'
-  if (host.indexOf('localhost') > -1) {
-    protocol = 'http:'
+  const host = req && (req.headers["x-forwarded-host"] ?? req.headers["host"])
+  const protocol = "https:"
+  if (host.indexOf("localhost") > -1) {
+    protocol = "http:"
   }
   const pageRequest = `${protocol}//${host}/api/settings/theircids`
   const res = await fetch(pageRequest)

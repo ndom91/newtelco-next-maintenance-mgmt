@@ -1,12 +1,12 @@
-import React, { useEffect } from 'react'
-import Link from 'next/link'
-import { Container, FlexboxGrid, Panel, Content, Button, Col } from 'rsuite'
+import React, { useEffect } from "react"
+import Link from "next/link"
+import { Container, FlexboxGrid, Panel, Content, Button, Col } from "rsuite"
 
-if (typeof window !== 'undefined') {
-  const WebFontLoader = require('webfontloader')
+if (typeof window !== "undefined") {
+  const WebFontLoader = require("webfontloader")
   WebFontLoader.load({
     google: {
-      families: ['Fira Sans:200,400', 'Chivo:300,400,700'],
+      families: ["Fira Sans:200,400", "Chivo:300,400,700"],
     },
   })
 }
@@ -15,9 +15,9 @@ const RequireLogin = () => (
   <Container>
     <Content>
       <FlexboxGrid
-        justify='center'
-        align='middle'
-        style={{ height: '70vh', flexDirection: 'column' }}
+        justify="center"
+        align="middle"
+        style={{ height: "70vh", flexDirection: "column" }}
       >
         <FlexboxGrid.Item
           componentClass={Col}
@@ -28,20 +28,20 @@ const RequireLogin = () => (
           xs={18}
         >
           <Panel
-            header='Session'
+            header="Session"
             bordered
             shaded
-            style={{ backgroundColor: '#fff' }}
+            style={{ backgroundColor: "#fff" }}
           >
-            <p style={{ margin: '20px' }}>
+            <p style={{ margin: "20px" }}>
               You must be signed in to view this page.
             </p>
             <p>
-              <Link href='/auth/signin'>
+              <Link href="/auth/signin">
                 <Button
-                  id='signin-btn'
-                  type='submit'
-                  appearance='primary'
+                  id="signin-btn"
+                  type="submit"
+                  appearance="primary"
                   block
                 >
                   Sign in
