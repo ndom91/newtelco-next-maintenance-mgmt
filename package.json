@@ -107,7 +107,12 @@
     "rules": {
       "no-unused-vars": 0,
       "no-undef": 0,
-      "react/prop-types": 0
+      "no-irregular-whitespace": 0,
+      "no-const-assign": 0,
+      "react/prop-types": 0,
+      "react/display-name": 0,
+      "react/jsx-no-undef": 0,
+      "react/no-unescaped-entities": 0
     },
     "extends": [
       "eslint:recommended",

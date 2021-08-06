@@ -414,7 +414,7 @@ const CustomerCIDs = (props) => {
 }
 CustomerCIDs.getInitialProps = async ({ req, query }) => {
   const host = req && (req.headers["x-forwarded-host"] ?? req.headers["host"])
-  const protocol = "https:"
+  let protocol = "https:"
   if (host.indexOf("localhost") > -1) {
     protocol = "http:"
   }
