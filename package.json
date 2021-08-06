@@ -31,8 +31,8 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@nivo/bar": "^0.62.0",
-    "@nivo/calendar": "^0.62.0",
+    "@nivo/bar": "^0.73.1",
+    "@nivo/calendar": "^0.73.0",
     "@sentry/nextjs": "^6.10.0",
     "@tinymce/tinymce-react": "^3.6.0",
     "algolia-react-autocomplete": "^1.0.5",

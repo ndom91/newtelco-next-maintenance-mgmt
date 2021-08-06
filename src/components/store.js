@@ -20,7 +20,6 @@ const useStore = create((set) => ({
   setCount: (num) => {
     set((state) => (state.count = num))
   },
-
   session: {},
   maintenance: {},
   impactPlaceholder: "",
