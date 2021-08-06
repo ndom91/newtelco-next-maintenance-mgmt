@@ -22,8 +22,7 @@ const SentryWebpackPluginOptions = {
   // recommended:
   //   release, url, org, project, authToken, configFile, stripPrefix,
   //   urlPrefix, include, ignore
-
-  silent: true, // Suppresses all logs
+  // silent: true, // Suppresses all logs
   // For all available options, see:
   // https://github.com/getsentry/sentry-webpack-plugin#options.
 }
@@ -33,9 +32,13 @@ const SentryWebpackPluginOptions = {
  */
 const nextConfig = {
   compress: false,
-  productionBrowserSourceMaps: true, // For Sentry
+  // productionBrowserSourceMaps: true, // For Sentry
   maximumFileSizeToCacheInBytes: 5242880,
-  webpack(config) {
+  // sentry: {
+  //   disableServerWebpackPlugin: true,
+  //   disableClientWebpackPlugin: true,
+  // },
+  webpack(config, { isServer }) {
     //   HACK_removeMinimizeOptionFromCssLoaders(config)
     config.module.rules.push({
       test: /\.(le|c)ss$/,

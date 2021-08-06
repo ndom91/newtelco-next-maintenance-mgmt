@@ -91,19 +91,6 @@
     "semi": false
   },
   "eslintConfig": {
-    "parserOptions": {
-      "ecmaVersion": 2020,
-      "sourceType": "module",
-      "ecmaFeatures": {
-        "jsx": true
-      }
-    },
-    "ignorePatterns": [
-      "node_modules/*",
-      ".next/*",
-      ".out/*",
-      "!.prettierrc.js"
-    ],
     "rules": {
       "no-unused-vars": 0,
       "no-undef": 0,
