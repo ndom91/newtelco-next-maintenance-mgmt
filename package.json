@@ -76,6 +76,7 @@
     "ag-grid-react": "^25.3.0",
     "css-loader": "^6.2.0",
     "cypress": "^6.6.0",
+    "eslint-config-next": "^11.0.1",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^3.4.0",
     "less": "^4.1.1",
