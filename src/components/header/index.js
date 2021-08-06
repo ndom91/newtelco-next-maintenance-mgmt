@@ -1,7 +1,8 @@
 import React from "react"
 import NextAuth from "next-auth/client"
 import Link from "next/link"
-import Store from "@/newtelco/store"
+// import Store from "@/newtelco/store"
+import useStore from "../store"
 import SearchInput from "./search"
 import "./header.css"
 import { Header, Nav, Navbar, Dropdown, Avatar, Badge, Divider } from "rsuite"
@@ -21,8 +22,9 @@ const NavLink = (props) => (
 
 const MaintHeader = () => {
   const [session, loading] = NextAuth.useSession()
-  const store = Store.useStore()
-  const count = store.get("count")
+  // const store = Store.useStore()
+  // const count = store.get("count")
+  const count = useStore((state) => state.count)
 
   let avatarPath
   if (!loading && session) {

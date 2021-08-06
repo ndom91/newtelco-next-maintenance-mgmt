@@ -6,7 +6,6 @@ import Layout from "@/newtelco/layout"
 import RequireLogin from "@/newtelco/require-login"
 import MaintPanel from "@/newtelco/panel"
 import UnreadBadge from "@/newtelco/unread"
-import Store from "@/newtelco/store"
 
 const AreaChart = dynamic(() => import("../components/homepage/areachart"), {
   ssr: false,
@@ -47,8 +46,6 @@ const ActiveMaintenances = dynamic(() =>
 )
 
 const Index = ({ session }) => {
-  const store = Store.useStore()
-
   if (typeof window !== "undefined" && !session) {
     Router.push("/auth/signin")
   }
@@ -59,7 +56,7 @@ const Index = ({ session }) => {
         <MaintPanel header="Maintenance">
           <div className="grid-container">
             <div className="unread">
-              <UnreadBadge count={store.get("count")} />
+              <UnreadBadge />
             </div>
             <div className="heatmap">
               <Heatmap />

@@ -3,7 +3,7 @@ import Head from "next/head"
 import { Provider } from "next-auth/client"
 import { H } from "highlight.run"
 // import ErrorBoundary from "@/newtelco/errorboundary"
-import Store from "@/newtelco/store"
+// import Store from "@/newtelco/store"
 const LogRocket = require("logrocket")
 const setupLogRocketReact = require("logrocket-react")
 
@@ -79,9 +79,7 @@ const App = ({ Component, pageProps }) => {
           href="/static/images/favicon/favicon.ico"
         />
       </Head>
-      <Store.Container>
-        <Component {...pageProps} />
-      </Store.Container>
+      <Component {...pageProps} />
       {/* </ConditionalWrap> */}
     </Provider>
   )

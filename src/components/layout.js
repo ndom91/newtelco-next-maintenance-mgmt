@@ -3,7 +3,8 @@ import Head from "next/head"
 import MaintHeader from "./header"
 import useSWR from "swr"
 import dynamic from "next/dynamic"
-import Store from "./store"
+// import Store from "./store"
+import useStore from "./store"
 import { Container, Content, Modal, Button, FlexboxGrid } from "rsuite"
 
 if (typeof window !== "undefined") {
@@ -23,8 +24,10 @@ if (typeof window !== "undefined") {
 const UnreadFavicon = dynamic(() => import("./unreadcount"), { ssr: false })
 
 const Layout = ({ children }) => {
-  const [style, setStyle] = useState("/static/css/rsuite-default.css")
-  const store = Store.useStore()
+  // const [style, setStyle] = useState("/static/css/rsuite-default.css")
+  // const store = Store.useStore()
+  // const count = useStore((state) => state.count)
+  const setCount = useStore((state) => state.setCount)
 
   const { data } = useSWR(
     "/v1/api/count",
@@ -33,27 +36,28 @@ const Layout = ({ children }) => {
   )
 
   useEffect(() => {
-    store.set("count")(data ? data.count : 0)
-  }, [data])
+    // store.set("count")(data ? data.count : 0)
+    setCount(data ? data.count : 0)
+  }, [data, setCount])
 
-  store.on("night").subscribe((night) => {
-    fetch(
-      night ? "/static/css/rsuite-dark.css" : "/static/css/rsuite-default.css"
-    )
-      .then((response) => response.text())
-      .then((data) => {
-        setStyle(data)
-      })
-  })
+  // store.on("night").subscribe((night) => {
+  //   fetch(
+  //     night ? "/static/css/rsuite-dark.css" : "/static/css/rsuite-default.css"
+  //   )
+  //     .then((response) => response.text())
+  //     .then((data) => {
+  //       setStyle(data)
+  //     })
+  // })
 
   return (
     <div>
-      <Head>
+      {/* <Head>
         <style>{style}</style>
-      </Head>
-      <UnreadFavicon count={store.get("count")} />
+      </Head> */}
+      <UnreadFavicon />
       <Container>
-        <MaintHeader unread={store.get("count")} />
+        <MaintHeader />
         <Content>
           <FlexboxGrid justify="center">
             <FlexboxGrid.Item colspan={23} style={{ marginTop: "20px" }}>
