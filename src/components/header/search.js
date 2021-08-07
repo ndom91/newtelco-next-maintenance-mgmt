@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react"
+import { useRef, useEffect } from "react"
 import Router from "next/router"
 import algoliasearch from "algoliasearch"
 import Autocomplete from "algolia-react-autocomplete"

@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react"
-import format from "date-fns/format"
+import { useState, useEffect } from "react"
 import { Loader, Timeline, Icon } from "rsuite"
+import format from "date-fns/format"
 
 const Changelog = ({ maintId }) => {
   const [fetching, setFetching] = useState(false)
@@ -8,18 +8,16 @@ const Changelog = ({ maintId }) => {
 
   useEffect(() => {
     setFetching(true)
-    fetch(`/api/maintenances/history?mid=${maintId}`, {
-      method: "get",
-    })
+    fetch(`/api/maintenances/history?mid=${maintId}`)
       .then((resp) => resp.json())
       .then((data) => {
         setMaintHistory(data.historyQuery)
         setFetching(false)
       })
       .catch((err) => console.error(err))
-  }, [])
+  }, [maintId])
 
-  if (maintHistory.length !== 0) {
+  if (maintHistory.length) {
     return (
       <Timeline align="left">
         {maintHistory.map((item) => {

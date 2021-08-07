@@ -1,4 +1,3 @@
-import React from "react"
 import useSWR from "swr"
 import Chart from "react-apexcharts"
 import { Panel, Icon, Loader } from "rsuite"
@@ -55,7 +54,7 @@ const options = {
     show: false,
   },
   theme: {
-    palette: "palette4", // upto palette10
+    palette: "palette4",
   },
 }
 

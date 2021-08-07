@@ -5,8 +5,6 @@ const useStore = create((set) => ({
   setCount: (num) => {
     set((state) => (state.count = num))
   },
-  session: {},
-  maintenance: {},
   rescheduleData: [],
   setRescheduleData: (rescheduleMaint) => {
     set((state) => (state.rescheduleData = rescheduleMaint))

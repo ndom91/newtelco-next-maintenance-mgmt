@@ -1,4 +1,3 @@
-import React from "react"
 import useSWR from "swr"
 import Router from "next/router"
 import format from "date-fns/format"

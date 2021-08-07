@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from "react"
+import { useRef, useEffect, useState } from "react"
 import { AgGridReact } from "ag-grid-react"
 import "ag-grid-community/dist/styles/ag-grid.css"
 import "ag-grid-community/dist/styles/ag-theme-material.css"
@@ -69,9 +69,7 @@ const Companies = (props) => {
   const [companyToDelete, setCompanyToDelete] = useState("")
 
   useEffect(() => {
-    fetch("/api/companies", {
-      method: "get",
-    })
+    fetch("/api/companies")
       .then((resp) => resp.json())
       .then((data) => {
         setRowData(data.companies)
@@ -91,9 +89,7 @@ const Companies = (props) => {
   }
 
   const handleDelete = () => {
-    fetch(`/api/settings/delete/companies?id=${companyToDelete.id}`, {
-      method: "get",
-    })
+    fetch(`/api/settings/delete/companies?id=${companyToDelete.id}`)
       .then((resp) => resp.json())
       .then((data) => {
         if (data.deleteCompanyQuery.affectedRows === 1) {
@@ -129,18 +125,12 @@ const Companies = (props) => {
         newName
       )}&domain=${encodeURIComponent(newDomain)}&recipient=${encodeURIComponent(
         newRecipient
-      )}`,
-      {
-        method: "get",
-      }
+      )}`
     )
       .then((resp) => resp.json())
       .then((data) => {
-        const insertId = data.insertCompanyQuery.insertId
-        if (
-          data.insertCompanyQuery.affectedRows === 1 &&
-          data.insertCompanyQuery.warningCount === 0
-        ) {
+        const { insertId, affectedRows, warningCount } = data.insertCompanyQuery
+        if (affectedRows === 1 && warningCount === 0) {
           Notify("success", `${newName} Added`)
         } else {
           Notify("warning", "Error", data.err)
@@ -170,10 +160,7 @@ const Companies = (props) => {
         newName
       )}&domain=${encodeURIComponent(newDomain)}&recipient=${encodeURIComponent(
         newRecipient
-      )}`,
-      {
-        method: "get",
-      }
+      )}`
     )
       .then((resp) => resp.json())
       .then((data) => {

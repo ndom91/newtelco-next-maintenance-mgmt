@@ -1,4 +1,3 @@
-import React from "react"
 import { Panel, FlexboxGrid } from "rsuite"
 import "./panel.css"
 

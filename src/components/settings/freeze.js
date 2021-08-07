@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { AgGridReact } from "ag-grid-react"
 import Select from "react-select"
 import { StartDateTime, EndDateTime } from "@/newtelco/ag-grid"
@@ -87,9 +87,7 @@ const Freeze = (props) => {
   }
 
   useEffect(() => {
-    fetch("/api/freeze", {
-      method: "get",
-    })
+    fetch("/api/freeze")
       .then((resp) => resp.json())
       .then((data) => {
         gridApi.current.hideOverlay()
@@ -139,9 +137,7 @@ const Freeze = (props) => {
   }
 
   const handleDelete = () => {
-    fetch(`/api/settings/delete/freeze?id=${freezeIdToDelete}`, {
-      method: "get",
-    })
+    fetch(`/api/settings/delete/freeze?id=${freezeIdToDelete}`)
       .then((resp) => resp.json())
       .then((data) => {
         if (data.deleteFreezeQuery.affectedRows === 1) {
@@ -180,19 +176,13 @@ const Freeze = (props) => {
         newStartDateTime
       )}&enddatetime=${encodeURIComponent(
         newEndDateTime
-      )}&notes=${encodeURIComponent(newNotes)}`,
-      {
-        method: "get",
-      }
+      )}&notes=${encodeURIComponent(newNotes)}`
     )
       .then((resp) => resp.json())
       .then((data) => {
-        const insertId = data.insertFreezeQuery.insertId
+        const { insertId, affectedRows, warningCount } = data.insertFreezeQuery
         const newCompanyName = newCompany.label
-        if (
-          data.insertFreezeQuery.affectedRows === 1 &&
-          data.insertFreezeQuery.warningCount === 0
-        ) {
+        if (affectedRows === 1 && warningCount === 0) {
           Notify("success", `Freeze for ${newCompanyName} Added`)
         } else {
           Notify("warning", "Error", data.err)
@@ -234,10 +224,7 @@ const Freeze = (props) => {
         startdate
       )}&enddate=${encodeURIComponent(enddate)}&notes=${encodeURIComponent(
         notes
-      )}`,
-      {
-        method: "get",
-      }
+      )}`
     )
       .then((resp) => resp.json())
       .then((data) => {

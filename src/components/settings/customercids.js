@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react"
+import { useEffect, useState, useRef } from "react"
 import { AgGridReact } from "ag-grid-react"
 import "ag-grid-community/dist/styles/ag-grid.css"
 import "ag-grid-community/dist/styles/ag-theme-material.css"
@@ -92,9 +92,7 @@ const CustomerCIDs = (props) => {
   }
 
   useEffect(() => {
-    fetch("/api/customercids", {
-      method: "get",
-    })
+    fetch("/api/customercids")
       .then((resp) => resp.json())
       .then((data) => {
         gridApi.current.hideOverlay()
@@ -102,18 +100,14 @@ const CustomerCIDs = (props) => {
       })
       .catch((err) => console.error(err))
     // fill Companies Select
-    fetch("/api/companies/selectmaint", {
-      method: "get",
-    })
+    fetch("/api/companies/selectmaint")
       .then((resp) => resp.json())
       .then((data) => {
         setCompanySelections(data.companies)
       })
       .catch((err) => console.error(`Error - ${err}`))
     // fill Supplier Select
-    fetch("/api/lieferantcids/select", {
-      method: "get",
-    })
+    fetch("/api/lieferantcids/select")
       .then((resp) => resp.json())
       .then((data) => {
         setSupplierSelections(data.lieferantCids)
@@ -147,9 +141,7 @@ const CustomerCIDs = (props) => {
   }
 
   const handleDelete = () => {
-    fetch(`/api/settings/delete/customercids?id=${customerCidIdToDelete}`, {
-      method: "get",
-    })
+    fetch(`/api/settings/delete/customercids?id=${customerCidIdToDelete}`)
       .then((resp) => resp.json())
       .then((data) => {
         if (data.deleteCustomerCidQuery.affectedRows === 1) {
@@ -188,18 +180,13 @@ const CustomerCIDs = (props) => {
         newCompanySelection.value
       )}&protection=${encodeURIComponent(
         newProtection
-      )}&supplier=${encodeURIComponent(newSupplierSelection.value)}`,
-      {
-        method: "get",
-      }
+      )}&supplier=${encodeURIComponent(newSupplierSelection.value)}`
     )
       .then((resp) => resp.json())
       .then((data) => {
-        const insertId = data.insertCustomerCidQuery.insertId
-        if (
-          data.insertCustomerCidQuery.affectedRows === 1 &&
-          data.insertCustomerCidQuery.warningCount === 0
-        ) {
+        const { insertId, affectedRows, warningCount } =
+          data.insertCustomerCidQuery
+        if (affectedRows === 1 && warningCount === 0) {
           Notify("success", `${newNewtelcoCid} Added`)
         } else {
           Notify("warning", "Error", data.err)
@@ -232,10 +219,7 @@ const CustomerCIDs = (props) => {
     fetch(
       `/api/settings/edit/customercids?id=${id}&customercid=${encodeURIComponent(
         newCustomerCid
-      )}&protected=${encodeURIComponent(newProtected)}`,
-      {
-        method: "get",
-      }
+      )}&protected=${encodeURIComponent(newProtected)}`
     )
       .then((resp) => resp.json())
       .then((data) => {

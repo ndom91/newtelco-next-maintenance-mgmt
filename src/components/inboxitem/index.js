@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import { useState, useEffect } from "react"
 import Router from "next/router"
 import UseAnimations from "react-useanimations"
 import trash2 from "react-useanimations/lib/trash2"
@@ -35,16 +35,14 @@ const InboxItem = ({ toggle, mail, index, handleDelete }) => {
 
   useEffect(() => {
     try {
-      fetch(`/v1/api/favicon?d=${mail.domain}`, {
-        method: "get",
-      })
+      fetch(`/v1/api/favicon?d=${mail.domain}`)
         .then((resp) => resp.json())
         .then((data) => {
-          const iconUrl = data.icons
-          if (data.icons.substr(0, 4) !== "http") {
-            setFaviconUrl(`https://${iconUrl}`)
+          const { icons } = data
+          if (icons.substr(0, 4) !== "http") {
+            setFaviconUrl(`https://${icons}`)
           } else {
-            setFaviconUrl(iconUrl)
+            setFaviconUrl(icons)
           }
           setLoading(false)
         })

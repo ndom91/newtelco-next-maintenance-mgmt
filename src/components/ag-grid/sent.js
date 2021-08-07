@@ -1,4 +1,3 @@
-import React from "react"
 import { Icon, Badge } from "rsuite"
 
 export const SentIcon = ({ node }) => {

@@ -1,6 +1,7 @@
-import React, { useEffect } from "react"
+import { useEffect } from "react"
 import Link from "next/link"
 import { Container, FlexboxGrid, Panel, Content, Button, Col } from "rsuite"
+import "../pages/auth/signin.css"
 
 if (typeof window !== "undefined") {
   const WebFontLoader = require("webfontloader")
@@ -38,14 +39,16 @@ const RequireLogin = () => (
             </p>
             <p>
               <Link href="/auth/signin">
-                <Button
-                  id="signin-btn"
-                  type="submit"
-                  appearance="primary"
-                  block
-                >
-                  Sign in
-                </Button>
+                <a>
+                  <Button
+                    id="signin-btn"
+                    type="submit"
+                    appearance="primary"
+                    block
+                  >
+                    Sign in
+                  </Button>
+                </a>
               </Link>
             </p>
           </Panel>

@@ -1,12 +1,11 @@
-import React, { useRef, useEffect, useState } from "react"
+import { useRef, useEffect, useState } from "react"
 import { getSession } from "next-auth/client"
-import "./companies.css"
-import Layout from "@/newtelco/layout"
 import { AgGridReact } from "ag-grid-react"
-import "ag-grid-community/dist/styles/ag-grid.css"
-import "ag-grid-community/dist/styles/ag-theme-material.css"
 import moment from "moment-timezone"
+import Layout from "@/newtelco/layout"
+import MaintPanel from "@/newtelco/panel"
 import RequireLogin from "@/newtelco/require-login"
+import { IconButton, ButtonGroup, SelectPicker } from "rsuite"
 import {
   EditBtn,
   MaintId,
@@ -19,8 +18,9 @@ import {
   CompleteIcon,
   EdittedBy,
 } from "@/newtelco/ag-grid"
-import MaintPanel from "@/newtelco/panel"
-import { IconButton, ButtonGroup, SelectPicker } from "rsuite"
+import "./companies.css"
+import "ag-grid-community/dist/styles/ag-grid.css"
+import "ag-grid-community/dist/styles/ag-theme-material.css"
 
 const Companies = ({ session, suppliers, company }) => {
   const gridOptions = {
@@ -170,7 +170,7 @@ const Companies = ({ session, suppliers, company }) => {
       )
       handleNewCompanySelect(selectedCompany.value)
     }
-  }, [])
+  }, [company, suppliers])
 
   const handleGridReady = (params) => {
     gridApi.current = params.api

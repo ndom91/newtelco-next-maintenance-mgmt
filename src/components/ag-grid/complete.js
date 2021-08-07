@@ -1,5 +1,3 @@
-import React from "react"
-
 export const CompleteIcon = ({ node }) => {
   if (node.data.done !== 1) {
     if (node.data.done === 0) {

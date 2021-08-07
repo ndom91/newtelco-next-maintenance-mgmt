@@ -1,10 +1,9 @@
-import React, { useState, useRef } from "react"
+import { useState, useRef } from "react"
 import { Rnd } from "react-rnd"
 import ShadowDom from "../../components/shadowdom"
 import DOMPurify from "dompurify"
 import { OutTable, ExcelRenderer } from "react-excel-renderer"
-import { Document, Page } from "react-pdf"
-import { pdfjs } from "react-pdf"
+import { Document, Page, pdfjs } from "react-pdf"
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`
 import Notify from "@/newtelco-utils/notification"
 import { saveAs } from "file-saver"
@@ -87,7 +86,7 @@ const ReadModal = ({
       const fileData = new Blob([base64Fixed], { type: mimeType })
       saveAs(fileData, filename)
     }
-    if (id !== null) {
+    if (id) {
       let filetype = ""
       const fileExt = filename.match(/\.[0-9a-z]+$/i)
       switch (fileExt[0]) {
@@ -152,9 +151,7 @@ const ReadModal = ({
       } else if (filetype === "pdf") {
         const pdfIndex = incomingAttachments.findIndex((el) => el.id === id)
         const file = incomingAttachments[pdfIndex]
-        const filedata = file.data
-        const mime = file.mime
-        const filename = file.name
+        const { mime, data: filedata, name: filename } = file
         let base64 = filedata.replace(/_/g, "/")
         base64 = base64.replace(/-/g, "+")
         const base64Fixed = fixBase64(base64)
@@ -181,9 +178,7 @@ const ReadModal = ({
       } else if (filetype === "html") {
         const fileIndex = incomingAttachments.findIndex((el) => el.id === id)
         const file = incomingAttachments[fileIndex]
-        const filedata = file.data
-        const filename = file.name
-        const mime = file.mime
+        const { mime, data: filedata, name: filename } = file
         let base64 = filedata.replace(/_/g, "/")
         base64 = base64.replace(/-/g, "+")
         setFiletype(filetype)
@@ -208,8 +203,7 @@ const ReadModal = ({
       } else {
         const fileIndex = incomingAttachments.findIndex((el) => el.id === id)
         const file = incomingAttachments[fileIndex]
-        const mime = file.mime
-        const rawData = file.data
+        const { mime, data: rawData } = file
         let base64 = rawData.replace(/_/g, "/")
         base64 = base64.replace(/-/g, "+")
         setAttachmentPopoverBody(

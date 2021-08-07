@@ -1,4 +1,3 @@
-import React from "react"
 import { FlexboxGrid } from "rsuite"
 
 export const Supplier = ({ node }) => {

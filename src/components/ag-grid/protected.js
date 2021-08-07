@@ -1,5 +1,3 @@
-import React from "react"
-
 export const ProtectedIcon = ({ node }) => {
   if (node && node.data) {
     if (node.data.protected === "1" || node.data.protected === true) {

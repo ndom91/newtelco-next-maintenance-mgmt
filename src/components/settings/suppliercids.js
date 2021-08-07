@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef } from "react"
 import { AgGridReact } from "ag-grid-react"
 import Select from "react-select"
 import "ag-grid-community/dist/styles/ag-grid.css"
@@ -65,9 +65,7 @@ const SupplierCIDs = (props) => {
   }
 
   useEffect(() => {
-    fetch("/api/lieferantcids/settings", {
-      method: "get",
-    })
+    fetch("/api/lieferantcids/settings")
       .then((resp) => resp.json())
       .then((data) => {
         gridApi.current.hideOverlay()
@@ -75,9 +73,7 @@ const SupplierCIDs = (props) => {
       })
       .catch((err) => console.error(err))
     // fill Companies Select
-    fetch("/api/companies/selectmaint", {
-      method: "get",
-    })
+    fetch("/api/companies/selectmaint")
       .then((resp) => resp.json())
       .then((data) => {
         setCompanySelections(data.companies)
@@ -104,9 +100,7 @@ const SupplierCIDs = (props) => {
   }
 
   const handleDelete = () => {
-    fetch(`/api/settings/delete/suppliercids?id=${supplierCidToDelete.id}`, {
-      method: "get",
-    })
+    fetch(`/api/settings/delete/suppliercids?id=${supplierCidToDelete.id}`)
       .then((resp) => resp.json())
       .then((data) => {
         if (data.deleteSupplierCidQuery.affectedRows === 1) {
@@ -140,18 +134,13 @@ const SupplierCIDs = (props) => {
     fetch(
       `/api/settings/add/suppliercids?cid=${encodeURIComponent(
         newSupplierCid
-      )}&company=${encodeURIComponent(newCompanySelection.value)}`,
-      {
-        method: "get",
-      }
+      )}&company=${encodeURIComponent(newCompanySelection.value)}`
     )
       .then((resp) => resp.json())
       .then((data) => {
-        const insertId = data.insertSupplierCidQuery.insertId
-        if (
-          data.insertSupplierCidQuery.affectedRows === 1 &&
-          data.insertSupplierCidQuery.warningCount === 0
-        ) {
+        const { insertId, affectedRows, warningCount } =
+          data.insertSupplierCidQuery
+        if (affectedRows === 1 && warningCount === 0) {
           Notify("success", `${newSupplierCid} Added`)
         } else {
           Notify("warning", "Error", data.err)
@@ -170,16 +159,13 @@ const SupplierCIDs = (props) => {
   }
 
   const handleCellEdit = (params) => {
-    const id = params.data.id
+    const { id } = params.data
     const newSupplierCid = params.data.derenCID
 
     fetch(
       `/api/settings/edit/suppliercids?id=${id}&suppliercid=${encodeURIComponent(
         newSupplierCid
-      )}`,
-      {
-        method: "get",
-      }
+      )}`
     )
       .then((resp) => resp.json())
       .then((data) => {

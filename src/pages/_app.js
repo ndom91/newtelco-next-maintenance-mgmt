@@ -2,25 +2,23 @@ import { useEffect } from "react"
 import Head from "next/head"
 import { Provider } from "next-auth/client"
 import { H } from "highlight.run"
-// import ErrorBoundary from "@/newtelco/errorboundary"
-// import Store from "@/newtelco/store"
 const LogRocket = require("logrocket")
 const setupLogRocketReact = require("logrocket-react")
 
 import "./style/app.css"
 import "./style/ntTheme.less"
 import "./style/index.css"
-// import "rsuite/lib/styles/index.less"
 import "algolia-react-autocomplete/build/css/index.css"
 
 const App = ({ Component, pageProps }) => {
-  // const ConditionalWrap = ({ condition, wrap, children }) =>
-  //   condition ? wrap(children) : children
-
   const { session } = pageProps
 
   useEffect(() => {
-    if (typeof window !== "undefined" && session) {
+    if (
+      typeof window !== "undefined" &&
+      process.env.NODE_ENV !== "development" &&
+      session
+    ) {
       H.init("3ng2zrg1")
       H.identify(session.user.email, {
         name: session.user.name,
@@ -37,10 +35,6 @@ const App = ({ Component, pageProps }) => {
 
   return (
     <Provider session={pageProps.session}>
-      {/* <ConditionalWrap
-        condition={process.env.NEXT_PUBLIC_ENV === "production"}
-        wrap={(children) => <ErrorBoundary>{children}</ErrorBoundary>}
-      > */}
       <Head>
         <title>Newtelco Maintenance</title>
         <meta name="msapplication-TileColor" content="#67b246" />
@@ -80,7 +74,6 @@ const App = ({ Component, pageProps }) => {
         />
       </Head>
       <Component {...pageProps} />
-      {/* </ConditionalWrap> */}
     </Provider>
   )
 }

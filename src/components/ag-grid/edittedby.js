@@ -1,5 +1,3 @@
-import React from "react"
-
 export const EdittedBy = ({ node }) => {
   let avatarFile = "avatar.svg"
   if (node?.data?.bearbeitetvon) {

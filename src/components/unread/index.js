@@ -1,8 +1,8 @@
-import React, { useEffect } from "react"
+import { useEffect } from "react"
 import Link from "next/link"
 import { Panel, Icon } from "rsuite"
-import "./unread.css"
 import useStore from "../store"
+import "./unread.css"
 
 const UnreadBadge = () => {
   const count = useStore((state) => state.count)

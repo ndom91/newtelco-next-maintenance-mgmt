@@ -72,7 +72,7 @@ const Inbox = ({ session, inboxItems }) => {
         }
       })
     }
-  }, [])
+  }, [inboxMails])
 
   const toggle = (mailId) => {
     if (mailId) {
@@ -161,7 +161,7 @@ const Inbox = ({ session, inboxItems }) => {
     return (
       <Layout>
         <MaintPanel header="Inbox">
-          {inboxMails.length !== 0 ? (
+          {inboxMails.length === 0 ? (
             <FlexboxGrid
               justify="center"
               align="middle"

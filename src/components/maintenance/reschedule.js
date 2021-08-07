@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react"
+import { useEffect, useState, useRef } from "react"
 import { AgGridReact } from "ag-grid-react"
 import {
   StartDateTime,
@@ -73,15 +73,13 @@ const RescheduleGrid = ({ maintId, user, handleCalendarUpdate }) => {
   })
 
   useEffect(() => {
-    fetch(`/api/reschedule?id=${maintId}`, {
-      method: "get",
-    })
+    fetch(`/api/reschedule?id=${maintId}`)
       .then((resp) => resp.json())
       .then((data) => {
         setRescheduleData(data.reschedules)
       })
       .catch((err) => console.error(`Error Loading Reschedules - ${err}`))
-  }, [maintId])
+  }, [maintId, setRescheduleData])
 
   const gridOptions = {
     defaultColDef: {
@@ -187,7 +185,7 @@ const RescheduleGrid = ({ maintId, user, handleCalendarUpdate }) => {
   }
 
   const handleRescheduleSave = () => {
-    const timezone = reschedule.timezone
+    const { timezone } = reschedule
     const newStartDateTime = moment
       .tz(reschedule.startDateTime, timezone)
       .utc()
@@ -250,18 +248,13 @@ const RescheduleGrid = ({ maintId, user, handleCalendarUpdate }) => {
       })
       .catch((err) => console.error(`Error Saving Reschedule - ${err}`))
 
-    fetch(`/api/reschedule/increment?id=${maintId}`, {
-      method: "get",
-    })
-      .then((resp) => resp.json())
-      .then((data) => {
-        // console.log(data.rescheduleInc)
-      })
-      .catch((err) => console.error(`Error Incrementing Reschedule - ${err}`))
+    fetch(`/api/reschedule/increment?id=${maintId}`).catch((err) =>
+      console.error(`Error Incrementing Reschedule - ${err}`)
+    )
   }
 
   const handleRescheduleCellEdit = (params) => {
-    const rcounter = params.data.rcounter
+    const { rcounter } = params.data
     const newStartDateTime = moment(params.data.startDateTime).format(
       "YYYY.MM.DD HH:mm:ss"
     )

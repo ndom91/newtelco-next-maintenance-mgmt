@@ -1,11 +1,9 @@
 import React, { useState } from "react"
 import Head from "next/head"
-// import Store from "./store"
 import useStore from "./store"
 
 const UnreadCount = () => {
   const [faviconEl, setFaviconEl] = useState({})
-  // const store = Store.useStore(t)
   const count = useStore((state) => state.count)
 
   const getFavicon = (count) => {
@@ -59,19 +57,11 @@ const UnreadCount = () => {
     (count) => {
       if (typeof window !== "undefined" && count !== 0) {
         const fav = getFavicon(count)
-        // fav && setFaviconEl(fav)
         setFaviconEl(fav)
       }
     },
     (state) => state.count
   )
-
-  // store.on("count").subscribe(async (count) => {
-  //   if (typeof window !== "undefined" && count !== 0) {
-  //     const fav = getFavicon(count)
-  //     fav && setFaviconEl(fav)
-  //   }
-  // })
 
   return <Head>{`${faviconEl}`}</Head>
 }

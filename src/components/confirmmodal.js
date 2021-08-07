@@ -1,4 +1,3 @@
-import React from "react"
 import { Modal, FlexboxGrid, ButtonGroup, ButtonToolbar, Button } from "rsuite"
 
 const ConfirmModal = ({

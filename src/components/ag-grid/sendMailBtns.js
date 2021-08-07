@@ -1,16 +1,22 @@
-import React from "react"
 import { ButtonGroup, IconButton, Icon } from "rsuite"
 
-export const sendMailBtns = (props) => {
+export const sendMailBtns = ({ data }) => {
+  const {
+    maintenanceRecipient,
+    kundenCID,
+    frozen,
+    name,
+    protected: prot,
+  } = data
   return (
     <ButtonGroup>
       <IconButton
         onClick={() =>
           props.context.prepareDirectSend(
-            props.data.maintenanceRecipient,
-            props.data.kundenCID,
-            props.data.frozen,
-            props.data.name
+            maintenanceRecipient,
+            kundenCID,
+            frozen,
+            name
           )
         }
         size="sm"
@@ -20,9 +26,9 @@ export const sendMailBtns = (props) => {
       <IconButton
         onClick={() =>
           props.context.togglePreviewModal(
-            props.data.maintenanceRecipient,
-            props.data.kundenCID,
-            props.data.protected
+            maintenanceRecipient,
+            kundenCID,
+            prot
           )
         }
         size="sm"

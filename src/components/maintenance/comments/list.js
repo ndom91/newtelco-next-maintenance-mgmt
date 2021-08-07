@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import { useState, useEffect } from "react"
 import Comment from "./comment"
 import Notify from "@/newtelco-utils/notification"
 import {
@@ -19,12 +19,10 @@ const CommentList = ({ user, id, initialComment }) => {
     if (id === "NEW") {
       return
     }
-    fetch(`/api/comments?m=${id}`, {
-      method: "get",
-    })
+    fetch(`/api/comments?m=${id}`)
       .then((resp) => resp.json())
       .then((data) => {
-        let comments = data.comments
+        let { comments } = data
         if (initialComment) {
           comments.push({
             user: "ndomino@newtelco.de",
@@ -40,10 +38,10 @@ const CommentList = ({ user, id, initialComment }) => {
         }
       })
       .catch((err) => console.error(err))
-  }, [id])
+  }, [id, initialComment])
 
   useEffect(() => {
-    if (initialComment !== null) {
+    if (initialComment) {
       const newComments = comments
       const now = new Date()
       newComments.unshift({
@@ -53,7 +51,7 @@ const CommentList = ({ user, id, initialComment }) => {
       })
       setComments(newComments)
     }
-  }, [initialComment])
+  }, [comments, initialComment])
 
   const reverseArrayInPlace = (arr) => {
     for (var i = 0; i <= arr.length / 2; i++) {

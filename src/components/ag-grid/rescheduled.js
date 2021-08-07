@@ -1,4 +1,3 @@
-import React from "react"
 import { Badge } from "rsuite"
 
 export const RescheduledIcon = ({ node }) => {

@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from "react"
+import { useState, useEffect } from "react"
 import Head from "next/head"
-import MaintHeader from "./header"
 import useSWR from "swr"
 import dynamic from "next/dynamic"
-// import Store from "./store"
 import useStore from "./store"
+import MaintHeader from "./header"
 import { Container, Content, Modal, Button, FlexboxGrid } from "rsuite"
 
 if (typeof window !== "undefined") {
@@ -25,8 +24,6 @@ const UnreadFavicon = dynamic(() => import("./unreadcount"), { ssr: false })
 
 const Layout = ({ children }) => {
   // const [style, setStyle] = useState("/static/css/rsuite-default.css")
-  // const store = Store.useStore()
-  // const count = useStore((state) => state.count)
   const setCount = useStore((state) => state.setCount)
 
   const { data } = useSWR(
@@ -36,7 +33,6 @@ const Layout = ({ children }) => {
   )
 
   useEffect(() => {
-    // store.set("count")(data ? data.count : 0)
     setCount(data ? data.count : 0)
   }, [data, setCount])
 

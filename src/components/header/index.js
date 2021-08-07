@@ -1,13 +1,12 @@
-import React from "react"
-import NextAuth from "next-auth/client"
+import { forwardRef } from "react"
+import { useSession } from "next-auth/client"
 import Link from "next/link"
-// import Store from "@/newtelco/store"
 import useStore from "../store"
 import SearchInput from "./search"
-import "./header.css"
 import { Header, Nav, Navbar, Dropdown, Avatar, Badge, Divider } from "rsuite"
+import "./header.css"
 
-const NextLink = React.forwardRef((props, ref) => {
+const NextLink = forwardRef((props, ref) => {
   const { href, as, external, ...rest } = props
   return (
     <Link href={external ? "" : href} as={external ? "" : as}>
@@ -21,16 +20,15 @@ const NavLink = (props) => (
 )
 
 const MaintHeader = () => {
-  const [session, loading] = NextAuth.useSession()
-  // const store = Store.useStore()
-  // const count = store.get("count")
+  const [session, loading] = useSession()
   const count = useStore((state) => state.count)
 
   let avatarPath
   if (!loading && session) {
-    const username = session.user.email?.match(/^([^@]*)@/)[1]
-    if (session.user.image) {
-      avatarPath = session.user.image
+    const { email, image, name } = session.user
+    const username = email?.match(/^([^@]*)@/)[1]
+    if (image) {
+      avatarPath = image
     } else if (
       [
         "alissitsin",
@@ -46,7 +44,7 @@ const MaintHeader = () => {
     ) {
       avatarPath = `/static/images/avatars/${username}.png`
     } else {
-      avatarPath = `https://i.pravatar.cc/128?u=${session.user.name}`
+      avatarPath = `https://i.pravatar.cc/128?u=${name}`
     }
   }
 

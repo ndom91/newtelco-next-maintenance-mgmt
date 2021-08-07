@@ -1,9 +1,8 @@
-import React from "react"
-import NextAuth from "next-auth/client"
+import { useSession } from "next-auth/client"
 import { Avatar, FlexboxGrid, Dropdown, Icon, IconButton } from "rsuite"
 
 const Comment = ({ data, handleDelete }) => {
-  const [session, loading] = NextAuth.useSession()
+  const [session, loading] = useSession()
   const username = data.user.match(/^([^@]*)@/)[1]
 
   return (

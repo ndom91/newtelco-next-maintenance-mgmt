@@ -1,6 +1,5 @@
 import { isValid, format } from "date-fns"
 
-// module.exports = {
 // deduplicate array of objects
 const getUnique = (arr, comp) => {
   const unique = arr
@@ -21,6 +20,5 @@ const convertDateTime = (datetime) => {
   }
   return newDateTime
 }
-// }
 
 export { getUnique, convertDateTime }

@@ -1,11 +1,12 @@
-import React, { useState } from "react"
+import { useState } from "react"
 import Notify from "@/newtelco-utils/notification"
 import { Tag, Whisper, Tooltip } from "rsuite"
 
-export const CustomerCid = (props) => {
+export const CustomerCid = ({ data }) => {
+  const { kundenCID } = data
   const [hover, setHover] = useState(false)
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(props.data.kundenCID)
+    navigator.clipboard.writeText(kundenCID)
     Notify("info", "Customer CID Copied to Clipboard")
   }
   return (
@@ -13,7 +14,7 @@ export const CustomerCid = (props) => {
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >
-      {props.data.kundenCID}
+      {kundenCID}
       <Whisper
         placement="bottom"
         speaker={<Tooltip>Copy to Clipboard</Tooltip>}
