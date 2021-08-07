@@ -1,6 +1,6 @@
 {
   "name": "next-maintenance",
-  "version": "2.8.2",
+  "version": "3.0.0",
   "description": "Newtelco Maintenance App",
   "scripts": {
     "dev": "NEXT_PUBLIC_ENV=development next -p 4000",

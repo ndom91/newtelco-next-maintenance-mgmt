@@ -1,18 +1,20 @@
 <img align="right" src="https://imgur.com/HPVFsC4.png" height="256" />
 
-# Newtelco MaintenanceDB
+# Network MaintenanceDB
 
-🚀 Rewrite of [maintenance.newtelco.de](https://maintenance.newtelco.de) with a modern stack.
+🚀 [maintenance.newtelco.de](https://maintenance.newtelco.de) with a modern stack.
+
+> Manage, update and notify your customers of maintenance windows and more! 🚧
 
 ## Features
 
-- Gmail API - Create maintenance entries directly from incoming Emails
+- Gmail API - Create maintenance entries directly from incoming emails
 - Google Translate API - Translate mails directly in the read preview
 - Google Calendar API - Create calendar entries from the application
 - Clean, professional, responsive UI
 - WYSIWYG Editor
 - Export data to CSV
-- LogRocket error tracking
+- Sentry + LogRocket
 - Keyboard Shortcuts
 
 ## Contributing
@@ -20,8 +22,9 @@
 There is an API sister project to this one located in the following repo: (`newtelco/api-maintenance`). This must be running during dev / prod to get anything going.
 
 #### Prerequisites:
+
 1. MySQL DB
-2. G Suite Service Account .json credential file
+2. Google Workspace Service Account .json credential file
 3. SMTP Server
 
 #### Frontend
@@ -40,8 +43,9 @@ This will then start the frontend on port `4000`
 
 This will then start the backend on port `4100`
 
-It is currently setup so that the host is dynamic, you can reverse proxy it out under any domain, however it is important that wherever you reverse proxy out the frontend, the backend must be under the location `/v1/api` of the same domain. So, for example, if you have the frontend available at `myapplication.com`, then the backend must be available at `myapplication.com/v1/api`. An example nginx config file is included in the [api repo](https://github.com/newtelco/api-maintenance).
+It is currently setup so that the host is dynamic, you can reverse proxy it out under any domain, however it is important that wherever you reverse proxy out the frontend, the backend must be available under the same domain, under the path prefix `/v1/api/..`. So, for example, if you have the frontend available at `myapplication.com`, then the backend must be available at `myapplication.com/v1/api`.
 
+An example nginx config file is included in the [api repository](https://github.com/newtelco/api-maintenance).
 
 ### Screenshots
 
