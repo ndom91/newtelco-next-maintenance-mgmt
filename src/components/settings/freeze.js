@@ -346,12 +346,11 @@ const Freeze = (props) => {
                     <Flatpickr
                       value={newStartDateTime}
                       data-enable-time
-                      weekNumbers
                       className="flatpickr"
                       onChange={handleNewStartChange}
                       options={{
                         time_24hr: "true",
-                        allow_input: "true",
+                        allowInput: "true",
                       }}
                     />
                   </FormGroup>
@@ -360,12 +359,11 @@ const Freeze = (props) => {
                     <Flatpickr
                       value={newEndDateTime}
                       data-enable-time
-                      weekNumbers
                       className="flatpickr"
                       onChange={handleNewEndChange}
                       options={{
                         time_24hr: "true",
-                        allow_input: "true",
+                        allowInput: "true",
                       }}
                     />
                   </FormGroup>

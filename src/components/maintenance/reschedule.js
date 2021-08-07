@@ -494,7 +494,7 @@ const RescheduleGrid = ({ maintId, user, handleCalendarUpdate }) => {
                     <label>Start Date/Time</label>
                     <Flatpickr
                       data-enable-time
-                      options={{ time_24hr: "true", allow_input: "true" }}
+                      options={{ time_24hr: "true", allowInput: "true" }}
                       className="flatpickr end-date-time"
                       value={reschedule.startDateTime || null}
                       onChange={(date) =>
@@ -506,7 +506,7 @@ const RescheduleGrid = ({ maintId, user, handleCalendarUpdate }) => {
                     <label>End Date/Time</label>
                     <Flatpickr
                       data-enable-time
-                      options={{ time_24hr: "true", allow_input: "true" }}
+                      options={{ time_24hr: "true", allowInput: "true" }}
                       className="flatpickr end-date-time"
                       value={reschedule.endDateTime || null}
                       onChange={(date) =>

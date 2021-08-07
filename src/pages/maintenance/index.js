@@ -102,7 +102,6 @@ const MyDateTime = ({ field, form, ...props }) => {
       value={field.value}
       disabled={props.maintId === "NEW"}
       data-enable-time
-      weekNumbers
       onChange={(option) => {
         const rawValue = moment(option[0])
           .format("YYYY-MM-DD HH:mm:ss")
@@ -130,7 +129,7 @@ const MyDateTime = ({ field, form, ...props }) => {
       }}
       options={{
         time_24hr: "true",
-        allow_input: "true",
+        allowInput: "true",
       }}
       className="flatpickr"
       render={({ defaultValue, ...props }, ref) => {
@@ -219,23 +218,25 @@ const AutoSave = ({ debounceMs, id }) => {
       style={{ color: "var(--grey2)", display: "flex", alignItems: "center" }}
     >
       <Whisper placement="top" speaker={<Tooltip>Last Saved</Tooltip>}>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="18"
-          height="18"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="var(--grey2)"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
-          <polyline points="17 21 17 13 7 13 7 21" />
-          <polyline points="7 3 7 8 15 8" />
-        </svg>
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="var(--grey2)"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+            <polyline points="17 21 17 13 7 13 7 21" />
+            <polyline points="7 3 7 8 15 8" />
+          </svg>
+          <span style={{ marginLeft: "5px" }}>{result}</span>
+        </div>
       </Whisper>
-      <span style={{ marginLeft: "5px" }}>{result}</span>
     </div>
   )
 }
@@ -1594,26 +1595,33 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                                 placement="top"
                                 speaker={<Tooltip>Mail Arrived</Tooltip>}
                               >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  fill="none"
-                                  width="18"
-                                  height="18"
-                                  viewBox="0 0 24 24"
-                                  stroke="currentColor"
+                                <div
                                   style={{
-                                    marginRight: "3px",
+                                    display: "flex",
+                                    alignItems: "center",
                                   }}
                                 >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M3 19v-8.93a2 2 0 01.89-1.664l7-4.666a2 2 0 012.22 0l7 4.666A2 2 0 0121 10.07V19M3 19a2 2 0 002 2h14a2 2 0 002-2M3 19l6.75-4.5M21 19l-6.75-4.5M3 10l6.75 4.5M21 10l-6.75 4.5m0 0l-1.14.76a2 2 0 01-2.22 0l-1.14-.76"
-                                  />
-                                </svg>
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    width="18"
+                                    height="18"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                    style={{
+                                      marginRight: "3px",
+                                    }}
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M3 19v-8.93a2 2 0 01.89-1.664l7-4.666a2 2 0 012.22 0l7 4.666A2 2 0 0121 10.07V19M3 19a2 2 0 002 2h14a2 2 0 002-2M3 19l6.75-4.5M21 19l-6.75-4.5M3 10l6.75 4.5M21 10l-6.75 4.5m0 0l-1.14.76a2 2 0 01-2.22 0l-1.14-.76"
+                                    />
+                                  </svg>
+                                  {convertDateTime(maintenance.maileingang)}
+                                </div>
                               </Whisper>
-                              {convertDateTime(maintenance.maileingang)}
                             </div>
                           </Col>
                         </Row>
