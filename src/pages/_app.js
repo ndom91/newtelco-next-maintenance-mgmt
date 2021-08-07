@@ -1,7 +1,7 @@
 import { useEffect } from "react"
 import Head from "next/head"
 import { Provider } from "next-auth/client"
-import { H } from "highlight.run"
+// import { H } from "highlight.run"
 const LogRocket = require("logrocket")
 const setupLogRocketReact = require("logrocket-react")
 
@@ -19,11 +19,11 @@ const App = ({ Component, pageProps }) => {
       process.env.NODE_ENV !== "development" &&
       session
     ) {
-      H.init("3ng2zrg1")
-      H.identify(session.user.email, {
-        name: session.user.name,
-        email: session.user.email,
-      })
+      // H.init("3ng2zrg1")
+      // H.identify(session.user.email, {
+      //   name: session.user.name,
+      //   email: session.user.email,
+      // })
       LogRocket.init("ui2vht/next-maintenance")
       LogRocket.identify(session.user.email, {
         name: session.user.name,
