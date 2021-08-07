@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react"
+import { useCallback, useState, useEffect, useRef } from "react"
 import { getSession } from "next-auth/client"
 import Head from "next/head"
 import dynamic from "next/dynamic"
@@ -187,8 +187,8 @@ const MyTagPicker = ({ field, form, ...props }) => {
 
 const AutoSave = ({ debounceMs, id }) => {
   const formik = useFormikContext()
-  const [lastSaved, setLastSaved] = React.useState(null)
-  const debouncedSubmit = React.useCallback(
+  const [lastSaved, setLastSaved] = useState(null)
+  const debouncedSubmit = useCallback(
     debounce(
       () =>
         formik
@@ -199,11 +199,11 @@ const AutoSave = ({ debounceMs, id }) => {
     [debounceMs, formik.submitForm]
   )
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (id !== "NEW") {
       debouncedSubmit()
     }
-  }, [debouncedSubmit, formik.values])
+  }, [id, debouncedSubmit, formik.values])
 
   let result = null
 
@@ -241,7 +241,6 @@ const AutoSave = ({ debounceMs, id }) => {
 }
 
 const Maintenance = ({ session, serverData, suppliers }) => {
-  // const store = Store.useStore()
   const rescheduleData = useStore((state) => state.rescheduleData)
 
   const [maintenance, setMaintenance] = useState(serverData.profile)
@@ -456,10 +455,6 @@ const Maintenance = ({ session, serverData, suppliers }) => {
         cancelled: !!+cancelled,
         emergency: !!+emergency,
         done: !!+done,
-        // timezone: 'Europe/Amsterdam',
-        // timezoneLabel: '(GMT+01:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna',
-        // startDateTime: moment.tz(serverData.profile.startDateTime, 'GMT').tz('Etc/GMT-1').format('YYYY-MM-DD HH:mm:ss'),
-        // endDateTime: moment.tz(serverData.profile.endDateTime, 'GMT').tz('Etc/GMT-1').format('YYYY-MM-DD HH:mm:ss')
       })
       fetchSupplierCids(serverData.profile.lieferant)
 
@@ -626,9 +621,9 @@ const Maintenance = ({ session, serverData, suppliers }) => {
     const currentMaint = formRef.current.values
 
     if (
-      currentMaint.id === "" ||
-      currentMaint.startDateTime === "" ||
-      currentMaint.endDateTime === ""
+      !currentMaint.id ||
+      !currentMaint.startDateTime ||
+      !currentMaint.endDateTime
     ) {
       Notify("warning", "Missing Required Fields")
       return
@@ -765,16 +760,16 @@ const Maintenance = ({ session, serverData, suppliers }) => {
       toggleConfirmFreezeModal()
       return
     }
-    const body = htmlBody || mailBodyText
-    let subject = subj || mailPreviewSubject
-    const to = recipient || mailPreviewRecipients
+    const body = htmlBody ?? mailBodyText
+    let subject = subj ?? mailPreviewSubject
+    const to = recipient ?? mailPreviewRecipients
 
     fetch("/v1/api/mail/send", {
       method: "post",
       body: JSON.stringify({
-        body: body,
-        subject: subject,
-        to: to,
+        body,
+        subject,
+        to,
       }),
       headers: {
         "Content-Type": "application/json",
@@ -782,8 +777,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
     })
       .then((resp) => resp.json())
       .then((data) => {
-        const status = data.response.status
-        const statusText = data.response.statusText
+        const { status, statusText } = data.response
 
         if (status === 200 && statusText === "OK") {
           updateSentProgress()
@@ -808,9 +802,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
             if (isFromPreview) {
               setOpenPreviewModal(!openPreviewModal)
             }
-            if (gridApi.current) {
-              gridApi.current.refreshCells()
-            }
+            gridApi?.current?.refreshCells()
             const maintId = maintenance.id
             const user = session.user.email
             const action = "sent to"
@@ -855,33 +847,27 @@ const Maintenance = ({ session, serverData, suppliers }) => {
   }
 
   const updateSentProgress = () => {
-    if (customerCids.length !== 0) {
+    if (customerCids.length) {
       let progressSent = 0
       customerCids.forEach((cid) => {
         if (cid.sent === 1 || cid.sent === 2) {
           progressSent += 1
         }
       })
-      const result = (progressSent / customerCids.length) * 100
-      setSentProgress(result)
+      setSentProgress((progressSent / customerCids.length) * 100)
     }
   }
 
   const handleCalendarCreate = () => {
-    const company = maintenance.name
-    const maintId = maintenance.id
     const currentMaint = formRef.current.values
-    const startDateTime = currentMaint.startDateTime
-    const endDateTime = currentMaint.endDateTime
+    const { name: company, id: maintId } = maintenance
+    const { startDateTime, endDateTime } = currentMaint
 
-    let derenCidString = []
-    currentMaint.supplierCids?.forEach((supplierCidId) => {
+    const derenCidString = currentMaint.supplierCids?.map((supplierCidId) => {
       const supplierCid = supplierCids.find(
         (supplier) => supplier.value === supplierCidId
       )
-      if (supplierCid) {
-        derenCidString.push(supplierCid?.label || "")
-      }
+      return supplierCid?.label ?? ""
     })
 
     let cids = ""
@@ -898,13 +884,13 @@ const Maintenance = ({ session, serverData, suppliers }) => {
     fetch("/v1/api/calendar/create", {
       method: "post",
       body: JSON.stringify({
-        company: company,
-        cids: cids,
-        supplierCID: derenCidString.join(" ").trim(),
-        maintId: maintId,
+        company,
+        cids,
+        maintId,
         startDateTime: startDE,
         endDateTime: endDE,
         user: session.user.email,
+        supplierCID: derenCidString.join(" ").trim(),
       }),
       headers: {
         "Content-Type": "application/json",
@@ -912,8 +898,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
     })
       .then((resp) => resp.json())
       .then((data) => {
-        const status = data.status
-        const statusText = data.statusText
+        const { status, statusText } = data
 
         if (status === 200 && statusText === "OK") {
           Notify("success", "Calendar Entry Created")
@@ -946,21 +931,19 @@ const Maintenance = ({ session, serverData, suppliers }) => {
   }
 
   function handleCalendarUpdate(startDateTime, endDateTime, rcounter) {
-    const calId = maintenance.calendarId
-    const company = maintenance.name
-    const maintId = maintenance.id
+    const { calendarId: calId, name: company, id: maintId } = maintenance
     const currentMaint = formRef.current.values
 
-    let derenCid = ""
+    let supplierCID = ""
     currentMaint.supplierCids.forEach((supp) => {
       const supplierLabel = supplierCids.filter(
         (supplier) => supplier.value === supp
       )
       if (supplierLabel[0].label) {
-        derenCid += ` ${supplierLabel[0].label}`
+        supplierCID += ` ${supplierLabel[0].label}`
       }
     })
-    derenCid = derenCid.trim()
+    supplierCID = supplierCID.trim()
 
     let cids = ""
     customerCids.forEach((cid) => {
@@ -972,14 +955,14 @@ const Maintenance = ({ session, serverData, suppliers }) => {
       fetch("/v1/api/calendar/reschedule", {
         method: "post",
         body: JSON.stringify({
-          company: company,
-          cids: cids,
-          supplierCID: derenCid,
-          maintId: maintId,
-          calId: calId,
-          startDateTime: startDateTime,
-          endDateTime: endDateTime,
-          rcounter: rcounter,
+          company,
+          cids,
+          maintId,
+          calId,
+          startDateTime,
+          endDateTime,
+          rcounter,
+          supplierCID,
         }),
         headers: {
           "Content-Type": "application/json",
@@ -1025,9 +1008,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
         )
         return
       }
-      fetch(`/v1/api/mail/${mailId}`, {
-        method: "get",
-      })
+      fetch(`/v1/api/mail/${mailId}`)
         .then((resp) => resp.json())
         .then((data) => {
           let mailBody
@@ -1088,9 +1069,9 @@ const Maintenance = ({ session, serverData, suppliers }) => {
     fetch("/api/maintenances/save/create", {
       method: "post",
       body: JSON.stringify({
-        bearbeitetvon: bearbeitetvon,
-        lieferant: lieferant,
-        mailId: mailId,
+        bearbeitetvon,
+        lieferant,
+        mailId,
         updatedAt: updatedAtFormatted,
         maileingang: incomingFormatted,
       }),
@@ -1137,13 +1118,13 @@ const Maintenance = ({ session, serverData, suppliers }) => {
   }
 
   const generateMailSubject = () => {
-    const rData = rescheduleData
-    let text = rData.length !== 0 ? " [RESCHEDULED]" : ""
+    // const rData = rescheduleData
+    let text = rescheduleData ? " [RESCHEDULED]" : ""
     text += formRef.current.values.emergency ? " [EMERGENCY]" : ""
     text += formRef.current.values.cancelled ? " [CANCELLED]" : ""
     text += " Planned Work Notification - NT-" + maintenance.id
-    if (rData.length !== 0) {
-      text += "-" + rData[rData.length - 1].rcounter
+    if (rescheduleData) {
+      text += "-" + rescheduleData[rescheduleData.length - 1].rcounter
     }
     setMailPreviewSubject(text.trim())
     return text
@@ -1403,9 +1384,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
           disabled={maintenance.id === "NEW"}
           value={field.value}
           onChange={(option) => {
-            fetch(`/api/lieferantcids?id=${option}`, {
-              method: "get",
-            })
+            fetch(`/api/lieferantcids?id=${option}`)
               .then((resp) => resp.json())
               .then((data) => {
                 if (!data.lieferantCIDsResult) {
@@ -1432,7 +1411,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
             form.setFieldValue(field.name, option)
             form.setFieldValue("supplierCids", [])
           }}
-          data={suppliers?.companies || []}
+          data={suppliers?.companies ?? []}
           placeholder="Please select a Supplier"
         />
       )

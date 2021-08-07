@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react"
 import { getSession } from "next-auth/client"
+import Image from "next/image"
 import Layout from "@/newtelco/layout"
 import RequireLogin from "@/newtelco/require-login"
 import MaintPanel from "@/newtelco/panel"
@@ -160,17 +161,18 @@ const Inbox = ({ session, inboxItems }) => {
     return (
       <Layout>
         <MaintPanel header="Inbox">
-          {inboxMails.length === 0 ? (
+          {inboxMails.length !== 0 ? (
             <FlexboxGrid
               justify="center"
               align="middle"
               style={{ margin: "40px 0" }}
             >
               <FlexboxGrid.Item>
-                <img
+                <Image
                   src="/static/images/inbox0.svg"
+                  width="400px"
+                  height="400px"
                   alt="Inbox"
-                  style={{ width: "400px" }}
                 />
                 <h4 style={{ textAlign: "center" }}>
                   Congrats, nothing to do!
