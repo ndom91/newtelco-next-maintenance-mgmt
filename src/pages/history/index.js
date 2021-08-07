@@ -37,7 +37,6 @@ const History = ({ session, data }) => {
       resizable: true,
       sortable: true,
       filter: true,
-      selectable: true,
     },
     columnDefs: [
       {
@@ -139,7 +138,6 @@ const History = ({ session, data }) => {
         resizable: false,
         sortable: false,
         filter: false,
-        selectable: false,
         width: 105,
         pinned: "right",
         cellRenderer: "complete",

@@ -87,7 +87,6 @@ const RescheduleGrid = ({ maintId, user, handleCalendarUpdate }) => {
       sortable: true,
       filter: true,
       editable: true,
-      selectable: true,
     },
     columnDefs: [
       {

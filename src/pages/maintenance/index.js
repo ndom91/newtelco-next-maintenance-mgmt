@@ -234,7 +234,7 @@ const AutoSave = ({ debounceMs, id }) => {
             <polyline points="17 21 17 13 7 13 7 21" />
             <polyline points="7 3 7 8 15 8" />
           </svg>
-          <span style={{ marginLeft: "5px" }}>{result}</span>
+          <span style={{ marginLeft: "5px" }}>{convertDateTime(result)}</span>
         </div>
       </Whisper>
     </div>
@@ -340,7 +340,6 @@ const Maintenance = ({ session, serverData, suppliers }) => {
       resizable: true,
       sortable: true,
       filter: true,
-      selectable: true,
     },
     columnDefs: [
       {
@@ -1004,8 +1003,8 @@ const Maintenance = ({ session, serverData, suppliers }) => {
       if (mailId === "NT") {
         Notify(
           "warning",
-          "No Mail Available",
-          "This Maintenance was manually created."
+          "Mail Not Available",
+          "Maintenance was created manually."
         )
         return
       }

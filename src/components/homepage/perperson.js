@@ -1,6 +1,6 @@
 import useSWR from "swr"
 import { Bar } from "@nivo/bar"
-import { Panel, Loader, Icon } from "rsuite"
+import { Panel, Loader, Icon, Tag } from "rsuite"
 
 const BarChart = () => {
   const { data } = useSWR(
@@ -53,9 +53,9 @@ const BarChart = () => {
           borderRadius={3}
           borderWidth={0}
           tooltip={({ id, value, data, color }) => (
-            <strong style={{ color: "#67b246" }}>
-              {data.person}: {value} maintenances
-            </strong>
+            <Tag color="green">
+              {data.person}: <strong>{value}</strong>
+            </Tag>
           )}
         />
       </Panel>

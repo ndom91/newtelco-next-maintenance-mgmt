@@ -1,4 +1,5 @@
 import { useSession } from "next-auth/client"
+import { convertDateTime } from "@/newtelco/maintenance/helper"
 import { Avatar, FlexboxGrid, Dropdown, Icon, IconButton } from "rsuite"
 
 const Comment = ({ data, handleDelete }) => {
@@ -13,7 +14,6 @@ const Comment = ({ data, handleDelete }) => {
           circle
           style={{
             color: "var(--primary)",
-            border: "2px solid var(--primary)",
           }}
         />
       </FlexboxGrid.Item>
@@ -28,12 +28,12 @@ const Comment = ({ data, handleDelete }) => {
         >
           <span
             style={{
-              color: "var(--grey2)",
+              color: "var(--grey3)",
               fontSize: "0.8rem",
               marginBottom: "20px",
             }}
           >
-            {data.datetime}
+            {convertDateTime(data.datetime)}
           </span>
           <span style={{ marginBottom: "10px" }}>{data.body}</span>
         </div>

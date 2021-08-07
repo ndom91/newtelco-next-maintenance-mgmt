@@ -35,7 +35,6 @@ const SupplierCIDs = (props) => {
       resizable: true,
       sortable: true,
       filter: true,
-      selectable: true,
       editable: true,
     },
     columnDefs: [

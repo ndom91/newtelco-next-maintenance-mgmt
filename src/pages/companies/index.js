@@ -28,7 +28,6 @@ const Companies = ({ session, suppliers, company }) => {
       resizable: true,
       sortable: true,
       filter: true,
-      selectable: true,
     },
     columnDefs: [
       {

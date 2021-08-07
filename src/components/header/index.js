@@ -134,14 +134,7 @@ const MaintHeader = () => {
               className="header-dropdown"
               noCaret
               placement="bottomEnd"
-              icon={
-                <Avatar
-                  size="md"
-                  circle
-                  src={avatarPath}
-                  style={{ border: "1px solid #67b246" }}
-                />
-              }
+              icon={<Avatar size="md" circle src={avatarPath} />}
             >
               <Dropdown.Item
                 panel

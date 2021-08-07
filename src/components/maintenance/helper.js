@@ -14,7 +14,7 @@ const getUnique = (arr, comp) => {
 const convertDateTime = (datetime) => {
   let newDateTime
   if (isValid(new Date(datetime))) {
-    newDateTime = format(new Date(datetime), "dd.M.yyyy, HH:mm:ss")
+    newDateTime = format(new Date(datetime), "dd.MM.yyyy, HH:mm:ss")
   } else {
     newDateTime = datetime
   }
