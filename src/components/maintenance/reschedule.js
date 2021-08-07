@@ -8,7 +8,7 @@ import {
 } from "@/newtelco/ag-grid"
 import "ag-grid-community/dist/styles/ag-grid.css"
 import "ag-grid-community/dist/styles/ag-theme-material.css"
-import Store from "@/newtelco/store"
+import useStore from "@/newtelco/store"
 import { Rnd } from "react-rnd"
 import moment from "moment-timezone"
 import Flatpickr from "react-flatpickr"
@@ -56,7 +56,8 @@ const rescheduleReasons = [
 ]
 
 const RescheduleGrid = ({ maintId, user, handleCalendarUpdate }) => {
-  const store = Store.useStore()
+  const setRescheduleData = useStore((state) => state.setRescheduleData)
+  const rescheduleData = useStore((state) => state.rescheduleData)
   const rescheduleGridApi = useRef()
   const [openRescheduleModal, setOpenRescheduleModal] = useState(false)
   const [openConfirmDeleteModal, setOpenConfirmDeleteModal] = useState(false)
@@ -70,7 +71,6 @@ const RescheduleGrid = ({ maintId, user, handleCalendarUpdate }) => {
     id: null,
     rcounter: null,
   })
-  // const [store.get('rescheduleData'), store.set('rescheduleData')] = useState([])
 
   useEffect(() => {
     fetch(`/api/reschedule?id=${maintId}`, {
@@ -78,10 +78,10 @@ const RescheduleGrid = ({ maintId, user, handleCalendarUpdate }) => {
     })
       .then((resp) => resp.json())
       .then((data) => {
-        store.set("rescheduleData")(data.reschedules)
+        setRescheduleData(data.reschedules)
       })
       .catch((err) => console.error(`Error Loading Reschedules - ${err}`))
-  }, [])
+  }, [maintId])
 
   const gridOptions = {
     defaultColDef: {
@@ -167,7 +167,7 @@ const RescheduleGrid = ({ maintId, user, handleCalendarUpdate }) => {
 
   const handleRescheduleGridReady = (params) => {
     rescheduleGridApi.current = params.api
-    params.api.setRowData(store.get("rescheduleData"))
+    params.api.setRowData(rescheduleData)
   }
 
   /// /////////////////////////////////////////////////////////
@@ -208,7 +208,7 @@ const RescheduleGrid = ({ maintId, user, handleCalendarUpdate }) => {
         impact: reschedule.impact,
         sdt: newStartDateTime,
         edt: newEndDateTime,
-        rcounter: store.get("rescheduleData").length + 1,
+        rcounter: rescheduleData.length + 1,
         user: user,
         reason: rescheduleReasons.find(
           (reason) => reason.value === reschedule.reason
@@ -224,9 +224,9 @@ const RescheduleGrid = ({ maintId, user, handleCalendarUpdate }) => {
         if (data.insertRescheduleQuery.affectedRows === 1) {
           setOpenRescheduleModal(!openRescheduleModal)
           Notify("success", "Reschedule Save Complete")
-          const data = store.get("rescheduleData")
+          const data = rescheduleData
           data.push({
-            rcounter: store.get("rescheduleData").length + 1,
+            rcounter: rescheduleData.length + 1,
             startDateTime: moment(newStartDateTime).format(),
             endDateTime: moment(newEndDateTime).format(),
             impact: reschedule.impact,
@@ -236,7 +236,7 @@ const RescheduleGrid = ({ maintId, user, handleCalendarUpdate }) => {
             sent: 0,
           })
 
-          store.set("rescheduleData")(data)
+          setRescheduleData(data)
 
           setReschedule({
             impact: "",
@@ -295,7 +295,7 @@ const RescheduleGrid = ({ maintId, user, handleCalendarUpdate }) => {
   }
 
   function toggleRescheduleSentBtn(rcounter) {
-    const newRescheduleData = store.get("rescheduleData")
+    const newRescheduleData = rescheduleData
     // TODO: fix dis!
     // const reschedIndex = newRescheduleData.findIndex(el => el.rcounter === rcounter)
     // console.log(reschedIndex, newRescheduleData, rcounter)
@@ -309,7 +309,7 @@ const RescheduleGrid = ({ maintId, user, handleCalendarUpdate }) => {
       newRescheduleData[rcounter - 1].sent = 1
       newSentStatus = 1
     }
-    store.set("rescheduleData")(newRescheduleData)
+    setRescheduleData(newRescheduleData)
 
     fetch("/api/reschedule/sent", {
       method: "post",
@@ -365,14 +365,12 @@ const RescheduleGrid = ({ maintId, user, handleCalendarUpdate }) => {
       .then((data) => {
         if (data.deleteRescheduleQuery.affectedRows === 1) {
           Notify("success", "Reschedule Delete Success")
-          const newRescheduleData = store
-            .get("rescheduleData")
-            .filter(
-              (resched) => resched.rcounter !== rescheduleToDelete.rcounter
-            )
+          const newRescheduleData = rescheduleData.filter(
+            (resched) => resched.rcounter !== rescheduleToDelete.rcounter
+          )
           rescheduleGridApi.current.setRowData(newRescheduleData)
           setOpenConfirmDeleteModal(!openConfirmDeleteModal)
-          store.set("rescheduleData")(newRescheduleData)
+          setRescheduleData(newRescheduleData)
         } else {
           Notify("error", "Reschedule Delete Error")
         }
@@ -411,7 +409,7 @@ const RescheduleGrid = ({ maintId, user, handleCalendarUpdate }) => {
           >
             <AgGridReact
               gridOptions={gridOptions}
-              rowData={store.get("rescheduleData")}
+              rowData={rescheduleData}
               onGridReady={handleRescheduleGridReady}
               pagination
               onCellEditingStopped={handleRescheduleCellEdit}

@@ -55,7 +55,7 @@ const History = ({ session, data }) => {
         width: 100,
         pinned: "left",
         cellRenderer: "maintId",
-        sort: { direction: "asc", priority: 0 },
+        sort: "desc",
       },
       {
         headerName: "By",

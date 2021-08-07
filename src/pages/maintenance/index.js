@@ -5,7 +5,7 @@ import dynamic from "next/dynamic"
 import Router, { useRouter } from "next/router"
 
 import Layout from "@/newtelco/layout"
-import Store from "@/newtelco/store"
+import useStore from "@/newtelco/store"
 import MaintPanel from "@/newtelco/panel"
 import RequireLogin from "@/newtelco/require-login"
 import ConfirmModal from "@/newtelco/confirmmodal"
@@ -241,7 +241,8 @@ const AutoSave = ({ debounceMs, id }) => {
 }
 
 const Maintenance = ({ session, serverData, suppliers }) => {
-  const store = Store.useStore()
+  // const store = Store.useStore()
+  const rescheduleData = useStore((state) => state.rescheduleData)
 
   const [maintenance, setMaintenance] = useState(serverData.profile)
   const [frozenCompany, setFrozenCompany] = useState("")
@@ -662,25 +663,25 @@ const Maintenance = ({ session, serverData, suppliers }) => {
       maintenanceIntro = `We would like to inform you that these planned works (<b>NT-${maintenance.id}</b>) have been labelled as <b>emergency</b> works on the following CID(s):`
     }
 
-    if (store.get("rescheduleData").length !== 0) {
-      const latest = store.get("rescheduleData").length - 1
-      const newStart = moment(
-        store.get("rescheduleData")[latest].startDateTime
-      ).format("YYYY-MM-DD HH:mm:ss")
-      const newEnd = moment(
-        store.get("rescheduleData")[latest].endDateTime
-      ).format("YYYY-MM-DD HH:mm:ss")
-      const newImpact = store.get("rescheduleData")[latest].impact
-      const newReason = store.get("rescheduleData")[latest].reason.toLowerCase()
-      const rcounter = store.get("rescheduleData")[latest].rcounter
-      if (cancelled && store.get("rescheduleData")[latest]) {
+    if (rescheduleData.length) {
+      const latest = rescheduleData.length - 1
+      const newStart = moment(rescheduleData[latest].startDateTime).format(
+        "YYYY-MM-DD HH:mm:ss"
+      )
+      const newEnd = moment(rescheduleData[latest].endDateTime).format(
+        "YYYY-MM-DD HH:mm:ss"
+      )
+      const newImpact = rescheduleData[latest].impact
+      const newReason = rescheduleData[latest].reason.toLowerCase()
+      const rcounter = rescheduleData[latest].rcounter
+      if (cancelled && rescheduleData[latest]) {
         maintenanceIntro = `We would like to inform you that these rescheduled planned works (<b>NT-${maintenance.id}-${rcounter}</b>) have been <b>cancelled</b>.<br><br>We are sorry for any inconveniences this may have caused.<br><footer>​<style>.sig{font-family:Century Gothic, sans-serif;font-size:9pt;color:#636266!important;}b.i{color:#4ca702;}.gray{color:#636266 !important;}a{text-decoration:none;color:#636266 !important;}</style><div class="sig"><div>Best regards <b class="i">|</b> Mit freundlichen Grüßen</div><br><div><b>Newtelco Maintenance Team</b></div><br><div>NewTelco GmbH <b class="i">|</b> Moenchhofsstr. 24 <b class="i">|</b> 60326 Frankfurt a.M. <b class="i">|</b> DE <br>www.newtelco.com <b class="i">|</b> 24/7 NOC  49 69 75 00 27 30 ​​<b class="i">|</b> <a style="color:#" href="mailto:service@newtelco.de">service@newtelco.de</a><br><br><div><img alt="sig" src="https://home.newtelco.de/sig.png" height="29" width="516"></div></div>​</footer><hr />`
       }
       maintenanceIntro = `We regret to inform you that the planned works have been <b>rescheduled</b> on the following CID(s):\n\n<br><br><b>${customerCID}</b><br><br>The maintenance has been rescheduled due to ${newReason}.<br><br>The new details are as follows:<br><table border="0" cellspacing="2" cellpadding="2" width="775px"><tr><td style='width: 205px;'>Maintenance ID:</td><td><b>NT-${maintenance.id}-${rcounter}</b></td></tr><tr><td>New Start date and time:</td><td><b>${newStart} (${tzSuffixRAW})</b></td></tr><tr><td>New Finish date and time:</td><td><b>${newEnd} (${tzSuffixRAW})</b></td></tr><tr><td>New Impact:</td><td><b>${newImpact}</b></td></tr></table><br>Thank you very much for your patience and cooperation.<br>`
 
-      if (store.get("rescheduleData").length > 1) {
+      if (rescheduleData.length > 1) {
         maintenanceIntro += "<br><hr><br><b>Previous Reschedules:</b><br>"
-        const oldReschedules = store.get("rescheduleData")
+        const oldReschedules = rescheduleData
         oldReschedules.pop()
         let index = oldReschedules.length
         const reversedReschedules = {
@@ -713,7 +714,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
       if (protection) {
         body = body + "<tr><td>Impact:</td><td>50ms Protection Switch</td></tr>"
       } else {
-        const impactText = currentMaint.impact || store.get("impactPlaceholder")
+        const impactText = currentMaint.impact || impactPlaceholder
         body = body + "<tr><td>Impact:</td><td>" + impactText + "</td></tr>"
       }
     }
@@ -1136,7 +1137,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
   }
 
   const generateMailSubject = () => {
-    const rData = store.get("rescheduleData")
+    const rData = rescheduleData
     let text = rData.length !== 0 ? " [RESCHEDULED]" : ""
     text += formRef.current.values.emergency ? " [EMERGENCY]" : ""
     text += formRef.current.values.cancelled ? " [CANCELLED]" : ""

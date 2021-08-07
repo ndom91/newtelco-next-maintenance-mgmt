@@ -84,7 +84,6 @@ const Companies = (props) => {
     gridApi.current = params.api
     gridApi.current.showLoadingOverlay()
     params.api.sizeColumnsToFit()
-    params.api.setSortModel({ colId: "name", sort: "asc" })
   }
 
   const toggleCompanyAdd = () => {

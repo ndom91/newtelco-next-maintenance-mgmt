@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react"
-import Store from "@/newtelco/store"
 import Comment from "./comment"
 import Notify from "@/newtelco-utils/notification"
 import {
@@ -13,7 +12,6 @@ import {
 } from "rsuite"
 
 const CommentList = ({ user, id, initialComment }) => {
-  const store = Store.useStore()
   const [comment, setComment] = useState("")
   const [comments, setComments] = useState([])
 

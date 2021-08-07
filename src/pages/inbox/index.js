@@ -5,7 +5,7 @@ import RequireLogin from "@/newtelco/require-login"
 import MaintPanel from "@/newtelco/panel"
 import InboxItem from "@/newtelco/inboxitem"
 import Notify from "@/newtelco-utils/notification"
-import Store from "@/newtelco/store"
+import useStore from "@/newtelco/store"
 import useSWR from "swr"
 import DOMPurify from "dompurify"
 import {
@@ -23,7 +23,8 @@ import {
 } from "rsuite"
 
 const Inbox = ({ session, inboxItems }) => {
-  const store = Store.useStore()
+  const count = useStore((state) => state.count)
+  const setCount = useStore((state) => state.setCount)
   const [isOpen, setIsOpen] = useState(false)
   const [faviconLoading, setFaviconLoading] = useState(false)
   const [modalInfo, setModalInfo] = useState({})
@@ -142,13 +143,13 @@ const Inbox = ({ session, inboxItems }) => {
       .then((data) => {
         if (data.status === "complete") {
           Notify("success", "Message Deleted")
-          const newUnread = store.get("count") - 1
+          const newUnread = count - 1
           const array = inboxMails
           const index = inboxMails.findIndex((el) => el.id === data.id)
           if (index !== -1) {
             array.splice(index, 1)
             setInboxMails(array)
-            store.set("count")(newUnread)
+            setCount(newUnread)
           }
         }
       })
