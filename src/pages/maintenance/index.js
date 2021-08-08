@@ -596,7 +596,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
   /// /////////////////////////////////////////////////////////
 
   // prepare mail from direct-send button
-  function prepareDirectSend(recipient, customerCID, frozen, companyName) {
+  const prepareDirectSend = (recipient, customerCID, frozen, companyName) => {
     if (frozen) {
       setFrozenState({
         recipient: recipient,
@@ -616,11 +616,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
     // TODO: everything that can be changed by form = currentMaint, everythign else =hook maintenance
     const currentMaint = formRef.current.values
 
-    if (
-      !currentMaint.id ||
-      !currentMaint.startDateTime ||
-      !currentMaint.endDateTime
-    ) {
+    if (!currentMaint.startDateTime || !currentMaint.endDateTime) {
       Notify("warning", "Missing Required Fields")
       return
     }
@@ -735,7 +731,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
   }
 
   // send out the created mail
-  const sendMail = (
+  const sendMail = async (
     recipient,
     customerCid,
     subj,
@@ -760,7 +756,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
     let subject = subj ?? mailPreviewSubject
     const to = recipient ?? mailPreviewRecipients
 
-    fetch("/v1/api/mail/send", {
+    await fetch("/v1/api/mail/send", {
       method: "post",
       body: JSON.stringify({
         body,
@@ -1116,7 +1112,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
     text += formRef.current.values.emergency ? " [EMERGENCY]" : ""
     text += formRef.current.values.cancelled ? " [CANCELLED]" : ""
     text += " Planned Work Notification - NT-" + maintenance.id
-    if (rescheduleData) {
+    if (rescheduleData.length) {
       text += "-" + rescheduleData[rescheduleData.length - 1].rcounter
     }
     setMailPreviewSubject(text.trim())
@@ -1539,7 +1535,6 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                       setMaintHistory(values)
                       if (values.supplierCids && !customerCids.length) {
                         fetchCustomerCids(values.supplierCids)
-                        console.log("1")
                       }
                       if (Object.keys(diff).length) {
                         if (maintenance.id === "NEW") {
