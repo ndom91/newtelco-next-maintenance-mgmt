@@ -20,26 +20,58 @@ const Settings = ({ session, router }) => {
       <Nav appearance="subtle">
         <Nav.Item key={tab} componentClass="div" active={tab === "companies"}>
           <Link href={{ pathname: "/settings", query: { tab: "companies" } }}>
-            <a>Companies</a>
+            <a
+              style={{
+                color: "#595b5e",
+                fontWeight: "400",
+                fontSize: "14px",
+              }}
+            >
+              Companies
+            </a>
           </Link>
         </Nav.Item>
         <Nav.Item componentClass="div" active={tab === "suppliercids"}>
           <Link
             href={{ pathname: "/settings", query: { tab: "suppliercids" } }}
           >
-            <a>Supplier CIDs</a>
+            <a
+              style={{
+                color: "#595b5e",
+                fontWeight: "400",
+                fontSize: "14px",
+              }}
+            >
+              Supplier CIDs
+            </a>
           </Link>
         </Nav.Item>
         <Nav.Item componentClass="div" active={tab === "customercids"}>
           <Link
             href={{ pathname: "/settings", query: { tab: "customercids" } }}
           >
-            <a>Customer CIDs</a>
+            <a
+              style={{
+                color: "#595b5e",
+                fontWeight: "400",
+                fontSize: "14px",
+              }}
+            >
+              Customer CIDs
+            </a>
           </Link>
         </Nav.Item>
         <Nav.Item componentClass="div" active={tab === "freeze"}>
           <Link href={{ pathname: "/settings", query: { tab: "freeze" } }}>
-            <a>Freeze</a>
+            <a
+              style={{
+                color: "#595b5e",
+                fontWeight: "400",
+                fontSize: "14px",
+              }}
+            >
+              Freeze
+            </a>
           </Link>
         </Nav.Item>
       </Nav>

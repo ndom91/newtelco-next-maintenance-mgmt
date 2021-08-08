@@ -51,7 +51,7 @@ const History = ({ session, data }) => {
       {
         headerName: "ID",
         field: "id",
-        width: 100,
+        width: 110,
         pinned: "left",
         cellRenderer: "maintId",
         sort: "desc",
@@ -339,12 +339,12 @@ const History = ({ session, data }) => {
                 }
                 style={{
                   padding: "0 20px",
-                  color: "#272c36",
+                  color: "#595b5e",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "space-between",
                   fontFamily: "Fira Sans",
-                  fontWeight: "200",
+                  fontWeight: "400",
                   fontSize: "14px",
                 }}
               >
@@ -372,10 +372,10 @@ const History = ({ session, data }) => {
                   padding: "0 20px",
                   display: "flex",
                   alignItems: "center",
-                  color: "#272c36",
+                  color: "#595b5e",
                   justifyContent: "space-between",
                   fontFamily: "Fira Sans",
-                  fontWeight: "200",
+                  fontWeight: "400",
                   fontSize: "14px",
                 }}
               >
@@ -402,11 +402,11 @@ const History = ({ session, data }) => {
                 style={{
                   padding: "0 20px",
                   display: "flex",
-                  color: "#272c36",
+                  color: "#595b5e",
                   alignItems: "center",
                   justifyContent: "space-between",
                   fontFamily: "Fira Sans",
-                  fontWeight: "200",
+                  fontWeight: "400",
                   fontSize: "14px",
                 }}
               >
