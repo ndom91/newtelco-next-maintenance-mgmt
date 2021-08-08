@@ -13,7 +13,7 @@ import {
   Avatar,
 } from "rsuite"
 
-const InboxItem = ({ toggle, mail, index, handleDelete }) => {
+const InboxItem = ({ toggle, mail, handleDelete }) => {
   const [loading, setLoading] = useState(true)
   const [faviconUrl, setFaviconUrl] = useState("")
 

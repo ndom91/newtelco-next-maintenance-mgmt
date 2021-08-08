@@ -6,6 +6,7 @@ import SearchInput from "./search"
 import { Header, Nav, Navbar, Dropdown, Avatar, Badge, Divider } from "rsuite"
 import "./header.css"
 
+/* eslint-disable react/display-name */
 const NextLink = forwardRef((props, ref) => {
   const { href, as, external, ...rest } = props
   return (

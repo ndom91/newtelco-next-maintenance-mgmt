@@ -20,7 +20,7 @@ import {
   Loader,
 } from "rsuite"
 
-const Companies = (props) => {
+const Companies = () => {
   const gridOptions = {
     defaultColDef: {
       resizable: true,
@@ -323,7 +323,7 @@ const Companies = (props) => {
   )
 }
 
-Companies.getInitialProps = async ({ req, query }) => {
+Companies.getInitialProps = async ({ req }) => {
   const host = req && (req.headers["x-forwarded-host"] ?? req.headers["host"])
   let protocol = "https:"
   if (host.indexOf("localhost") > -1) {

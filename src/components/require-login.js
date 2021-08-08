@@ -1,4 +1,3 @@
-import { useEffect } from "react"
 import Link from "next/link"
 import { Container, FlexboxGrid, Panel, Content, Button, Col } from "rsuite"
 import "../pages/auth/signin.css"

@@ -22,7 +22,7 @@ import {
   Loader,
 } from "rsuite"
 
-const CustomerCIDs = (props) => {
+const CustomerCIDs = () => {
   const gridApi = useRef()
   const gridColumnApi = useRef()
   const [newNewtelcoCid, setNewNewtelcoCid] = useState("")
@@ -395,7 +395,7 @@ const CustomerCIDs = (props) => {
     </div>
   )
 }
-CustomerCIDs.getInitialProps = async ({ req, query }) => {
+CustomerCIDs.getInitialProps = async ({ req }) => {
   const host = req && (req.headers["x-forwarded-host"] ?? req.headers["host"])
   let protocol = "https:"
   if (host.indexOf("localhost") > -1) {

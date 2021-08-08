@@ -52,7 +52,7 @@ const BarChart = () => {
           motionDamping={26}
           borderRadius={3}
           borderWidth={0}
-          tooltip={({ id, value, data, color }) => (
+          tooltip={({ value, data }) => (
             <Tag color="green">
               {data.person}: <strong>{value}</strong>
             </Tag>

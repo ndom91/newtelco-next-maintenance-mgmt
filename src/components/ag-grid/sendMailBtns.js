@@ -1,6 +1,6 @@
 import { ButtonGroup, IconButton, Icon } from "rsuite"
 
-export const sendMailBtns = ({ data }) => {
+export const sendMailBtns = ({ data, context }) => {
   const {
     maintenanceRecipient,
     kundenCID,
@@ -8,16 +8,12 @@ export const sendMailBtns = ({ data }) => {
     name,
     protected: prot,
   } = data
+  const { prepareDirectSend, togglePreviewModal } = context
   return (
     <ButtonGroup>
       <IconButton
         onClick={() =>
-          props.context.prepareDirectSend(
-            maintenanceRecipient,
-            kundenCID,
-            frozen,
-            name
-          )
+          prepareDirectSend(maintenanceRecipient, kundenCID, frozen, name)
         }
         size="sm"
         appearance="ghost"
@@ -25,11 +21,7 @@ export const sendMailBtns = ({ data }) => {
       />
       <IconButton
         onClick={() =>
-          props.context.togglePreviewModal(
-            maintenanceRecipient,
-            kundenCID,
-            prot
-          )
+          togglePreviewModal(maintenanceRecipient, kundenCID, prot)
         }
         size="sm"
         appearance="ghost"

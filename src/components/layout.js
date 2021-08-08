@@ -1,10 +1,9 @@
-import { useState, useEffect } from "react"
-import Head from "next/head"
+import { useEffect } from "react"
 import useSWR from "swr"
 import dynamic from "next/dynamic"
 import useStore from "./store"
 import MaintHeader from "./header"
-import { Container, Content, Modal, Button, FlexboxGrid } from "rsuite"
+import { Container, Content, FlexboxGrid } from "rsuite"
 
 if (typeof window !== "undefined") {
   const WebFontLoader = require("webfontloader")
@@ -23,7 +22,6 @@ if (typeof window !== "undefined") {
 const UnreadFavicon = dynamic(() => import("./unreadcount"), { ssr: false })
 
 const Layout = ({ children }) => {
-  // const [style, setStyle] = useState("/static/css/rsuite-default.css")
   const setCount = useStore((state) => state.setCount)
 
   const { data } = useSWR(
@@ -36,21 +34,8 @@ const Layout = ({ children }) => {
     setCount(data ? data.count : 0)
   }, [data, setCount])
 
-  // store.on("night").subscribe((night) => {
-  //   fetch(
-  //     night ? "/static/css/rsuite-dark.css" : "/static/css/rsuite-default.css"
-  //   )
-  //     .then((response) => response.text())
-  //     .then((data) => {
-  //       setStyle(data)
-  //     })
-  // })
-
   return (
     <div>
-      {/* <Head>
-        <style>{style}</style>
-      </Head> */}
       <UnreadFavicon />
       <Container>
         <MaintHeader />

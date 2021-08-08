@@ -222,9 +222,7 @@ const History = ({ session, data }) => {
   }
 
   const handleDelete = () => {
-    fetch(`/api/maintenances/delete?maintId=${idToDelete}`, {
-      method: "get",
-    })
+    fetch(`/api/maintenances/delete?maintId=${idToDelete}`)
       .then((resp) => resp.json())
       .then((data) => {
         if (data.status === 200 && data.statusText === "OK") {
@@ -259,9 +257,7 @@ const History = ({ session, data }) => {
 
   const handleSelectOpen = () => {
     if (newMaintenanceInfo.length === 0) {
-      fetch("/api/companies/select", {
-        method: "get",
-      })
+      fetch("/api/companies/select")
         .then((resp) => resp.json())
         .then((data) => {
           setNewMaintenanceInfo(data.companiesDomains)

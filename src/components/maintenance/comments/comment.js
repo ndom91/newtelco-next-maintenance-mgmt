@@ -1,6 +1,6 @@
 import { useSession } from "next-auth/client"
 import { convertDateTime } from "@/newtelco/maintenance/helper"
-import { Avatar, FlexboxGrid, Dropdown, Icon, IconButton } from "rsuite"
+import { Avatar, FlexboxGrid, Dropdown, IconButton } from "rsuite"
 
 const Comment = ({ data, handleDelete }) => {
   const [session, loading] = useSession()

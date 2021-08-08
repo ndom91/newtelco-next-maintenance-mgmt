@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Editor as TinyEditor } from "@tinymce/tinymce-react"
 import {
   Modal,

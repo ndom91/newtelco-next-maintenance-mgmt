@@ -7,6 +7,7 @@
     "ci": "NEXT_PUBLIC_ENV=CI next start -p 4000",
     "start": "NEXT_PUBLIC_ENV=production next start -p 4000",
     "build": "next build",
+    "lint": "next lint",
     "prettier": "prettier --check \"src/**/*.{js,jsx,json}\"",
     "prettier:fix": "prettier --write \"src/**/*.{js,jsx,json}\"",
     "cy:open": "cypress open",
@@ -42,7 +43,6 @@
     "dompurify": "^2.2.8",
     "file-saver": "^2.0.2",
     "formik": "^2.1.5",
-    "highlight.run": "^2.3.2",
     "just-debounce-it": "^1.1.0",
     "lodash.isarray": "^4.0.0",
     "lodash.isequal": "^4.5.0",
@@ -65,7 +65,6 @@
     "serverless-mysql": "^1.5.4",
     "sql-template-strings": "^2.2.2",
     "swr": "^0.3.0",
-    "undux": "^5.2.0",
     "webfontloader": "^1.6.28",
     "zustand": "^3.5.7"
   },
@@ -93,27 +92,42 @@
   },
   "eslintConfig": {
     "rules": {
-      "no-unused-vars": 0,
-      "no-undef": 0,
       "no-irregular-whitespace": 0,
-      "no-const-assign": 0,
       "react/prop-types": 0,
-      "react/display-name": 0,
-      "react/jsx-no-undef": 0,
-      "react/no-unescaped-entities": 0
+      "@next/next/no-img-element": 0,
+      "import/no-anonymous-default-export": 0
     },
     "extends": [
       "eslint:recommended",
       "next",
-      "plugin:prettier/recommended"
-    ]
+      "prettier"
+    ],
+    "globals": {
+      "require": "readonly",
+      "module": "readonly",
+      "process": "readonly",
+      "fetch": "readonly",
+      "useEffect": "readonly",
+      "Set": "readonly",
+      "Symbol": "readonly",
+      "setTimeout": "readonly",
+      "navigator": "readonly",
+      "window": "readonly",
+      "document": "readonly",
+      "atob": "readonly",
+      "ArrayBuffer": "readonly",
+      "Uint8Array": "readonly",
+      "Blob": "readonly",
+      "exports": "writable",
+      "console": "readonly"
+    }
   },
   "simple-git-hooks": {
     "commit-msg": "npx --no-install commitlint --edit \"$1\"",
     "pre-commit": "npx --no-install lint-staged"
   },
   "lint-staged": {
-    "*.{js,jsx,json}": [
+    "*.{js,jsx,json,html,css}": [
       "npm run prettier:fix"
     ]
   },

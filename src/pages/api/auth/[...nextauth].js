@@ -7,8 +7,8 @@ const cypressLogin = Providers.Credentials({
     username: { label: "Username", type: "text", placeholder: "jsmith" },
     password: { label: "Password", type: "password" },
   },
-  async authorize(credentials) {
-    const user = (credentials) => {
+  async authorize() {
+    const user = () => {
       return {
         id: 1,
         name: "J Smith",
@@ -25,7 +25,6 @@ const cypressLogin = Providers.Credentials({
 })
 
 const options = {
-  site: process.env.SITE,
   providers: [
     Providers.Google({
       clientId: process.env.GOOGLE_ID,
@@ -37,9 +36,6 @@ const options = {
     signin: "/auth/signin",
   },
   secret: "tfS86sjmpEqrNuEvbYaC3rQ6bREfoVOOw2u9NmdXUjiEOPE9lmTm8lPiw6disNnY",
-  session: {
-    jwt: true,
-  },
   jwt: {
     secret: "aLjPYy0Xk3YJn5AGmyv9gcSYJa60nKP5Qf86i9oPpckiMTCksHNrNaCodjLauB8T",
   },

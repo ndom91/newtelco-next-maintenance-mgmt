@@ -4,7 +4,6 @@ import useStore from "./store"
 
 const UnreadCount = () => {
   const [faviconEl, setFaviconEl] = useState({})
-  const count = useStore((state) => state.count)
 
   const getFavicon = (count) => {
     const favicon = document.getElementById("favicon")
@@ -53,7 +52,7 @@ const UnreadCount = () => {
     }
   }
 
-  const unsubCount = useStore.subscribe(
+  useStore.subscribe(
     (count) => {
       if (typeof window !== "undefined" && count !== 0) {
         const fav = getFavicon(count)

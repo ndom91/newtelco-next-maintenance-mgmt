@@ -1,4 +1,3 @@
-import { useEffect } from "react"
 import Link from "next/link"
 import { Panel, Icon } from "rsuite"
 import useStore from "../store"

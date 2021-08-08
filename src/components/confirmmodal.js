@@ -1,4 +1,4 @@
-import { Modal, FlexboxGrid, ButtonGroup, ButtonToolbar, Button } from "rsuite"
+import { Modal, FlexboxGrid, ButtonGroup, Button } from "rsuite"
 
 const ConfirmModal = ({
   header,

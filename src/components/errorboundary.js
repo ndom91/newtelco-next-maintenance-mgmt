@@ -59,11 +59,11 @@ export default class ErrorBoundary extends React.Component {
                       alt="error"
                     />
                     <h4 style={{ textAlign: "center", marginBottom: "10px" }}>
-                      Oops — something's gone wrong.
+                      Oops — something&lsquo;s gone wrong.
                     </h4>
                     <p>
                       If you would like to provide us more information, please
-                      select 'Report' below.
+                      select &lsquo;Report&lsquo; below.
                     </p>
                     <ButtonGroup
                       justified

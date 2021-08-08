@@ -9,6 +9,7 @@ import UnreadBadge from "@/newtelco/unread"
 
 const AreaChart = dynamic(() => import("../components/homepage/areachart"), {
   ssr: false,
+  /* eslint-disable react/display-name */
   loading: () => (
     <Panel
       bordered

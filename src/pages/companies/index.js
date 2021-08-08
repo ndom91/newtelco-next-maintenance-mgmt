@@ -52,7 +52,7 @@ const Companies = ({ session, suppliers, company }) => {
         field: "bearbeitetvon",
         cellRenderer: "edittedby",
         width: 110,
-        cellStyle: (params) => {
+        cellStyle: () => {
           return {
             display: "flex",
             alignItems: "center",

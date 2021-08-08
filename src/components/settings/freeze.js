@@ -21,11 +21,10 @@ import {
   FormGroup,
   Input,
   ControlLabel,
-  HelpBlock,
   Loader,
 } from "rsuite"
 
-const Freeze = (props) => {
+const Freeze = () => {
   const gridApi = useRef()
   const [openFreezeAdd, setOpenFreezeAdd] = useState(false)
   const [openConfirmDeleteModal, setOpenConfirmDelete] = useState(false)
@@ -94,9 +93,7 @@ const Freeze = (props) => {
       })
       .catch((err) => console.error(err))
     // fill Companies Select
-    fetch("/api/companies/selectmaint", {
-      method: "get",
-    })
+    fetch("/api/companies/selectmaint")
       .then((resp) => resp.json())
       .then((data) => {
         setCompanySelections(data.companies)
@@ -119,10 +116,6 @@ const Freeze = (props) => {
       value: selectedOption.value,
       label: selectedOption.label,
     })
-  }
-
-  const handleNotesChange = (event) => {
-    setNewNotes(event.target.value)
   }
 
   const handleNewStartChange = (date) => {

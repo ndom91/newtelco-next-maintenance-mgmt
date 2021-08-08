@@ -23,6 +23,7 @@ const CommentList = ({ user, id, initialComment }) => {
       .then((resp) => resp.json())
       .then((data) => {
         let { comments } = data
+        const now = new Date()
         if (initialComment) {
           comments.push({
             user: "ndomino@newtelco.de",

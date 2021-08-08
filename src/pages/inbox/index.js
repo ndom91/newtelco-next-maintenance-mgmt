@@ -52,9 +52,7 @@ const Inbox = ({ session, inboxItems }) => {
       inboxMails.forEach((mail, index) => {
         if (mail.faviconUrl.length === 0) {
           const mailDomain = mail.domain
-          fetch(`/v1/api/favicon?d=${mailDomain}`, {
-            method: "get",
-          })
+          fetch(`/v1/api/favicon?d=${mailDomain}`)
             .then((resp) => resp.json())
             .then((data) => {
               const iconUrl = data.icons

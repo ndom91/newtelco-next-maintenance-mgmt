@@ -395,7 +395,7 @@ const ReadModal = ({
             >
               {Array.isArray(maintenance.incomingAttachments) &&
                 maintenance.incomingAttachments.length !== 0 &&
-                maintenance.incomingAttachments.map((attachment, index) => {
+                maintenance.incomingAttachments.map((attachment) => {
                   return (
                     <Whisper
                       key={attachment.id}

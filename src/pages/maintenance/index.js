@@ -188,14 +188,15 @@ const AutoSave = ({ debounceMs, id }) => {
   const formik = useFormikContext()
   const [lastSaved, setLastSaved] = useState(null)
   const debouncedSubmit = useCallback(
-    debounce(
-      () =>
-        formik
-          .submitForm()
-          .then(() => setLastSaved(new Date().toLocaleString("de-DE"))),
-      debounceMs
-    ),
-    [debounceMs, formik.submitForm]
+    () =>
+      debounce(
+        () =>
+          formik
+            .submitForm()
+            .then(() => setLastSaved(new Date().toLocaleString("de-DE"))),
+        debounceMs
+      ),
+    [debounceMs, formik]
   )
 
   useEffect(() => {
@@ -423,9 +424,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
         0,
         session.user.email.indexOf("@")
       )
-      fetch(`/api/companies/domain?id=${serverData.profile.name}`, {
-        method: "get",
-      })
+      fetch(`/api/companies/domain?id=${serverData.profile.name}`)
         .then((resp) => resp.json())
         .then((data) => {
           if (!data.companyResults[0]) {
@@ -473,7 +472,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
         setImpactPlaceholder(impactCalculation)
       }
     }
-  }, [serverData.profile])
+  }, [serverData.profile, session?.user?.email])
 
   /// /////////////////////////////////////////////////////////
   //
@@ -501,9 +500,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
       setSupplierCids([{ label: "Invalid Supplier ID", value: "1" }])
       return
     }
-    fetch(`/api/lieferantcids?id=${lieferantId}`, {
-      method: "get",
-    })
+    fetch(`/api/lieferantcids?id=${lieferantId}`)
       .then((resp) => resp.json())
       .then((data) => {
         if (!data.lieferantCIDsResult) {
@@ -808,10 +805,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
             const action = "sent to"
             const field = activeCustomer.name
             fetch(
-              `/api/history?mid=${maintId}&user=${user}&field=${field}&action=${action}`,
-              {
-                method: "get",
-              }
+              `/api/history?mid=${maintId}&user=${user}&field=${field}&action=${action}`
             ).catch((err) => console.error(`Error updating Audit Log - ${err}`))
           }
         } else {
