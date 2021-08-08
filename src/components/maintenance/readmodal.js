@@ -41,12 +41,14 @@ const ReadModal = ({
   const [currentAttachmentName, setCurrentAttachmentName] = useState("")
   const [attachmentPopoverBody, setAttachmentPopoverBody] = useState("")
   const [faviconLoading, setFaviconLoading] = useState(true)
+
   const copySubjectToClipboard = () => {
     navigator.clipboard.writeText(
       maintenance.incomingSubject || maintenance.subject
     )
     Notify("info", "Subject Copied To Clipboard!")
   }
+
   const copyFromToClipboard = () => {
     navigator.clipboard.writeText(maintenance.incomingFrom || maintenance.from)
     Notify("info", "Sender Copied To Clipboard!")
@@ -54,17 +56,19 @@ const ReadModal = ({
 
   const fileTypeIcon = (filename) => {
     const fileExt = filename.match(/\.[0-9a-z]+$/i)
-    switch (fileExt[0]) {
-      case ".xlsx":
-        return "file-excel-o"
-      case ".xls":
-        return "file-excel-o"
-      case ".pdf":
-        return "file-pdf-o"
-      case ".html":
-        return "html5"
-      default:
-        return "file-o"
+    if (fileExt) {
+      switch (fileExt[0]) {
+        case ".xlsx":
+          return "file-excel-o"
+        case ".xls":
+          return "file-excel-o"
+        case ".pdf":
+          return "file-pdf-o"
+        case ".html":
+          return "html5"
+        default:
+          return "file-o"
+      }
     }
   }
 
@@ -81,14 +85,16 @@ const ReadModal = ({
       }
       return view
     }
+
     function downloadFile(base64, filename, mimeType) {
       const base64Fixed = fixBase64(base64)
       const fileData = new Blob([base64Fixed], { type: mimeType })
       saveAs(fileData, filename)
     }
-    if (id) {
-      let filetype = ""
-      const fileExt = filename.match(/\.[0-9a-z]+$/i)
+
+    let filetype = ""
+    const fileExt = filename.match(/\.[0-9a-z]+$/i)
+    if (fileExt) {
       switch (fileExt[0]) {
         case ".xlsx":
           filetype = "excel"
@@ -113,7 +119,7 @@ const ReadModal = ({
         base64 = base64.replace(/-/g, "+")
         const base64Fixed = fixBase64(base64)
         var fileData = new Blob([base64Fixed], {
-          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;",
+          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         })
 
         ExcelRenderer(fileData, (err, resp) => {
@@ -220,8 +226,6 @@ const ReadModal = ({
           </Dropdown.Menu>
         )
       }
-    } else {
-      setOpenAttachmentModal(!openAttachmentModal)
     }
   }
 

@@ -188,22 +188,21 @@ const AutoSave = ({ debounceMs, id }) => {
   const formik = useFormikContext()
   const [lastSaved, setLastSaved] = useState(null)
   const debouncedSubmit = useCallback(
-    () =>
-      debounce(
-        () =>
-          formik
-            .submitForm()
-            .then(() => setLastSaved(new Date().toLocaleString("de-DE"))),
-        debounceMs
-      ),
-    [debounceMs, formik]
+    debounce(
+      () =>
+        formik
+          .submitForm()
+          .then(() => setLastSaved(new Date().toLocaleString("de-DE"))),
+      debounceMs
+    ),
+    [debounceMs, formik.submitForm]
   )
 
   useEffect(() => {
     if (id !== "NEW") {
       debouncedSubmit()
     }
-  }, [id, debouncedSubmit, formik.values])
+  }, [debouncedSubmit, formik.values])
 
   let result = null
 
@@ -472,7 +471,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
         setImpactPlaceholder(impactCalculation)
       }
     }
-  }, [serverData.profile, session?.user?.email])
+  }, [serverData.profile])
 
   /// /////////////////////////////////////////////////////////
   //
@@ -1540,6 +1539,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                       setMaintHistory(values)
                       if (values.supplierCids && !customerCids.length) {
                         fetchCustomerCids(values.supplierCids)
+                        console.log("1")
                       }
                       if (Object.keys(diff).length) {
                         if (maintenance.id === "NEW") {

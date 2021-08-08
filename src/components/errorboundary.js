@@ -73,11 +73,11 @@ export default class ErrorBoundary extends React.Component {
                         componentClass="a"
                         href={`mailto:ndomino@newtelco.de?subject=${encodeURIComponent(
                           "Newtelco Maintenance - Error"
-                        )}&body=${encodeURIComponent(
+                        )}&body=Hi%20Team%2C%0A%0AError%3A%3Cpre%3E${encodeURIComponent(
                           this.state.error
                         )}%0D%0A%0D%0A${encodeURIComponent(
                           JSON.stringify(this.state.errorInfo)
-                        )}%0D%0A%0D%0AThanks`}
+                        )}%3C%2Fpre%3E%0D%0A%0D%0AThanks`}
                       >
                         Report
                       </Button>
