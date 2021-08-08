@@ -45,7 +45,7 @@ const Companies = ({ session, suppliers, company }) => {
         width: 100,
         pinned: "left",
         cellRenderer: "maintId",
-        sort: { direction: "desc", priority: 0 },
+        sort: "desc",
       },
       {
         headerName: "By",
