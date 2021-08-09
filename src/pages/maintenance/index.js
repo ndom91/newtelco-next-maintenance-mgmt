@@ -1107,8 +1107,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
   }
 
   const generateMailSubject = () => {
-    // const rData = rescheduleData
-    let text = rescheduleData ? " [RESCHEDULED]" : ""
+    let text = rescheduleData.length > 0 ? " [RESCHEDULED]" : ""
     text += formRef.current.values.emergency ? " [EMERGENCY]" : ""
     text += formRef.current.values.cancelled ? " [CANCELLED]" : ""
     text += " Planned Work Notification - NT-" + maintenance.id
