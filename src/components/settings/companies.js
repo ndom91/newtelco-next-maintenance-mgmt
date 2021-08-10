@@ -88,7 +88,9 @@ const Companies = () => {
   }
 
   const handleDelete = () => {
-    fetch(`/api/settings/delete/companies?id=${companyToDelete.id}`)
+    fetch(`/api/settings/companies?id=${companyToDelete.id}`, {
+      method: "DELETE",
+    })
       .then((resp) => resp.json())
       .then((data) => {
         if (data.deleteCompanyQuery.affectedRows === 1) {
@@ -119,13 +121,17 @@ const Companies = () => {
   }
 
   const handleAddCompany = () => {
-    fetch(
-      `/api/settings/add/companies?name=${encodeURIComponent(
-        newName
-      )}&domain=${encodeURIComponent(newDomain)}&recipient=${encodeURIComponent(
-        newRecipient
-      )}`
-    )
+    fetch(`/api/settings/companies`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name: newName,
+        domain: newDomain,
+        recipient: newRecipient,
+      }),
+    })
       .then((resp) => resp.json())
       .then((data) => {
         const { insertId, affectedRows, warningCount } = data.insertCompanyQuery
@@ -154,13 +160,18 @@ const Companies = () => {
     const newDomain = params.data.mailDomain
     const newRecipient = params.data.maintenanceRecipient
 
-    fetch(
-      `/api/settings/edit/companies?id=${id}&name=${encodeURIComponent(
-        newName
-      )}&domain=${encodeURIComponent(newDomain)}&recipient=${encodeURIComponent(
-        newRecipient
-      )}`
-    )
+    fetch(`/api/settings/companies`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: id,
+        name: newName,
+        domain: newDomain,
+        recipient: newRecipient,
+      }),
+    })
       .then((resp) => resp.json())
       .then((data) => {
         if (data.updateCompanyQuery.affectedRows === 1) {
@@ -273,7 +284,9 @@ const Companies = () => {
                     />
                   </FormGroup>
                   <FormGroup>
-                    <ControlLabel>Recipients</ControlLabel>
+                    <ControlLabel>
+                      Recipients <small>(optional)</small>
+                    </ControlLabel>
                     <Input
                       key="input-recipient"
                       name="recipients"
@@ -321,20 +334,6 @@ const Companies = () => {
       )}
     </div>
   )
-}
-
-Companies.getInitialProps = async ({ req }) => {
-  const host = req && (req.headers["x-forwarded-host"] ?? req.headers["host"])
-  let protocol = "https:"
-  if (host.indexOf("localhost") > -1) {
-    protocol = "http:"
-  }
-  const pageRequest = `${protocol}//${host}/api/settings/companies`
-  const res = await fetch(pageRequest)
-  const json = await res.json()
-  return {
-    jsonData: json,
-  }
 }
 
 export default Companies
