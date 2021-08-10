@@ -74,6 +74,8 @@ const CustomerCIDs = () => {
         field: "protected",
         width: 80,
         cellRenderer: "protectedIcon",
+        cellEditor: "agSelectCellEditor",
+        cellEditorParams: { values: [true, false] },
         cellStyle: {
           display: "flex",
           justifyContent: "center",
@@ -140,10 +142,12 @@ const CustomerCIDs = () => {
   }
 
   const handleDelete = () => {
-    fetch(`/api/settings/delete/customercids?id=${customerCidIdToDelete}`)
+    fetch(`/api/settings/customercids?id=${customerCidIdToDelete}`, {
+      method: "DELETE",
+    })
       .then((resp) => resp.json())
       .then((data) => {
-        if (data.deleteCustomerCidQuery.affectedRows === 1) {
+        if (data.id) {
           Notify("success", `${customerNameToDelete} Deleted`)
         } else {
           Notify("warning", "Error", data.err)
@@ -172,20 +176,21 @@ const CustomerCIDs = () => {
   }
 
   const handleAddCustomerCid = () => {
-    fetch(
-      `/api/settings/add/customercids?customercid=${encodeURIComponent(
-        newNewtelcoCid
-      )}&company=${encodeURIComponent(
-        newCompanySelection.value
-      )}&protection=${encodeURIComponent(
-        newProtection
-      )}&supplier=${encodeURIComponent(newSupplierSelection.value)}`
-    )
+    fetch(`/api/settings/customercids`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        customercid: newNewtelcoCid,
+        company: newCompanySelection.value,
+        protection: newProtection,
+        supplier: newSupplierSelection.value,
+      }),
+    })
       .then((resp) => resp.json())
       .then((data) => {
-        const { insertId, affectedRows, warningCount } =
-          data.insertCustomerCidQuery
-        if (affectedRows === 1 && warningCount === 0) {
+        if (data.id) {
           Notify("success", `${newNewtelcoCid} Added`)
         } else {
           Notify("warning", "Error", data.err)
@@ -193,7 +198,7 @@ const CustomerCIDs = () => {
         const newRowData = rowData
         const newProtectionValue = newProtection ? "1" : "0"
         newRowData.push({
-          id: insertId,
+          id: data.id,
           derenCID: newSupplierSelection.label,
           kundenCID: newNewtelcoCid,
           name: newCompanySelection.label,
@@ -215,14 +220,20 @@ const CustomerCIDs = () => {
     const newCustomerCid = params.data.kundenCID
     const newProtected = params.data.protected
 
-    fetch(
-      `/api/settings/edit/customercids?id=${id}&customercid=${encodeURIComponent(
-        newCustomerCid
-      )}&protected=${encodeURIComponent(newProtected)}`
-    )
+    fetch(`/api/settings/customercids`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: id,
+        customercid: newCustomerCid,
+        protection: newProtected,
+      }),
+    })
       .then((resp) => resp.json())
       .then((data) => {
-        if (data.updateCustomerCidQuery.affectedRows === 1) {
+        if (data.id) {
           Notify("success", `${newCustomerCid} Updated`)
         } else {
           Notify("warning", "Error", data.err)

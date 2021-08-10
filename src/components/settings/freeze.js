@@ -129,10 +129,12 @@ const Freeze = () => {
   }
 
   const handleDelete = () => {
-    fetch(`/api/settings/delete/freeze?id=${freezeIdToDelete}`)
+    fetch(`/api/settings/freeze?id=${freezeIdToDelete}`, {
+      method: "DELETE",
+    })
       .then((resp) => resp.json())
       .then((data) => {
-        if (data.deleteFreezeQuery.affectedRows === 1) {
+        if (data.id) {
           Notify("success", `Freeze for ${freezeCompanyToDelete} Deleted`)
         } else {
           Notify("warning", "Error", data.err)
@@ -161,27 +163,28 @@ const Freeze = () => {
   }
 
   const handleFreezeAdd = () => {
-    fetch(
-      `/api/settings/add/freeze?companyid=${encodeURIComponent(
-        newCompany.value
-      )}&startdatetime=${encodeURIComponent(
-        newStartDateTime
-      )}&enddatetime=${encodeURIComponent(
-        newEndDateTime
-      )}&notes=${encodeURIComponent(newNotes)}`
-    )
+    fetch(`/api/settings/freeze`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        companyid: newCompany.value,
+        startDateTime: new Date(newStartDateTime).toISOString(),
+        endDateTime: new Date(newEndDateTime).toISOString(),
+        notes: newNotes,
+      }),
+    })
       .then((resp) => resp.json())
       .then((data) => {
-        const { insertId, affectedRows, warningCount } = data.insertFreezeQuery
-        const newCompanyName = newCompany.label
-        if (affectedRows === 1 && warningCount === 0) {
-          Notify("success", `Freeze for ${newCompanyName} Added`)
+        if (data.id) {
+          Notify("success", `Freeze for ${newCompany.label} Added`)
         } else {
           Notify("warning", "Error", data.err)
         }
         const newRowData = rowData
         newRowData.push({
-          id: insertId,
+          id: data.id,
           name: newCompany.label,
           companyId: newCompany.value,
           startDateTime: newStartDateTime,
@@ -211,16 +214,21 @@ const Freeze = () => {
     )
     const notes = params.data.notes
 
-    fetch(
-      `/api/settings/edit/freeze?id=${id}&startdate=${encodeURIComponent(
-        startdate
-      )}&enddate=${encodeURIComponent(enddate)}&notes=${encodeURIComponent(
-        notes
-      )}`
-    )
+    fetch(`/api/settings/freeze`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: id,
+        startdate: new Date(startdate).toISOString(),
+        enddate: new Date(enddate).toISOString(),
+        notes: notes,
+      }),
+    })
       .then((resp) => resp.json())
       .then((data) => {
-        if (data.updateFreezeQuery.affectedRows === 1) {
+        if (data.id) {
           Notify("success", `${params.data.name} Freeze Updated`)
         } else {
           Notify("warning", "Error", data.err)

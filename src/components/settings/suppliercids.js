@@ -99,10 +99,12 @@ const SupplierCIDs = () => {
   }
 
   const handleDelete = () => {
-    fetch(`/api/settings/delete/suppliercids?id=${supplierCidToDelete.id}`)
+    fetch(`/api/settings/suppliercids?id=${supplierCidToDelete.id}`, {
+      method: "DELETE",
+    })
       .then((resp) => resp.json())
       .then((data) => {
-        if (data.deleteSupplierCidQuery.affectedRows === 1) {
+        if (data.id) {
           Notify("success", `${supplierCidToDelete.name} Deleted`)
         } else {
           Notify("warning", "Error", data.err)
@@ -130,23 +132,26 @@ const SupplierCIDs = () => {
   }
 
   const handleAddSupplierCid = () => {
-    fetch(
-      `/api/settings/add/suppliercids?cid=${encodeURIComponent(
-        newSupplierCid
-      )}&company=${encodeURIComponent(newCompanySelection.value)}`
-    )
+    fetch(`/api/settings/suppliercids`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        cid: newSupplierCid,
+        company: newCompanySelection.value,
+      }),
+    })
       .then((resp) => resp.json())
       .then((data) => {
-        const { insertId, affectedRows, warningCount } =
-          data.insertSupplierCidQuery
-        if (affectedRows === 1 && warningCount === 0) {
+        if (data.id) {
           Notify("success", `${newSupplierCid} Added`)
         } else {
           Notify("warning", "Error", data.err)
         }
         const newRowData = rowData
         newRowData.push({
-          id: insertId,
+          id: data.id,
           derenCID: newSupplierCid,
           name: newCompanySelection.label,
         })
@@ -161,14 +166,19 @@ const SupplierCIDs = () => {
     const { id } = params.data
     const newSupplierCid = params.data.derenCID
 
-    fetch(
-      `/api/settings/edit/suppliercids?id=${id}&suppliercid=${encodeURIComponent(
-        newSupplierCid
-      )}`
-    )
+    fetch(`/api/settings/suppliercids`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: id,
+        suppliercid: newSupplierCid,
+      }),
+    })
       .then((resp) => resp.json())
       .then((data) => {
-        if (data.updateSupplierCidQuery.affectedRows === 1) {
+        if (data.id) {
           Notify("success", `${newSupplierCid} Updated`)
         } else {
           Notify("warning", "Error", data.err)
