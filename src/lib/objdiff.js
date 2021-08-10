@@ -1,7 +1,7 @@
-import transform from 'lodash.transform'
-import isEqual from 'lodash.isequal'
-import isArray from 'lodash.isarray'
-import isObject from 'lodash.isobject'
+import transform from "lodash.transform"
+import isEqual from "lodash.isequal"
+import isArray from "lodash.isarray"
+import isObject from "lodash.isobject"
 
 /**
  * Find difference between two objects

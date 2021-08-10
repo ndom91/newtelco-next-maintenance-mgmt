@@ -1,22 +1,21 @@
-import React, { useState } from 'react'
-import Head from 'next/head'
-import Store from './store'
+import React, { useState } from "react"
+import Head from "next/head"
+import useStore from "./store"
 
 const UnreadCount = () => {
   const [faviconEl, setFaviconEl] = useState({})
-  const store = Store.useStore()
 
-  const getFavicon = count => {
-    const favicon = document.getElementById('favicon')
+  const getFavicon = (count) => {
+    const favicon = document.getElementById("favicon")
     if (favicon) {
       const faviconSize = 16
 
-      const canvas = document.createElement('canvas')
+      const canvas = document.createElement("canvas")
       canvas.width = faviconSize
       canvas.height = faviconSize
 
-      const context = canvas.getContext('2d')
-      const img = document.createElement('img')
+      const context = canvas.getContext("2d")
+      const img = document.createElement("img")
       img.src = favicon.href
 
       img.onload = () => {
@@ -32,14 +31,14 @@ const UnreadCount = () => {
           0,
           2 * Math.PI
         )
-        context.fillStyle = '#FF0000'
+        context.fillStyle = "#FF0000"
         context.fill()
 
         // Draw Notification Number
         context.font = '9px "helvetica", sans-serif'
-        context.textAlign = 'center'
-        context.textBaseline = 'middle'
-        context.fillStyle = '#FFFFFF'
+        context.textAlign = "center"
+        context.textBaseline = "middle"
+        context.fillStyle = "#FFFFFF"
         context.fillText(
           count,
           canvas.width - faviconSize / 3,
@@ -47,18 +46,21 @@ const UnreadCount = () => {
         )
 
         // Replace favicon
-        favicon.href = canvas.toDataURL('image/png')
+        favicon.href = canvas.toDataURL("image/png")
         return favicon
       }
     }
   }
 
-  store.on('count').subscribe(async count => {
-    if (typeof window !== 'undefined' && count !== 0) {
-      const fav = getFavicon(count)
-      fav && setFaviconEl(fav)
-    }
-  })
+  useStore.subscribe(
+    (count) => {
+      if (typeof window !== "undefined" && count !== 0) {
+        const fav = getFavicon(count)
+        setFaviconEl(fav)
+      }
+    },
+    (state) => state.count
+  )
 
   return <Head>{`${faviconEl}`}</Head>
 }

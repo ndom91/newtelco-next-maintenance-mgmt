@@ -1,4 +1,4 @@
-import React from 'react'
+import React from "react"
 import {
   Container,
   Content,
@@ -7,7 +7,7 @@ import {
   Button,
   Panel,
   Col,
-} from 'rsuite'
+} from "rsuite"
 
 export default class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -25,12 +25,12 @@ export default class ErrorBoundary extends React.Component {
         <Container>
           <Content>
             <FlexboxGrid
-              justify='center'
-              align='middle'
+              justify="center"
+              align="middle"
               style={{
-                height: '70vh',
-                flexDirection: 'column',
-                marginTop: '30px',
+                height: "70vh",
+                flexDirection: "column",
+                marginTop: "30px",
               }}
             >
               <FlexboxGrid.Item
@@ -43,46 +43,46 @@ export default class ErrorBoundary extends React.Component {
               >
                 <Panel
                   header={
-                    <h4 style={{ textAlign: 'center' }}>
+                    <h4 style={{ textAlign: "center" }}>
                       Newtelco Maintenance
                     </h4>
                   }
                   bordered
                   shaded
-                  style={{ backgroundColor: '#fff', padding: '20px' }}
+                  style={{ backgroundColor: "#fff", padding: "20px" }}
                 >
-                  <Container className='container-border'>
+                  <Container className="container-border">
                     <img
-                      style={{ marginBottom: '50px' }}
-                      width='500px'
-                      src='/static/images/error.svg'
-                      alt='error'
+                      style={{ marginBottom: "50px" }}
+                      width="500px"
+                      src="/static/images/error.svg"
+                      alt="error"
                     />
-                    <h4 style={{ textAlign: 'center', marginBottom: '10px' }}>
-                      Oops — something's gone wrong.
+                    <h4 style={{ textAlign: "center", marginBottom: "10px" }}>
+                      Oops — something&lsquo;s gone wrong.
                     </h4>
                     <p>
                       If you would like to provide us more information, please
-                      select 'Report' below.
+                      select &lsquo;Report&lsquo; below.
                     </p>
                     <ButtonGroup
                       justified
-                      style={{ marginTop: '20px', width: '100%' }}
+                      style={{ marginTop: "20px", width: "100%" }}
                     >
                       <Button
-                        componentClass='a'
+                        componentClass="a"
                         href={`mailto:ndomino@newtelco.de?subject=${encodeURIComponent(
-                          'Newtelco Maintenance - Error'
-                        )}&body=${encodeURIComponent(
+                          "Newtelco Maintenance - Error"
+                        )}&body=Hi%20Team%2C%0A%0AError%3A%3Cpre%3E${encodeURIComponent(
                           this.state.error
                         )}%0D%0A%0D%0A${encodeURIComponent(
                           JSON.stringify(this.state.errorInfo)
-                        )}%0D%0A%0D%0AThanks`}
+                        )}%3C%2Fpre%3E%0D%0A%0D%0AThanks`}
                       >
                         Report
                       </Button>
                       <Button
-                        appearance='primary'
+                        appearance="primary"
                         onClick={() => window.location.reload(true)}
                       >
                         Try Again

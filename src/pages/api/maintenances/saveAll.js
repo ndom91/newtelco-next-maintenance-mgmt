@@ -1,5 +1,5 @@
-const db = require('../../../lib/db')
-const escape = require('sql-template-strings')
+const db = require("../../../lib/db")
+const escape = require("sql-template-strings")
 
 module.exports = async (req, res) => {
   const maintId = req.body.id
@@ -15,29 +15,29 @@ module.exports = async (req, res) => {
       emergency = ${values.emergency},
       startDateTime = ${values.startDateTime},
       endDateTime = ${values.endDateTime},
-      impact = ${values.impact || ''},
-      location = ${values.location || ''},
-      reason = ${values.reason || ''},
-      maintNote = ${values.maintNote || ''},
-      lieferant = ${values.supplier || ''},
-      derenCIDid = ${values.supplierCids ? values.supplierCids.join(',') : ''},
-      timezone = ${values.timezone || ''}
+      impact = ${values.impact || ""},
+      location = ${values.location || ""},
+      reason = ${values.reason || ""},
+      maintNote = ${values.maintNote || ""},
+      lieferant = ${values.supplier || ""},
+      derenCIDid = ${values.supplierCids ? values.supplierCids.join(",") : ""},
+      timezone = ${values.timezone || ""}
     WHERE id LIKE ${maintId}
   `)
   const fieldName = {
-    cancelled: 'cancelled',
-    done: 'done',
-    emergency: 'emergency',
-    startDateTime: 'start date/time',
-    endDateTime: 'end date/time',
-    impact: 'impact',
-    location: 'location',
-    reason: 'reason',
-    maintNote: 'notes',
-    supplier: 'supplier',
-    supplierCids: 'supplier cids',
-    timezone: 'timezone',
-    senderMaintenanceId: 'sender maintenance id',
+    cancelled: "cancelled",
+    done: "done",
+    emergency: "emergency",
+    startDateTime: "start date/time",
+    endDateTime: "end date/time",
+    impact: "impact",
+    location: "location",
+    reason: "reason",
+    maintNote: "notes",
+    supplier: "supplier",
+    supplierCids: "supplier cids",
+    timezone: "timezone",
+    senderMaintenanceId: "sender maintenance id",
   }
   let updateHistory
   if (field) {

@@ -1,11 +1,14 @@
-import { createConnectedStore } from 'undux'
+import create from "zustand"
 
-export default createConnectedStore({
+const useStore = create((set) => ({
   count: 0,
-  session: {},
-  maintenance: {},
-  impactPlaceholder: '',
-  comments: [],
+  setCount: (num) => {
+    set((state) => (state.count = num))
+  },
   rescheduleData: [],
-  night: false,
-})
+  setRescheduleData: (rescheduleMaint) => {
+    set((state) => (state.rescheduleData = rescheduleMaint))
+  },
+}))
+
+export default useStore

@@ -1,33 +1,31 @@
-import React from 'react'
-import { ButtonGroup, IconButton, Icon } from 'rsuite'
+import { ButtonGroup, IconButton, Icon } from "rsuite"
 
-export const sendMailBtns = props => {
+export const sendMailBtns = ({ data, context }) => {
+  const {
+    maintenanceRecipient,
+    kundenCID,
+    frozen,
+    name,
+    protected: prot,
+  } = data
+  const { prepareDirectSend, togglePreviewModal } = context
   return (
     <ButtonGroup>
       <IconButton
         onClick={() =>
-          props.context.prepareDirectSend(
-            props.data.maintenanceRecipient,
-            props.data.kundenCID,
-            props.data.frozen,
-            props.data.name
-          )
+          prepareDirectSend(maintenanceRecipient, kundenCID, frozen, name)
         }
-        size='sm'
-        appearance='ghost'
-        icon={<Icon icon='send' />}
+        size="sm"
+        appearance="ghost"
+        icon={<Icon icon="send" />}
       />
       <IconButton
         onClick={() =>
-          props.context.togglePreviewModal(
-            props.data.maintenanceRecipient,
-            props.data.kundenCID,
-            props.data.protected
-          )
+          togglePreviewModal(maintenanceRecipient, kundenCID, prot)
         }
-        size='sm'
-        appearance='ghost'
-        icon={<Icon icon='search' />}
+        size="sm"
+        appearance="ghost"
+        icon={<Icon icon="search" />}
       />
     </ButtonGroup>
   )

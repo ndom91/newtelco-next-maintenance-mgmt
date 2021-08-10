@@ -1,5 +1,4 @@
-const db = require('../../../lib/db')
-const escape = require('sql-template-strings')
+const db = require("../../../lib/db")
 
 module.exports = async (req, res) => {
   const companies = await db.query(`
