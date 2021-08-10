@@ -93,7 +93,7 @@ const Companies = () => {
     })
       .then((resp) => resp.json())
       .then((data) => {
-        if (data.deleteCompanyQuery.affectedRows === 1) {
+        if (data.id) {
           Notify("success", `${companyToDelete.name} Deleted`)
         } else {
           Notify("warning", "Error", data.err)
@@ -134,22 +134,21 @@ const Companies = () => {
     })
       .then((resp) => resp.json())
       .then((data) => {
-        const { insertId, affectedRows, warningCount } = data.insertCompanyQuery
-        if (affectedRows === 1 && warningCount === 0) {
+        if (data.id) {
           Notify("success", `${newName} Added`)
+          const newRowData = rowData
+          newRowData.push({
+            id: data.id,
+            mailDomain: newDomain,
+            maintenanceRecipient: newRecipient,
+            name: newName,
+          })
+          setRowData(newRowData)
+          gridApi.current.setRowData(newRowData)
         } else {
           Notify("warning", "Error", data.err)
         }
-        const newRowData = rowData
-        newRowData.push({
-          id: insertId,
-          mailDomain: newDomain,
-          maintenanceRecipient: newRecipient,
-          name: newName,
-        })
-        setRowData(newRowData)
         setOpenCompanyModal(!openCompanyModal)
-        gridApi.current.setRowData(newRowData)
       })
       .catch((err) => console.error(err))
   }
@@ -174,7 +173,7 @@ const Companies = () => {
     })
       .then((resp) => resp.json())
       .then((data) => {
-        if (data.updateCompanyQuery.affectedRows === 1) {
+        if (data.id) {
           Notify("success", `${newName} Updated`)
         } else {
           Notify("warning", "Error", data.err)
