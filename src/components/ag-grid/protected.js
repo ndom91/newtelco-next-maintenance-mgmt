@@ -1,6 +1,5 @@
 export const ProtectedIcon = ({ node }) => {
   if (node && node.data) {
-    console.log(node.data.protected, typeof node.data.protected)
     if (node.data.protected == 1 || node.data.protected == true) {
       // Lock Closed
       return (

@@ -62,8 +62,8 @@ const RescheduleGrid = ({ maintId, user, handleCalendarUpdate }) => {
   const [openRescheduleModal, setOpenRescheduleModal] = useState(false)
   const [openConfirmDeleteModal, setOpenConfirmDeleteModal] = useState(false)
   const [reschedule, setReschedule] = useState({
-    startDateTime: null,
-    endDateTime: null,
+    sdt: null,
+    edt: null,
     impact: "",
     reason: "",
   })
@@ -76,7 +76,7 @@ const RescheduleGrid = ({ maintId, user, handleCalendarUpdate }) => {
     fetch(`/api/reschedule?id=${maintId}`)
       .then((resp) => resp.json())
       .then((data) => {
-        setRescheduleData(data.reschedules)
+        setRescheduleData(data)
       })
       .catch((err) => console.error(`Error Loading Reschedules - ${err}`))
   }, [maintId, setRescheduleData])
@@ -99,13 +99,13 @@ const RescheduleGrid = ({ maintId, user, handleCalendarUpdate }) => {
       },
       {
         headerName: "Start",
-        field: "startDateTime",
+        field: "sdt",
         width: 170,
         cellRenderer: "startdateTime",
       },
       {
         headerName: "End",
-        field: "endDateTime",
+        field: "edt",
         width: 170,
         cellRenderer: "enddateTime",
       },
@@ -175,22 +175,22 @@ const RescheduleGrid = ({ maintId, user, handleCalendarUpdate }) => {
 
   const handleRescheduleStartDateTimeChange = (date) => {
     const startDateTime = moment(date[0]).format("YYYY-MM-DD HH:mm:ss")
-    setReschedule({ ...reschedule, startDateTime })
+    setReschedule({ ...reschedule, sdt: startDateTime })
   }
 
   const handleRescheduleEndDateTimeChange = (date) => {
     const endDateTime = moment(date[0]).format("YYYY-MM-DD HH:mm:ss")
-    setReschedule({ ...reschedule, endDateTime })
+    setReschedule({ ...reschedule, edt: endDateTime })
   }
 
   const handleRescheduleSave = () => {
     const { timezone } = reschedule
     const newStartDateTime = moment
-      .tz(reschedule.startDateTime, timezone)
+      .tz(reschedule.sdt, timezone)
       .utc()
       .format("YYYY-MM-DD HH:mm:ss")
     const newEndDateTime = moment
-      .tz(reschedule.endDateTime, timezone)
+      .tz(reschedule.edt, timezone)
       .utc()
       .format("YYYY-MM-DD HH:mm:ss")
     if (reschedule.reason === "" || reschedule.impact === "") {
@@ -198,13 +198,13 @@ const RescheduleGrid = ({ maintId, user, handleCalendarUpdate }) => {
       return
     }
 
-    fetch("/api/reschedule/save", {
-      method: "post",
+    fetch("/api/reschedule", {
+      method: "POST",
       body: JSON.stringify({
         mid: maintId,
         impact: reschedule.impact,
-        sdt: newStartDateTime,
-        edt: newEndDateTime,
+        sdt: moment(newStartDateTime).format(),
+        edt: moment(newEndDateTime).format(),
         rcounter: rescheduleData.length + 1,
         user: user,
         reason: rescheduleReasons.find(
@@ -212,20 +212,19 @@ const RescheduleGrid = ({ maintId, user, handleCalendarUpdate }) => {
         ).label,
       }),
       headers: {
-        "Access-Control-Allow-Origin": "*",
         "Content-Type": "application/json",
       },
     })
       .then((resp) => resp.json())
       .then((data) => {
-        if (data.insertRescheduleQuery.affectedRows === 1) {
+        if (data.id) {
           setOpenRescheduleModal(!openRescheduleModal)
           Notify("success", "Reschedule Save Complete")
           const data = rescheduleData
           data.push({
             rcounter: rescheduleData.length + 1,
-            startDateTime: moment(newStartDateTime).format(),
-            endDateTime: moment(newEndDateTime).format(),
+            sdt: moment(newStartDateTime).format(),
+            edt: moment(newEndDateTime).format(),
             impact: reschedule.impact,
             reason: rescheduleReasons.find(
               (reason) => reason.value === reschedule.reason
@@ -238,8 +237,8 @@ const RescheduleGrid = ({ maintId, user, handleCalendarUpdate }) => {
           setReschedule({
             impact: "",
             reason: "",
-            startDateTime: null,
-            endDateTime: null,
+            sdt: null,
+            edt: null,
           })
 
           rescheduleGridApi.current.setRowData(data)
@@ -254,12 +253,10 @@ const RescheduleGrid = ({ maintId, user, handleCalendarUpdate }) => {
 
   const handleRescheduleCellEdit = (params) => {
     const { rcounter } = params.data
-    const newStartDateTime = moment(params.data.startDateTime).format(
+    const newStartDateTime = moment(params.data.sdt).format(
       "YYYY.MM.DD HH:mm:ss"
     )
-    const newEndDateTime = moment(params.data.endDateTime).format(
-      "YYYY.MM.DD HH:mm:ss"
-    )
+    const newEndDateTime = moment(params.data.edt).format("YYYY.MM.DD HH:mm:ss")
     const newImpact = params.data.impact
 
     fetch("/api/reschedule/edit", {
@@ -488,7 +485,7 @@ const RescheduleGrid = ({ maintId, user, handleCalendarUpdate }) => {
                       data-enable-time
                       options={{ time_24hr: "true", allowInput: "true" }}
                       className="flatpickr end-date-time"
-                      value={reschedule.startDateTime || null}
+                      value={reschedule.sdt || null}
                       onChange={(date) =>
                         handleRescheduleStartDateTimeChange(date)
                       }
@@ -500,7 +497,7 @@ const RescheduleGrid = ({ maintId, user, handleCalendarUpdate }) => {
                       data-enable-time
                       options={{ time_24hr: "true", allowInput: "true" }}
                       className="flatpickr end-date-time"
-                      value={reschedule.endDateTime || null}
+                      value={reschedule.edt || null}
                       onChange={(date) =>
                         handleRescheduleEndDateTimeChange(date)
                       }
