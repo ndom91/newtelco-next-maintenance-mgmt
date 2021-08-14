@@ -3,7 +3,15 @@ import prisma from "../../../lib/prisma"
 export default async function handle(req, res) {
   const { query, body, method } = req
 
-  if (method === "POST") {
+  if (method === "GET") {
+    // GET /api/settings/freeze
+    const freeze = await prisma.freeze.findMany({
+      include: {
+        company: true,
+      },
+    })
+    res.status(200).json(freeze)
+  } else if (method === "POST") {
     // POST /api/settings/freeze
     const { companyid, startDateTime, endDateTime, notes } = body
     const freeze = await prisma.freeze.create({

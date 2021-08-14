@@ -53,7 +53,7 @@ const Freeze = () => {
       },
       {
         headerName: "Company",
-        field: "name",
+        field: "company.name",
         width: 200,
         editable: false,
       },
@@ -85,11 +85,11 @@ const Freeze = () => {
   }
 
   useEffect(() => {
-    fetch("/api/freeze")
+    fetch("/api/settings/freeze")
       .then((resp) => resp.json())
       .then((data) => {
         gridApi.current.hideOverlay()
-        setRowData(data.freezeQuery)
+        setRowData(data)
       })
       .catch((err) => console.error(err))
     // fill Companies Select
@@ -390,20 +390,6 @@ const Freeze = () => {
       )}
     </div>
   )
-}
-
-Freeze.getInitialProps = async ({ req }) => {
-  const host = req && (req.headers["x-forwarded-host"] ?? req.headers["host"])
-  let protocol = "https:"
-  if (host.indexOf("localhost") > -1) {
-    protocol = "http:"
-  }
-  const pageRequest = `${protocol}//${host}/api/settings/freeze`
-  const res = await fetch(pageRequest)
-  const json = await res.json()
-  return {
-    jsonData: json,
-  }
 }
 
 export default Freeze
