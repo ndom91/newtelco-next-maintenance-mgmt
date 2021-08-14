@@ -54,11 +54,11 @@ model Freeze {
 
 model CustomerCircuit {
   id           Int    @id @default(autoincrement())
-  lieferantCID Int
-  lieferant    SupplierCircuit @relation(fields: [lieferantCID], references: [id])
+  lieferantCID Int?
+  lieferant    SupplierCircuit? @relation(fields: [lieferantCID], references: [id])
   kundenCID    String @db.VarChar(1700)
   protected    String @db.VarChar(16)
-  companyId        Int    @map("kunde")
+  companyId    Int    @map("kunde")
   kundeCompany Company @relation(fields: [companyId], references: [id])
 
   @@index([companyId], name: "kunde")

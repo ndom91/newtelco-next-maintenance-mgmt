@@ -15,7 +15,11 @@ import tzOptions from "@/newtelco/maintenance/timezoneOptions"
 import MailEditor from "@/newtelco/maintenance/mailEditor"
 import CommentList from "@/newtelco/maintenance/comments/list"
 import RescheduleGrid from "@/newtelco/maintenance/reschedule"
-import { getUnique, convertDateTime } from "@/newtelco/maintenance/helper"
+import {
+  getUnique,
+  convertDateTime,
+  flattenObject,
+} from "@/newtelco/maintenance/helper"
 
 import Notify from "@/newtelco-utils/notification"
 import objDiff from "@/newtelco-utils/objdiff"
@@ -519,8 +523,8 @@ const Maintenance = ({ session, serverData, suppliers }) => {
       gridApi.current.hideOverlay()
       return
     }
-    fetch("/api/customercids/maint", {
-      method: "post",
+    fetch("/api/settings/customercids", {
+      method: "POST",
       body: JSON.stringify({
         cids: lieferantCidId,
       }),
@@ -535,11 +539,12 @@ const Maintenance = ({ session, serverData, suppliers }) => {
         if (maintenance.done) {
           currentSentStatus = 1
         }
-        const kundencids = data.kundenCIDsResult
-        kundencids.forEach((cid) => {
-          cid.sent = currentSentStatus
-          cid.frozen = false
-          cid.protected = !!+cid.protected
+        const kundencids = data.map((cid) => {
+          const returnCid = flattenObject(cid)
+          returnCid.sent = currentSentStatus
+          returnCid.frozen = false
+          returnCid.protected = !!+cid.protected
+          return returnCid
         })
         const uniqueKundenCids = getUnique(kundencids, "kundenCID")
         setCustomerCids(uniqueKundenCids)

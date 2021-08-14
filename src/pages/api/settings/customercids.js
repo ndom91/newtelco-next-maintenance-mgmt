@@ -2,8 +2,45 @@ import prisma from "../../../lib/prisma"
 
 export default async function handle(req, res) {
   const { query, body, method } = req
+  const { cids } = body
 
-  if (method === "POST") {
+  if (method === "GET") {
+    // GET /api/settings/customercids
+    const customerCids = await prisma.customerCircuit.findMany({
+      include: {
+        kundeCompany: true,
+        lieferant: true,
+      },
+    })
+    res.status(200).json(customerCids)
+  } else if (method === "POST" && cids) {
+    // POST /api/settings/customercids { cids: ["..."] }
+    const customerCircuit = await prisma.supplierCircuit.findMany({
+      where: {
+        id: {
+          in: cids,
+        },
+      },
+      select: {
+        id: true,
+        derenCID: true,
+        kundenCID: {
+          select: {
+            protected: true,
+            kundenCID: true,
+            companyId: true,
+          },
+        },
+        company: {
+          select: {
+            name: true,
+            maintenanceRecipient: true,
+          },
+        },
+      },
+    })
+    res.status(200).json(customerCircuit)
+  } else if (method === "POST") {
     // POST /api/settings/customercids
     const { customercid, company, protection, supplier } = body
     const customerCircuit = await prisma.customerCircuit.create({

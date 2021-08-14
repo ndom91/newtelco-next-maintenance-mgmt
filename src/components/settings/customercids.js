@@ -48,7 +48,7 @@ const CustomerCIDs = () => {
       {
         headerName: "ID",
         field: "id",
-        width: 60,
+        width: 80,
         editable: false,
       },
       {
@@ -58,14 +58,14 @@ const CustomerCIDs = () => {
       },
       {
         headerName: "Customer",
-        field: "name",
+        field: "kundeCompany.name",
         width: 200,
         // sort: { direction: 'asc', priority: 0 },
         editable: false,
       },
       {
         headerName: "Their CID",
-        field: "derenCID",
+        field: "lieferant.derenCID",
         width: 200,
         editable: false,
       },
@@ -93,11 +93,11 @@ const CustomerCIDs = () => {
   }
 
   useEffect(() => {
-    fetch("/api/customercids")
+    fetch("/api/settings/customercids")
       .then((resp) => resp.json())
       .then((data) => {
         gridApi.current.hideOverlay()
-        setRowData(data.customercids)
+        setRowData(data)
       })
       .catch((err) => console.error(err))
     // fill Companies Select
@@ -184,7 +184,7 @@ const CustomerCIDs = () => {
       body: JSON.stringify({
         customercid: newNewtelcoCid,
         company: newCompanySelection.value,
-        protection: newProtection,
+        protection: newProtection ? "1" : "0",
         supplier: newSupplierSelection.value,
       }),
     })
