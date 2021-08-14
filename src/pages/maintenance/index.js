@@ -804,9 +804,17 @@ const Maintenance = ({ session, serverData, suppliers }) => {
             const user = session.user.email
             const action = "sent to"
             const field = activeCustomer.name
-            fetch(
-              `/api/history?mid=${maintId}&user=${user}&field=${field}&action=${action}`
-            ).catch((err) => console.error(`Error updating Audit Log - ${err}`))
+            fetch(`/api/changelog`, {
+              method: "POST",
+              body: JSON.stringify({
+                maintId,
+                user,
+                field,
+                action,
+              }),
+            }).catch((err) =>
+              console.error(`Error updating Audit Log - ${err}`)
+            )
           }
         } else {
           Notify("error", "Error Sending Mail")
