@@ -12,7 +12,9 @@
     "prettier:fix": "prettier --write \"src/**/*.{js,jsx,json}\"",
     "cy:open": "cypress open",
     "cy:run": "cypress run",
-    "cy:ci": "cypress run --record"
+    "cy:ci": "cypress run --record",
+    "prisma:generate": "npx --no-install prisma generate",
+    "prisma:studio": "npx --no-install prisma studio"
   },
   "keywords": [
     "nextjs",

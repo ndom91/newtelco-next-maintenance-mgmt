@@ -136,4 +136,5 @@ model Reschedule {
   active        Boolean  @default(false)
   sent          Int      @default(0) @db.TinyInt
   @@map("reschedule")
+  @@unique([maintenanceid, rcounter])
 }
