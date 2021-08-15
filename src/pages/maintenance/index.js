@@ -427,15 +427,15 @@ const Maintenance = ({ session, serverData, suppliers }) => {
         0,
         session.user.email.indexOf("@")
       )
-      fetch(`/api/companies/domain?id=${serverData.profile.name}`)
+      fetch(`/api/companies?domain=${serverData.profile.name}`)
         .then((resp) => resp.json())
         .then((data) => {
-          if (!data.companyResults[0]) {
+          if (!data[0]) {
             fetchSupplierCids()
             return
           }
-          const companyId = data.companyResults[0].id
-          const companyName = data.companyResults[0].name
+          const companyId = data[0].id
+          const companyName = data[0].name
           setMaintenance({
             ...serverData.profile,
             name: companyName,
