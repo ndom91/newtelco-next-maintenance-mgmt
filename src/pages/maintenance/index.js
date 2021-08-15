@@ -1400,9 +1400,8 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                 setMaintenance({
                   ...maintenance,
                   lieferant: option,
-                  name: suppliers.companies.find(
-                    (options) => options.value === option
-                  ).label,
+                  name: suppliers.find((options) => options.value === option)
+                    .label,
                 })
                 setSupplierCids(data.lieferantCIDsResult)
                 setCustomerCids([])
@@ -1412,7 +1411,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
             form.setFieldValue(field.name, option)
             form.setFieldValue("supplierCids", [])
           }}
-          data={suppliers?.companies ?? []}
+          data={suppliers ?? []}
           placeholder="Please select a Supplier"
         />
       )
@@ -2133,7 +2132,7 @@ export async function getServerSideProps({ req, query }) {
   if (host.indexOf("localhost") > -1) {
     protocol = "http:"
   }
-  const res2 = await fetch(`${protocol}//${host}/api/companies/selectmaint`)
+  const res2 = await fetch(`${protocol}//${host}/api/companies?select=true`)
   const suppliers = await res2.json()
   if (query.id === "NEW") {
     return {

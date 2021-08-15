@@ -9,8 +9,8 @@ export default async function handle(req, res) {
     const company = await prisma.company.create({
       data: {
         name,
-        mailDomain: domain,
-        maintenanceRecipient: recipient,
+        maildomain: domain,
+        maintenancerecipient: recipient,
       },
     })
     res.status(200).json(company)
@@ -20,8 +20,8 @@ export default async function handle(req, res) {
     const company = await prisma.company.update({
       data: {
         name,
-        mailDomain: domain,
-        maintenanceRecipient: recipient,
+        maildomain: domain,
+        maintenancerecipient: recipient,
       },
       where: {
         id,

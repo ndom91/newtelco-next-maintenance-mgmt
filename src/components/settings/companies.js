@@ -71,7 +71,7 @@ const Companies = () => {
     fetch("/api/companies")
       .then((resp) => resp.json())
       .then((data) => {
-        setRowData(data.companies)
+        setRowData(data)
         gridApi.current.hideOverlay()
       })
       .catch((err) => console.error(err))

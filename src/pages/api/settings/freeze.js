@@ -21,8 +21,8 @@ export default async function handle(req, res) {
             id: companyid,
           },
         },
-        startDateTime,
-        endDateTime,
+        startdatetime: startDateTime,
+        enddatetime: endDateTime,
         notes,
       },
     })
@@ -32,8 +32,8 @@ export default async function handle(req, res) {
     const { id, startdate, enddate, notes } = body
     const freeze = await prisma.freeze.update({
       data: {
-        startDateTime: startdate,
-        endDateTime: enddate,
+        startdatetime: startdate,
+        enddatetime: enddate,
         notes,
       },
       where: {

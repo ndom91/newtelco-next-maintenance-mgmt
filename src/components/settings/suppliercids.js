@@ -72,10 +72,10 @@ const SupplierCIDs = () => {
       })
       .catch((err) => console.error(err))
     // fill Companies Select
-    fetch("/api/companies/selectmaint")
+    fetch("/api/companies?select=true")
       .then((resp) => resp.json())
       .then((data) => {
-        setCompanySelections(data.companies)
+        setCompanySelections(data)
       })
       .catch((err) => console.error(`Error - ${err}`))
   }, [])

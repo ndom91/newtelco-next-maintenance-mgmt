@@ -215,6 +215,13 @@ const History = ({ session, data }) => {
 
   const handleToggleNewModal = () => {
     setOpenNewModal(!openNewModal)
+    if (!openNewModal && newMaintenanceInfo.length === 0) {
+      fetch("/api/companies?mail=true")
+        .then((resp) => resp.json())
+        .then((data) => {
+          setNewMaintenanceInfo(data)
+        })
+    }
   }
 
   const handleNewCompanySelect = (selectedOption) => {
@@ -255,15 +262,7 @@ const History = ({ session, data }) => {
     setOpenConfirmDeleteModal(!openConfirmDeleteModal)
   }
 
-  const handleSelectOpen = () => {
-    if (newMaintenanceInfo.length === 0) {
-      fetch("/api/companies/select")
-        .then((resp) => resp.json())
-        .then((data) => {
-          setNewMaintenanceInfo(data.companiesDomains)
-        })
-    }
-  }
+  const handleSelectOpen = () => {}
 
   const createNewMaintenance = (newCompanyDomain) => {
     Router.push({

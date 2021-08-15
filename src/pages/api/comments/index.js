@@ -8,7 +8,7 @@ export default async function handle(req, res) {
     const maintId = query.m
     const comments = await prisma.comment.findMany({
       where: {
-        maintId: parseInt(maintId),
+        maintid: parseInt(maintId),
       },
     })
 

@@ -195,10 +195,10 @@ const Companies = ({ session, suppliers, company }) => {
 
   const handleNewCompanySelect = (selectedOption) => {
     setSelectedNewCompany(selectedOption)
-    fetch(`/api/companies/maintenances?id=${selectedOption}`)
+    fetch(`/api/companies?maintId=${selectedOption}`)
       .then((resp) => resp.json())
       .then((data) => {
-        setRowData(data.maintenances)
+        setRowData(data)
       })
   }
 
@@ -213,7 +213,7 @@ const Companies = ({ session, suppliers, company }) => {
                 style={{ width: 325 }}
                 value={selectedNewCompany}
                 onChange={handleNewCompanySelect}
-                data={suppliers.companies}
+                data={suppliers}
                 placeholder="Please select a Company"
               />
               <ButtonGroup>
@@ -276,7 +276,7 @@ export async function getServerSideProps({ req, query }) {
   if (host.indexOf("localhost") > -1) {
     protocol = "http:"
   }
-  const res2 = await fetch(`${protocol}//${host}/api/companies/selectmaint`)
+  const res2 = await fetch(`${protocol}//${host}/api/companies?select=true`)
   const suppliers = await res2.json()
   return {
     props: {

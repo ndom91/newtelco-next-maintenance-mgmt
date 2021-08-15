@@ -45,14 +45,14 @@ export default async function handle(req, res) {
     const { customercid, company, protection, supplier } = body
     const customerCircuit = await prisma.customerCircuit.create({
       data: {
-        kundenCID: customercid,
+        kundencid: customercid,
         protected: protection,
         lieferant: {
           connect: {
             id: supplier,
           },
         },
-        kundeCompany: {
+        kundecompany: {
           connect: {
             id: company,
           },
@@ -65,7 +65,7 @@ export default async function handle(req, res) {
     const { id, customercid, protection } = body
     const customerCircuit = await prisma.customerCircuit.update({
       data: {
-        kundenCID: customercid,
+        kundencid: customercid,
         protected: protection.toString(),
       },
       where: {

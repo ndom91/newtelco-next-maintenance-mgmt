@@ -13,7 +13,7 @@ export default async function handle(req, res) {
             id: company,
           },
         },
-        derenCID: cid,
+        derencid: cid,
       },
     })
     res.status(200).json(supplierCircuit)
@@ -22,7 +22,7 @@ export default async function handle(req, res) {
     const { id, suppliercid } = body
     const supplierCircuit = await prisma.supplierCircuit.update({
       data: {
-        derenCID: suppliercid,
+        derencid: suppliercid,
       },
       where: {
         id,
