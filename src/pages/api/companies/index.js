@@ -16,6 +16,10 @@ export default async function handle(req, res) {
           },
         },
       },
+      // include: {
+      //   suppliercircuits: true,
+      //   lieferantcompany: true,
+      // },
       select: {
         id: true,
         sendermaintenanceid: true,

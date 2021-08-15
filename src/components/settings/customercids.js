@@ -53,19 +53,19 @@ const CustomerCIDs = () => {
       },
       {
         headerName: "Newtelco CID",
-        field: "kundenCID",
+        field: "kundencid",
         width: 200,
       },
       {
         headerName: "Customer",
-        field: "kundeCompany.name",
+        field: "kundecompany.name",
         width: 200,
         // sort: { direction: 'asc', priority: 0 },
         editable: false,
       },
       {
         headerName: "Their CID",
-        field: "lieferant.derenCID",
+        field: "lieferant.derencid",
         width: 200,
         editable: false,
       },
@@ -165,7 +165,7 @@ const CustomerCIDs = () => {
       const row = gridApi.current.getSelectedRows()
       if (row[0]) {
         const customerCidId = row[0].id
-        const customerCidName = row[0].kundenCID
+        const customerCidName = row[0].kundencid
         setOpenConfirmDeleteModal(!openConfirmDeleteModal)
         setCustomerCidIdToDelete(customerCidId)
         setCustomerNameToDelete(customerCidName)
@@ -199,8 +199,8 @@ const CustomerCIDs = () => {
         const newProtectionValue = newProtection ? "1" : "0"
         newRowData.push({
           id: data.id,
-          derenCID: newSupplierSelection.label,
-          kundenCID: newNewtelcoCid,
+          derencid: newSupplierSelection.label,
+          kundencid: newNewtelcoCid,
           name: newCompanySelection.label,
           protected: newProtectionValue || "0",
         })
@@ -216,9 +216,7 @@ const CustomerCIDs = () => {
   }
 
   const handleCellEdit = (params) => {
-    const id = params.data.id
-    const newCustomerCid = params.data.kundenCID
-    const newProtected = params.data.protected
+    const { id, kundencid, protected: protection } = params.data
 
     fetch(`/api/settings/customercids`, {
       method: "PUT",
@@ -226,15 +224,15 @@ const CustomerCIDs = () => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        id: id,
-        customercid: newCustomerCid,
-        protection: newProtected,
+        id,
+        kundencid,
+        protection,
       }),
     })
       .then((resp) => resp.json())
       .then((data) => {
         if (data.id) {
-          Notify("success", `${newCustomerCid} Updated`)
+          Notify("success", `${kundencid} Updated`)
         } else {
           Notify("warning", "Error", data.err)
         }

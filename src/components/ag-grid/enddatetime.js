@@ -3,7 +3,7 @@ import moment from "moment-timezone"
 
 export const EndDateTime = ({ node }) => {
   let dateTime
-  const nodeDateTime = node.data.endDateTime || node.data.edt
+  const nodeDateTime = node.data.enddatetime || node.data.edt
   if (isValid(new Date(nodeDateTime))) {
     const intDateTime = moment.tz(nodeDateTime, "GMT")
     const intDateTime2 = intDateTime.tz("Etc/GMT-2")

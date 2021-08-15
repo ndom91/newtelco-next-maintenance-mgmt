@@ -62,29 +62,29 @@ const Companies = ({ session, suppliers, company }) => {
       },
       {
         headerName: "Sender Maint ID",
-        field: "senderMaintenanceId",
+        field: "sendermaintenanceid",
         tooltipField: "senderMaintenanceId",
       },
-      {
-        headerName: "Their CID",
-        field: "derenCID",
-        tooltipField: "derenCID",
-      },
+      // {
+      //   headerName: "Their CID",
+      //   field: "derencid",
+      //   tooltipField: "derenCID",
+      // },
       {
         headerName: "Start",
-        field: "startDateTime",
+        field: "startdatetime",
         width: 160,
-        cellRenderer: "startdateTime",
+        cellRenderer: "startdatetime",
       },
       {
         headerName: "End",
-        field: "endDateTime",
+        field: "enddatetime",
         width: 160,
-        cellRenderer: "enddateTime",
+        cellRenderer: "enddatetime",
       },
       {
         headerName: "Newtelco CIDs",
-        field: "betroffeneCIDs",
+        field: "betroffenecids",
         tooltipField: "betroffeneCIDs",
       },
       {
@@ -94,7 +94,7 @@ const Companies = ({ session, suppliers, company }) => {
       },
       {
         headerName: "Updated",
-        field: "updatedAt",
+        field: "updatedat",
         cellRenderer: "updatedAt",
       },
       {
@@ -120,8 +120,8 @@ const Companies = ({ session, suppliers, company }) => {
     context: { componentParent: this },
     frameworkComponents: {
       editBtn: EditBtn,
-      startdateTime: StartDateTime,
-      enddateTime: EndDateTime,
+      startdatetime: StartDateTime,
+      enddatetime: EndDateTime,
       mailArrived: MailArrived,
       updatedAt: UpdatedAt,
       maintId: MaintId,

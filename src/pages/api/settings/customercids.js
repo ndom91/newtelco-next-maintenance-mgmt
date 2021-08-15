@@ -8,7 +8,7 @@ export default async function handle(req, res) {
     // GET /api/settings/customercids
     const customerCids = await prisma.customerCircuit.findMany({
       include: {
-        kundeCompany: true,
+        kundecompany: true,
         lieferant: true,
       },
     })
@@ -23,18 +23,18 @@ export default async function handle(req, res) {
       },
       select: {
         id: true,
-        derenCID: true,
-        kundenCID: {
+        derencid: true,
+        kundencid: {
           select: {
             protected: true,
-            kundenCID: true,
-            companyId: true,
+            kundencid: true,
+            companyid: true,
           },
         },
         company: {
           select: {
             name: true,
-            maintenanceRecipient: true,
+            maintenancerecipient: true,
           },
         },
       },
@@ -62,10 +62,10 @@ export default async function handle(req, res) {
     res.status(200).json(customerCircuit)
   } else if (method === "PUT") {
     // PUT /api/settings/customercids
-    const { id, customercid, protection } = body
+    const { id, kundencid, protection } = body
     const customerCircuit = await prisma.customerCircuit.update({
       data: {
-        kundencid: customercid,
+        kundencid,
         protected: protection.toString(),
       },
       where: {

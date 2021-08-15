@@ -37,7 +37,7 @@ const Companies = () => {
       },
       {
         headerName: "Domain",
-        field: "mailDomain",
+        field: "maildomain",
         width: 100,
       },
       {
@@ -48,7 +48,7 @@ const Companies = () => {
       },
       {
         headerName: "Recipient",
-        field: "maintenanceRecipient",
+        field: "maintenancerecipient",
       },
     ],
     rowSelection: "single",
@@ -154,10 +154,7 @@ const Companies = () => {
   }
 
   const handleCellEdit = (params) => {
-    const id = params.data.id
-    const newName = params.data.name
-    const newDomain = params.data.mailDomain
-    const newRecipient = params.data.maintenanceRecipient
+    const { id, name, mailDomain, maintenanceRecipient } = params.data
 
     fetch(`/api/settings/companies`, {
       method: "PUT",
@@ -165,10 +162,10 @@ const Companies = () => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        id: id,
-        name: newName,
-        domain: newDomain,
-        recipient: newRecipient,
+        id,
+        name,
+        domain: mailDomain,
+        recipient: maintenanceRecipient,
       }),
     })
       .then((resp) => resp.json())

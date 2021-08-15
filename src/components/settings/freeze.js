@@ -59,13 +59,13 @@ const Freeze = () => {
       },
       {
         headerName: "Start Date",
-        field: "startDateTime",
+        field: "startdatetime",
         width: 200,
         cellRenderer: "startdateTime",
       },
       {
         headerName: "End Date",
-        field: "endDateTime",
+        field: "enddatetime",
         width: 200,
         cellRenderer: "enddateTime",
       },
@@ -151,11 +151,9 @@ const Freeze = () => {
     if (gridApi.current) {
       const row = gridApi.current.getSelectedRows()
       if (row[0]) {
-        const freezeId = row[0].id
-        const freezeCompany = row[0].name
         setOpenConfirmDelete(!openConfirmDeleteModal)
-        setFreezeIdToDelete(freezeId)
-        setFreezeCompanyToDelete(freezeCompany)
+        setFreezeIdToDelete(row[0].id)
+        setFreezeCompanyToDelete(row[0].company.name)
       } else {
         Notify("warning", "Please select a freeze")
       }
@@ -170,8 +168,8 @@ const Freeze = () => {
       },
       body: JSON.stringify({
         companyid: newCompany.value,
-        startDateTime: new Date(newStartDateTime).toISOString(),
-        endDateTime: new Date(newEndDateTime).toISOString(),
+        startdatetime: new Date(newStartDateTime).toISOString(),
+        enddatetime: new Date(newEndDateTime).toISOString(),
         notes: newNotes,
       }),
     })
@@ -185,10 +183,13 @@ const Freeze = () => {
         const newRowData = rowData
         newRowData.push({
           id: data.id,
-          name: newCompany.label,
-          companyId: newCompany.value,
-          startDateTime: newStartDateTime,
-          endDateTime: newEndDateTime,
+          company: {
+            name: newCompany.label,
+            id: newCompany.value,
+          },
+          companyid: newCompany.value,
+          startdatetime: newStartDateTime,
+          enddatetime: newEndDateTime,
           notes: newNotes,
         })
         setRowData(newRowData)
@@ -197,6 +198,7 @@ const Freeze = () => {
           value: "",
           label: "",
         })
+        setNewNotes("")
         setNewStartDateTime()
         setNewEndDateTime()
         gridApi.current.setRowData(newRowData)
@@ -206,10 +208,10 @@ const Freeze = () => {
 
   const handleCellEdit = (params) => {
     const id = params.data.id
-    const startdate = moment(params.data.startDateTime).format(
+    const startdate = moment(params.data.startdatetime).format(
       "YYYY.MM.DD HH:mm:ss"
     )
-    const enddate = moment(params.data.endDateTime).format(
+    const enddate = moment(params.data.enddatetime).format(
       "YYYY.MM.DD HH:mm:ss"
     )
     const notes = params.data.notes
@@ -229,7 +231,7 @@ const Freeze = () => {
       .then((resp) => resp.json())
       .then((data) => {
         if (data.id) {
-          Notify("success", `${params.data.name} Freeze Updated`)
+          Notify("success", `${params.data.company.name} Freeze Updated`)
         } else {
           Notify("warning", "Error", data.err)
         }

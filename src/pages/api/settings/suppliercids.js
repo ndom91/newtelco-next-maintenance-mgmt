@@ -3,7 +3,14 @@ import prisma from "../../../lib/prisma"
 export default async function handle(req, res) {
   const { query, body, method } = req
 
-  if (method === "POST") {
+  if (method === "GET") {
+    const supplierCircuit = await prisma.supplierCircuit.findMany({
+      include: {
+        company: true,
+      },
+    })
+    res.status(200).json(supplierCircuit)
+  } else if (method === "POST") {
     // POST /api/settings/suppliercids
     const { company, cid } = body
     const supplierCircuit = await prisma.supplierCircuit.create({
@@ -39,7 +46,7 @@ export default async function handle(req, res) {
     })
     res.status(200).json(supplierCircuit)
   } else {
-    res.setHeader("Allow", ["PUT", "POST", "DELETE"])
+    res.setHeader("Allow", ["PUT", "GET", "POST", "DELETE"])
     res.status(405).end(`Method ${method} Not Allowed`)
   }
 }

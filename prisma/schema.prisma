@@ -63,19 +63,19 @@ model CustomerCircuit {
 
   @@index([companyId], name: "kunde")
   @@index([lieferantcid], name: "lieferantCID")
-  @@map("kundenCID")
+  @@map("kundencid")
 }
 
 model SupplierCircuit {
   id        Int    @id @default(autoincrement())
-  companyId Int    @map("lieferant")
-  company   Company   @relation(fields: [companyId], references: [id])
+  companyId Int?    @map("lieferant")
+  company   Company?   @relation(fields: [companyId], references: [id])
   derencid  String    @db.VarChar(128)
   kundencid CustomerCircuit[]
   maintenance Maintenance[]
 
   @@index([companyId], name: "lieferant")
-  @@map("lieferantCID")
+  @@map("lieferantcid")
 }
 
 model Maintenance {
@@ -84,10 +84,9 @@ model Maintenance {
   sendermaintenanceid String?   @db.VarChar(256)
   receivedmail        String?   @db.VarChar(256)
   bearbeitetvon       String?   @db.VarChar(128)
-  companyid           Int    @map("lieferant")
+  companyid           Int       @map("lieferant")
   lieferantcompany    Company   @relation(fields: [companyid], references: [id])
-  // derencidid          String    @db.VarChar(256) // Array of LieferantCID's i.e. "[12,48,38]"
-  derencidid          Int[]     // Array of LieferantCID's i.e. "[12,48,38]"
+  derencidid          Int[]     // Array of LieferantCID's i.e. "{12,48,38}"
   suppliercircuits    SupplierCircuit @relation(fields: [derencidid], references: [id])
   startdatetime       DateTime? @db.Timestamptz(6)
   enddatetime         DateTime? @db.Timestamptz(6)
