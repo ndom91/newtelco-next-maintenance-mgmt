@@ -20,7 +20,7 @@ export default async function handle(req, res) {
   } else if (method === "GET" && query.maintId) {
     const companies = await prisma.maintenance.findMany({
       where: {
-        lieferantcompany: {
+        suppliercompany: {
           is: {
             id: parseInt(query.maintId),
           },
@@ -28,7 +28,7 @@ export default async function handle(req, res) {
       },
       // include: {
       //   suppliercircuits: true,
-      //   lieferantcompany: true,
+      //   suppliercompany: true,
       // },
       select: {
         id: true,
@@ -48,7 +48,7 @@ export default async function handle(req, res) {
         cancelled: true,
         emergency: true,
         rescheduled: true,
-        lieferantcompany: {
+        suppliercompany: {
           select: {
             maildomain: true,
             name: true,

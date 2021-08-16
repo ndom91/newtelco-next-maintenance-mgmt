@@ -25,10 +25,8 @@ export default async function handle(req, res) {
         id: true,
         derencid: true,
         kundencid: {
-          select: {
-            protected: true,
-            kundencid: true,
-            companyid: true,
+          include: {
+            kundecompany: true,
           },
         },
         company: {

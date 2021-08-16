@@ -1,15 +1,170 @@
-const db = require("../../../lib/db")
-const escape = require("sql-template-strings")
+import prisma from "../../../lib/prisma"
 
-module.exports = async (req, res) => {
-  const maintenances = await db.query(escape`
-      SELECT maintenancedb.id, maintenancedb.maileingang, maintenancedb.senderMaintenanceId, maintenancedb.receivedmail, companies.name, lieferantCID.derenCID, maintenancedb.bearbeitetvon, maintenancedb.betroffeneKunden, DATE_FORMAT(maintenancedb.startDateTime, "%Y-%m-%d %H:%i:%S") as startDateTime, DATE_FORMAT(maintenancedb.endDateTime, "%Y-%m-%d %H:%i:%S") as endDateTime, maintenancedb.postponed, maintenancedb.notes, maintenancedb.mailSentAt, maintenancedb.updatedAt, maintenancedb.betroffeneCIDs, maintenancedb.done, maintenancedb.cancelled, companies.mailDomain, maintenancedb.emergency, maintenancedb.rescheduled FROM maintenancedb LEFT JOIN lieferantCID ON maintenancedb.derenCIDid = lieferantCID.id LEFT JOIN companies ON maintenancedb.lieferant = companies.id WHERE maintenancedb.active = 1
-    `)
-  const count = await db.query(escape`
-      SELECT COUNT(*)
-      AS maintenanceCount
-      FROM maintenancedb
-    `)
-  const { maintenancesCount } = count[0]
-  res.status(200).json({ maintenances, maintenancesCount })
+export default async function handle(req, res) {
+  const { query, body, method } = req
+  const { mid } = query
+
+  if (method === "GET" && mid) {
+    const maintenances = await prisma.maintenance.findUnique({
+      where: {
+        id: parseInt(mid),
+      },
+      include: {
+        suppliercompany: {
+          select: {
+            name: true,
+            maildomain: true,
+          },
+        },
+      },
+    })
+
+    res.status(200).json(maintenances)
+  } else if (method === "GET") {
+    const maintenances = await prisma.maintenance.findMany({
+      include: {
+        suppliercompany: {
+          select: {
+            name: true,
+            maildomain: true,
+          },
+        },
+      },
+    })
+
+    res.status(200).json(maintenances)
+  } else if (method === "DELETE") {
+    const { maintId } = query
+    const maintenanceInactive = await prisma.maintenance.update({
+      data: {
+        active: false,
+      },
+      where: {
+        id: parseInt(maintId),
+      },
+    })
+    res.status(200).json(maintenanceInactive)
+  } else if (method === "PUT") {
+    // const maintId = req.body.id
+    // const values = req.body.values
+    // const user = req.body.user
+    // const field = req.body.field
+    // const save = await db.query(escape`
+    //   UPDATE maintenancedb
+    //   SET
+    //     cancelled = ${values.cancelled},
+    //     senderMaintenanceId = ${values.senderMaintenanceId},
+    //     done = ${values.done},
+    //     emergency = ${values.emergency},
+    //     startDateTime = ${values.startDateTime},
+    //     endDateTime = ${values.endDateTime},
+    //     impact = ${values.impact || ""},
+    //     location = ${values.location || ""},
+    //     reason = ${values.reason || ""},
+    //     maintNote = ${values.maintNote || ""},
+    //     lieferant = ${values.supplier || ""},
+    //     derenCIDid = ${values.supplierCids ? values.supplierCids.join(",") : ""},
+    //     timezone = ${values.timezone || ""}
+    //   WHERE id LIKE ${maintId}
+    // `)
+    // const fieldName = {
+    //   cancelled: "cancelled",
+    //   done: "done",
+    //   emergency: "emergency",
+    //   startDateTime: "start date/time",
+    //   endDateTime: "end date/time",
+    //   impact: "impact",
+    //   location: "location",
+    //   reason: "reason",
+    //   maintNote: "notes",
+    //   supplier: "supplier",
+    //   supplierCids: "supplier cids",
+    //   timezone: "timezone",
+    //   senderMaintenanceId: "sender maintenance id",
+    // }
+    // let updateHistory
+    // if (field) {
+    //   updateHistory = await db.query(
+    //     escape`INSERT INTO changelog (mid, user, action, field) VALUES (${maintId}, ${user}, 'changed', ${fieldName[field]});`
+    //   )
+    // }
+    // res.status(200).json({
+    //   saved: save.affectedRows === 1 ? true : save,
+    //   insertHistory: updateHistory?.affectedRows === 1,
+    //   maintId,
+    //   values,
+    // })
+    const { id, values, user, field } = body
+    const {
+      cancelled,
+      sendermaintenanceid,
+      done,
+      emergency,
+      startdatetime,
+      enddatetime,
+      impact,
+      location,
+      reason,
+      maintnote,
+      supplier,
+      suppliercids,
+      timezone,
+    } = values
+
+    const maintenanceSave = await prisma.maintenance.update({
+      data: {
+        cancelled,
+        sendermaintenanceid,
+        done,
+        emergency,
+        startdatetime,
+        enddatetime,
+        impact,
+        location,
+        reason,
+        maintnote,
+        supplier,
+        derencidid: suppliercids,
+        timezone,
+      },
+      where: {
+        id: parseInt(id),
+      },
+    })
+
+    const fieldName = {
+      cancelled: "cancelled",
+      done: "done",
+      emergency: "emergency",
+      startDateTime: "start date/time",
+      endDateTime: "end date/time",
+      impact: "impact",
+      location: "location",
+      reason: "reason",
+      maintNote: "notes",
+      supplier: "supplier",
+      supplierCids: "supplier cids",
+      timezone: "timezone",
+      senderMaintenanceId: "sender maintenance id",
+    }
+
+    // Insert Changelog
+    await prisma.changelog.create({
+      data: {
+        maintenance: {
+          connect: {
+            id: parseInt(mid),
+          },
+        },
+        user,
+        action: "changed",
+        field: fieldName[field],
+      },
+    })
+
+    res.status(200).json(maintenanceSave)
+  } else {
+    res.setHeader("Allow", ["GET", "PUT", "POST", "DELETE"])
+    res.status(405).end(`Method ${method} Not Allowed`)
+  }
 }

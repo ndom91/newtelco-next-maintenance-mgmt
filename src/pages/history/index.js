@@ -72,7 +72,7 @@ const History = ({ session, data }) => {
       },
       {
         headerName: "Supplier",
-        field: "name",
+        field: "suppliercompany.name",
         width: 240,
         cellRenderer: "supplier",
         cellStyle: () => {
@@ -85,29 +85,29 @@ const History = ({ session, data }) => {
       },
       {
         headerName: "Supplier CID",
-        field: "derenCID",
+        field: "derencid",
         tooltipField: "derenCID",
       },
       {
         headerName: "Sender Maint ID",
-        field: "senderMaintenanceId",
+        field: "sendermaintenanceid",
         tooltipField: "senderMaintenanceId",
       },
       {
         headerName: "Start",
-        field: "startDateTime",
+        field: "startdatetime",
         width: 160,
         cellRenderer: "startdateTime",
       },
       {
         headerName: "End",
-        field: "endDateTime",
+        field: "enddatetime",
         width: 160,
         cellRenderer: "enddateTime",
       },
       {
         headerName: "Newtelco CIDs",
-        field: "betroffeneCIDs",
+        field: "betroffenecids",
         tooltipField: "betroffeneCIDs",
       },
       {
@@ -117,7 +117,7 @@ const History = ({ session, data }) => {
       },
       {
         headerName: "Last Updated",
-        field: "updatedAt",
+        field: "updatedat",
         cellRenderer: "updatedAt",
       },
       {
@@ -189,7 +189,7 @@ const History = ({ session, data }) => {
   const [openNewModal, setOpenNewModal] = useState(false)
   const [selectedNewCompany, setSelectedNewCompany] = useState("")
   const [openConfirmDeleteModal, setOpenConfirmDeleteModal] = useState(false)
-  const [rowData, setRowData] = useState(data.maintenances)
+  const [rowData, setRowData] = useState(data)
   const [newMaintenanceInfo, setNewMaintenanceInfo] = useState([])
   const [idToDelete, setIdToDelete] = useState("")
 
@@ -229,10 +229,12 @@ const History = ({ session, data }) => {
   }
 
   const handleDelete = () => {
-    fetch(`/api/maintenances/delete?maintId=${idToDelete}`)
+    fetch(`/api/maintenances?maintId=${idToDelete}`, {
+      method: "DELETE",
+    })
       .then((resp) => resp.json())
       .then((data) => {
-        if (data.status === 200 && data.statusText === "OK") {
+        if (data.id && data.active === false) {
           Notify("info", "Maintenance Deleted")
         } else {
           Notify("error", "Error Deleting Maintenance", data.err)

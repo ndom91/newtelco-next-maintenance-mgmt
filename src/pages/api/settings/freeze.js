@@ -51,7 +51,7 @@ export default async function handle(req, res) {
     })
     res.status(200).json(freeze)
   } else {
-    res.setHeader("Allow", ["PUT", "POST", "DELETE"])
+    res.setHeader("Allow", ["GET", "PUT", "POST", "DELETE"])
     res.status(405).end(`Method ${method} Not Allowed`)
   }
 }
