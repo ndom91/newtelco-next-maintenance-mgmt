@@ -44,56 +44,61 @@ export default async function handle(req, res) {
       },
     })
     res.status(200).json(maintenanceInactive)
-  } else if (method === "PUT") {
-    // const maintId = req.body.id
-    // const values = req.body.values
-    // const user = req.body.user
-    // const field = req.body.field
-    // const save = await db.query(escape`
-    //   UPDATE maintenancedb
-    //   SET
-    //     cancelled = ${values.cancelled},
-    //     senderMaintenanceId = ${values.senderMaintenanceId},
-    //     done = ${values.done},
-    //     emergency = ${values.emergency},
-    //     startDateTime = ${values.startDateTime},
-    //     endDateTime = ${values.endDateTime},
-    //     impact = ${values.impact || ""},
-    //     location = ${values.location || ""},
-    //     reason = ${values.reason || ""},
-    //     maintNote = ${values.maintNote || ""},
-    //     lieferant = ${values.supplier || ""},
-    //     derenCIDid = ${values.supplierCids ? values.supplierCids.join(",") : ""},
-    //     timezone = ${values.timezone || ""}
-    //   WHERE id LIKE ${maintId}
-    // `)
-    // const fieldName = {
-    //   cancelled: "cancelled",
-    //   done: "done",
-    //   emergency: "emergency",
-    //   startDateTime: "start date/time",
-    //   endDateTime: "end date/time",
-    //   impact: "impact",
-    //   location: "location",
-    //   reason: "reason",
-    //   maintNote: "notes",
-    //   supplier: "supplier",
-    //   supplierCids: "supplier cids",
-    //   timezone: "timezone",
-    //   senderMaintenanceId: "sender maintenance id",
-    // }
-    // let updateHistory
-    // if (field) {
-    //   updateHistory = await db.query(
-    //     escape`INSERT INTO changelog (mid, user, action, field) VALUES (${maintId}, ${user}, 'changed', ${fieldName[field]});`
+  } else if (method === "POST") {
+    // const bearbeitetvon = req.body.bearbeitetvon
+    // const lieferant = req.body.lieferant
+    // const mailId = req.body.mailId
+    // const updatedAt = req.body.updatedAt
+    // const incomingMailDate = req.body.maileingang
+
+    // const insertQuery = await db.query(
+    //   escape`INSERT INTO maintenancedb (bearbeitetvon, receivedmail, lieferant, updatedAt, maileingang) VALUES (${bearbeitetvon}, ${mailId}, ${lieferant}, ${updatedAt}, ${incomingMailDate});`
+    // )
+    // const getLastInsertedID = await db.query("SELECT LAST_INSERT_ID();")
+    // const newId = getLastInsertedID[0]
+
+    // if (insertQuery.affectedRows >= 1) {
+    //   const updateHistory = await db.query(
+    //     escape`INSERT INTO changelog (mid, user, action) VALUES (${newId["LAST_INSERT_ID()"]}, ${bearbeitetvon}, 'created');`
     //   )
+    //   res.status(200).json({
+    //     statusText: "OK",
+    //     status: 200,
+    //     newId: newId,
+    //     update: updateHistory,
+    //   })
+    // } else {
+    //   res
+    //     .status(200)
+    //     .json({ statusText: "FAIL", status: 500, err: "Save Failed" })
     // }
-    // res.status(200).json({
-    //   saved: save.affectedRows === 1 ? true : save,
-    //   insertHistory: updateHistory?.affectedRows === 1,
-    //   maintId,
-    //   values,
-    // })
+    const { bearbeitetvon, lieferant, mailid, updatedat, maileingang } = body
+    const maintenanceCreate = await prisma.maintenance.create({
+      data: {
+        bearbeitetvon,
+        receivedmail: mailid,
+        supplierid: lieferant,
+        updatedat,
+        maileingang,
+      },
+      include: {
+        suppliercompany: true,
+      },
+    })
+    // Insert Changelog
+    await prisma.changelog.create({
+      data: {
+        maintenance: {
+          connect: {
+            id: maintenanceCreate.id,
+          },
+        },
+        user: bearbeitetvon,
+        action: "created",
+      },
+    })
+    res.status(200).json(maintenanceCreate)
+  } else if (method === "PUT") {
     const { id, values, user, field } = body
     const {
       cancelled,
@@ -123,7 +128,7 @@ export default async function handle(req, res) {
         location,
         reason,
         maintnote,
-        supplier,
+        supplierid: supplier,
         derencidid: suppliercids,
         timezone,
       },
@@ -153,7 +158,7 @@ export default async function handle(req, res) {
       data: {
         maintenance: {
           connect: {
-            id: parseInt(mid),
+            id: parseInt(id),
           },
         },
         user,

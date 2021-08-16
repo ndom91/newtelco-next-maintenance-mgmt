@@ -244,7 +244,11 @@ const AutoSave = ({ debounceMs, id }) => {
 const Maintenance = ({ session, serverData, suppliers }) => {
   const rescheduleData = useStore((state) => state.rescheduleData)
 
-  const [maintenance, setMaintenance] = useState(serverData)
+  const [maintenance, setMaintenance] = useState({
+    ...serverData,
+    name: serverData.suppliercompany?.name ?? "",
+    maildomain: serverData.suppliercompany?.maildomain ?? "",
+  })
   const [frozenCompany, setFrozenCompany] = useState("")
   const [openReadModal, setOpenReadModal] = useState(false)
   const [openPreviewModal, setOpenPreviewModal] = useState(false)
@@ -259,7 +263,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
   const [sentProgress, setSentProgress] = useState(0)
   const [activeTab, setActiveTab] = useState("customer")
   const [maintHistory, setMaintHistory] = useState({
-    timezone: serverData?.timezone || undefined,
+    timezone: serverData?.timezone || null,
     supplier: serverData?.supplierid,
     sendermaintenanceid: serverData?.sendermaintenanceid,
     startdatetime: serverData?.startdatetime,
@@ -450,6 +454,8 @@ const Maintenance = ({ session, serverData, suppliers }) => {
 
       setMaintenance({
         ...serverData,
+        name: serverData.suppliercompany.name,
+        maildomain: serverData.suppliercompany.maildomain,
         cancelled: !!+cancelled,
         emergency: !!+emergency,
         done: !!+done,
@@ -571,10 +577,10 @@ const Maintenance = ({ session, serverData, suppliers }) => {
         body: JSON.stringify({
           companys: [...new Set(uniqueCustomers)],
           startdate: moment
-            .tz(maintenance.startDateTime, maintenance.timezone)
+            .tz(maintenance.startdatetime, maintenance.timezone)
             .format(),
           enddate: moment
-            .tz(maintenance.endDateTime, maintenance.timezone)
+            .tz(maintenance.enddatetime, maintenance.timezone)
             .format(),
         }),
         headers: {
@@ -1078,14 +1084,14 @@ const Maintenance = ({ session, serverData, suppliers }) => {
       "yyyy-MM-dd HH:mm:ss"
     )
 
-    fetch("/api/maintenances/save/create", {
-      method: "post",
+    fetch("/api/maintenances", {
+      method: "POST",
       body: JSON.stringify({
         bearbeitetvon,
         lieferant,
-        mailId,
-        updatedAt: updatedAtFormatted,
-        maileingang: incomingFormatted,
+        mailid: mailId,
+        updatedat: moment(updatedAtFormatted).format(),
+        maileingang: moment(incomingFormatted).format(),
       }),
       headers: {
         "Content-Type": "application/json",
@@ -1093,13 +1099,17 @@ const Maintenance = ({ session, serverData, suppliers }) => {
     })
       .then((resp) => resp.json())
       .then((data) => {
-        const newId = data.newId["LAST_INSERT_ID()"]
-        const newMaint = { ...maintenance, id: newId }
+        const newMaint = {
+          ...maintenance,
+          id: data.id,
+          name: data.suppliercompany.name,
+          maildomain: data.suppliercompany.maildomain,
+        }
         setMaintenance(newMaint)
-        const newLocation = `/maintenance?id=${newId}`
+        const newLocation = `/maintenance?id=${data.id}`
         router.push(newLocation, newLocation, { shallow: false })
 
-        if (data.status === 200 && data.statusText === "OK") {
+        if (data.id) {
           Notify("success", "Create Success")
         } else {
           Notify("error", "Create Error", data.err)
@@ -1379,7 +1389,7 @@ const Maintenance = ({ session, serverData, suppliers }) => {
           value={
             tzOptions
               ? tzOptions.find((option) => option.value === field.value)
-              : ""
+              : null
           }
           onChange={(option) => form.setFieldValue(field.name, option.value)}
           className="timezone-select"
@@ -1534,9 +1544,9 @@ const Maintenance = ({ session, serverData, suppliers }) => {
                     validateOnChange={false}
                     validateOnBlur={false}
                     initialValues={{
-                      timezone: serverData.timezone,
+                      timezone: serverData.timezone || null,
                       sendermaintenanceid: serverData.sendermaintenanceid,
-                      supplier: serverData.lieferant,
+                      supplier: serverData.supplierid,
                       startdatetime: serverData.startdatetime,
                       enddatetime: serverData.enddatetime,
                       suppliercids: serverData.derencidid,
@@ -2139,8 +2149,10 @@ export async function getServerSideProps({ req, query }) {
   if (host.indexOf("localhost") > -1) {
     protocol = "http:"
   }
-  const res2 = await fetch(`${protocol}//${host}/api/companies?select=true`)
-  const suppliers = await res2.json()
+  const companiesResponse = await fetch(
+    `${protocol}//${host}/api/companies?select=true`
+  )
+  const suppliers = await companiesResponse.json()
   if (query.id === "NEW") {
     return {
       props: {
@@ -2150,10 +2162,10 @@ export async function getServerSideProps({ req, query }) {
       },
     }
   } else {
-    const res = await fetch(
+    const maintenanceRes = await fetch(
       `${protocol}//${host}/api/maintenances?mid=${query.id}`
     )
-    const serverData = await res.json()
+    const serverData = await maintenanceRes.json()
     return {
       props: {
         serverData,
