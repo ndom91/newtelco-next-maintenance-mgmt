@@ -72,7 +72,7 @@ model SupplierCircuit {
   company   Company?   @relation(fields: [companyId], references: [id])
   derencid  String     @db.VarChar(128)
   kundencid CustomerCircuit[]
-  maintenance Maintenance[]
+  maintenancesupplier MaintenanceSupplierCircuits[]
 
   @@index([companyId], name: "lieferant")
   @@map("lieferantcid")
@@ -86,8 +86,8 @@ model Maintenance {
   bearbeitetvon       String?          @db.VarChar(128)
   supplierid          Int              @map("lieferant")
   suppliercompany     Company?         @relation(fields: [supplierid], references: [id])
-  derencidid          Int[]            // Array of LieferantCID's i.e. "{12,48,38}"
-  suppliercircuits    SupplierCircuit? @relation(fields: [derencidid], references: [id])
+  // derencidid          Int[]            // Array of LieferantCID's i.e. "{12,48,38}"
+  // suppliercircuits    SupplierCircuit? @relation(fields: [derencidid], references: [id])
   startdatetime       DateTime?        @db.Timestamptz(6)
   enddatetime         DateTime?        @db.Timestamptz(6)
   timezone            String?          @db.VarChar(64)
@@ -114,9 +114,10 @@ model Maintenance {
   reschedules         Reschedule[]
   comments            Comment[]
   changelog           Changelog[]
+  maintenancesupplier MaintenanceSupplierCircuits[]
 
   @@index([bearbeitetvon], name: "bearbeitet")
-  @@index([derencidid], name: "index_derenCIDid")
+  // @@index([derencidid], name: "index_derenCIDid")
   @@index([supplierid], name: "index_lieferant")
   @@index([startdatetime, enddatetime], name: "startenddatetime")
   @@map("maintenancedb")
@@ -139,4 +140,14 @@ model Reschedule {
   sent          Int           @default(0) @db.SmallInt
   @@map("reschedule")
   @@unique([maintenanceid, rcounter])
+}
+
+model MaintenanceSupplierCircuits {
+  maintenance_id      Int
+  maintenance         Maintenance @relation(fields: [maintenance_id], references: [id])
+  suppliercircuits_id Int
+  suppliercircuit     SupplierCircuit @relation(fields: [suppliercircuits_id], references: [id])
+
+  @@id([maintenance_id, suppliercircuits_id])
+  @@map("maintenance_suppliercircuits")
 }

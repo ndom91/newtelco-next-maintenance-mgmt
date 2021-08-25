@@ -32,6 +32,7 @@ import {
 } from "rsuite"
 
 const History = ({ session, data }) => {
+  console.log(data)
   const gridOptions = {
     defaultColDef: {
       resizable: true,
