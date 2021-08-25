@@ -19,6 +19,7 @@ import {
   MailArrived,
   UpdatedAt,
   Supplier,
+  SupplierCidId,
   RescheduledIcon,
   CompleteIcon,
   EdittedBy,
@@ -32,7 +33,6 @@ import {
 } from "rsuite"
 
 const History = ({ session, data }) => {
-  console.log(data)
   const gridOptions = {
     defaultColDef: {
       resizable: true,
@@ -86,7 +86,8 @@ const History = ({ session, data }) => {
       },
       {
         headerName: "Supplier CID",
-        field: "derencid",
+        cellRenderer: "supplierCidId",
+        field: "maintenancesupplier",
         tooltipField: "derenCID",
       },
       {
@@ -153,6 +154,7 @@ const History = ({ session, data }) => {
       mailArrived: MailArrived,
       updatedAt: UpdatedAt,
       supplier: Supplier,
+      supplierCidId: SupplierCidId,
       complete: CompleteIcon,
       edittedby: EdittedBy,
       rescheduledIcon: RescheduledIcon,

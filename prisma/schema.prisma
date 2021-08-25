@@ -117,7 +117,6 @@ model Maintenance {
   maintenancesupplier MaintenanceSupplierCircuits[]
 
   @@index([bearbeitetvon], name: "bearbeitet")
-  // @@index([derencidid], name: "index_derenCIDid")
   @@index([supplierid], name: "index_lieferant")
   @@index([startdatetime, enddatetime], name: "startenddatetime")
   @@map("maintenancedb")
@@ -143,11 +142,11 @@ model Reschedule {
 }
 
 model MaintenanceSupplierCircuits {
+  maintcircuitid      Int           @id @default(autoincrement())
   maintenance_id      Int
   maintenance         Maintenance @relation(fields: [maintenance_id], references: [id])
   suppliercircuits_id Int
   suppliercircuit     SupplierCircuit @relation(fields: [suppliercircuits_id], references: [id])
 
-  @@id([maintenance_id, suppliercircuits_id])
-  @@map("maintenance_suppliercircuits")
+  @@map("maintsuppliercircuits")
 }
