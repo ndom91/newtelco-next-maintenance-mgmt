@@ -31,8 +31,8 @@ const Heatmap = () => {
             data={data.maintenances}
             minValue={0}
             maxValue={10}
-            from={format(startOfYear(new Date()), "yyyy-LL-dd")}
-            to={format(subYears(startOfYear(new Date()), 1), "yyyy-LL-dd")}
+            to={format(startOfYear(new Date()), "yyyy-LL-dd")}
+            from={format(subYears(startOfYear(new Date()), 1), "yyyy-LL-dd")}
             emptyColor="#eeeeee"
             colors={["#C6E2BA", "#8DC574", "#67B246", "#5A9C3D"]}
             margin={{ top: 40, right: 40, bottom: 40, left: 40 }}
